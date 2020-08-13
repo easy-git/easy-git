@@ -3,10 +3,10 @@ const path = require('path');
 
 const hx = require('hbuilderx');
 
-const utils = require('./utils.js');
+const utils = require('../utils.js');
 const icon = require('./static.js');
 
-const MainView = require('./MainView.js');
+const MainView = require('./main.js');
 
 
 /**

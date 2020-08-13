@@ -1,11 +1,10 @@
 const hx = require("hbuilderx");
 
-const main = require("./src/main.js");
+const index = require("./src/index.js");
 const file = require('./src/file.js');
 
 
 let source = 'viewMenu';
-var n = 0;
 
 //该方法将在插件激活的时候调用
 function activate(context) {
@@ -20,20 +19,20 @@ function activate(context) {
     });
 
     // if (source == 'viewMenu') {
-    //     main.main('main',{}, FileView,context);
-    //     main.main('log',{}, LogView,context);
+    //     index.main('main',{}, FileView,context);
+    //     index.main('log',{}, LogView,context);
     // };
 
     // git file view
     let disposable = hx.commands.registerCommand('extension.EasyGitMain', (param) => {
         context.source = 'filesExplorer';
-        main.main('main',param, FileView, context);
+        index.main('main',param, FileView, context);
     });
 
     // git file log view
     let log = hx.commands.registerCommand('extension.EasyGitLog', (param) => {
         context.source = 'filesExplorer';
-        main.main('log',param, LogView, context);
+        index.main('log',param, LogView, context);
     });
 
     // about

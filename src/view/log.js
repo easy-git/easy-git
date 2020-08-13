@@ -3,7 +3,7 @@ const path = require('path');
 
 const hx = require('hbuilderx');
 
-const utils = require('./utils.js');
+const utils = require('../utils.js');
 const icon = require('./static.js');
 
 /**

@@ -3,11 +3,11 @@ const path = require('path');
 
 const hx = require('hbuilderx');
 
-const file = require('./file.js');
-let utils = require('./utils.js');
-const icon = require('./static.js');
+const file = require('../file.js');
+let utils = require('../utils.js');
 
-const html = require('./MainHtml.js')
+const icon = require('./static.js');
+const html = require('./mainHtml.js')
 
 /**
  * @description 显示webview

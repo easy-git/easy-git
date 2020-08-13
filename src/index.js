@@ -7,9 +7,9 @@ const spawn = require('cross-spawn');
 const file = require('./file.js');
 const utils = require('./utils.js');
 
-const MainView = require('./MainView.js');
-const LogView = require('./LogView.js');
-const initView = require('./initView.js');
+const MainView = require('./view/main.js');
+const LogView = require('./view/log.js');
+const initView = require('./view/init.js');
 
 /**
  * @description 检查是否安装了Git
@@ -77,7 +77,7 @@ async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, File
         });
         return;
     };
-    
+
     // 当焦点不再编辑器，从菜单【工具】【easy-git】【源代码管理】触发，此时param == null
     if (param == null) {
 
