@@ -37,7 +37,7 @@ function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
                 hx.commands.executeCommand('workbench.view.explorer');
                 break;
             case 'open':
-                hx.commands.executeCommand('workbench.action.files.openFile');
+                hx.commands.executeCommand('workbench.action.files.openFolder');
                 break;
             default:
                 break;
@@ -141,7 +141,7 @@ function generateLogHtml(userConfig, uiData, FilesExplorerProjectInfo) {
             <div id="app" v-cloak>
                 <div class="d-flex flex-column mt-3 mx-3" v-if="FoldersNum == 1 || currentSelect != undefined">
                     <div>
-                        <p class="d-block">当前选择的项目【 {{ projectInfo.FolderName }}】 没有 git 储存库。</p>
+                        <p class="d-block">当前选择的项目【 {{ projectInfo.FolderName }} 】 没有 git 储存库。</p>
                     </div>
                     <div>
                         <button class="btn-imp" @click.once="gitInit(projectInfo);">初始化存储库</button>

@@ -66,7 +66,7 @@ function checkFileList(GitStatusResult) {
  *   - 多个页面进入初始页面
  */
 async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo) {
-    console.log('viewType',viewType);
+    console.log('viewType',viewType, param);
     // 检查用户电脑Git环境是否正常
     let isInstall = isGitInstalled();
     if (!isInstall) {
@@ -87,7 +87,7 @@ async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, File
         if (FoldersNum == 1) {
             let {FolderName,FolderPath,isGit} = Folders[0];
             let isGitProject = isGit;
-
+            
             // 如果是git项目，直接打开
             if (isGitProject) {
                 let gitInfo = await utils.gitStatus(FolderPath);
@@ -101,6 +101,8 @@ async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, File
                 if (viewType == 'log') {
                     LogView.show(webviewPanel, userConfig, gitData);
                 };
+            } else {
+                initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
             };
         } else {
             // 非git项目，则进入初始化
