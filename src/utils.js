@@ -143,6 +143,45 @@ async function gitInit(projectPath,projectName) {
     }
 };
 
+/**
+ * @description clone
+ */
+async function gitClone(info,isAuth) {
+
+    let remote = '';
+    let {username, password, repo, branch, localPath} = info;
+
+    if (isAuth) {
+        if (repo.includes('https://') || repo.includes('https//')) {
+            repo = repo.replace(/(^http:\/\/|^https:\/\/)/, "");
+        };
+        repo = `http://${username}:${password}@${repo}`;
+    };
+
+    try{
+        let options = [localPath]
+        if (branch) {
+            let t = '-b ' + branch;
+            options.push(t);
+        }
+        let status = await git()
+            .clone(repo, options)
+            .then((res) => {
+                hx.window.showInformationMessage(`Git: 克隆仓库成功`,['我知道了']);
+                return 'success'
+            })
+            .catch((err) => {
+                let errMsg = "\n\n" + (err).toString();
+                createOutputChannel(`Git: 克隆仓库失败！`, errMsg);
+                return 'fail';
+            });
+        return status
+    } catch(e) {
+        hx.window.showErrorMessage(`Git: 克隆仓库异常！`, ['我知道了']);
+        return 'error';
+    };
+};
+
 
 /**
  * @description 获取git信息
@@ -857,6 +896,7 @@ module.exports = {
     getThemeColor,
     getFilesExplorerProjectInfo,
     gitInit,
+    gitClone,
     gitStatus,
     gitAdd,
     gitAddCommit,
