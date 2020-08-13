@@ -1,0 +1,15 @@
+# 文件的行尾自动转换。如果是文本文件，则在文件入Git库时，行尾自动转换为LF。如果已经在入Git库中的文件的行尾是GRLF，则文件在入Git库时，不再转换为LF。
+* text=auto
+
+LICENSE.txt eol=crlf
+ThirdPartyNotices.txt eol=crlf
+
+# 对于sh/bat文件，标记为文本文件，在文件入Git库时进行规范化，即行尾为LF。在检出到工作目录时，行尾也不会转换为CRLF（即保持LF）。
+*.sh eol=lf
+*.bat eol=crlf
+*.cmd eol=crlf
+
+# jar/ext/qm文件，当做二进制文件处理
+*.jar binary
+*.exe binary
+*.qm binary

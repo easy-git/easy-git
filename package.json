@@ -1,0 +1,151 @@
+{
+    "name": "easy-git",
+    "description": "easy-git HBuilderX内图形化Git工具",
+    "displayName": "【easy-git】Git源码管理",
+    "version": "0.0.3",
+    "publisher": "oneone",
+    "engines": {
+        "HBuilderX": "^2.8.3"
+    },
+    "categories": [
+        "Other"
+    ],
+    "main": "./extension",
+    "activationEvents": [
+        "onCommand:extension.EasyGitMain",
+        "onCommand:extension.EasyGitLog",
+        "onCommand:extension.AboutEasyGit",
+        "onCommand:extension.setEasyGit",
+        "onCommand:extension.EasyGitSetGitingore",
+        "onCommand:extension.EasyGitSetGitattributes",
+        "onView:EasyGitSourceCode",
+        "onView:EasyGitLog"
+    ],
+    "contributes": {
+        "configuration": {
+            "title": "easy-git - Git源码管理",
+            "properties": {
+                "EasyGit.AlwaysAutoAddCommit": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。"
+                },
+                "EasyGit.DisableDevTools": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Git视图页面, 禁用右键菜单开发者工具(非必要时，请勿开启开发者工具)"
+                }
+            }
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "EasyGitSourceCode",
+                    "title": "easy-git"
+                }
+            ],
+            "rightside": [
+                {
+                    "id": "EasyGitLog",
+                    "title": "easy-git-log"
+                }
+            ]
+        },
+        "views": {
+            "EasyGitSourceCode": [
+                {
+                    "id": "EasyGitSourceCode",
+                    "title": "easy-git"
+                }
+            ],
+            "EasyGitLog": [
+                {
+                    "id": "EasyGitLog",
+                    "title": "easy-git-log"
+                }
+            ]
+        },
+        "commands": [
+            {
+                "command": "extension.EasyGitMain",
+                "title": "easy-git: 源代码管理"
+            },
+            {
+                "command": "extension.EasyGitLog",
+                "title": "easy-git: log"
+            },
+            {
+                "command": "extension.AboutEasyGit",
+                "title": "关于easy-git"
+            },
+            {
+                "command": "extension.setEasyGit",
+                "title": "设置easy-git"
+            },
+            {
+                "command": "extension.EasyGitSetGitingore",
+                "title": "设置.gitignore"
+            },
+            {
+                "command": "extension.EasyGitSetGitattributes",
+                "title": "设置.gitattributes"
+            }
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "command": "extension.EasyGitMain",
+                    "group": "z_commands"
+                }
+            ],
+            "menubar/tool": [
+                {
+                    "command": "extension.EasyGitMain",
+                    "title": "easy-git: 源代码管理",
+                    "group": "ext_settings"
+                },
+                {
+                    "title": "easy-git",
+                    "group": "ext_settings",
+                    "id": "toolsMenu"
+                },
+                {
+                    "command": "extension.EasyGitLog",
+                    "title": "查看提交记录(日志)",
+                    "group": "toolsMenu@1"
+                },
+                {
+                    "group": "toolsMenu@1"
+                },
+                {
+                    "command": "extension.EasyGitSetGitingore",
+                    "title": "设置.gitignore",
+                    "group": "toolsMenu@2"
+                },
+                {
+                    "command": "extension.EasyGitSetGitattributes",
+                    "title": "设置.gitattributes",
+                    "group": "toolsMenu@2"
+                },
+                {
+                    "group": "toolsMenu@3"
+                },
+                {
+                    "command": "extension.AboutEasyGit",
+                    "title": "关于/评价easy-git",
+                    "group": "toolsMenu@3"
+                },
+                {
+                    "group": "ext_settings"
+                }
+            ]
+        }
+    },
+    "extensionDependencies": [
+        "plugin-manager"
+    ],
+    "dependencies": {
+        "cross-spawn": "^7.0.3",
+        "simple-git": "^2.17.0"
+    }
+}
