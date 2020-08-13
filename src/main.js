@@ -55,13 +55,18 @@ function checkFileList(GitStatusResult) {
 
 
 /**
- * @description 项目管理器，选中项目，右键菜单入口； 菜单【工具】【easy-git】
+ * @description
  *
+ * 项目管理器，选中项目，右键菜单入口:
  *  - 是Git项目，则直接打开
  *  - 不是Git项目，显示【初始化存储库】按钮
+ *
+ * 菜单【工具】【easy-git】:
+ *   - 只有一个项目，如果是git，直接打开，不是则进入初始化页面
+ *   - 多个页面进入初始页面
  */
 async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo) {
-
+    console.log('viewType',viewType);
     // 检查用户电脑Git环境是否正常
     let isInstall = isGitInstalled();
     if (!isInstall) {
@@ -72,12 +77,39 @@ async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, File
         });
         return;
     };
-
+    
     // 当焦点不再编辑器，从菜单【工具】【easy-git】【源代码管理】触发，此时param == null
     if (param == null) {
-        initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
+
+        let {FoldersNum, Folders} = FilesExplorerProjectInfo;
+
+        // 如果项目管理器只有一个项目, 且是git项目。直接打开
+        if (FoldersNum == 1) {
+            let {FolderName,FolderPath,isGit} = Folders[0];
+            let isGitProject = isGit;
+
+            // 如果是git项目，直接打开
+            if (isGitProject) {
+                let gitInfo = await utils.gitStatus(FolderPath);
+                let gitData = Object.assign(gitInfo, {
+                    'projectName': FolderName,
+                    'projectPath': FolderPath
+                });
+                if (viewType == 'main') {
+                    MainView.active(webviewPanel, userConfig, gitData);
+                };
+                if (viewType == 'log') {
+                    LogView.show(webviewPanel, userConfig, gitData);
+                };
+            };
+        } else {
+            // 非git项目，则进入初始化
+            initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
+        };
+
+        let containerid = viewType == 'log' ? 'EasyGitLog': 'EasyGitSourceCode';
         hx.window.showView({
-           containerid: "EasyGitSourceCode"
+           containerid: containerid
         });
         return;
     };

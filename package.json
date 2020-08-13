@@ -110,11 +110,6 @@
                     "id": "toolsMenu"
                 },
                 {
-                    "command": "extension.EasyGitLog",
-                    "title": "查看提交记录(日志)",
-                    "group": "toolsMenu@1"
-                },
-                {
                     "group": "toolsMenu@1"
                 },
                 {

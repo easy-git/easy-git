@@ -4,7 +4,7 @@ const main = require("./src/main.js");
 const file = require('./src/file.js');
 
 
-var source = 'viewMenu';
+let source = 'viewMenu';
 var n = 0;
 
 //该方法将在插件激活的时候调用

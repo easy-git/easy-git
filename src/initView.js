@@ -105,7 +105,7 @@ function generateLogHtml(userConfig, uiData, FilesExplorerProjectInfo) {
             <style type="text/css">
                 body {
                     color: $  {fontColor};
-                    font-size: 0.92rem;
+                    font-size: 14px;
                 }
                 body::-webkit-scrollbar {
                     display: none;
@@ -123,7 +123,7 @@ function generateLogHtml(userConfig, uiData, FilesExplorerProjectInfo) {
                     width: 100%;
                     margin: 10px 0px;
                     padding: 5px 0;
-                    font-size: 0.95rem;
+                    font-size: 14px;
                     color: ${fontColor};
                     outline: 0;
                 }
