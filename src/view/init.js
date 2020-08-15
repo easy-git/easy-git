@@ -56,7 +56,7 @@ function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
                 });
                 MainView.active(webviewPanel, userConfig, gitData);
             };
-            if (viewId == 'EasyGitLog') {
+            if (viewId == 'EasyGitCommon') {
                 let data = {
                     'projectPath': projectPath,
                     'projectName': projectName,
