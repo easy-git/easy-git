@@ -2,7 +2,7 @@
     "name": "easy-git",
     "description": "easy-git HBuilderX内图形化Git工具",
     "displayName": "【easy-git】Git源码管理",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "publisher": "oneone",
     "engines": {
         "HBuilderX": "^2.8.3"
@@ -19,8 +19,8 @@
         "onCommand:extension.setEasyGit",
         "onCommand:extension.EasyGitSetGitingore",
         "onCommand:extension.EasyGitSetGitattributes",
-        "onView:EasyGitSourceCode",
-        "onView:EasyGitCommon"
+        "onView:EasyGitSourceCodeView",
+        "onView:EasyGitCommonView"
     ],
     "contributes": {
         "configuration": {
@@ -41,27 +41,27 @@
         "viewsContainers": {
             "activitybar": [
                 {
-                    "id": "EasyGitSourceCode",
+                    "id": "EasyGitSourceCodeView",
                     "title": "easy-git"
                 }
             ],
             "rightside": [
                 {
-                    "id": "EasyGitCommon",
+                    "id": "EasyGitCommonView",
                     "title": "easy-git-log"
                 }
             ]
         },
         "views": {
-            "EasyGitSourceCode": [
+            "EasyGitSourceCodeView": [
                 {
-                    "id": "EasyGitSourceCode",
+                    "id": "EasyGitSourceCodeView",
                     "title": "easy-git"
                 }
             ],
-            "EasyGitCommon": [
+            "EasyGitCommonView": [
                 {
-                    "id": "EasyGitCommon",
+                    "id": "EasyGitCommonView",
                     "title": "easy-git-log"
                 }
             ]

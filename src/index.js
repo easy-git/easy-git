@@ -84,7 +84,7 @@ async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, File
             initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
         };
 
-        let containerid = viewType == 'log' ? 'EasyGitCommon': 'EasyGitSourceCode';
+        let containerid = viewType == 'log' ? 'EasyGitCommonView': 'EasyGitSourceCodeView';
         hx.window.showView({
            containerid: containerid
         });
@@ -168,12 +168,12 @@ async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, File
         if (isGitProject) {
             MainView.active(webviewPanel, userConfig, gitData);
             hx.window.showView({
-               containerid: "EasyGitSourceCode"
+               containerid: "EasyGitSourceCodeView"
             });
         } else {
             initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
             hx.window.showView({
-               containerid: "EasyGitSourceCode"
+               containerid: "EasyGitSourceCodeView"
             });
         };
         return;
@@ -183,7 +183,7 @@ async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, File
     if (viewType == 'log') {
         LogView.show(webviewPanel, userConfig, gitData);
         hx.window.showView({
-           containerid: "EasyGitCommon"
+           containerid: "EasyGitCommonView"
         });
         return;
     };
@@ -266,7 +266,7 @@ async function main(viewType, param, webviewPanel, context) {
     if (viewType == 'clone') {
         cloneView.show(webviewPanel, userConfig);
         hx.window.showView({
-           containerid: "EasyGitSourceCode"
+           containerid: "EasyGitSourceCodeView"
         });
         return;
     };

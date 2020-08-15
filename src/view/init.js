@@ -48,7 +48,7 @@ function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
         let {projectPath,projectName} = msg;
         let status = await utils.gitInit(projectPath,projectName);
         if (status == 'success') {
-            if (viewId == 'EasyGitSourceCode') {
+            if (viewId == 'EasyGitSourceCodeView') {
                 let gitInfo = await utils.gitStatus(projectPath,projectName);
                 let gitData = Object.assign(gitInfo, {
                     'projectName': projectName,
@@ -56,7 +56,7 @@ function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
                 });
                 MainView.active(webviewPanel, userConfig, gitData);
             };
-            if (viewId == 'EasyGitCommon') {
+            if (viewId == 'EasyGitCommonView') {
                 let data = {
                     'projectPath': projectPath,
                     'projectName': projectName,
