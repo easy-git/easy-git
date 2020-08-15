@@ -14,12 +14,13 @@
     "activationEvents": [
         "onCommand:extension.EasyGitMain",
         "onCommand:extension.EasyGitLog",
+        "onCommand:extension.EasyGitCloneProject",
         "onCommand:extension.AboutEasyGit",
         "onCommand:extension.setEasyGit",
         "onCommand:extension.EasyGitSetGitingore",
         "onCommand:extension.EasyGitSetGitattributes",
         "onView:EasyGitSourceCode",
-        "onView:EasyGitLog"
+        "onView:EasyGitCommon"
     ],
     "contributes": {
         "configuration": {
@@ -46,7 +47,7 @@
             ],
             "rightside": [
                 {
-                    "id": "EasyGitLog",
+                    "id": "EasyGitCommon",
                     "title": "easy-git-log"
                 }
             ]
@@ -58,9 +59,9 @@
                     "title": "easy-git"
                 }
             ],
-            "EasyGitLog": [
+            "EasyGitCommon": [
                 {
-                    "id": "EasyGitLog",
+                    "id": "EasyGitCommon",
                     "title": "easy-git-log"
                 }
             ]
@@ -73,6 +74,10 @@
             {
                 "command": "extension.EasyGitLog",
                 "title": "easy-git: log"
+            },
+            {
+                "command": "extension.EasyGitCloneProject",
+                "title": "easy-git: clone"
             },
             {
                 "command": "extension.AboutEasyGit",
@@ -100,8 +105,13 @@
             ],
             "menubar/tool": [
                 {
+                    "command": "extension.EasyGitCloneProject",
+                    "title": "Git: 克隆仓库",
+                    "group": "ext_settings"
+                },
+                {
                     "command": "extension.EasyGitMain",
-                    "title": "easy-git: 源代码管理",
+                    "title": "Git: 源代码管理",
                     "group": "ext_settings"
                 },
                 {
@@ -141,6 +151,7 @@
     ],
     "dependencies": {
         "cross-spawn": "^7.0.3",
+        "ini": "^1.3.5",
         "simple-git": "^2.17.0"
     }
 }

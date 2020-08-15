@@ -98,16 +98,30 @@ async function getFilesExplorerProjectInfo() {
 /**
  * @description 创建输出控制台
  */
-function createOutputChannel(label,msg) {
+function createOutputChannel(label=false,msg) {
     let channel_name = "Git";
     let outputChannel = hx.window.createOutputChannel(channel_name);
     outputChannel.show();
-    outputChannel.appendLine(label);
+
+    if (label) {
+        outputChannel.appendLine(label);
+    };
 
     let text = `${msg}`;
     outputChannel.appendLine('\n\n' + text);
 };
 
+/**
+ * @description 创建输出控制台
+ */
+function createOutputChannelForClone(msg) {
+    let channel_name = "Git";
+    let outputChannel = hx.window.createOutputChannel(channel_name);
+    outputChannel.show();
+
+    let text = `${msg}`;
+    outputChannel.appendLine('\n\n' + text);
+};
 
 /**
  * @description 运行命令
@@ -119,6 +133,19 @@ async function runCmd(cmd) {
     });
 };
 
+
+/**
+ * @description 检查是否安装了Git
+ */
+function isGitInstalled() {
+  const command = spawn.sync('git', ['--version'], {
+    stdio: 'ignore'
+  });
+  if (command.error) {
+    return false;
+  };
+  return true;
+};
 
 /**
  * @description 获取git信息
@@ -146,10 +173,10 @@ async function gitInit(projectPath,projectName) {
 /**
  * @description clone
  */
-async function gitClone(info,isAuth) {
+async function gitClone(info) {
 
     let remote = '';
-    let {username, password, repo, branch, localPath} = info;
+    let {username, password, repo, branch, localPath, projectName, isAuth} = info;
 
     if (isAuth) {
         if (repo.includes('https://') || repo.includes('https//')) {
@@ -159,25 +186,29 @@ async function gitClone(info,isAuth) {
     };
 
     try{
-        let options = [localPath]
+        let options = []
+
         if (branch) {
             let t = '-b ' + branch;
             options.push(t);
-        }
+        };
+
+        createOutputChannelForClone(`开始克隆 ${projectName}！受网络影响，需要一定时间，请耐心等待。`);
+
         let status = await git()
-            .clone(repo, options)
+            .clone(repo, localPath, options)
             .then((res) => {
-                hx.window.showInformationMessage(`Git: 克隆仓库成功`,['我知道了']);
+                createOutputChannelForClone(`克隆成功。本地路径: ${localPath}`);
                 return 'success'
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: 克隆仓库失败！`, errMsg);
+                createOutputChannelForClone('Git: 克隆仓库失败！' + errMsg);
                 return 'fail';
             });
         return status
     } catch(e) {
-        hx.window.showErrorMessage(`Git: 克隆仓库异常！`, ['我知道了']);
+        createOutputChannelForClone('克隆仓库异常' + e);
         return 'error';
     };
 };
@@ -893,6 +924,7 @@ async function gitDiffFile(workingDir,filename) {
 
 
 module.exports = {
+    isGitInstalled,
     getThemeColor,
     getFilesExplorerProjectInfo,
     gitInit,

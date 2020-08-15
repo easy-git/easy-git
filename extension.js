@@ -3,7 +3,7 @@ const hx = require("hbuilderx");
 const index = require("./src/index.js");
 const file = require('./src/file.js');
 
-
+console.log(hx.env.appData);
 let source = 'viewMenu';
 
 //该方法将在插件激活的时候调用
@@ -14,13 +14,13 @@ function activate(context) {
         enableScritps: true
     });
 
-    let LogView = hx.window.createWebView("EasyGitLog", {
+    let CommonView = hx.window.createWebView("EasyGitCommon", {
         enableScritps: true
     });
 
     // if (source == 'viewMenu') {
     //     index.main('main',{}, FileView,context);
-    //     index.main('log',{}, LogView,context);
+    //     index.main('log',{}, CommonView,context);
     // };
 
     // git file view
@@ -32,7 +32,13 @@ function activate(context) {
     // git file log view
     let log = hx.commands.registerCommand('extension.EasyGitLog', (param) => {
         context.source = 'filesExplorer';
-        index.main('log',param, LogView, context);
+        index.main('log',param, CommonView, context);
+    });
+
+    // git clone menu
+    let clone = hx.commands.registerCommand('extension.EasyGitCloneProject',(param) => {
+        context.source = 'clone';
+        index.main('clone',param, FileView, context);
     });
 
     // about
