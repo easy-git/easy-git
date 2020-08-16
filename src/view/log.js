@@ -289,8 +289,11 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     text-overflow:ellipsis;
                 }
                 .change-files .num {
-                    width: 25px;
+                    width: 28px;
                     display:inline-block;
+                }
+                .change-files .binary {
+                    font-size: 12px;
                 }
                 .change-files ul > li {
                     list-style: none;
@@ -365,13 +368,13 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         </div>
                     </div>
                 </div>
-                <div id="log-view-file" class="fixed-bottom p-3 view-log-details" v-if="isShowViewDetails">
+                <div id="log-view-file" class="fixed-bottom p-3 view-log-details" v-if="isShowViewDetails" @mouseenter="viewDetailsMouseenter();" @mouseleave="viewDetailsMouseleave();">
                     <div class="d-flex">
                         <div class="flex-grow-1">
                             <h6>{{ logDetails.message }}</h6>
                         </div>
                         <div>
-                            <button type="button" class="close" aria-label="Close" @click="isShowViewDetails = false">
+                            <button type="button" class="close" aria-label="Close" @click="closeViewDetails();">
                               <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -385,12 +388,12 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     <div class="change-files mt-3">
                         <ul class="pl-0">
                             <li v-for="(v5,i5) in logDetailsFiles" :key="i5">
-                                <div class="d-inline" v-if="!v5.binary">
+                                <div class="d-inline-block" v-if="!v5.binary" style="width: 115px !important;">
                                     <span class="num">{{ v5.changes }}</span>
                                     <span class="fgreen">{{ v5.add_str }}</span>
                                     <span class="fred">{{ v5.del_str }}</span>
                                 </div>
-                                <div class="d-inline" v-else-if="v5.binary">
+                                <div class="d-inline-block binary" v-else-if="v5.binary" style="width: 115px !important;">
                                     <span>二进制文件</span>
                                 </div>
                                 <div class="d-inline htext pl-3">
@@ -469,10 +472,17 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         symbolRepeat(str, num) {
                         	return num > 1 ? str.repeat(num): str;
                         },
+                        viewDetailsMouseenter() {
+                            // 解决背景层滚动的问题
+                            document.body.style.overflow = 'hidden';
+                        },
+                        viewDetailsMouseleave() {
+                            // 解决背景层滚动的问题
+                            document.body.style.overflow = 'auto';
+                        },
                         viewDetails(data) {
                             this.isShowViewDetails = true;
                             this.logDetails = data;
-                            console.log(data)
                             let files = data.diff.files;
                             let tmp = [];
                             for (let f of files) {
@@ -489,6 +499,9 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 tmp.push(f);
                             };
                             this.logDetailsFiles = tmp;
+                        },
+                        closeViewDetails() {
+                            this.isShowViewDetails = false;
                         },
                         openFile(filename) {
                             hbuilderx.postMessage({
