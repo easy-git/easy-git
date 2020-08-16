@@ -14,7 +14,10 @@ let CommonView = hx.window.createWebView("EasyGitCommonView", {
     enableScritps: true
 });
 
-//该方法将在插件激活的时候调用
+/**
+ * @todo 多个视图一起执行的问题
+ * @todo 通过工具菜单触发视图，第一次点击打开后，第二次点击没有反应的问题
+ */
 function activate(context) {
     context.source = 'viewMenu';
 
@@ -23,48 +26,46 @@ function activate(context) {
     //     index.main('log',{}, CommonView,context);
     // };
 
-    // git file view
+    // 菜单【源代码管理】，菜单【工具】、及项目管理器右键菜单
     let f = hx.commands.registerCommand('extension.EasyGitMain', (param) => {
         context.source = 'filesExplorer';
-        console.log('----->EasyGitMain');
         index.main('main',param, FileView, context);
     });
     context.subscriptions.push(f);
 
-    // git file log view
+    // 菜单【日志】
     let l = hx.commands.registerCommand('extension.EasyGitLog', (param) => {
         context.source = 'filesExplorer';
         index.main('log',param, CommonView, context);
     });
     context.subscriptions.push(l);
 
-    // git clone menu
+    // 菜单【工具】【克隆存储库】
     let clone = hx.commands.registerCommand('extension.EasyGitCloneProject',(param) => {
         context.source = 'clone';
-        console.log('----->EasyGitCloneProject');
         index.main('clone',param, FileView, context);
     });
     context.subscriptions.push(clone);
 
-    // about
+    // 菜单【工具】【关于】
     let about = hx.commands.registerCommand('extension.AboutEasyGit', () => {
         let url = "https://ext.dcloud.net.cn/plugin?name=easy-git";
         hx.env.openExternal(url);
     });
 
-    // setting
+    // 菜单【工具】【设置】
     let setting = hx.commands.registerCommand('extension.setEasyGit', ()=> {
         hx.commands.executeCommand('workbench.action.openGlobalSettings');
     });
 
-    // .gitignore
+    // 菜单 【.gitignore】
     let setGitignore = hx.commands.registerCommand('extension.EasyGitSetGitingore', (param)=> {
         file.gitignore({
             'param': param
         });
     });
 
-    // .gitattributes
+    // 菜单【.gitattributes】
     let setGitattributes= hx.commands.registerCommand('extension.EasyGitSetGitattributes', (param)=> {
         file.gitattributes({
             'param': param
@@ -73,7 +74,7 @@ function activate(context) {
 
 };
 
-//该方法将在插件禁用的时候调用（目前是在插件卸载的时候触发）
+
 function deactivate() {
 
 };
