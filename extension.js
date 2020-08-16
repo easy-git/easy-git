@@ -6,18 +6,17 @@ const file = require('./src/file.js');
 
 let source = 'viewMenu';
 
+let FileView = hx.window.createWebView("EasyGitSourceCodeView", {
+    enableScritps: true
+});
+
+let CommonView = hx.window.createWebView("EasyGitCommonView", {
+    enableScritps: true
+});
+
 //该方法将在插件激活的时候调用
 function activate(context) {
-    
     context.source = 'viewMenu';
-
-    let FileView = hx.window.createWebView("EasyGitSourceCodeView", {
-        enableScritps: true
-    });
-
-    let CommonView = hx.window.createWebView("EasyGitCommonView", {
-        enableScritps: true
-    });
 
     // if (source == 'viewMenu') {
     //     index.main('main',{}, FileView,context);
@@ -27,6 +26,7 @@ function activate(context) {
     // git file view
     let f = hx.commands.registerCommand('extension.EasyGitMain', (param) => {
         context.source = 'filesExplorer';
+        console.log('----->EasyGitMain');
         index.main('main',param, FileView, context);
     });
     context.subscriptions.push(f);
@@ -41,6 +41,7 @@ function activate(context) {
     // git clone menu
     let clone = hx.commands.registerCommand('extension.EasyGitCloneProject',(param) => {
         context.source = 'clone';
+        console.log('----->EasyGitCloneProject');
         index.main('clone',param, FileView, context);
     });
     context.subscriptions.push(clone);

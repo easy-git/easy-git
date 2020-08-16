@@ -39,6 +39,9 @@ function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
             case 'open':
                 hx.commands.executeCommand('workbench.action.files.openFolder');
                 break;
+            case 'open_clone':
+                hx.commands.executeCommand('extension.EasyGitCloneProject');
+                break;
             default:
                 break;
         };
@@ -104,7 +107,7 @@ function generateLogHtml(userConfig, uiData, FilesExplorerProjectInfo) {
             <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
             <style type="text/css">
                 body {
-                    color: $  {fontColor};
+                    color: ${fontColor};
                     font-size: 14px;
                 }
                 body::-webkit-scrollbar {
@@ -139,19 +142,24 @@ function generateLogHtml(userConfig, uiData, FilesExplorerProjectInfo) {
         </head>
         <body style="background-color:${background};">
             <div id="app" v-cloak>
-                <div class="d-flex flex-column mt-3 mx-3" v-if="FoldersNum == 1 || currentSelect != undefined">
-                    <div>
-                        <p class="d-block">当前选择的项目【 {{ projectInfo.FolderName }} 】 没有 git 储存库。</p>
+                <div class="mt-3">
+                    <div class="d-flex flex-column mt-3 mx-3" v-if="FoldersNum == 1 || currentSelect != undefined">
+                        <div>
+                            <p class="d-block">当前选择的项目【 {{ projectInfo.FolderName }} 】 没有 git 储存库。</p>
+                        </div>
+                        <div>
+                            <button class="btn-imp" @click.once="gitInit(projectInfo);">初始化存储库</button>
+                        </div>
                     </div>
-                    <div>
-                        <button class="btn-imp" @click.once="gitInit(projectInfo);">初始化存储库</button>
+                    <div class="d-flex mt-3 mx-3" v-if="FoldersNum > 1 && currentSelect == undefined">
+                        <button class="btn-imp" @click.once="selectProject();">选择项目管理器中的Git项目</button>
                     </div>
-                </div>
-                <div class="d-flex mt-3 mx-3" v-if="FoldersNum > 1 && currentSelect == undefined">
-                    <button class="btn-imp" @click.once="selectProject();">选择项目管理器中的Git项目</button>
-                </div>
-                <div class="d-flex mx-3" v-if="currentSelect == undefined">
-                    <button class="btn-imp" @click="openLocal();">打开本地Git项目</button>
+                    <div class="d-flex mx-3" v-if="currentSelect == undefined">
+                        <button class="btn-imp" @click="openLocal();">打开本地Git项目</button>
+                    </div>
+                    <div class="d-flex mx-3">
+                        <button class="btn-imp" @click="goClone();">克隆Git存储库</button>
+                    </div>
                 </div>
             </div>
             <script>
@@ -205,6 +213,11 @@ function generateLogHtml(userConfig, uiData, FilesExplorerProjectInfo) {
                         openLocal() {
                             hbuilderx.postMessage({
                                 command: 'open'
+                            });
+                        },
+                        goClone() {
+                            hbuilderx.postMessage({
+                                command: 'open_clone'
                             });
                         }
                     }

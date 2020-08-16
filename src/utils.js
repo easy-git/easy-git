@@ -4,6 +4,7 @@ const {exec} = require('child_process');
 
 const hx = require('hbuilderx');
 const spawn = require('cross-spawn')
+const ini = require('ini');
 
 const git = require('simple-git');
 // const git = simpleGit();
@@ -57,6 +58,27 @@ function getThemeColor() {
         lineColor
     };
 };
+
+
+/**
+ * @description 读取HBuilderX.ini, 获取ProjectWizard
+ */
+function getHBuilderXiniConfig(v) {
+    let iniFile = '';
+    try{
+        const appData = hx.env.appData;
+        const iniFile = path.join(appData,'HBuilder X.ini')
+        let fileinfo = ini.parse(fs.readFileSync(iniFile, 'utf-8'));
+        let value = '';
+        if (v == 'filesExplorer') {
+            value = fileinfo["uistate"]["window\\closedProWidgetHeight"];
+        };
+        return value;
+    } catch(e){
+        return '';
+    };
+};
+
 
 /**
  * @description 获取项目管理器的项目数量
@@ -925,6 +947,7 @@ async function gitDiffFile(workingDir,filename) {
 
 module.exports = {
     isGitInstalled,
+    getHBuilderXiniConfig,
     getThemeColor,
     getFilesExplorerProjectInfo,
     gitInit,

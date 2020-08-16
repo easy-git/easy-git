@@ -23,7 +23,7 @@ function getProjectWizard() {
         const appData = hx.env.appData;
         const iniFile = path.join(appData,'HBuilder X.ini')
         const fileinfo = ini.parse(fs.readFileSync(iniFile, 'utf-8'));
-		const ProjectWizard = path.join(fileinfo.ProjectWizard.location,'/');
+        const ProjectWizard = path.join(fileinfo.ProjectWizard.location,'/');
         return ProjectWizard;
     } catch(e){
         return '';

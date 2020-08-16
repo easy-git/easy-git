@@ -40,6 +40,7 @@ function checkFileList(GitStatusResult) {
     return {num,isNodeModules}
 };
 
+
 /**
  * @description
  *
@@ -255,12 +256,21 @@ async function main(viewType, param, webviewPanel, context) {
     // 获取来源
     let {source} = context;
 
+    let filesExplorer = utils.getHBuilderXiniConfig('filesExplorer')
+    if (filesExplorer <= 0) {
+        hx.commands.executeCommand('workbench.action.toggleSidebarVisibility');
+    };
+
     // user config
     let config = hx.workspace.getConfiguration();
     let DisableDevTools = config.get('EasyGit.DisableDevTools');
     let userConfig = {
         'DisableDevTools': DisableDevTools
     };
+
+    // 项目管理器所有项目信息
+    let FilesExplorerProjectInfo = await utils.getFilesExplorerProjectInfo();
+    FilesExplorerProjectInfo.source = source;
 
     // 克隆
     if (viewType == 'clone') {
@@ -270,10 +280,6 @@ async function main(viewType, param, webviewPanel, context) {
         });
         return;
     };
-
-    // 项目管理器所有项目信息
-    let FilesExplorerProjectInfo = await utils.getFilesExplorerProjectInfo();
-    FilesExplorerProjectInfo.source = source;
 
     // 从菜单【视图】【显示扩展视图】进入
     if (source == "viewMenu") {
