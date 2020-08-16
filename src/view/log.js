@@ -98,6 +98,7 @@ async function show(webviewPanel, userConfig, gitData) {
 
 /**
  * @description generationhtml
+ * @todo 查看日志详情，背景层也滚动的Bug
  */
 function generateLogHtml(userConfig, uiData, gitData) {
     // 是否启用开发者工具

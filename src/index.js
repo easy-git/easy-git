@@ -256,10 +256,11 @@ async function main(viewType, param, webviewPanel, context) {
     // 获取来源
     let {source} = context;
 
-    let filesExplorer = utils.getHBuilderXiniConfig('filesExplorer')
-    if (filesExplorer <= 0) {
-        hx.commands.executeCommand('workbench.action.toggleSidebarVisibility');
-    };
+    // @todo ? 获取左侧视图开启情况，当没有开启时，则展开。
+    // let filesExplorer = utils.getHBuilderXiniConfig('filesExplorer')
+    // if (filesExplorer <= 0 || ['main', 'clone'].includes(viewType)) {
+    //     hx.commands.executeCommand('workbench.view.explorer');
+    // };
 
     // user config
     let config = hx.workspace.getConfiguration();

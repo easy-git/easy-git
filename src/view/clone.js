@@ -51,8 +51,6 @@ function show(webviewPanel, userConfig) {
     let ProjectWizard = getProjectWizard();
     let hxData = { 'ProjectWizard': ProjectWizard };
 
-    // hx.commands.executeCommand('workbench.view.explorer');
-
     view.html = generateLogHtml(userConfig, uiData, hxData);
 
     view.onDidReceiveMessage((msg) => {
@@ -93,6 +91,8 @@ function show(webviewPanel, userConfig) {
 
 /**
  * @description generationhtml
+ * @todo 目前通过js打开资源管理器，无法打开的目录。因此 本地存储路径输入框，不支持手动选择
+ * @todo 克隆进度条
  */
 function generateLogHtml(userConfig, uiData, hxData) {
     // 是否启用开发者工具
