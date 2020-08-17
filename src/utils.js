@@ -902,7 +902,6 @@ async function gitLog(workingDir,filterCondition) {
             filter = [...filter, ...tmp]
         };
     };
-    console.log(filter);
     try {
         let result = {
             "success": true,

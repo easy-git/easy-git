@@ -92,7 +92,7 @@ function active(webviewPanel, userConfig, gitData) {
                     'projectName': projectName,
                     'easyGitInner': true
                 }
-                hx.commands.executeCommand('extension.EasyGitLog',data);
+                hx.commands.executeCommand('EasyGit.log',data);
                 break;
             case 'open':
                 let fileUri = path.join(projectPath, msg.text);

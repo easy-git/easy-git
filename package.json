@@ -1,8 +1,8 @@
 {
     "name": "easy-git",
-    "description": "easy-git HBuilderX内图形化Git工具",
+    "description": "easy-git: HBuilderX内图形化Git工具，简单好用。",
     "displayName": "【easy-git】Git源码管理",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "publisher": "oneone",
     "engines": {
         "HBuilderX": "^2.8.3"
@@ -12,13 +12,13 @@
     ],
     "main": "./extension",
     "activationEvents": [
-        "onCommand:extension.EasyGitMain",
-        "onCommand:extension.EasyGitLog",
-        "onCommand:extension.EasyGitCloneProject",
-        "onCommand:extension.AboutEasyGit",
-        "onCommand:extension.setEasyGit",
-        "onCommand:extension.EasyGitSetGitingore",
-        "onCommand:extension.EasyGitSetGitattributes",
+        "onCommand:EasyGit.main",
+        "onCommand:EasyGit.log",
+        "onCommand:EasyGit.clone",
+        "onCommand:EasyGit.about",
+        "onCommand:EasyGit.set",
+        "onCommand:EasyGit.setGitingore",
+        "onCommand:EasyGit.setGitattributes",
         "onView:EasyGitSourceCodeView",
         "onView:EasyGitCommonView"
     ],
@@ -68,40 +68,40 @@
         },
         "commands": [
             {
-                "command": "extension.EasyGitMain",
+                "command": "EasyGit.main",
                 "title": "easy-git: 源代码管理"
             },
             {
-                "command": "extension.EasyGitLog",
+                "command": "EasyGit.log",
                 "title": "easy-git: log"
             },
             {
-                "command": "extension.EasyGitCloneProject",
+                "command": "EasyGit.clone",
                 "title": "easy-git: clone"
             },
             {
-                "command": "extension.AboutEasyGit",
+                "command": "EasyGit.about",
                 "title": "关于easy-git"
             },
             {
-                "command": "extension.setEasyGit",
+                "command": "EasyGit.set",
                 "title": "设置easy-git"
             },
             {
-                "command": "extension.EasyGitSetGitingore",
+                "command": "EasyGit.setGitingore",
                 "title": "设置.gitignore"
             },
             {
-                "command": "extension.EasyGitSetGitattributes",
+                "command": "EasyGit.setGitattributes",
                 "title": "设置.gitattributes"
             }
         ],
         "menus": {
             "explorer/context": [{
-                    "command": "extension.EasyGitMain",
+                    "command": "EasyGit.main",
                     "group": "z_commands"
                 }, {
-                    "command": "extension.EasyGitLog",
+                    "command": "EasyGit.log",
                     "title": "easy-git: 查看日志",
                     "group": "z_commands"
                 }, {
@@ -109,7 +109,7 @@
                 }
             ],
             "editor/context": [{
-                    "command": "extension.EasyGitLog",
+                    "command": "EasyGit.log",
                     "title": "easy-git: 查看日志",
                     "group": "z_commands"
                 },{
@@ -118,12 +118,12 @@
             ],
             "menubar/tool": [
                 {
-                    "command": "extension.EasyGitCloneProject",
+                    "command": "EasyGit.clone",
                     "title": "Git: 克隆仓库",
                     "group": "ext_settings"
                 },
                 {
-                    "command": "extension.EasyGitMain",
+                    "command": "EasyGit.main",
                     "title": "Git: 源代码管理",
                     "group": "ext_settings"
                 },
@@ -136,12 +136,12 @@
                     "group": "toolsMenu@1"
                 },
                 {
-                    "command": "extension.EasyGitSetGitingore",
+                    "command": "EasyGit.setGitingore",
                     "title": "设置.gitignore",
                     "group": "toolsMenu@2"
                 },
                 {
-                    "command": "extension.EasyGitSetGitattributes",
+                    "command": "EasyGit.setGitattributes",
                     "title": "设置.gitattributes",
                     "group": "toolsMenu@2"
                 },
@@ -149,7 +149,7 @@
                     "group": "toolsMenu@3"
                 },
                 {
-                    "command": "extension.AboutEasyGit",
+                    "command": "EasyGit.about",
                     "title": "关于/评价easy-git",
                     "group": "toolsMenu@3"
                 },

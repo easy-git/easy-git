@@ -40,7 +40,7 @@ function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
                 hx.commands.executeCommand('workbench.action.files.openFolder');
                 break;
             case 'open_clone':
-                hx.commands.executeCommand('extension.EasyGitCloneProject');
+                hx.commands.executeCommand('EasyGit.clone');
                 break;
             default:
                 break;
@@ -65,7 +65,7 @@ function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
                     'projectName': projectName,
                     'easyGitInner': true
                 }
-                hx.commands.executeCommand('extension.EasyGitMain',data);
+                hx.commands.executeCommand('EasyGit.main',data);
             };
 
         }

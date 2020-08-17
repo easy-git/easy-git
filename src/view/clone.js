@@ -83,7 +83,7 @@ function show(webviewPanel, userConfig) {
                 'projectName': projectName,
                 'projectPath': localPath
             };
-            hx.commands.executeCommand('extension.EasyGitMain', pinfo);
+            hx.commands.executeCommand('EasyGit.main', pinfo);
         };
     };
 };

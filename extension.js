@@ -27,46 +27,46 @@ function activate(context) {
     // };
 
     // 菜单【源代码管理】，菜单【工具】、及项目管理器右键菜单
-    let f = hx.commands.registerCommand('extension.EasyGitMain', (param) => {
+    let f = hx.commands.registerCommand('EasyGit.main', (param) => {
         context.source = 'filesExplorer';
         index.main('main',param, FileView, context);
     });
     context.subscriptions.push(f);
 
     // 菜单【日志】
-    let l = hx.commands.registerCommand('extension.EasyGitLog', (param) => {
+    let l = hx.commands.registerCommand('EasyGit.log', (param) => {
         context.source = 'filesExplorer';
         index.main('log',param, CommonView, context);
     });
     context.subscriptions.push(l);
 
     // 菜单【工具】【克隆存储库】
-    let clone = hx.commands.registerCommand('extension.EasyGitCloneProject',(param) => {
+    let clone = hx.commands.registerCommand('EasyGit.clone',(param) => {
         context.source = 'clone';
         index.main('clone',param, FileView, context);
     });
     context.subscriptions.push(clone);
 
     // 菜单【工具】【关于】
-    let about = hx.commands.registerCommand('extension.AboutEasyGit', () => {
+    let about = hx.commands.registerCommand('EasyGit.about', () => {
         let url = "https://ext.dcloud.net.cn/plugin?name=easy-git";
         hx.env.openExternal(url);
     });
 
     // 菜单【工具】【设置】
-    let setting = hx.commands.registerCommand('extension.setEasyGit', ()=> {
+    let setting = hx.commands.registerCommand('EasyGit.set', ()=> {
         hx.commands.executeCommand('workbench.action.openGlobalSettings');
     });
 
     // 菜单 【.gitignore】
-    let setGitignore = hx.commands.registerCommand('extension.EasyGitSetGitingore', (param)=> {
+    let setGitignore = hx.commands.registerCommand('EasyGit.setGitingore', (param)=> {
         file.gitignore({
             'param': param
         });
     });
 
     // 菜单【.gitattributes】
-    let setGitattributes= hx.commands.registerCommand('extension.EasyGitSetGitattributes', (param)=> {
+    let setGitattributes= hx.commands.registerCommand('EasyGit.setGitattributes', (param)=> {
         file.gitattributes({
             'param': param
         });
