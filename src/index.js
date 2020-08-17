@@ -56,7 +56,6 @@ async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, File
 
     // 当焦点不再编辑器，从菜单【工具】【easy-git】【源代码管理】触发，此时param == null
     if (param == null) {
-
         let {FoldersNum, Folders} = FilesExplorerProjectInfo;
 
         // 如果项目管理器只有一个项目, 且是git项目。直接打开
@@ -93,6 +92,8 @@ async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, File
     };
 
     // 获取项目名称、项目路径
+    let projectName, projectPath, selectedFile;
+
     let {easyGitInner} = param;
     if (easyGitInner != undefined || easyGitInner) {
         try{
@@ -106,9 +107,11 @@ async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, File
             try {
                 projectName = param.workspaceFolder.name;
                 projectPath = param.workspaceFolder.uri.fsPath;
+                selectedFile = param.fsPath;
             } catch (e) {
                 projectName = param.document.workspaceFolder.name;
                 projectPath = param.document.workspaceFolder.uri.fsPath;
+                selectedFile = param.document.uri.fsPath;
             };
         } catch(e){
             return hx.window.showErrorMessage('easy-git: 无法获取到项目，请在项目管理器选中后再试。', ['我知道了']);
@@ -120,7 +123,8 @@ async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, File
     isGitProject = gitInfo.isGit;
     let gitData = Object.assign(gitInfo, {
         'projectName': projectName,
-        'projectPath': projectPath
+        'projectPath': projectPath,
+        'selectedFile': selectedFile
     });
 
     // Git文件视图：检查git项目是否包含node_modules
@@ -148,6 +152,7 @@ async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, File
     // 设置项目路径(暂时无用)
     webviewPanel._projectPath = projectPath;
 
+    // 清空webview html
     let isActive = webviewPanel._webView._html;
     if (isActive != '') {
         webviewPanel._webView._html = '';

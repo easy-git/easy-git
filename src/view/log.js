@@ -40,11 +40,11 @@ async function show(webviewPanel, userConfig, gitData) {
     let uiData = Object.assign(iconData,colorData);
 
     // get project info
-    const {projectPath,projectName,currentBranch} = gitData;
+    const {projectPath, projectName, selectedFile, currentBranch} = gitData;
 
     // get webview html content, set html
     async function setLogView(condition) {
-
+        // 引导用户正确的使用日期查询
         if(validateData(condition)){
             return hx.window.showErrorMessage(
                 '检测到您只输入了一个日期, 日期查询, 请使用--after、--before、--since、--until。例如:--after=2020/8/1 \n',
@@ -70,7 +70,18 @@ async function show(webviewPanel, userConfig, gitData) {
         view.html = generateLogHtml(userConfig, uiData, gitData);
     };
 
-    setLogView('default');
+    if (selectedFile != '' && selectedFile != undefined) {
+        // 选中文件，则查看此文件的log记录
+        let sfile = selectedFile.replace(path.join(projectPath,path.sep),'');
+        if (projectPath == selectedFile ) {
+            setLogView('default');
+        } else {
+            setLogView(sfile);
+        }
+    } else {
+        setLogView('default');
+    };
+
 
     view.onDidReceiveMessage((msg) => {
         let action = msg.command;

@@ -899,9 +899,10 @@ async function gitLog(workingDir,filterCondition) {
             filter = filterCondition.split(',');
         } else {
             let tmp = filterCondition.split(',');
-            filter = [...tmp, ...filter]
+            filter = [...filter, ...tmp]
         };
     };
+    console.log(filter);
     try {
         let result = {
             "success": true,

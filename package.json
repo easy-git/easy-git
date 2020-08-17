@@ -97,9 +97,22 @@
             }
         ],
         "menus": {
-            "explorer/context": [
-                {
+            "explorer/context": [{
                     "command": "extension.EasyGitMain",
+                    "group": "z_commands"
+                }, {
+                    "command": "extension.EasyGitLog",
+                    "title": "easy-git: 查看日志",
+                    "group": "z_commands"
+                }, {
+                    "group": "z_commands"
+                }
+            ],
+            "editor/context": [{
+                    "command": "extension.EasyGitLog",
+                    "title": "easy-git: 查看日志",
+                    "group": "z_commands"
+                },{
                     "group": "z_commands"
                 }
             ],
