@@ -22,8 +22,8 @@ function activate(context) {
     context.source = 'viewMenu';
 
     // if (source == 'viewMenu') {
-    //     index.main('main',{}, FileView,context);
-    //     index.main('log',{}, CommonView,context);
+    //     index.main('main', {}, FileView, context);
+    //     index.main('log', {}, CommonView, context);
     // };
 
     // 菜单【源代码管理】，菜单【工具】、及项目管理器右键菜单

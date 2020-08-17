@@ -40,6 +40,44 @@ function checkFileList(GitStatusResult) {
     return {num,isNodeModules}
 };
 
+/**
+ * @description 当焦点不在编辑器、项目管理器上
+ */
+async function FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo) {
+    // 当焦点不再编辑器，从菜单【工具】【easy-git】【源代码管理】触发，此时param == null
+    let {FoldersNum, Folders} = FilesExplorerProjectInfo;
+
+    // 如果项目管理器只有一个项目, 且是git项目。直接打开
+    if (FoldersNum == 1) {
+        let {FolderName,FolderPath,isGit} = Folders[0];
+        let isGitProject = isGit;
+
+        // 如果是git项目，直接打开
+        if (isGitProject) {
+            let gitInfo = await utils.gitStatus(FolderPath);
+            let gitData = Object.assign(gitInfo, {
+                'projectName': FolderName,
+                'projectPath': FolderPath
+            });
+            if (viewType == 'main') {
+                MainView.active(webviewPanel, userConfig, gitData);
+            };
+            if (viewType == 'log') {
+                LogView.show(webviewPanel, userConfig, gitData);
+            };
+        } else {
+            initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
+        };
+    } else {
+        // 非git项目，则进入初始化
+        initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
+    };
+
+    let containerid = viewType == 'log' ? 'EasyGitCommonView': 'EasyGitSourceCodeView';
+    hx.window.showView({
+       containerid: containerid
+    });
+};
 
 /**
  * @description
@@ -52,44 +90,7 @@ function checkFileList(GitStatusResult) {
  *   - 只有一个项目，如果是git，直接打开，不是则进入初始化页面
  *   - 多个页面进入初始页面
  */
-async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo) {
-
-    // 当焦点不再编辑器，从菜单【工具】【easy-git】【源代码管理】触发，此时param == null
-    if (param == null) {
-        let {FoldersNum, Folders} = FilesExplorerProjectInfo;
-
-        // 如果项目管理器只有一个项目, 且是git项目。直接打开
-        if (FoldersNum == 1) {
-            let {FolderName,FolderPath,isGit} = Folders[0];
-            let isGitProject = isGit;
-
-            // 如果是git项目，直接打开
-            if (isGitProject) {
-                let gitInfo = await utils.gitStatus(FolderPath);
-                let gitData = Object.assign(gitInfo, {
-                    'projectName': FolderName,
-                    'projectPath': FolderPath
-                });
-                if (viewType == 'main') {
-                    MainView.active(webviewPanel, userConfig, gitData);
-                };
-                if (viewType == 'log') {
-                    LogView.show(webviewPanel, userConfig, gitData);
-                };
-            } else {
-                initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
-            };
-        } else {
-            // 非git项目，则进入初始化
-            initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
-        };
-
-        let containerid = viewType == 'log' ? 'EasyGitCommonView': 'EasyGitSourceCodeView';
-        hx.window.showView({
-           containerid: containerid
-        });
-        return;
-    };
+async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo) {
 
     // 获取项目名称、项目路径
     let projectName, projectPath, selectedFile;
@@ -135,9 +136,7 @@ async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, File
                 '检测到当前git项目下，包含node_modules，且未设置.gitignore, 是否设置?',['设置.gitignore','以后再说'],
             ).then((result) => {
                 if (result == '设置.gitignore') {
-                    file.gitignore({
-                        'projectPath': projectPath
-                    });
+                    file.gitignore({'projectPath': projectPath});
                 }
             })
         };
@@ -173,15 +172,12 @@ async function FromFilesExplorer(viewType, param, webviewPanel, userConfig, File
     if (viewType == 'main') {
         if (isGitProject) {
             MainView.active(webviewPanel, userConfig, gitData);
-            hx.window.showView({
-               containerid: "EasyGitSourceCodeView"
-            });
         } else {
             initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
-            hx.window.showView({
-               containerid: "EasyGitSourceCodeView"
-            });
         };
+        hx.window.showView({
+           containerid: "EasyGitSourceCodeView"
+        });
         return;
     };
 
@@ -247,25 +243,28 @@ async function main(viewType, param, webviewPanel, context) {
         return;
     };
 
-    // 检查用户电脑Git环境是否正常
-    let isInstall = utils.isGitInstalled();
-    if (!isInstall) {
-        hx.window.showErrorMessage('检测到您本机未安装Git环境! 如已安装，还提示此错误，请重启HBuilderX',['现在安装','关闭']).then((result) => {
-            if (result == '现在安装') {
-                hx.env.openExternal('https://git-scm.com/downloads');
-            };
-        });
-        return;
-    };
-
     // 获取来源
     let {source} = context;
 
+    // 因为从扩展视图进入，会执行两遍，所以从扩展视图进入，不执行此处
+    if (source != "viewMenu") {
+        // 检查用户电脑Git环境是否正常
+        let isInstall = utils.isGitInstalled();
+        if (!isInstall) {
+            hx.window.showErrorMessage('检测到您本机未安装Git环境! 如已安装，还提示此错误，请重启HBuilderX',['现在安装','关闭']).then((result) => {
+                if (result == '现在安装') {
+                    hx.env.openExternal('https://git-scm.com/downloads');
+                };
+            });
+            return;
+        };
+    };
+
     // @todo ? 获取左侧视图开启情况，当没有开启时，则展开。
-    // let filesExplorer = utils.getHBuilderXiniConfig('filesExplorer')
-    // if (filesExplorer <= 0 || ['main', 'clone'].includes(viewType)) {
-    //     hx.commands.executeCommand('workbench.view.explorer');
-    // };
+    let filesExplorer = utils.getHBuilderXiniConfig('filesExplorer')
+    if (['main', 'clone'].includes(viewType)) {
+        hx.commands.executeCommand('workbench.view.explorer');
+    };
 
     // user config
     let config = hx.workspace.getConfiguration();
@@ -278,6 +277,11 @@ async function main(viewType, param, webviewPanel, context) {
     let FilesExplorerProjectInfo = await utils.getFilesExplorerProjectInfo();
     FilesExplorerProjectInfo.source = source;
 
+    // 从菜单【视图】【显示扩展视图】进入
+    if (source == "viewMenu") {
+        FromViewMenu(viewType, webviewPanel, userConfig, FilesExplorerProjectInfo);
+    };
+
     // 克隆
     if (viewType == 'clone') {
         cloneView.show(webviewPanel, userConfig);
@@ -287,14 +291,16 @@ async function main(viewType, param, webviewPanel, context) {
         return;
     };
 
-    // 从菜单【视图】【显示扩展视图】进入
-    if (source == "viewMenu") {
-        FromViewMenu(viewType, webviewPanel, userConfig, FilesExplorerProjectInfo);
+    // 项目管理器、编辑器，右键菜单 (获取到焦点)
+    if (source == "filesExplorer" && param != null) {
+        param = param;
+        FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo);
     };
 
-    if (source == "filesExplorer") {
+    // 没有获取到焦点
+    if (source == "filesExplorer" && param == null) {
         param = param;
-        FromFilesExplorer(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo);
+        FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo);
     };
 };
 

@@ -69,9 +69,23 @@ easy-git, 支持通过快捷键打开git视图。
 点击菜单【工具】【自定义快捷键】，可自定义快捷键。
 
 ```json
+
+// 打开Git文件视图
 {
     "key":"",
     "command": "extension.EasyGitMain"
+}
+ 
+// 查看日志
+{
+    "key": "",
+    "command": "extension.EasyGitLog"
+}
+
+// Git克隆
+{
+    "key": "",
+    "command": "extension.EasyGitCloneProject"
 }
 ```
 
