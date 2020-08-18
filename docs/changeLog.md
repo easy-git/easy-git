@@ -8,6 +8,7 @@
 * 新增 Git日志视图 双击commit id，即可复制到剪切板
 * 优化 Git文件视图 更多菜单，鼠标移走，关闭菜单列表
 * 修复 Git日志视图 按文件查询 提示`fatal: option '-n 100' must come before non-option arguments`的Bug
+* 优化 Git日志搜索 分析搜索字符，自动追加git log选项
 * 优化 深色主题下 输入框聚焦时，改变输入框颜色
 * 优化 Git分支视图 合并svg图标 在深色主题下，图标颜色不对的Bug
 
