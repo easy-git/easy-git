@@ -51,13 +51,14 @@ async function show(webviewPanel, userConfig, gitData) {
                 ['我知道了']
            );
         };
-        
+
         // 引导使用--grep
         if (!validateData(condition) &&
             condition!='default' &&
             !condition.includes(',') &&
             !condition.includes('-n ') &&
             !condition.includes('--grep=') &&
+            !(/\-([A-Za-z]+)/.test(condition)) &&
             !(/\-\-([A-Za-z0-9]+)(\=?)/.test(condition)) &&
             !(/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(condition))
         ) {
@@ -78,7 +79,8 @@ async function show(webviewPanel, userConfig, gitData) {
             return hx.window.showErrorMessage('获取日志失败，未知错误。请重新尝试操作，或通过运行日志查看错误。',['关闭']);
         };
         if (!gitLogInfo.success && gitLogInfo.errorMsg != '') {
-            hx.window.showErrorMessage(`获取日志失败。原因: ${gitLogInfo.errorMsg}`,['关闭']);
+            let emsg = `日志搜索失败，原因：<span>${gitLogInfo.errorMsg}。</span>请查看: <a href="https://ext.dcloud.net.cn/plugin?id=2475">git log搜索方法</a>`
+            hx.window.showErrorMessage(emsg,['关闭']);
         };
         gitData = Object.assign(gitData,{
             "logData": gitLogInfo.data
