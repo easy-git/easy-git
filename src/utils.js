@@ -933,6 +933,8 @@ async function gitLog(workingDir,filterCondition) {
             filter = [...filter, ...tmp]
         };
     };
+    filter = filter.filter( s => s && s.trim());
+    
     try {
         let result = {
             "success": true,
