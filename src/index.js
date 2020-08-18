@@ -13,34 +13,6 @@ const cloneView = require('./view/clone.js');
 
 
 /**
- * @description 检查文件列表是否包含node_modules，并返回文件数量
- * @param {Object} GitStatusResult
- */
-function checkFileList(GitStatusResult) {
-    let gitFileList = JSON.parse(GitStatusResult.gitStatusResult);
-
-    let staged = gitFileList.staged;
-    let modified = gitFileList.modified;
-    let deleted = gitFileList.deleted;
-    let not_added = gitFileList.not_added;
-    let renamed = gitFileList.renamed;
-    let created = gitFileList.created;
-
-    let all = [...staged,...modified,...deleted,...not_added,...renamed,...created];
-    let num = all.length;
-
-    let isNodeModules = false;
-    let tmp = [...modified,...not_added,...created]
-    for (let s of tmp) {
-        if (s.includes('node_modules')) {
-            isNodeModules = true;
-            break;
-        };
-    };
-    return {num,isNodeModules}
-};
-
-/**
  * @description 当焦点不在编辑器、项目管理器上
  */
 async function FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo) {
@@ -78,6 +50,7 @@ async function FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExpl
        containerid: containerid
     });
 };
+
 
 /**
  * @description
@@ -130,7 +103,7 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
 
     // Git文件视图：检查git项目是否包含node_modules
     if (viewType == 'main' && isGitProject) {
-        let {num,isNodeModules} = checkFileList(gitInfo);
+        let {num,isNodeModules} = utils.checkNodeModulesFileList(gitInfo);
         if (isNodeModules) {
             hx.window.showErrorMessage(
                 '检测到当前git项目下，包含node_modules，且未设置.gitignore, 是否设置?',['设置.gitignore','以后再说'],
@@ -280,6 +253,7 @@ async function main(viewType, param, webviewPanel, context) {
     // 从菜单【视图】【显示扩展视图】进入
     if (source == "viewMenu") {
         FromViewMenu(viewType, webviewPanel, userConfig, FilesExplorerProjectInfo);
+        return;
     };
 
     // 克隆
@@ -295,12 +269,14 @@ async function main(viewType, param, webviewPanel, context) {
     if (source == "filesExplorer" && param != null) {
         param = param;
         FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo);
+        return;
     };
 
     // 没有获取到焦点
     if (source == "filesExplorer" && param == null) {
         param = param;
         FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo);
+        return;
     };
 };
 

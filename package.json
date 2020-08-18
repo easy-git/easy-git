@@ -15,6 +15,7 @@
         "onCommand:EasyGit.main",
         "onCommand:EasyGit.log",
         "onCommand:EasyGit.clone",
+        "onCommand:EasyGit.pull",
         "onCommand:EasyGit.about",
         "onCommand:EasyGit.set",
         "onCommand:EasyGit.setGitingore",
@@ -78,6 +79,10 @@
             {
                 "command": "EasyGit.clone",
                 "title": "easy-git: clone"
+            },
+            {
+                "command": "EasyGit.pull",
+                "title": "easy-git: pull"
             },
             {
                 "command": "EasyGit.about",

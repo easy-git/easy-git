@@ -1,11 +1,3 @@
-<!--
- * @Author: your name
- * @Date: 2020-08-13 13:50:22
- * @LastEditTime: 2020-08-17 21:53:07
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /easy-git/README.md
--->
 # easy-git
 
 ## 简介
@@ -94,6 +86,12 @@ easy-git, 支持通过快捷键打开git视图。
 {
     "key": "",
     "command": "EasyGit.clone"
+}
+
+// Git pull --rebase
+{
+    "key": "",
+    "command": "EasyGit.pull"
 }
 ```
 

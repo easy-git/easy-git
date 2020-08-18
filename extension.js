@@ -2,7 +2,7 @@ const hx = require("hbuilderx");
 
 const index = require("./src/index.js");
 const file = require('./src/file.js');
-
+const git = require('./src/git.js');
 
 let source = 'viewMenu';
 
@@ -70,6 +70,11 @@ function activate(context) {
         file.gitattributes({
             'param': param
         });
+    });
+
+    // Git拉取
+    let pull = hx.commands.registerCommand('EasyGit.pull', (param)=> {
+        git.action(param,'pull');
     });
 
 };

@@ -169,6 +169,36 @@ function isGitInstalled() {
   return true;
 };
 
+
+/**
+ * @description 检查文件列表是否包含node_modules，并返回文件数量
+ * @param {Object} GitStatusResult
+ */
+function checkNodeModulesFileList(GitStatusResult) {
+    let gitFileList = JSON.parse(GitStatusResult.gitStatusResult);
+
+    let staged = gitFileList.staged;
+    let modified = gitFileList.modified;
+    let deleted = gitFileList.deleted;
+    let not_added = gitFileList.not_added;
+    let renamed = gitFileList.renamed;
+    let created = gitFileList.created;
+
+    let all = [...staged,...modified,...deleted,...not_added,...renamed,...created];
+    let num = all.length;
+
+    let isNodeModules = false;
+    let tmp = [...modified,...not_added,...created]
+    for (let s of tmp) {
+        if (s.includes('node_modules')) {
+            isNodeModules = true;
+            break;
+        };
+    };
+    return {num,isNodeModules}
+};
+
+
 /**
  * @description 获取git信息
  * @param {Object} projectPath
@@ -440,6 +470,7 @@ async function gitPull(workingDir,options) {
             });
         return status
     } catch (e) {
+        console.log(e);
         return 'error';
     }
 };
@@ -950,6 +981,7 @@ module.exports = {
     getHBuilderXiniConfig,
     getThemeColor,
     getFilesExplorerProjectInfo,
+    checkNodeModulesFileList,
     gitInit,
     gitClone,
     gitStatus,
