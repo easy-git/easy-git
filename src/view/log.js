@@ -51,6 +51,27 @@ async function show(webviewPanel, userConfig, gitData) {
                 ['我知道了']
            );
         };
+        
+        // 引导使用--grep
+        if (!validateData(condition) &&
+            condition!='default' &&
+            !condition.includes(',') &&
+            !condition.includes('-n ') &&
+            !condition.includes('--grep=') &&
+            !(/\-\-([A-Za-z0-9]+)(\=?)/.test(condition)) &&
+            !(/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(condition))
+        ) {
+            condition = '--grep=' + condition;
+        };
+
+        // 引导email搜索
+        if (condition!='default' &&
+            !condition.includes(',') &&
+            !condition.includes('--author=') &&
+            (/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(condition))
+        ) {
+            condition = '--author=' + condition;
+        };
 
         let gitLogInfo = await utils.gitLog(projectPath,condition);
         if (!gitLogInfo.success && gitLogInfo.errorMsg == '') {
@@ -200,7 +221,9 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     border-radius: 2px !important;
                     font-size: 0.9rem !important;
                     border: none;
-                    color: ${fontColor};
+                    color: ${inputLineColor} !important;
+                    font-weight: 500 !important;
+                    font-size: 0.9rem !important;
                     caret-color: ${cursorColor};
                 }
                 .form-control:focus {
@@ -208,7 +231,9 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     border-bottom: 1px solid ${lineColor};
                     padding-left: 16px;
                     border-bottom: 1px solid ${inputLineColor};
-                    color: ${fontColor};
+                    color: ${inputLineColor};
+                    font-weight: 500;
+                    font-size: 0.9rem;
                     caret-color: ${cursorColor};
                 }
                 .icon:active {
@@ -334,10 +359,10 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                             v-on:keyup.enter="searchLog();"/>
                                     </div>
                                     <div class="pt-2 px-1">
-                                        <span @click="searchLog();">${searchIcon}</span>
+                                        <span @click.once="searchLog();">${searchIcon}</span>
                                     </div>
                                     <div class="pt-2">
-                                        <span title="刷新日志" @click="refresh();">${refreshIcon}</span>
+                                        <span title="刷新日志" @click.once="refresh();">${refreshIcon}</span>
                                     </div>
                                 </div>
                             </div>
