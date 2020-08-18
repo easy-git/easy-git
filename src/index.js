@@ -233,12 +233,6 @@ async function main(viewType, param, webviewPanel, context) {
         };
     };
 
-    // @todo ? 获取左侧视图开启情况，当没有开启时，则展开。
-    let filesExplorer = utils.getHBuilderXiniConfig('filesExplorer')
-    if (['main', 'clone'].includes(viewType)) {
-        hx.commands.executeCommand('workbench.view.explorer');
-    };
-
     // user config
     let config = hx.workspace.getConfiguration();
     let DisableDevTools = config.get('EasyGit.DisableDevTools');
@@ -248,7 +242,14 @@ async function main(viewType, param, webviewPanel, context) {
 
     // 项目管理器所有项目信息
     let FilesExplorerProjectInfo = await utils.getFilesExplorerProjectInfo();
+    let {FoldersNum} = FilesExplorerProjectInfo;
     FilesExplorerProjectInfo.source = source;
+
+    // @todo ? 获取左侧视图开启情况，当没有开启时，则展开。
+    // let filesExplorer = utils.getHBuilderXiniConfig('filesExplorer')
+    if (FoldersNum == 0 && ['main', 'clone'].includes(viewType)) {
+        hx.commands.executeCommand('workbench.view.explorer');
+    };
 
     // 从菜单【视图】【显示扩展视图】进入
     if (source == "viewMenu") {
