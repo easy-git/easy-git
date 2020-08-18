@@ -55,6 +55,8 @@ async function show(webviewPanel, userConfig, gitData) {
         // 引导使用--grep
         if (!validateData(condition) &&
             condition!='default' &&
+            !(fs.existsSync(path.join(projectPath,condition)))&&
+            !(condition.includes('.')) &&
             !condition.includes(',') &&
             !condition.includes('-n ') &&
             !condition.includes('--grep=') &&
@@ -228,7 +230,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     font-size: 0.9rem !important;
                     caret-color: ${cursorColor};
                 }
-                .form-control:focus {
+                .form-control:focus , .form-control:active{
                     border-radius: 2px !important;
                     border-bottom: 1px solid ${lineColor};
                     padding-left: 16px;
