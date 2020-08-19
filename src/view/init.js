@@ -137,28 +137,51 @@ function generateLogHtml(userConfig, uiData, FilesExplorerProjectInfo) {
                 button:hover {
                     color: ${inputLineColor} !important;
                 }
+                .action-desc {
+                    font-size: 12px;
+                    color: ${fontColor};
+                }
             </style>
             <script src="https://cdn.jsdelivr.net/npm/vue"></script>
         </head>
         <body style="background-color:${background};">
             <div id="app" v-cloak>
                 <div class="mt-3">
-                    <div class="d-flex flex-column mt-3 mx-3" v-if="FoldersNum == 1 || currentSelect != undefined">
+                    <div class="d-flex flex-column mt-5 mx-3" v-if="FoldersNum == 1 || currentSelect != undefined">
                         <div>
-                            <p class="d-block">当前选择的项目【 {{ projectInfo.FolderName }} 】 没有 git 储存库。</p>
+                            <span class="d-block action-desc">
+                                当前选择的项目【 {{ projectInfo.FolderName }} 】 没有 git 储存库。
+                            </span>
                         </div>
                         <div>
                             <button class="btn-imp" @click.once="gitInit(projectInfo);">初始化存储库</button>
                         </div>
                     </div>
-                    <div class="d-flex mt-3 mx-3" v-if="FoldersNum > 1 && currentSelect == undefined">
-                        <button class="btn-imp" @click.once="selectProject();">选择项目管理器中的Git项目</button>
+                    <div class="d-flex flex-column mt-5 mx-3" v-if="FoldersNum > 1 && currentSelect == undefined">
+                        <div>
+                            <span class="d-block action-desc">
+                                项目管理器，选中项目，右键菜单点击源代码管理，即可打开Git视图。
+                            </span>
+                        </div>
+                        <div>
+                            <button class="btn-imp" @click.once="selectProject();">选择项目管理器中的Git项目</button>
+                        </div>
                     </div>
-                    <div class="d-flex mx-3" v-if="currentSelect == undefined">
-                        <button class="btn-imp" @click="openLocal();">打开本地Git项目</button>
-                    </div>
-                    <div class="d-flex mx-3">
-                        <button class="btn-imp" @click="goClone();">克隆Git存储库</button>
+                    <!--
+                        <div class="d-flex mx-3" v-if="currentSelect == undefined">
+                            <button class="btn-imp" @click="openLocal();">打开本地Git项目</button>
+                        </div>
+                    -->
+                    <div class="d-flex flex-column mx-3 mt-3">
+                        <div>
+                            <span class="d-block action-desc">
+                                输入URL克隆Git仓库，克隆成功后，会自动在项目管理器打开。
+                                <a href="https://ext.dcloud.net.cn/plugin?id=2475">了解详情</a>
+                            </span>
+                        </div>
+                        <div>
+                            <button class="btn-imp" @click="goClone();">克隆Git存储库</button>
+                        </div>
                     </div>
                 </div>
             </div>
