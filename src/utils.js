@@ -268,7 +268,6 @@ async function gitClone(info) {
         repo = `http://${username}:${password}@${repo}`;
     };
 
-    console.log('--->',repo);
     try{
         let options = []
 

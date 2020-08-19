@@ -229,7 +229,7 @@ function generateLogHtml(userConfig, uiData, hxData) {
                             <div class="form-group" v-if="isShowOption">
                                 <input type="password" class="form-control outline-none" id="git-passwd" placeholder="Git仓库密码" v-model="cloneInfo.password">
                             </div>
-                            <button type="button" class="btn-imp" @click.stop="gitClone();" :disabled="btnDisable">开始克隆</button>
+                            <button type="button" class="btn-imp" @click.stop="gitClone();">开始克隆</button>
                         </form>
                     </div>
                 </div>
