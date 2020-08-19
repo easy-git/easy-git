@@ -617,6 +617,7 @@ async function gitBranchSwitch(workingDir,branchName) {
         let status = await git(workingDir).init()
             .checkout([branchName])
             .then(() => {
+                hx.window.setStatusBarMessage('Git: 分支切换成功', 3000, 'info');
                 return 'success';
             })
             .catch((err) => {
