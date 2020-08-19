@@ -29,14 +29,15 @@ async function show(webviewPanel, userConfig, gitData) {
 
     // 根据主题适配颜色
     let colorData = utils.getThemeColor();
-    let {fontColor} = colorData;
+    let {fontColor,lineColor} = colorData;
 
     // svg icon
     let helpIcon = icon.getHelpIcon(fontColor);
     let refreshIcon = icon.getRefreshIcon(fontColor);
     let searchIcon = icon.getSearchIcon(fontColor);
+    let noIcon = icon.getNoIcon(lineColor);
 
-    let iconData = {helpIcon,refreshIcon,searchIcon};
+    let iconData = {helpIcon,refreshIcon,searchIcon,noIcon};
     let uiData = Object.assign(iconData,colorData);
 
     // get project info
@@ -151,7 +152,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
         lineColor,
         helpIcon,
         refreshIcon,
-        searchIcon
+        searchIcon,
+        noIcon
     } = uiData;
 
     // 获取git日志列表
@@ -373,7 +375,12 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         </div>
                     </div>
                     <div class="row mb-5"  style="margin-top:80px;">
-                        <div class="col mt-2 px-0">
+                        <div class="col mt-2 px-0" v-if="gitLogInfoList.length == 0">
+                            <div class="text-center" style="margin-top: 20%;">
+                                ${noIcon}
+                            </div>
+                        </div>
+                        <div class="col mt-2 px-0" v-else>
                             <ul class="pl-0 mb-0" style="list-style-type:none;">
                                 <li class="li-log gitfile"
                                     v-for="(item,idx) of gitLogInfoList" :key="idx"
