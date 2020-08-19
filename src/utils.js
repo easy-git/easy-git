@@ -254,6 +254,13 @@ async function gitClone(info) {
     let remote = '';
     let {username, password, repo, branch, localPath, projectName, isAuth} = info;
 
+    if (username.includes('@')) {
+        username = username.replace('@','%40')
+    };
+    if (password.includes('@')) {
+        password = password.replace('@','%40')
+    };
+
     if (isAuth) {
         if (repo.includes('https://') || repo.includes('https//')) {
             repo = repo.replace(/(^http:\/\/|^https:\/\/)/, "");
@@ -261,6 +268,7 @@ async function gitClone(info) {
         repo = `http://${username}:${password}@${repo}`;
     };
 
+    console.log('--->',repo);
     try{
         let options = []
 

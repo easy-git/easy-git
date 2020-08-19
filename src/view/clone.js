@@ -227,7 +227,7 @@ function generateLogHtml(userConfig, uiData, hxData) {
                                 <input type="text" class="form-control outline-none" id="git-user" placeholder="Git仓库用户名" v-model="cloneInfo.username">
                             </div>
                             <div class="form-group" v-if="isShowOption">
-                                <input type="text" class="form-control outline-none" id="git-passwd" placeholder="Git仓库密码" v-model="cloneInfo.password">
+                                <input type="password" class="form-control outline-none" id="git-passwd" placeholder="Git仓库密码" v-model="cloneInfo.password">
                             </div>
                             <button type="button" class="btn-imp" @click.stop="gitClone();" :disabled="btnDisable">开始克隆</button>
                         </form>
@@ -271,6 +271,9 @@ function generateLogHtml(userConfig, uiData, hxData) {
                     methods: {
                         gitClone() {
                             this.cloneInfo.repo = this.repo;
+                            if (this.isShowOption) {
+                                this.cloneInfo.isAuth = true;
+                            };
                             hbuilderx.postMessage({
                                 command: 'clone',
                                 info: this.cloneInfo,
