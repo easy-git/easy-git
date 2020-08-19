@@ -288,6 +288,7 @@ async function gitClone(info) {
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
                 createOutputChannelForClone('Git: 克隆仓库失败！' + errMsg);
+                createOutputChannelForClone('Git: 克隆失败，请参考: https://ext.dcloud.net.cn/plugin?id=2475');
                 return 'fail';
             });
         return status
