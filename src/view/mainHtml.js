@@ -778,10 +778,10 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
                             </div>
                             <ul class="pl-0 mb-0" style="list-style-type:none;">
                                 <li class="lif">
-                                   <span @click="gitCreateBranch();" title="在当前工作区上创建分支">创建新分支</span>
+                                   <span @click="gitCreateBranch();" title="在当前工作区上创建分支">从现有来源创建新分支</span>
                                 </li>
                                 <li class="lif">
-                                    <span @click="gitCreatePushBranch();" title="在当前工作区上创建分支">创建新分支并push到远端</span>
+                                    <span @click="gitCreatePushBranch();" title="在当前工作区上创建分支">从现有来源创建新分支并push</span>
                                 </li>
                                 <li class="lif">
                                     <span @click="openModelBox('none');">从...创建分支</span>
