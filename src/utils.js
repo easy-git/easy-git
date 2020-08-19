@@ -94,7 +94,6 @@ function importProjectToExplorer(projectPaht) {
         } else {
             hxExecutableProgram = path.join(appRoot,'HBuilderX.exe');
         };
-        console.log('--->',hxExecutableProgram);
         const command = spawn.sync(hxExecutableProgram, [projectPaht], {
           stdio: 'ignore'
         });
