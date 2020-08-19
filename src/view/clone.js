@@ -77,13 +77,14 @@ function show(webviewPanel, userConfig) {
 
         let result = await utils.gitClone(info);
         if (result == 'success') {
-            hx.workspace.openTextDocument(localPath);
+            utils.importProjectToExplorer(localPath);
             let pinfo = {
                 'easyGitInner': true,
                 'projectName': projectName,
                 'projectPath': localPath
             };
             hx.commands.executeCommand('EasyGit.main', pinfo);
+            hx.commands.executeCommand('workbench.view.explorer');
         };
     };
 };
@@ -160,6 +161,7 @@ function generateLogHtml(userConfig, uiData, hxData) {
                 .form-control {
                     background-color:${background} !important;
                     font-size: 0.9rem !important;
+                    border: 1px solid ${lineColor} !important;
                 }
                 .form-control:focus {
                     border: 1px solid ${inputLineColor} !important;

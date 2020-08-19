@@ -1,4 +1,5 @@
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const {exec} = require('child_process');
 
@@ -77,6 +78,30 @@ function getHBuilderXiniConfig(v) {
     } catch(e){
         return '';
     };
+};
+
+
+/**
+ * @description 导入项目到项目管理
+ */
+function importProjectToExplorer(projectPaht) {
+    try{
+        let hxExecutableProgram;
+        const osName = os.platform();
+        let appRoot = hx.env.appRoot;
+        if (osName == 'darwin') {
+            hxExecutableProgram = path.join(path.dirname(appRoot),'MacOS/HBuilderX');
+        } else {
+            hxExecutableProgram = path.join(appRoot,'HBuilderX.exe');
+        };
+        console.log('--->',hxExecutableProgram);
+        const command = spawn.sync(hxExecutableProgram, [projectPaht], {
+          stdio: 'ignore'
+        });
+    }catch(e){
+        console.error(e)
+        //TODO handle the exception
+    }
 };
 
 
@@ -934,7 +959,7 @@ async function gitLog(workingDir,filterCondition) {
         };
     };
     filter = filter.filter( s => s && s.trim());
-    
+
     try {
         let result = {
             "success": true,
@@ -982,6 +1007,7 @@ module.exports = {
     isGitInstalled,
     getHBuilderXiniConfig,
     getThemeColor,
+    importProjectToExplorer,
     getFilesExplorerProjectInfo,
     checkNodeModulesFileList,
     gitInit,
