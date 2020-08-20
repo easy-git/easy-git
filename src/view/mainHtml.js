@@ -1,5 +1,8 @@
 const hx = require('hbuilderx');
 
+const os = require('os');
+const osName = os.platform();
+
 /**
  * @description 获取webview内容
  * @param {Object} uiData
@@ -47,10 +50,16 @@ function getWebviewContent(userConfig, uiData, gitData) {
     behind = behind == 0 ? '': behind;
     gitStatusResult = gitStatusResult;
 
+    let ctrl = 'ctrl';
+    if (osName == 'darwin') {
+        ctrl = 'meta'
+    };
+
     return `<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=249px, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
         <style type="text/css">
             body {
@@ -92,6 +101,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 white-space: nowrap;
                 text-overflow:ellipsis;
             }
+            @media screen and (max-width: 249px) {
+                .project-name {
+                    width: calc(100% - 129px);
+                }
+            }
             .text-hidden {
                 text-overflow:ellipsis;
                 overflow:hidden;
@@ -123,7 +137,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 resize: none;
                 max-height: 98px !important;
                 color: ${inputColor};
-                -webkit-text-fill-color: ${cursorColor};
+                /*-webkit-text-fill-color: ${cursorColor};*/
             }
             textarea::first-line {
                 color: ${cursorColor};
@@ -279,7 +293,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             <textarea rows=1
                                 v-model="codeComment"
                                 class="form-control outline-none textarea"
-                                placeholder="Message"
+                                :placeholder="commitMessage"
+                                @keyup.${ctrl}.enter="gitCommit();"
                                 onfocus="window.activeobj=this;this.clock=setInterval(function(){activeobj.style.height=(activeobj.scrollHeight + 2)+'px';},100);">
                             </textarea>
                         </div>
@@ -374,6 +389,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
             var app = new Vue({
                 el: '#app',
                 data: {
+                    commitMessage: "",
                     GitStatusResult: {},
                     codeComment: '',
                     isShowMenu: false,
@@ -386,6 +402,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     gitStashFileListLength: 0
                 },
                 created() {
+                    let ctrl = '${ctrl}';
+                    if (ctrl == 'meta') {
+                        ctrl = '⌘';
+                    };
+                    this.commitMessage = '消息（' + ctrl + '+Enter 在"${currentBranch}"提交）'
                     this.GitStatusResult = ${gitStatusResult};
                 },
                 mounted() {
