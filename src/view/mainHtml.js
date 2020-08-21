@@ -125,6 +125,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 border: 1px solid ${lineColor};
                 transition: none !important;
                 caret-color: ${cursorColor};
+                color: ${fontColor};
             }
             .form-control:focus  {
                 border-radius: 2px !important;
@@ -136,11 +137,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 overflow: hidden;
                 resize: none;
                 max-height: 98px !important;
-                color: ${inputColor};
-                /*-webkit-text-fill-color: ${cursorColor};*/
-            }
-            textarea::first-line {
-                color: ${cursorColor};
+                color: ${fontColor};
             }
             .add-title {
                 font-size: 15px;
