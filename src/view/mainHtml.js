@@ -73,6 +73,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
             body::-webkit-scrollbar {
                 display: none;
             }
+            @media screen and (max-width: 132px) {
+                body {
+                    display: none;
+                }
+            }
             .cactive:active {
                 -webkit-transform: rotate(0.9);
                 transform: scale(0.9);
