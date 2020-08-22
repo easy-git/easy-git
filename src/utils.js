@@ -1010,6 +1010,51 @@ async function gitDiffFile(workingDir,filename) {
     runCmd(cmd);
 };
 
+/**
+ * @description stash
+ * @option {String} Stash选项
+ */
+async function gitStash(projectInfo, options, msg) {
+    try {
+        let {projectPath} = projectInfo;
+        let status = await git(projectPath).init()
+            .stash(options)
+            .then((res) => {
+                hx.window.setStatusBarMessage(msg + '成功', 5000, 'info');
+                hx.commands.executeCommand('EasyGit.main', projectInfo);
+                return 'success';
+            })
+            .catch((err) => {
+                createOutputChannel(msg + '失败', err);
+                return 'fail';
+            });
+        return status;
+    } catch (e) {
+        createOutputChannel(msg + ', 插件运行异常', e);
+        return 'error';
+    };
+};
+
+/**
+ * @description 弹出储藏列表
+ */
+async function gitStashList(workingDir) {
+    try {
+        let status = await git(workingDir).init()
+            .stashList()
+            .then((res) => {
+                return res;
+            })
+            .catch((err) => {
+                hx.window.setStatusBarMessage('Git: 获取储藏列表失败。', 5000, 'error');
+                return 'fail';
+            });
+        return status;
+    } catch (e) {
+        createOutputChannel('Git: 获取储藏列表失败, 插件运行异常', e);
+        return 'error';
+    };
+}
 
 module.exports = {
     isGitInstalled,
@@ -1044,5 +1089,7 @@ module.exports = {
     gitClean,
     gitConfigShow,
     gitRemoteshowOrigin,
-    gitLog
+    gitLog,
+    gitStash,
+    gitStashList
 }

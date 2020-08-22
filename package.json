@@ -16,6 +16,10 @@
         "onCommand:EasyGit.log",
         "onCommand:EasyGit.clone",
         "onCommand:EasyGit.pull",
+        "onCommand:EasyGit.stash",
+        "onCommand:EasyGit.stashAll",
+        "onCommand:EasyGit.stashPop",
+        "onCommand:EasyGit.stashPopNew",
         "onCommand:EasyGit.about",
         "onCommand:EasyGit.set",
         "onCommand:EasyGit.setGitingore",
@@ -74,15 +78,31 @@
             },
             {
                 "command": "EasyGit.log",
-                "title": "easy-git: log"
+                "title": "easy-git: log - 查看日志"
             },
             {
                 "command": "EasyGit.clone",
-                "title": "easy-git: clone"
+                "title": "easy-git: clone - 克隆"
             },
             {
                 "command": "EasyGit.pull",
-                "title": "easy-git: pull"
+                "title": "easy-git: pull - 拉取"
+            },
+            {
+                "command": "EasyGit.stash",
+                "title": "easy-git: stash - 储藏"
+            },
+            {
+                "command": "EasyGit.stashAll",
+                "title": "easy-git: stashAll - 储藏全部(包含未跟踪的)"
+            },
+            {
+                "command": "EasyGit.stashPop",
+                "title": "easy-git: stashPop - 弹出储藏..."
+            },
+            {
+                "command": "EasyGit.stashPopNew",
+                "title": "easy-git: stashPopNew - 弹出最新储藏..."
             },
             {
                 "command": "EasyGit.about",

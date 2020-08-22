@@ -1,25 +1,29 @@
-# easy-git
-
-## 简介
-
-easy-git，是采用webview api创建的可视化图形Git工具。
-
-注意：
-
-- easy-git webview引用了外部资源（`bootstrap.css`和`vue.js`），所以在`没有网络`的电脑上无法使用。
-- 已适配HBuilderX绿柔主题、酷黑主题、雅蓝主题
+easy-git, 是基于HBuilderX API开发的可视化图形Git插件，界面参考vscode源代码管理器。
 
 ## 安装
 
+[HBuilderX easy-git插件下载地址: https://ext.dcloud.net.cn/plugin?name=easy-git](https://ext.dcloud.net.cn/plugin?name=easy-git)
+
 Mac, 安装此插件可直接使用。
 
-Windows需要电脑本机安装git-bash。[git-bash下载地址](https://git-scm.com/download/win)
+Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-scm.com/download/win)
+
+## 界面预览
+
+![插件预览.jpg](https://upload-images.jianshu.io/upload_images/1534169-4f25d36ebd7fb1f5.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 在项目管理器，选中`Git`项目，右键菜单，点击【easy-git】【源代码管理】即可打开`git视图`
 
-![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/f0ca4bd0510bfbddeb2ba7f85d8dc114.png)
+![image](https://upload-images.jianshu.io/upload_images/1534169-69b263353c29a671.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-## 基础功能
+## Git仓库克隆
+
+点击菜单【工具】【Git: 克隆仓库】，即可打开克隆界面
+
+![Git克隆.jpg](https://upload-images.jianshu.io/upload_images/1534169-8991fce5e730e340.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
+## Git文件视图
 
 - `打开文件`, `刷新当前项目`
 - `文件暂存`,`暂存所有更改`,`撤销更改`,`取消暂存` 
@@ -28,17 +32,19 @@ Windows需要电脑本机安装git-bash。[git-bash下载地址](https://git-scm
 - `push`
 - `分支查看`,`分支切换`, `打开log`等
 
-![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/d342084a4516c60bf0f2b2035954c769.jpg)
+![image](https://upload-images.jianshu.io/upload_images/1534169-763f7e17f9fad35d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ## 分支管理
 
-包含：`分支切换`, `分支创建并推送`, `删除分支`, `合并分支`, `创建tag`等 
+包含：`分支切换`, `分支创建并推送`, `删除分支`, `合并分支`, `创建tag`，`分支和tag搜索`等 
 
-![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/10df7f3442c244b05bd8e3e2d5458726.jpg)
+点击本地分支名称，即可快速切换分支 。
+
+![image](https://upload-images.jianshu.io/upload_images/1534169-f8305ac600f9eaa3.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ## 查看log
 
-- c默认显示最近100条log
+- 默认显示最近100条log, 如需查看更多数据，请使用-n 
 - 支持搜索，多个搜索条件用逗号隔开
 - 搜索条件，即git log参数
 
@@ -56,11 +62,11 @@ Windows需要电脑本机安装git-bash。[git-bash下载地址](https://git-scm
 > 更多见：[http://git-scm.com/docs/git-log](http://git-scm.com/docs/git-log)
 
 
-![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/e4213df52a4faf5e3d3f43a673e1c42c.jpg)
+![image](https://upload-images.jianshu.io/upload_images/1534169-ac966376406f1a07.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ## 更多功能
 
-![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/fd89625651fd15be3b3c3596c73a396c.jpg)
+![image](https://upload-images.jianshu.io/upload_images/1534169-e69c95a8f7893df5.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ## 快捷键
 
@@ -93,10 +99,41 @@ easy-git, 支持通过快捷键打开git视图。
     "key": "",
     "command": "EasyGit.pull"
 }
+
+// Git stash 储藏
+{
+    "key": "",
+    "command": "EasyGit.stash"
+}
+
+// Git stash 储藏全部(包含未跟踪的)
+{
+    "key": "",
+    "command": "EasyGit.stashAll"
+}
+
+// Git stash 弹出储藏
+{
+    "key": "",
+    "command": "EasyGit.stashPop"
+}
+
+// Git stash 弹出最新储藏
+{
+    "key": "",
+    "command": "EasyGit.stashPopNew"
+}
 ```
 
 ## 设置
 
 菜单【设置】【插件配置】【easy-git】功能
 
-![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/08fb87da3924ee29b723f0e5162d1377.jpg)
+![image](https://upload-images.jianshu.io/upload_images/1534169-81515e8a13810d1e.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+## 目前存在的问题
+
+注意：
+
+- easy-git，webview引用了外部资源（`bootstrap.css`和`vue.js`），所以在`没有网络`的电脑上无法使用。
+- 已适配HBuilderX 绿柔主题、酷黑主题、雅蓝主题

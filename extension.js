@@ -74,8 +74,28 @@ function activate(context) {
 
     // Git拉取
     let pull = hx.commands.registerCommand('EasyGit.pull', (param)=> {
-        git.action(param,'pull');
+        git.action(param, 'pull');
     });
+
+    // Git Stash 储藏
+    let stash = hx.commands.registerCommand('EasyGit.stash', (param)=> {
+        git.action(param, 'stash');
+    });
+
+    // Git Stash 储藏全部
+    let stashAll = hx.commands.registerCommand('EasyGit.stashAll', (param)=> {
+        git.action(param, 'stashAll');
+    });
+
+    // git Stash 弹出指定储藏
+    let stashPop = hx.commands.registerCommand('EasyGit.stashPop', (param)=> {
+        git.action(param, 'stashPop')
+    });
+
+    // git Stash 弹出最新储藏
+    let stashPopNew = hx.commands.registerCommand('EasyGit.stashPopNew', (param)=> {
+        git.action(param, 'stashPopNew')
+    })
 
 };
 
