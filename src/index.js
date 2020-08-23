@@ -11,6 +11,8 @@ const LogView = require('./view/log.js');
 const initView = require('./view/init.js');
 const cloneView = require('./view/clone.js');
 
+// 记录是否弹窗提示过用户
+var isShowGitConfigBox = false;
 
 /**
  * @description 当焦点不在编辑器、项目管理器上
@@ -101,8 +103,8 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
         'selectedFile': selectedFile
     });
 
-    // Git文件视图：检查git项目是否包含node_modules
     if (viewType == 'main' && isGitProject) {
+        // Git文件视图：检查git项目是否包含node_modules
         let {num,isNodeModules} = utils.checkNodeModulesFileList(gitInfo);
         if (isNodeModules) {
             hx.window.showErrorMessage(
@@ -118,6 +120,23 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
                 `easy-it: 项目${projectName}下, ${num}个文件发生了变化，easy-git插件需要一定的时间来加载。\n`,
                 ['我知道了'],
             )
+        };
+
+        // 检查是否设置了username和email，如未设置，弹窗提示
+        let configData = await utils.gitConfigShow(projectPath, false);
+        console.log(configData);
+        let gitUserName = configData['user.email'];
+        let gitEmail = configData['user.name'];
+        if (!gitEmail || !gitUserName) {
+            let msg = `当前项目 ${projectName} 未设置`
+            if (!gitEmail) {
+                msg = msg + 'user.mail'
+            };
+            if (!gitUserName) {
+                msg = msg + ' user.name'
+            };
+            msg = msg + ", 点击菜单【工具】【easy-git】可进行设置。"
+            hx.window.showErrorMessage(msg,['我知道了']).then((result)=> {});
         };
     };
 

@@ -23,6 +23,8 @@
         "onCommand:EasyGit.stashClear",
         "onCommand:EasyGit.about",
         "onCommand:EasyGit.set",
+        "onCommand:EasyGit.setUserName",
+        "onCommand:EasyGit.setEmail",
         "onCommand:EasyGit.setGitingore",
         "onCommand:EasyGit.setGitattributes",
         "onView:EasyGitSourceCodeView",
@@ -122,6 +124,14 @@
                 "title": "设置.gitignore"
             },
             {
+                "command": "EasyGit.setUserName",
+                "title": "设置user.name"
+            },
+            {
+                "command": "EasyGit.setEmail",
+                "title": "设置user.email"
+            },
+            {
                 "command": "EasyGit.setGitattributes",
                 "title": "设置.gitattributes"
             }
@@ -164,6 +174,19 @@
                 },
                 {
                     "group": "toolsMenu@1"
+                },
+                {
+                    "command": "EasyGit.setUserName",
+                    "title": "设置user.name",
+                    "group": "toolsMenu@1"
+                },
+                {
+                    "command": "EasyGit.setEmail",
+                    "title": "设置user.email",
+                    "group": "toolsMenu@1"
+                },
+                {
+                    "group": "toolsMenu@2"
                 },
                 {
                     "command": "EasyGit.setGitingore",

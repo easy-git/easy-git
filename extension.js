@@ -58,6 +58,16 @@ function activate(context) {
         hx.commands.executeCommand('workbench.action.openGlobalSettings');
     });
 
+    // 设置 git user.name
+    let setUserName = hx.commands.registerCommand('EasyGit.setUserName', (param)=> {
+        git.action(param, 'setUserName');
+    });
+
+    // 设置 git user.name
+    let setEmail = hx.commands.registerCommand('EasyGit.setEmail', (param)=> {
+        git.action(param, 'setEmail');
+    });
+
     // 菜单 【.gitignore】
     let setGitignore = hx.commands.registerCommand('EasyGit.setGitingore', (param)=> {
         file.gitignore({

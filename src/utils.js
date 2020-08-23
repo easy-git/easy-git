@@ -924,11 +924,9 @@ async function gitClean(workingDir) {
 
 /**
  * @description clean
+ * @param {Boolean} isPrint 是否在控制台打印
  */
-async function gitConfigShow(workingDir) {
-    // status bar show message
-    hx.window.setStatusBarMessage('Git: git config -l', 2000, 'info');
-
+async function gitConfigShow(workingDir, isPrint=true) {
     try {
         let status = await git(workingDir).init()
             .listConfig()
@@ -938,12 +936,15 @@ async function gitConfigShow(workingDir) {
                 for (let i of res) {
                     data = Object.assign(data,i);
                 };
-                let Msg = "\n\n";
-                for (let i2 in data) {
-                    Msg = Msg + i2 + '=' + data[i2] + '\n';
-                }
-                createOutputChannel(`Git: 配置文件如下:`,Msg);
-                return 'success';
+
+                if (isPrint == true) {
+                    let Msg = "\n\n";
+                    for (let i2 in data) {
+                        Msg = Msg + i2 + '=' + data[i2] + '\n';
+                    };
+                    createOutputChannel(`Git: 配置文件如下:`,Msg);
+                };
+                return data;
             })
             .catch((err) => {
                 hx.window.setStatusBarMessage(`Git: git config读取失败`, 5000, 'error');
@@ -1058,7 +1059,31 @@ async function gitStashList(workingDir) {
         createOutputChannel('Git: 获取储藏列表失败, 插件运行异常', e);
         return 'error';
     };
-}
+};
+
+/**
+ * @description 设置config
+ */
+async function gitConfigSet(workingDir, data) {
+    try {
+        let {key, value} = data;
+        let status = await git(workingDir).init()
+            .addConfig(key, value)
+            .then((res) => {
+                hx.window.setStatusBarMessage(`Git: 设置${key}成功。`, 5000, 'info');
+                return 'success';
+            })
+            .catch((err) => {
+                console.log(err);
+                hx.window.setStatusBarMessage(`Git: 设置${key}失败。`, 5000, 'error');
+                return 'fail';
+            });
+        return status;
+    } catch (e) {
+        createOutputChannel('Git: 设置失败, 插件运行异常', e);
+        return 'error';
+    };
+};
 
 module.exports = {
     isGitInstalled,
@@ -1092,6 +1117,7 @@ module.exports = {
     gitTagCreate,
     gitClean,
     gitConfigShow,
+    gitConfigSet,
     gitRemoteshowOrigin,
     gitLog,
     gitStash,
