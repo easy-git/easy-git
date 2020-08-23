@@ -95,6 +95,11 @@ function activate(context) {
     // git Stash 弹出最新储藏
     let stashPopNew = hx.commands.registerCommand('EasyGit.stashPopNew', (param)=> {
         git.action(param, 'stashPopNew')
+    });
+
+    // git Stash 清除所有储藏
+    let stashClear = hx.commands.registerCommand('EasyGit.stashClear', (param)=> {
+        git.action(param, 'stashClear')
     })
 
 };

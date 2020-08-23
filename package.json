@@ -20,6 +20,7 @@
         "onCommand:EasyGit.stashAll",
         "onCommand:EasyGit.stashPop",
         "onCommand:EasyGit.stashPopNew",
+        "onCommand:EasyGit.stashClear",
         "onCommand:EasyGit.about",
         "onCommand:EasyGit.set",
         "onCommand:EasyGit.setGitingore",
@@ -103,6 +104,10 @@
             {
                 "command": "EasyGit.stashPopNew",
                 "title": "easy-git: stashPopNew - 弹出最新储藏..."
+            },
+            {
+                "command": "EasyGit.stashClear",
+                "title": "easy-git: stashClear - 删除所有储藏..."
             },
             {
                 "command": "EasyGit.about",

@@ -54,6 +54,9 @@ function action(param,action_name) {
         case 'stashPopNew':
             goStashPop(innerProjectInfo, 'isNew');
             break;
+        case 'stashClear':
+            goStashClear(innerProjectInfo);
+            break;
         default:
             break;
     };
@@ -119,6 +122,16 @@ async function goStashPop(ProjectInfo, isNew) {
     };
 };
 
+/**
+ * @description 清除所有储藏
+ */
+async function goStashClear(ProjectInfo) {
+    hx.window.showErrorMessage('确定要删除所有储藏吗？\n一旦清除后无法恢复!',['确定','取消']).then((result) => {
+        if (result == '确定') {
+            utils.gitStash(ProjectInfo, ['clear'], 'Git: 清除所有储藏');
+        };
+    });
+};
 
 module.exports = {
     action
