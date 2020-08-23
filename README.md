@@ -62,7 +62,7 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 
 > 更多见：[http://git-scm.com/docs/git-log](http://git-scm.com/docs/git-log)
 
-![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/08fb87da3924ee29b723f0e5162d1377.jpg)
+![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/e4213df52a4faf5e3d3f43a673e1c42c.jpg)
 
 ## 更多功能
 
