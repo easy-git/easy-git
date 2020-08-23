@@ -238,6 +238,9 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 padding-left: 20px;
                 font-size:0.83rem !important;
             }
+            .menu ul>li:hover {
+                background-color: ${liHoverBackground};
+            }
             .divider {
                 height: 0;
                 margin: .2rem 0;
