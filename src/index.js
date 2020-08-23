@@ -124,7 +124,6 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
 
         // 检查是否设置了username和email，如未设置，弹窗提示
         let configData = await utils.gitConfigShow(projectPath, false);
-        console.log(configData);
         let gitUserName = configData['user.email'];
         let gitEmail = configData['user.name'];
         if (!gitEmail || !gitUserName) {

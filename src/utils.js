@@ -961,7 +961,6 @@ async function gitConfigShow(workingDir, isPrint=true) {
  * @param {Object} workingDir
  */
 async function gitLog(workingDir,filterCondition) {
-    //--pretty=tformat:"%h | %ad | %s%d | %an" --graph --date=format:"%Y-%m-%d %H:%M:%S"'
     filter = ['-n 100']
     if (filterCondition != 'default') {
         if (filterCondition.includes('-n')) {

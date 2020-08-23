@@ -1,8 +1,8 @@
 {
     "name": "easy-git",
-    "description": "easy-git: HBuilderX内图形化Git工具，简单好用。",
+    "description": "HBuilderX内图形化Git工具，简单好用唯一。",
     "displayName": "【easy-git】Git源码管理",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "publisher": "oneone",
     "engines": {
         "HBuilderX": "^2.8.3"
