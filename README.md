@@ -10,17 +10,17 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 
 ## 界面预览
 
-![插件预览.jpg](https://upload-images.jianshu.io/upload_images/1534169-4f25d36ebd7fb1f5.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![插件预览.jpg](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200823/01e5e92f365f34d11460574ceaad7b91.jpg)
 
 在项目管理器，选中`Git`项目，右键菜单，点击【easy-git】【源代码管理】即可打开`git视图`
 
-![image](https://upload-images.jianshu.io/upload_images/1534169-69b263353c29a671.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/f0ca4bd0510bfbddeb2ba7f85d8dc114.png)
 
 ## Git仓库克隆
 
 点击菜单【工具】【Git: 克隆仓库】，即可打开克隆界面
 
-![Git克隆.jpg](https://upload-images.jianshu.io/upload_images/1534169-8991fce5e730e340.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![Git克隆.jpg](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200823/a275dd462d976ea98f4024e8589a1e1e.jpg)
 
 
 ## Git文件视图
@@ -32,7 +32,8 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 - `push`
 - `分支查看`,`分支切换`, `打开log`等
 
-![image](https://upload-images.jianshu.io/upload_images/1534169-763f7e17f9fad35d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/d342084a4516c60bf0f2b2035954c769.jpg)
+
 
 ## 分支管理
 
@@ -40,7 +41,7 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 
 点击本地分支名称，即可快速切换分支 。
 
-![image](https://upload-images.jianshu.io/upload_images/1534169-f8305ac600f9eaa3.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/10df7f3442c244b05bd8e3e2d5458726.jpg)
 
 ## 查看log
 
@@ -61,12 +62,11 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 
 > 更多见：[http://git-scm.com/docs/git-log](http://git-scm.com/docs/git-log)
 
-
-![image](https://upload-images.jianshu.io/upload_images/1534169-ac966376406f1a07.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/08fb87da3924ee29b723f0e5162d1377.jpg)
 
 ## 更多功能
 
-![image](https://upload-images.jianshu.io/upload_images/1534169-e69c95a8f7893df5.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![image](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200823/0761a4b004cccaf8b9daa9bbe7bbbeb9.png)
 
 ## 快捷键
 
@@ -135,7 +135,7 @@ easy-git, 支持通过快捷键打开git视图。
 
 菜单【设置】【插件配置】【easy-git】功能
 
-![image](https://upload-images.jianshu.io/upload_images/1534169-81515e8a13810d1e.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/08fb87da3924ee29b723f0e5162d1377.jpg)
 
 ## 目前存在的问题
 
