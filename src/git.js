@@ -17,22 +17,28 @@ const cloneView = require('./view/clone.js');
  */
 function action(param,action_name) {
 
+    let {easyGitInner} = param;
     let projectName, projectPath, selectedFile;
     try{
-        try {
-            projectName = param.workspaceFolder.name;
-            projectPath = param.workspaceFolder.uri.fsPath;
-            selectedFile = param.fsPath;
-        } catch (e) {
-            projectName = param.document.workspaceFolder.name;
-            projectPath = param.document.workspaceFolder.uri.fsPath;
-            selectedFile = param.document.uri.fsPath;
+        if (easyGitInner) {
+            projectName = param.projectName;
+            projectPath = param.projectPath;
+        } else {
+            try {
+                projectName = param.workspaceFolder.name;
+                projectPath = param.workspaceFolder.uri.fsPath;
+                selectedFile = param.fsPath;
+            } catch (e) {
+                projectName = param.document.workspaceFolder.name;
+                projectPath = param.document.workspaceFolder.uri.fsPath;
+                selectedFile = param.document.uri.fsPath;
+            };
         };
     } catch(e){
         return hx.window.setStatusBarMessage('easy-git: 无法获取到项目路径，请在项目管理器选中后再试。',4000, 'error');
     };
 
-    const innerProjectInfo = {
+    const ProjectInfo = {
         'projectName': projectName,
         'projectPath': projectPath,
         'easyGitInner': true
@@ -43,19 +49,19 @@ function action(param,action_name) {
             utils.gitPull(projectPath, {'rebase': true});
             break;
         case 'stash':
-            goStash(innerProjectInfo, '', 'Git: 储藏(stash)');
+            goStash(ProjectInfo, '', 'Git: 储藏(stash)');
             break;
         case 'stashAll':
-            goStash(innerProjectInfo, '-a', 'Git: 全部储藏(stash)')
+            goStash(ProjectInfo, '-a', 'Git: 全部储藏(stash)')
             break;
         case 'stashPop':
-            goStashPop(innerProjectInfo, 'isOther');
+            goStashPop(ProjectInfo, 'isOther');
             break;
         case 'stashPopNew':
-            goStashPop(innerProjectInfo, 'isNew');
+            goStashPop(ProjectInfo, 'isNew');
             break;
         case 'stashClear':
-            goStashClear(innerProjectInfo);
+            goStashClear(ProjectInfo);
             break;
         default:
             break;

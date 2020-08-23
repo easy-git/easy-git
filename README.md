@@ -123,6 +123,12 @@ easy-git, 支持通过快捷键打开git视图。
     "key": "",
     "command": "EasyGit.stashPopNew"
 }
+
+// Git stash 删除所有储藏
+{
+    "key": "",
+    "command": "EasyGit.stashClear"
+}
 ```
 
 ## 设置

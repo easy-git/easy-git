@@ -5,6 +5,7 @@ const hx = require('hbuilderx');
 
 const file = require('../file.js');
 let utils = require('../utils.js');
+const gitAction = require('../git.js');
 
 const icon = require('./static.js');
 const html = require('./mainHtml.js')
@@ -182,6 +183,14 @@ function active(webviewPanel, userConfig, gitData) {
                 break;;
             case 'gitConfigFile':
                 gitConfigFileSetting(msg.text);
+                break;
+            case 'stash':
+                let param = {
+                    'projectPath': projectPath,
+                    'projectName': projectName,
+                    'easyGitInner': true
+                };
+                gitAction.action(param,msg.option);
                 break;
             default:
                 break;
@@ -469,8 +478,7 @@ function active(webviewPanel, userConfig, gitData) {
         if (filename == '.gitattributes') {
             file.gitattributes(data);
         }
-    }
-
+    };
 };
 
 

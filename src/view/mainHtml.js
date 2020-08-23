@@ -278,6 +278,12 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                         <li title="git checkout ." @click="gitCheckout('all');">放弃本地所有更改</li>
                                         <li title="git clean -df" @click="clean();">删除未跟踪的文件</li>
                                         <li class="divider"></li>
+                                        <li title="stash" @click="gitStash('stash');">储藏</li>
+                                        <li title="stash -a" @click="gitStash('stashAll');">储藏全部(包含未跟踪的)</li>
+                                        <li title="stash pop" @click="gitStash('stashPop');">弹出储藏</li>
+                                        <li title="stash pop stash@{0}" @click="gitStash('stashPopNew');">弹出最新储藏</li>
+                                        <li title="stash clear" @click="gitStash('stashClear');">删除所有储藏</li>
+                                        <li class="divider"></li>
                                         <li title="git show remote origin" @click="showRemoteOrigin();">查看远程仓库信息</li>
                                         <li title="git config -l" @click="showConfig();">查看配置文件</li>
                                         <li class="divider"></li>
@@ -547,6 +553,12 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         hbuilderx.postMessage({
                             command: 'checkout',
                             text: file
+                        });
+                    },
+                    gitStash(option) {
+                        hbuilderx.postMessage({
+                            command: 'stash',
+                            option: option
                         });
                     },
                     showBranchWindow() {
