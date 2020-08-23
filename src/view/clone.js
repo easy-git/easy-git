@@ -85,6 +85,11 @@ function show(webviewPanel, userConfig) {
             };
             hx.commands.executeCommand('EasyGit.main', pinfo);
             hx.commands.executeCommand('workbench.view.explorer');
+        } else {
+            view.postMessage({
+                command: 'clone',
+                status: result
+            });
         };
     };
 };
@@ -270,6 +275,7 @@ function generateLogHtml(userConfig, uiData, hxData) {
                     mounted() {},
                     methods: {
                         gitClone() {
+                            console.log("开始克隆")
                             this.cloneInfo.repo = this.repo;
                             if (this.isShowOption) {
                                 this.cloneInfo.isAuth = true;

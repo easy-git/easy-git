@@ -160,13 +160,17 @@ function createOutputChannel(label=false,msg) {
 /**
  * @description 创建输出控制台
  */
-function createOutputChannelForClone(msg) {
+function createOutputChannelForClone(msg, newline=true) {
     let channel_name = "Git";
     let outputChannel = hx.window.createOutputChannel(channel_name);
     outputChannel.show();
 
     let text = `${msg}`;
-    outputChannel.appendLine('\n\n' + text);
+    if (newline) {
+        outputChannel.appendLine('\n\n' + text);
+    } else {
+        outputChannel.appendLine(text);
+    };
 };
 
 /**
@@ -276,18 +280,18 @@ async function gitClone(info) {
             options.push(t);
         };
 
-        createOutputChannelForClone(`开始克隆 ${projectName}！受网络影响，需要一定时间，请耐心等待。`);
+        createOutputChannelForClone(`开始克隆 ${projectName}！受网络影响，需要一定时间，请耐心等待。请不要重复点击【克隆】按钮。`, false);
 
         let status = await git()
             .clone(repo, localPath, options)
             .then((res) => {
-                createOutputChannelForClone(`克隆成功。本地路径: ${localPath}`);
+                createOutputChannelForClone(`克隆成功。本地路径: ${localPath}`, false);
                 return 'success'
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
                 createOutputChannelForClone('Git: 克隆仓库失败！' + errMsg);
-                createOutputChannelForClone('Git: 克隆失败，请参考: https://ext.dcloud.net.cn/plugin?id=2475');
+                createOutputChannelForClone('Git: 克隆失败，请参考: https://ext.dcloud.net.cn/plugin?id=2475', false);
                 return 'fail';
             });
         return status
