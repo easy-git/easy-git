@@ -7,6 +7,7 @@ const hx = require('hbuilderx');
 const spawn = require('cross-spawn')
 const ini = require('ini');
 
+const gitRemoteOriginUrl = require('git-remote-origin-url');
 const git = require('simple-git');
 // const git = simpleGit();
 
@@ -315,9 +316,17 @@ async function gitStatus(workingDir) {
         'ahead': '',
         'behind': '',
         'currentBranch': '',
-        'BranchTracking': ''
+        'BranchTracking': '',
+        'originurl': undefined
     };
+
+    // 仓库url
+    result.originurl = await gitRemoteOriginUrl(this.projectPath).catch(function (err){
+        return undefined
+    });
+
     try {
+
         let statusSummary = await git(workingDir).status();
         result.isGit = true;
         result.tracking = statusSummary.tracking
@@ -453,19 +462,19 @@ async function gitAddCommit(workingDir,commitComment) {
  * @description git: push
  * @param {String} projectPath 项目路径
  */
-async function gitPush(workingDir) {
+async function gitPush(workingDir, options=[]) {
     // status bar show message
     hx.window.setStatusBarMessage(`Git: 正在向远端推送......`, 2000, 'info');
     try {
         let status = await git(workingDir).init()
-            .push()
+            .push(options)
             .then(() => {
                 hx.window.setStatusBarMessage('Git: push success', 3000, 'info');
                 return 'success';
             })
             .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
-                createOutputChannel('Git: push失败', errMsg);
+                let errMsg = "\n" + (err).toString();
+                createOutputChannel('Git: push操作失败', errMsg);
                 return 'fail';
             });
         return status
@@ -566,6 +575,30 @@ async function gitCancelAdd(workingDir, filename) {
 
 
 /**
+ * @description reset操作
+ * @param {Object} workingDir
+ */
+async function gitReset(workingDir, options, msg) {
+    try {
+        let status = await git(workingDir).init()
+            .reset(options)
+            .then(() => {
+                hx.window.setStatusBarMessage(msg + '成功', 5000, 'info');
+                return 'success'
+            })
+            .catch((err) => {
+                let errMsg = "\n\n" + (err).toString();
+                createOutputChannel(msg + '失败', errMsg);
+                return 'fail';
+            });
+        return status;
+    } catch (e) {
+        return 'error';
+    };
+};
+
+
+/**
  * @description 撤销对文件的修改
  */
 async function gitCheckout(workingDir, filename) {
@@ -620,6 +653,32 @@ async function gitBranch(workingDir) {
     }
 };
 
+/**
+ * @description 获取当前分支名称
+ */
+async function gitCurrentBranchName(workingDir) {
+    try {
+        let status = await git(workingDir).init()
+            .branch()
+            .then((info) => {
+                let currentbranchName = '';
+                for (let s in info.branches) {
+                    if ((info.branches[s]).current) {
+                        currentbranchName = (info.branches[s]).name;
+                        break;
+                    };
+                }
+                return currentbranchName;
+            })
+            .catch((err) => {
+                hx.window.setStatusBarMessage('Git: 获取当前分支信息失败', 3000, 'error');
+                return false;
+            });
+        return status;
+    } catch (e) {
+        return false;
+    }
+};
 
 /**
  * @description 分支切换
@@ -1084,6 +1143,28 @@ async function gitConfigSet(workingDir, data) {
     };
 };
 
+/**
+ * @description add remote
+ */
+async function gitAddRemote(workingDir, url) {
+    try {
+        let status = await git(workingDir).init()
+            .addRemote('origin', url)
+            .then((res) => {
+                hx.window.setStatusBarMessage(`Git: 操作成功。`, 5000, 'info');
+                return 'success';
+            })
+            .catch((err) => {
+                createOutputChannel('Git: 操作失败', err);
+                return 'fail';
+            });
+        return status;
+    } catch (e) {
+        createOutputChannel('Git: 操作失败，插件运行异常。', e);
+        return 'error';
+    };
+};
+
 module.exports = {
     isGitInstalled,
     getHBuilderXiniConfig,
@@ -1099,12 +1180,14 @@ module.exports = {
     gitAddCommitPush,
     gitCancelAdd,
     gitCommit,
+    gitReset,
     gitPush,
     gitPull,
     gitFetch,
     gitCheckout,
     gitDiffFile,
     gitBranch,
+    gitCurrentBranchName,
     gitBranchSwitch,
     gitBranchCreate,
     gitDeleteLocalBranch,
@@ -1120,5 +1203,6 @@ module.exports = {
     gitRemoteshowOrigin,
     gitLog,
     gitStash,
-    gitStashList
+    gitStashList,
+    gitAddRemote
 }
