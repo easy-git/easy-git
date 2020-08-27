@@ -48,6 +48,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
         behind,
         originurl
     } = gitData;
+
+    let originurlBoolean = originurl != undefined ? true : false;
     ahead = ahead == 0 ? '' : ahead;
     behind = behind == 0 ? '': behind;
     gitStatusResult = gitStatusResult;
@@ -412,6 +414,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     currentBranch: "",
                     tracking: "",
                     originurl: "",
+                    originurlBoolean: "",
                     commitMessage: "",
                     GitStatusResult: {},
                     codeComment: '',
@@ -426,11 +429,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 },
                 computed: {
                     GitAssociationRemote() {
-                        if (this.originurl != 'undefined') {
-                            return true;
-                        } else {
-                            return false;
-                        }
+                        return this.originurlBoolean
                     }
                 },
                 created() {
@@ -443,6 +442,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     this.projectName = '${projectName}';
                     this.tracking = '${tracking}';
                     this.originurl = '${originurl}';
+                    this.originurlBoolean = ${originurlBoolean};
                     this.currentBranch = '${currentBranch}';
                 },
                 mounted() {
@@ -687,6 +687,7 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
     let branchs = JSON.stringify(BranchInfo);
     TagsList = JSON.stringify(TagsList.data);
 
+    let originurlBoolean = originurl != undefined ? true : false;
     ahead = ahead == 0 ? '' : ahead;
     behind = behind == 0 ? '': behind;
 
@@ -1006,6 +1007,7 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
                     currentBranch: '',
                     tracking: '',
                     originurl: '',
+                    originurlBoolean: '',
                     isShowModel: false,
                     inputBranch: '',
                     rawBranchList: '',
@@ -1038,11 +1040,7 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
                         return document.body.clientWidth <= 300 ? width : document.body.clientWidth - width;
                     },
                     GitAssociationRemote() {
-                        if (this.originurl != 'undefined') {
-                            return true;
-                        } else {
-                            return false;
-                        }
+                        return this.originurlBoolean
                     }
                 },
                 watch: {
@@ -1066,6 +1064,7 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
                     this.currentBranch = '${currentBranch}';
                     this.tracking = '${tracking}';
                     this.originurl = '${originurl}';
+                    this.originurlBoolean = ${originurlBoolean};
                     this.rawBranchList = ${branchs};
                     this.BranchList = ${branchs};
                     this.rawTagsList = ${TagsList};
