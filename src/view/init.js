@@ -6,8 +6,6 @@ const hx = require('hbuilderx');
 const utils = require('../utils.js');
 const icon = require('./static.js');
 
-const MainView = require('./main.js');
-
 
 /**
  * @description 显示Git初始化页面
@@ -51,21 +49,17 @@ function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
         let {projectPath,projectName} = msg;
         let status = await utils.gitInit(projectPath,projectName);
         if (status == 'success') {
+            let data = {
+                'projectPath': projectPath,
+                'projectName': projectName,
+                'easyGitInner': true
+            };
             if (viewId == 'EasyGitSourceCodeView') {
-                let gitInfo = await utils.gitStatus(projectPath,projectName);
-                let gitData = Object.assign(gitInfo, {
-                    'projectName': projectName,
-                    'projectPath': projectPath
-                });
-                MainView.active(webviewPanel, userConfig, gitData);
+                hx.commands.executeCommand('EasyGit.main',data);
             };
             if (viewId == 'EasyGitCommonView') {
-                let data = {
-                    'projectPath': projectPath,
-                    'projectName': projectName,
-                    'easyGitInner': true
-                }
                 hx.commands.executeCommand('EasyGit.main',data);
+                hx.commands.executeCommand('EasyGit.log',data);
             };
 
         }
