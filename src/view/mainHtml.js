@@ -34,7 +34,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
         AddAllIcon,
         checkoutIconSvg,
         MenuIcon,
-        HistoryIcon
+        HistoryIcon,
+        uploadIcon
     } = uiData;
 
     let {
@@ -42,10 +43,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
         projectName,
         gitStatusResult,
         currentBranch,
+        tracking,
         ahead,
-        behind
+        behind,
+        originurl
     } = gitData;
-
     ahead = ahead == 0 ? '' : ahead;
     behind = behind == 0 ? '': behind;
     gitStatusResult = gitStatusResult;
@@ -226,7 +228,6 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 right: 10px;
                 box-shadow: 0px 0px 6px 1px rgba(0,0,0,0.2);
             }
-
             .menu ul {
                 list-style:none;
                 padding-left: 0px;
@@ -265,8 +266,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
             <div id="filelist" class="container-fluid pb-5">
                 <div id="page-top" class="fixed-top">
                     <div class="row m-3">
-                        <div class="col-auto mr-auto p-0 project-name">
-                            <span class="top">${projectName}</span>
+                        <div class="col-auto mr-auto p-0 project-name" :title="projectName">
+                            <span class="top">{{projectName}}</span>
                         </div>
                         <div class="col-auto p-0">
                             <span class="top" @click="refresh();" title="刷新">${iconRefresh}</span>
@@ -277,6 +278,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 <div id="menu" :class="[ isShowMenu ? 'menu' : 'd-none' ]" @mouseleave="isShowMenu=false">
                                     <ul>
                                         <li title="git pull" @click="gitPull('');">拉取</li>
+                                        <li class="divider"></li>
+                                        <li title="git reset --soft HEAD^" @click="gitResetSoftHEAD();">撤销上次commit</li>
                                         <li class="divider"></li>
                                         <li title="git checkout ." @click="gitCheckout('all');">放弃本地所有更改</li>
                                         <li title="git clean -df" @click="clean();">删除未跟踪的文件</li>
@@ -377,10 +380,10 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 <div class="row m-0 fixedBottom" id="git_branch">
                     <div class="col-auto mr-auto" title="切换/管理分支">
                         <span class="cactive" @click="showBranchWindow();">
-                            ${BranchIcon} ${currentBranch}
+                            ${BranchIcon} {{ currentBranch }}
                         </span>
                     </div>
-                    <div class="col-auto push-pull">
+                    <div class="col-auto push-pull" v-if="GitAssociationRemote">
                         <div class="ml-2" @click="gitFetch();" title="git fetch --all">
                             ${SyncIcon}
                         </div>
@@ -393,6 +396,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             <span>${UpArrowIcon}</span>
                         </div>
                     </div>
+                    <div class="col-auto push-pull" v-else>
+                        <div :title="projectName + '(git) - 发布更改'" @click="publish();">
+                            ${uploadIcon}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -400,6 +408,10 @@ function getWebviewContent(userConfig, uiData, gitData) {
             var app = new Vue({
                 el: '#app',
                 data: {
+                    projectName: "",
+                    currentBranch: "",
+                    tracking: "",
+                    originurl: "",
                     commitMessage: "",
                     GitStatusResult: {},
                     codeComment: '',
@@ -412,6 +424,15 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     gitChangeFileListLength: 0,
                     gitStashFileListLength: 0
                 },
+                computed: {
+                    GitAssociationRemote() {
+                        if (this.originurl != 'undefined') {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                },
                 created() {
                     let ctrl = '${ctrl}';
                     if (ctrl == 'meta') {
@@ -419,6 +440,10 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     };
                     this.commitMessage = '消息（' + ctrl + '+Enter 在"${currentBranch}"提交）'
                     this.GitStatusResult = ${gitStatusResult};
+                    this.projectName = '${projectName}';
+                    this.tracking = '${tracking}';
+                    this.originurl = '${originurl}';
+                    this.currentBranch = '${currentBranch}';
                 },
                 mounted() {
                     this.getGitChangeFileList();
@@ -522,11 +547,16 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             exist: exist
                         });
                     },
-
                     gitPush() {
                         hbuilderx.postMessage({
                             command: 'push',
                             text: ''
+                        });
+                    },
+                    publish() {
+                        hbuilderx.postMessage({
+                            command: 'publish',
+                            text: this.currentBranch
                         });
                     },
                     gitFetch() {
@@ -573,6 +603,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     clean() {
                         hbuilderx.postMessage({
                             command: 'clean'
+                        });
+                    },
+                    gitResetSoftHEAD() {
+                        hbuilderx.postMessage({
+                            command: 'ResetSoftHEAD'
                         });
                     }
                 }
@@ -626,7 +661,8 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
         XIcon,
         SyncIcon,
         MergeIcon,
-        TagIcon
+        TagIcon,
+        uploadIcon
     } = uiData;
 
     let {
@@ -635,7 +671,9 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
         BranchInfo,
         TagsList,
         ahead,
-        behind
+        behind,
+        tracking,
+        originurl
     } = gitData;
 
     let currentBranch = '';
@@ -795,8 +833,8 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
             <div class="container-fluid pb-5" v-if="!isShowModel">
                 <div id="page-top" class="fixed-top">
                     <div class="row px-3 pt-3">
-                        <div class="col-auto mr-auto project-name">
-                            <span class="top">${projectName}</span>
+                        <div class="col-auto mr-auto project-name" :title="projectName">
+                            <span class="top">{{ projectName }}</span>
                         </div>
                         <div class="col-auto pl-0">
                             <span class="top" @click="back();" title="返回">${BackIcon}</span>
@@ -898,9 +936,11 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
             <div class="container-fluid" v-if="!isShowModel">
                 <div class="row m-0 fixedBottom" id="git_branch">
                     <div class="col-auto mr-auto" title="切换/管理分支">
-                        <span @click="showBranchWindow();" class="branch">${BranchIcon} ${currentBranch}</span>
+                        <span @click="showBranchWindow();" class="branch">
+                            ${BranchIcon} {{currentBranch}}
+                        </span>
                     </div>
-                    <div class="col-auto push-pull">
+                    <div class="col-auto push-pull" v-if="GitAssociationRemote">
                         <div class="ml-2" @click="gitFetch();" title="git fetch --all">
                             ${SyncIcon}
                         </div>
@@ -910,6 +950,11 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
                         <div @click="gitPush();" title="git push">
                             <span class="cactive num">${ahead}</span>
                             <span>${UpArrowIcon}</span>
+                        </div>
+                    </div>
+                    <div class="col-auto push-pull" v-else>
+                        <div :title="projectName + '(git) - 发布更改'" @click="publish();">
+                            ${uploadIcon}
                         </div>
                     </div>
                 </div>
@@ -957,7 +1002,10 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
             var app = new Vue({
                 el: '#app',
                 data: {
+                    projectName: '',
                     currentBranch: '',
+                    tracking: '',
+                    originurl: '',
                     isShowModel: false,
                     inputBranch: '',
                     rawBranchList: '',
@@ -972,13 +1020,6 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
                     inputDisabled: false,
                     hoverStampID: false,
                     hoverTagId: false
-                },
-                created() {
-                    this.currentBranch = '${currentBranch}';
-                    this.rawBranchList = ${branchs};
-                    this.BranchList = ${branchs};
-                    this.rawTagsList = ${TagsList};
-                    this.TagsList = ${TagsList};
                 },
                 computed:{
                     BranchStyle(){
@@ -996,6 +1037,13 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
                         let width = '150';
                         return document.body.clientWidth <= 300 ? width : document.body.clientWidth - width;
                     },
+                    GitAssociationRemote() {
+                        if (this.originurl != 'undefined') {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
                 },
                 watch: {
                     inputBranch: function (newv, oldv) {
@@ -1012,6 +1060,16 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
                         });
                         this.TagsList = tmp1;
                     }
+                },
+                created() {
+                    this.projectName = '${projectName}';
+                    this.currentBranch = '${currentBranch}';
+                    this.tracking = '${tracking}';
+                    this.originurl = '${originurl}';
+                    this.rawBranchList = ${branchs};
+                    this.BranchList = ${branchs};
+                    this.rawTagsList = ${TagsList};
+                    this.TagsList = ${TagsList};
                 },
                 mounted() {
                     document.getElementById('inputBranch').focus();
@@ -1032,6 +1090,12 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
                         hbuilderx.postMessage({
                             command: 'push',
                             text: ''
+                        });
+                    },
+                    publish() {
+                        hbuilderx.postMessage({
+                            command: 'publish',
+                            text: this.currentBranch
                         });
                     },
                     gitPull(options) {

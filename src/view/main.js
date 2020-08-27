@@ -10,17 +10,12 @@ const gitAction = require('../git.js');
 const icon = require('./static.js');
 const html = require('./mainHtml.js')
 
-/**
- * @description 显示webview
- * @param {Object} userConfig 用户配置
- * @param {Object} webviewPanel
- * @param {Object} gitData
- */
-function active(webviewPanel, userConfig, gitData) {
-    const view = webviewPanel.webView;
 
-    // 获取项目信息、git信息
-    const {projectPath,projectName,currentBranch} = gitData;
+/**
+ * @description 获取图标、各种颜色
+ * @return {Object} UIData
+ */
+function getUIData() {
 
     // 根据主题适配颜色
     let colorData = utils.getThemeColor();
@@ -45,6 +40,7 @@ function active(webviewPanel, userConfig, gitData) {
     let TagIcon = icon.getTagIcon(fontColor);
     let MenuIcon = icon.getMenuIcon(fontColor);
     let HistoryIcon = icon.getHistoryIcon(fontColor);
+    let uploadIcon = icon.getUploadIcon(fontColor);
 
     let iconData = {
         CancelIconSvg,
@@ -64,10 +60,355 @@ function active(webviewPanel, userConfig, gitData) {
         MergeIcon,
         TagIcon,
         MenuIcon,
-        HistoryIcon
+        HistoryIcon,
+        uploadIcon
     };
 
     let uiData = Object.assign(iconData,colorData);
+    return uiData;
+};
+
+
+/**
+ * @description  set .gitignore and .gitattributes
+ * @param {Object} filename
+ */
+function gitConfigFileSetting(projectPath, filename) {
+    let data = {
+        "projectPath": projectPath
+    };
+    if (filename == '.gitignore') {
+        file.gitignore(data);
+    };
+    if (filename == '.gitattributes') {
+        file.gitattributes(data);
+    }
+};
+
+
+/**
+ * @description Git分支
+ */
+class GitBranch {
+    constructor(webviewPanel, projectPath, projectName, uiData, userConfig) {
+        this.webviewPanel = webviewPanel;
+        this.projectPath = projectPath;
+        this.projectName = projectName;
+        this.uiData = uiData;
+        this.userConfig = userConfig;
+    }
+
+    async LoadingBranchData() {
+        let BranchInfo = await utils.gitBranch(this.projectPath);
+        let StatusInfo = await utils.gitStatus(this.projectPath);
+        let TagsList = await utils.gitTagsList(this.projectPath);
+        console.log(BranchInfo)
+        const gitData = Object.assign({
+            'BranchInfo': BranchInfo
+        }, {
+            'TagsList': TagsList
+        }, {
+            'projectName': this.projectName,
+            'projectPath': this.projectPath,
+            'ahead': StatusInfo.ahead,
+            'behind': StatusInfo.behind,
+            'tracking': StatusInfo.tracking
+        });
+        const bhtml = html.getWebviewBranchContent(this.userConfig, this.uiData, gitData);
+        this.webviewPanel.webView.html = bhtml;
+    };
+
+    // Git branch: switch
+    async switch(branchInfo) {
+        let {name,current} = branchInfo;
+        if (current) {
+            return;
+        };
+        if (name.includes('remote')) {
+            return hx.window.setStatusBarMessage('请勿在远程分支上操作');
+        };
+        let switchStatus = await utils.gitBranchSwitch(this.projectPath,name);
+        if (switchStatus == 'success') {
+            this.LoadingBranchData();
+        };
+    };
+
+    // Git branch: create
+    async create(info) {
+        let { newBranchName, ref } = info;
+        let data = Object.assign(
+            { 'projectPath': this.projectPath }, info
+        );
+        if (newBranchName == '') {
+            return hx.window.showErrorMessage('Git: 在输入框输入分支名称后，再点击创建。',['关闭']);
+        };
+        if (ref == undefined) {
+            let breachCreateStatus = await utils.gitBranchCreate(data);
+            if (breachCreateStatus == 'success') {
+                this.LoadingBranchData();
+            };
+        } else {
+            let breachCreateStatus = await utils.gitBranchCreate(data);
+            if (breachCreateStatus == 'success') {
+                this.LoadingBranchData();
+            };
+        };
+    };
+
+    // Git branch: create and push
+    async FromCurrentBranchCreatePush(branchName) {
+        if (branchName == '') {
+            return hx.window.showErrorMessage('Git: 在输入框输入分支名称后，再点击创建。',['关闭']);
+        };
+        let cpStatus = await utils.gitBranchCreatePush(this.projectPath,branchName);
+        if (cpStatus == 'success') {
+            this.LoadingBranchData();
+        };
+    };
+
+    // Git branch: push local branch to remote
+    async LocalToRemote(branchName) {
+        let toStatus = await utils.gitLocalBranchToRemote(this.projectPath,branchName);
+        if (toStatus == 'success') {
+            this.LoadingBranchData();
+        };
+    };
+
+    // Git branch: merge
+    async merge(fromBranch,toBranch) {
+        let mergeStatus = await utils.gitBranchMerge(this.projectPath,fromBranch,toBranch);
+        if (mergeStatus == 'success') {
+            this.refreshFileList();
+        };
+    };
+
+    // Git branch: delete
+    async delete(branchName) {
+        let delMsg = `Git: 确认删除 ${branchName} 分支?`;
+        let btn = await hx.window.showInformationMessage(delMsg, ['删除','关闭']).then((result) =>{
+            return result;
+        });
+        if (btn == '关闭') {
+            return;
+        };
+        if (branchName.includes('remotes/origin')) {
+            let delStatus1 = await utils.gitDeleteRemoteBranch(this.projectPath,branchName);
+            if (delStatus1 == 'success') {
+                this.LoadingBranchData();
+            };
+        } else {
+            let delStatus2 = await utils.gitDeleteLocalBranch(this.projectPath,branchName);
+            if (delStatus2 == 'success') {
+                this.LoadingBranchData();
+            };
+        };
+    };
+
+    // Git tag: create
+    async TagCreate(tagName) {
+        if (tagName.length == 0) {
+            return hx.window.showErrorMessage('tag名称无效，请重新输入。',['关闭']);
+        };
+        let tagCreateStatus = await utils.gitTagCreate(this.projectPath, tagName);
+        if (tagCreateStatus == 'success') {
+            this.LoadingBranchData();
+        };
+    };
+};
+
+
+/**
+ * @description Git文件
+ */
+class GitFile {
+    constructor(webviewPanel, projectPath, projectName, uiData, userConfig) {
+        this.webviewPanel = webviewPanel;
+        this.projectPath = projectPath;
+        this.projectName = projectName;
+        this.uiData = uiData;
+        this.userConfig = userConfig;
+    }
+
+    // refresh webview git filelist
+    async refreshFileList() {
+        try{
+            let gitInfo = await utils.gitStatus(this.projectPath);
+            const gitData = Object.assign(gitInfo, {
+                'projectName': this.projectName,
+                'projectPath': this.projectPath
+            });
+            const vhtml = html.getWebviewContent(this.userConfig, this.uiData, gitData);
+            this.webviewPanel.webView.html = vhtml;
+        }catch(e){};
+    };
+
+    // Git: add
+    async add(filename) {
+        let files = [];
+        files.push(filename);
+        let addStatus = await utils.gitAdd(this.projectPath, files);
+        if (addStatus == 'success') {
+            this.refreshFileList();
+        };
+    };
+
+    // Git: commit
+    async commit(isStaged, exist, comment) {
+        if (exist == 0){
+            return hx.window.setStatusBarMessage('Git: 当前不存在要提交的文件',3000,'info');
+        };
+        if (comment == '') {
+            return hx.window.showErrorMessage('Git: 请填写commit message后再提交。', ['我知道了']);
+        };
+        if (isStaged) {
+            let ciStatus = await utils.gitCommit(this.projectPath, comment);
+            if (ciStatus == 'success') {
+                this.refreshFileList();
+            };
+        } else {
+            // 需要判断用户是否开启了：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。
+            let config = hx.workspace.getConfiguration();
+            let AlwaysAutoAddCommit = config.get('EasyGit.AlwaysAutoAddCommit');
+            console.log('AlwaysAutoAddCommit-->',AlwaysAutoAddCommit)
+            if (AlwaysAutoAddCommit) {
+                let acStatus = await utils.gitAddCommit(this.projectPath, comment);
+                if (acStatus == 'success') {
+                    this.refreshFileList();
+                };
+            } else {
+                let userSelect = await hx.window.showInformationMessage(
+                    '没有可提交的暂存更改。\n是否要自动暂存所有更改并直接提交? \n',['总是','是','关闭'],
+                ).then( (result) => { return result; })
+
+                if (userSelect == '是' || userSelect == '总是') {
+                    const goAddCI = async () => {
+                        let acStatus = await utils.gitAddCommit(this.projectPath, comment);
+                        if (acStatus == 'success') {
+                            this.refreshFileList();
+                        };
+                    };
+                    goAddCI();
+                    if (userSelect == '总是') {
+                        config.update("EasyGit.AlwaysAutoAddCommit", true).then(() => {
+                            hx.window.setStatusBarMessage("Git已开启：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。", 5000,'info');
+                        })
+                    };
+                };
+            };
+        };
+    };
+
+    // Git: 撤销上次commit
+    async resetLastCommit() {
+        let resetStatus = await utils.gitReset(this.projectPath, ['--soft', 'HEAD^'], 'Git: 插销上次commit');
+        if (resetStatus == 'success') {
+            this.refreshFileList();
+        };
+    };
+
+    // Git: cancel add
+    async cancelAdd(fileUri) {
+        let cancelStatus = await utils.gitCancelAdd(this.projectPath, fileUri);
+        if (cancelStatus == 'success') {
+            this.refreshFileList();
+        };
+    };
+
+    // Git: clean
+    async clean() {
+        let cleanMsg = 'Git: 确认删除当前所有未跟踪的文件，删除后无法恢复。';
+        let isDeleteBtn = await hx.window.showInformationMessage(cleanMsg, ['删除','关闭']).then((result) =>{
+            return result;
+        });
+        if (isDeleteBtn == '关闭') {
+            return;
+        };
+        let cleanStatus = await utils.gitClean(this.projectPath);
+        if (cleanStatus == 'success') {
+            this.refreshFileList();
+        };
+    };
+
+    // Git: 撤销更改 git checkout -- filename
+    async checkoutFile(fileinfo) {
+        let fpath,fstatus;
+        if (fileinfo instanceof Object) {
+            fpath = fileinfo.path;
+            fstatus = fileinfo.status;
+        } else {
+            fpath = fileinfo;
+        };
+        if (fileinfo == 'all' || fstatus != 'not_added') {
+            let checkoutlStatus = await utils.gitCheckout(this.projectPath, fpath);
+            if (checkoutlStatus == 'success') {
+                this.refreshFileList();
+            };
+        };
+        if (fpath != 'all' && fstatus == 'not_added') {
+            let absPath = path.join(this.projectPath, fpath);
+            let status = await file.remove(absPath, fpath);
+            if (status) {
+                this.refreshFileList();
+            };
+        };
+    };
+
+    // Git: add -> commit -> push
+    async acp(commitComment) {
+        if (commitComment.trim() == '') {
+            return hx.window.showErrorMessage('请输入注释后再提交', ['我知道了']);
+        };
+        let acpStatus = await utils.gitAddCommitPush(this.projectPath, commitComment);
+        if (acpStatus == 'success') {
+            this.refreshFileList();
+        };
+    };
+
+};
+
+
+/**
+ * @description  Git Cofing
+ * @return {String} projectPath 项目路径
+ */
+class GitConfig {
+    constructor(projectPath) {
+        this.projectPath = projectPath;
+    };
+
+    async showOrigin() {
+        await utils.gitRemoteshowOrigin(this.projectPath);
+    };
+
+    async ConfigShow() {
+        await utils.gitConfigShow(this.projectPath);
+    };
+
+};
+
+/**
+ * @description 显示webview
+ * @param {Object} userConfig 用户配置
+ * @param {Object} webviewPanel
+ * @param {Object} gitData
+ */
+function active(webviewPanel, userConfig, gitData) {
+    const view = webviewPanel.webView;
+
+    // get project info , and git info
+    const {projectPath,projectName,currentBranch} = gitData;
+    
+    // UI: color and svg icon
+    let uiData = getUIData();
+
+    // Git: 分支
+    let Branch = new GitBranch(webviewPanel, projectPath, projectName, uiData, userConfig);
+
+    // Git: 文件
+    let File = new GitFile(webviewPanel, projectPath, projectName, uiData, userConfig);
+
+    // Git: Config配置
+    let GitCfg = new GitConfig(projectPath);
 
     // get webview html content
     const viewContent = html.getWebviewContent(userConfig, uiData, gitData);
@@ -79,10 +420,10 @@ function active(webviewPanel, userConfig, gitData) {
         let action = msg.command;
         switch (action) {
             case 'back':
-                refreshFileList();
+                File.refreshFileList();
                 break;
             case 'refresh':
-                refreshFileList();
+                File.refreshFileList();
                 break;
             case 'diff':
                 utils.gitDiffFile(projectPath,msg.filename);
@@ -92,7 +433,7 @@ function active(webviewPanel, userConfig, gitData) {
                     'projectPath': projectPath,
                     'projectName': projectName,
                     'easyGitInner': true
-                }
+                };
                 hx.commands.executeCommand('EasyGit.log',data);
                 break;
             case 'open':
@@ -100,32 +441,34 @@ function active(webviewPanel, userConfig, gitData) {
                 hx.workspace.openTextDocument(fileUri);
                 break;
             case 'add':
-                add(projectPath, msg.text);
+                File.add(msg.text);
                 break;
             case 'commit':
                 let {isStaged,exist,comment} = msg;
-                commit(projectPath, isStaged, exist, comment);
+                File.commit(isStaged, exist, comment);
+                break;
+            case 'ResetSoftHEAD':
+                File.resetLastCommit();
                 break;
             case 'push':
-                push(projectPath, msg.text);
+                push(projectPath);
+                break;
+            case 'publish':
+                goPublish(projectPath, msg);
                 break;
             case 'acp':
                 let commitComment = msg.text;
-                if (commitComment.trim() == '') {
-                    hx.window.showErrorMessage('请输入注释后再提交', ['我知道了']);
-                } else {
-                    ACP(commitComment);
-                };
+                File.acp(commitComment);
                 break;
             case 'diff':
                 let fileAbsPath = path.join(projectPath, msg.text);
                 hx.commands.executeCommand('file.compareWithLastVersion', fileAbsPath);
                 break;
             case 'checkout':
-                CheckoutFile(projectPath, msg.text);
+                File.checkoutFile(msg.text);
                 break;
             case 'cancelStash':
-                CancelAdd(projectPath, msg.text);
+                File.cancelAdd(msg.text);
                 break;
             case 'pull':
                 pull(projectPath,msg);
@@ -135,54 +478,44 @@ function active(webviewPanel, userConfig, gitData) {
                 break;
             case 'BranchInfo':
                 if (msg.text == 'branch') {
-                    LoadingBranchData();
+                    Branch.LoadingBranchData();
                 } else {
-                    refreshFileList();
+                    File.refreshFileList();
                 };
                 break;
             case 'BranchSwitch':
-                BranchSwitch(msg.text);
+                Branch.switch(msg.text);
                 break;
             case 'BranchCreate':
-                BranchCreate(msg);
+                Branch.create(msg);
                 break;
             case 'pushBranchToRemote':
-                BranchToRemote(msg.text);
+                Branch.LocalToRemote(msg.text);
                 break;
             case 'BranchCreatePush':
-                FromCurrentBranchCreatePush(msg.text);
+                Branch.FromCurrentBranchCreatePush(msg.text);
+                break;
+            case 'BranchMerge':
+                Branch.merge(msg.from,msg.to);
                 break;
             case 'BranchDelete':
                 let branch = msg.text;
-                let delMsg = `Git: 确认删除 ${branch} 分支?`;
-                hx.window.showInformationMessage(delMsg, ['删除','关闭']).then((result) =>{
-                    if (result == '删除') {
-                        BranchDelete(branch);
-                    };
-                });
-                break;
-            case 'BranchMerge':
-                BranchMerge(msg.from,msg.to);
+                Branch.delete(branch);
                 break;
             case 'CreateTag':
-                TagCreate(msg.text);
+                Branch.TagCreate(msg.text);
                 break;
             case 'clean':
-                let cleanMsg = 'Git: 确认删除当前所有未跟踪的文件，删除后无法恢复。';
-                hx.window.showInformationMessage(cleanMsg, ['删除','关闭']).then((result) =>{
-                    if (result == '删除') {
-                        CleanFile();
-                    };
-                });
+                File.clean();
                 break;
             case 'configShow':
-                ConfigShow();
+                GitCfg.ConfigShow();
                 break;
             case 'showOrigin':
-                showOrigin();
+                GitCfg.showOrigin();
                 break;;
             case 'gitConfigFile':
-                gitConfigFileSetting(msg.text);
+                gitConfigFileSetting(projectPath, msg.text);
                 break;
             case 'stash':
                 let param = {
@@ -197,186 +530,21 @@ function active(webviewPanel, userConfig, gitData) {
         };
     });
 
-    // refresh webview git filelist
-    async function refreshFileList() {
-        let gitInfo = await utils.gitStatus(projectPath);
-        const gitData = Object.assign(gitInfo, {
-            'projectName': projectName,
-            'projectPath': projectPath
-        });
-        const vhtml = html.getWebviewContent(userConfig, uiData, gitData);
-        webviewPanel.webView.html = vhtml;
-    };
-
-
-    // get webview git branchs
-    async function LoadingBranchData() {
-        let BranchInfo = await utils.gitBranch(projectPath);
-        let StatusInfo = await utils.gitStatus(projectPath);
-        let TagsList = await utils.gitTagsList(projectPath);
-        const gitData = Object.assign(
-            {'BranchInfo': BranchInfo}, {'TagsList': TagsList}, {
-            'projectName': projectName,
-            'projectPath': projectPath,
-            'ahead': StatusInfo.ahead,
-            'behind': StatusInfo.behind
-        });
-        const bhtml = html.getWebviewBranchContent(userConfig, uiData, gitData);
-        webviewPanel.webView.html = bhtml;
-    };
-
-    // git branch switch
-    async function BranchSwitch(branchInfo) {
-        let {name,current} = branchInfo;
-        if (current) {
-            return;
-        };
-        if (name.includes('remote')) {
-            return hx.window.setStatusBarMessage('请勿在远程分支上操作');
-        };
-
-        let switchStatus = await utils.gitBranchSwitch(projectPath,name);
-        if (switchStatus == 'success') {
-            LoadingBranchData();
-        };
-    };
-
-    // git branch create
-    async function BranchCreate(info) {
-        let {newBranchName,ref} = info;
-        let data = Object.assign(
-            {'projectPath':projectPath},info
-        )
-        if (newBranchName == '') {
-            return hx.window.showErrorMessage('Git: 在输入框输入分支名称后，再点击创建。',['关闭']);
-        };
-        if (ref == undefined) {
-            let breachCreateStatus = await utils.gitBranchCreate(data);
-            if (breachCreateStatus == 'success') {
-                LoadingBranchData();
-            };
-        } else {
-            let breachCreateStatus = await utils.gitBranchCreate(data);
-            if (breachCreateStatus == 'success') {
-                LoadingBranchData();
-            };
-        };
-    };
-
-    // git branch create and push
-    async function FromCurrentBranchCreatePush(branchName) {
-        if (branchName == '') {
-            return hx.window.showErrorMessage('Git: 在输入框输入分支名称后，再点击创建。',['关闭']);
-        };
-        let cpStatus = await utils.gitBranchCreatePush(projectPath,branchName);
-        if (cpStatus == 'success') {
-            LoadingBranchData();
-        };
-    };
-
-    // git push local branch to remote
-    async function BranchToRemote(branchName) {
-        let toStatus = await utils.gitLocalBranchToRemote(projectPath,branchName);
-        if (toStatus == 'success') {
-            LoadingBranchData();
-        };
-    };
-
-    // git branch git
-    async function BranchMerge(fromBranch,toBranch) {
-        let mergeStatus = await utils.gitBranchMerge(projectPath,fromBranch,toBranch);
-        if (mergeStatus == 'success') {
-            refreshFileList();
-        }
-    };
-
-    // git branch delete
-    async function BranchDelete(branchName) {
-        if (branchName.includes('remotes/origin')) {
-            let delStatus1 = await utils.gitDeleteRemoteBranch(projectPath,branchName);
-            if (delStatus1 == 'success') {
-                LoadingBranchData();
-            };
-        } else {
-            let delStatus2 = await utils.gitDeleteLocalBranch(projectPath,branchName);
-            if (delStatus2 == 'success') {
-                LoadingBranchData();
-            };
-        }
-    };
-
-    // git add -> commit -> push
-    async function ACP(commitComment) {
-        let acpStatus = await utils.gitAddCommitPush(projectPath, commitComment);
-        if (acpStatus == 'fail') {
-            view.html = viewContent;
-        } else if (acpStatus == 'success') {
-            refreshFileList();
-        };
-    };
-
-    // git add
-    async function add(projectPath, filename) {
-        let files = [];
-        files.push(filename);
-        let addStatus = await utils.gitAdd(projectPath, files);
-        if (addStatus == 'success') {
-            refreshFileList();
-        };
-    };
-
-    // git commit
-    async function commit(projectPath, isStaged, exist, comment) {
-        if (exist == 0){
-            return hx.window.setStatusBarMessage('Git: 当前不存在要提交的文件',3000,'info');
-        };
-        if (isStaged) {
-            let ciStatus = await utils.gitCommit(projectPath, comment);
-            if (ciStatus == 'success') {
-                refreshFileList();
-            };
-        } else {
-            // 需要判断用户是否开启了：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。
-            let config = hx.workspace.getConfiguration();
-            let AlwaysAutoAddCommit = config.get('EasyGit.AlwaysAutoAddCommit');
-
-            if (AlwaysAutoAddCommit) {
-                let acStatus = await utils.gitAddCommit(projectPath, comment);
-                if (acStatus == 'success') {
-                    refreshFileList();
-                };
-            } else {
-                hx.window.showInformationMessage(
-                    '没有可提交的暂存更改。\n是否要自动暂存所有更改并直接提交?',['总是','是','关闭'],
-                ).then( (result) => {
-                    if (result == '是' || result == '总是') {
-                        const goAddCI = async () => {
-                            let acStatus = await utils.gitAddCommit(projectPath, comment);
-                            if (acStatus == 'success') {
-                                refreshFileList();
-                            };
-                        };
-                        goAddCI();
-                    };
-                    if (result == '总是') {
-                        config.update("EasyGit.AlwaysAutoAddCommit", true).then(() => {
-                            hx.window.setStatusBarMessage(
-                                "Git已开启：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。", 5000,'info'
-                            );
-                        })
-                    };
-                });
-            };
-        }
-    };
 
     // git push
-    async function push(projectPath, filename) {
-        let files = [];
-        files.push(filename);
-        let pushStatus = await utils.gitPush(projectPath, files);
+    async function push(projectPath) {
+        let pushStatus = await utils.gitPush(projectPath);
         if (pushStatus == 'success') {
-            refreshFileList();
+            File.refreshFileList();
+        };
+    };
+
+    // git publish
+    async function goPublish(projectName, msg) {
+        let branchName = msg.text;
+        let pushStatus = await utils.gitPush(projectPath,['-u', 'origin', branchName]);
+        if (pushStatus == 'success') {
+            File.refreshFileList();
         };
     };
 
@@ -387,9 +555,9 @@ function active(webviewPanel, userConfig, gitData) {
         let pullStatus = await utils.gitPull(projectPath,options);
         if (pullStatus == 'success') {
             if (text == 'file') {
-                refreshFileList();
+                File.refreshFileList();
             } else {
-                LoadingBranchData();
+                Branch.LoadingBranchData();
             };
         };
     };
@@ -399,86 +567,13 @@ function active(webviewPanel, userConfig, gitData) {
         let fetchStatus = await utils.gitFetch(projectPath);
         if (fetchStatus == 'success') {
             if (source == 'file') {
-                refreshFileList();
+                File.refreshFileList();
             } else {
-                LoadingBranchData();
+                Branch.LoadingBranchData();
             };
         };
     };
 
-    // git cancel add
-    async function CancelAdd(projectPath, fileUri) {
-        let cancelStatus = await utils.gitCancelAdd(projectPath, fileUri);
-        if (cancelStatus == 'success') {
-            refreshFileList();
-        };
-    };
-
-    // 撤销更改: git checkout -- filename
-    async function CheckoutFile(projectPath, fileinfo) {
-        let fpath,fstatus;
-        if (fileinfo instanceof Object) {
-            fpath = fileinfo.path;
-            fstatus = fileinfo.status;
-        } else {
-            fpath = fileinfo;
-        };
-        if (fileinfo == 'all' || fstatus != 'not_added') {
-            let checkoutlStatus = await utils.gitCheckout(projectPath, fpath);
-            if (checkoutlStatus == 'success') {
-                refreshFileList();
-            };
-        };
-        if (fpath != 'all' && fstatus == 'not_added') {
-            let absPath = path.join(projectPath, fpath);
-            let status = await file.remove(absPath,fpath);
-            if (status) {
-                refreshFileList();
-            };
-        };
-    };
-
-    // git tag create
-    async function TagCreate(tagName) {
-        if (tagName.length == 0) {
-            return hx.window.showErrorMessage('tag名称无效，请重新输入。',['关闭']);
-        }
-        let tagCreateStatus = await utils.gitTagCreate(projectPath,tagName);
-        if (tagCreateStatus == 'success') {
-            LoadingBranchData();
-        }
-    };
-
-    // git clean
-    async function CleanFile() {
-        let cleanStatus = await utils.gitClean(projectPath);
-        if (cleanStatus == 'success') {
-            refreshFileList();
-        }
-    };
-
-    // git config show
-    async function ConfigShow() {
-        await utils.gitConfigShow(projectPath);
-    };
-
-    // git remote show origin
-    async function showOrigin() {
-        await utils.gitRemoteshowOrigin(projectPath);
-    };
-
-    // git config file
-    function gitConfigFileSetting(filename) {
-        let data = {
-            "projectPath": projectPath
-        };
-        if (filename == '.gitignore') {
-            file.gitignore(data);
-        };
-        if (filename == '.gitattributes') {
-            file.gitattributes(data);
-        }
-    };
 };
 
 
