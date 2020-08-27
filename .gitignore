@@ -6,8 +6,7 @@
 *.swp
 
 # JavaScript
-# node_modules/
-.node_modules/
+!.node_modules/
 .eslintcache
 unpackage/dist/build/
 unpackage/dist/dev/

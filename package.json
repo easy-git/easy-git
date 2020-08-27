@@ -1,8 +1,8 @@
 {
     "name": "easy-git",
-    "description": "HBuilderX内图形化Git工具，简单好用唯一。",
-    "displayName": "【easy-git】Git源码管理",
-    "version": "0.0.6",
+    "description": "HBuilderX内唯一的图形化Git工具, vscode源代码管理工具风格, 简单易上手。",
+    "displayName": "【easy-git】Git源代码管理工具",
+    "version": "0.0.9",
     "publisher": "oneone",
     "engines": {
         "HBuilderX": "^2.8.3"
@@ -137,22 +137,27 @@
             }
         ],
         "menus": {
-            "explorer/context": [{
+            "explorer/context": [
+                {
                     "command": "EasyGit.main",
                     "group": "z_commands"
-                }, {
+                },
+                {
                     "command": "EasyGit.log",
                     "title": "easy-git: 查看日志",
                     "group": "z_commands"
-                }, {
+                },
+                {
                     "group": "z_commands"
                 }
             ],
-            "editor/context": [{
+            "editor/context": [
+                {
                     "command": "EasyGit.log",
                     "title": "easy-git: 查看日志",
                     "group": "z_commands"
-                },{
+                },
+                {
                     "group": "z_commands"
                 }
             ],
@@ -217,6 +222,7 @@
     ],
     "dependencies": {
         "cross-spawn": "^7.0.3",
+        "git-remote-origin-url": "^3.1.0",
         "ini": "^1.3.5",
         "simple-git": "^2.17.0"
     }
