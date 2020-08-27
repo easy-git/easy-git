@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.0.9
+* 
+
+## 0.0.8
+* 修复 0.0.6版本 引出的 项目初始化后，打开Git文件视图失败的Bug
+* 修复 本地没有设置user.name和user.email时，提示不准确的Bug
+
+## 0.0.7
+* 新增 Git 插销上次commit
+* 修复 Git日志视图 关闭log详情窗口，导致日志视图无法滚动的Bug
+
 ## 0.0.6
 * 新增 Git 储藏、储藏最新、弹出储藏、清除所有储藏功能
 * 新增 Git 设置user.name和user.email功能 （菜单【工具】【easy-git】)
