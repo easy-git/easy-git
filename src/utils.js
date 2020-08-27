@@ -321,12 +321,11 @@ async function gitStatus(workingDir) {
     };
 
     // 仓库url
-    result.originurl = await gitRemoteOriginUrl(this.projectPath).catch(function (err){
+    result.originurl = await gitRemoteOriginUrl(workingDir).catch(function (err){
         return undefined
     });
 
     try {
-
         let statusSummary = await git(workingDir).status();
         result.isGit = true;
         result.tracking = statusSummary.tracking

@@ -102,7 +102,7 @@ class GitBranch {
         let BranchInfo = await utils.gitBranch(this.projectPath);
         let StatusInfo = await utils.gitStatus(this.projectPath);
         let TagsList = await utils.gitTagsList(this.projectPath);
-        console.log(BranchInfo)
+
         const gitData = Object.assign({
             'BranchInfo': BranchInfo
         }, {
@@ -112,7 +112,8 @@ class GitBranch {
             'projectPath': this.projectPath,
             'ahead': StatusInfo.ahead,
             'behind': StatusInfo.behind,
-            'tracking': StatusInfo.tracking
+            'tracking': StatusInfo.tracking,
+            'originurl': StatusInfo.originurl
         });
         const bhtml = html.getWebviewBranchContent(this.userConfig, this.uiData, gitData);
         this.webviewPanel.webView.html = bhtml;
@@ -269,7 +270,7 @@ class GitFile {
             // 需要判断用户是否开启了：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。
             let config = hx.workspace.getConfiguration();
             let AlwaysAutoAddCommit = config.get('EasyGit.AlwaysAutoAddCommit');
-            console.log('AlwaysAutoAddCommit-->',AlwaysAutoAddCommit)
+
             if (AlwaysAutoAddCommit) {
                 let acStatus = await utils.gitAddCommit(this.projectPath, comment);
                 if (acStatus == 'success') {
@@ -381,7 +382,7 @@ class GitConfig {
     };
 
     async ConfigShow() {
-        await utils.gitConfigShow(this.projectPath);
+        return await utils.gitConfigShow(this.projectPath);
     };
 
 };
@@ -396,8 +397,8 @@ function active(webviewPanel, userConfig, gitData) {
     const view = webviewPanel.webView;
 
     // get project info , and git info
-    const {projectPath,projectName,currentBranch} = gitData;
-    
+    const { projectPath, projectName, currentBranch, originurl } = gitData;
+
     // UI: color and svg icon
     let uiData = getUIData();
 
@@ -478,7 +479,11 @@ function active(webviewPanel, userConfig, gitData) {
                 break;
             case 'BranchInfo':
                 if (msg.text == 'branch') {
-                    Branch.LoadingBranchData();
+                    if (originurl == undefined) {
+                        hx.window.showErrorMessage('请发布此项目到远程到后再进行操作。', ['我知道了']);
+                    } else {
+                        Branch.LoadingBranchData();
+                    };
                 } else {
                     File.refreshFileList();
                 };
@@ -542,7 +547,7 @@ function active(webviewPanel, userConfig, gitData) {
     // git publish
     async function goPublish(projectName, msg) {
         let branchName = msg.text;
-        let pushStatus = await utils.gitPush(projectPath,['-u', 'origin', branchName]);
+        let pushStatus = await utils.gitPush(projectPath,[]);
         if (pushStatus == 'success') {
             File.refreshFileList();
         };

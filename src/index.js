@@ -129,7 +129,7 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
 
         // 用户是否设置过不再提示
         let { GitConfigUserPrompt } = userConfig;
-        console.log('GitConfigUserPrompt',GitConfigUserPrompt);
+        
         if ((gitEmail == '' || gitUserName == '') && (GitConfigUserPrompt != false)) {
             let msg = `当前项目 ${projectName} 未设置`
             if (gitUserName == '') {
