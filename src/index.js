@@ -124,18 +124,27 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
 
         // 检查是否设置了username和email，如未设置，弹窗提示
         let configData = await utils.gitConfigShow(projectPath, false);
-        let gitUserName = configData['user.email'];
-        let gitEmail = configData['user.name'];
-        if (!gitEmail || !gitUserName) {
+        let gitUserName = configData['user.name'];
+        let gitEmail = configData['user.email'];
+
+        // 用户是否设置过不再提示
+        let { GitConfigUserPrompt } = userConfig;
+        console.log('GitConfigUserPrompt',GitConfigUserPrompt);
+        if ((gitEmail == '' || gitUserName == '') && (GitConfigUserPrompt != false)) {
             let msg = `当前项目 ${projectName} 未设置`
-            if (!gitEmail) {
-                msg = msg + 'user.mail'
+            if (gitUserName == '') {
+                msg = msg + 'user.name'
             };
-            if (!gitUserName) {
-                msg = msg + ' user.name'
+            if (gitEmail == '') {
+                msg = msg + 'user.email'
             };
-            msg = msg + ", 点击菜单【工具】【easy-git】可进行设置。"
-            hx.window.showErrorMessage(msg,['我知道了']).then((result)=> {});
+            msg = msg + ", 点击菜单【工具】【easy-git】可进行设置。\n"
+            hx.window.showErrorMessage(msg,['我知道了','不再提示']).then((result)=> {
+                if (result == '不再提示') {
+                    let config = hx.workspace.getConfiguration();
+                    config.update("EasyGit.GitConfigUserPrompt", false).then(() => {});
+                }
+            });
         };
     };
 
@@ -254,8 +263,10 @@ async function main(viewType, param, webviewPanel, context) {
     // user config
     let config = hx.workspace.getConfiguration();
     let DisableDevTools = config.get('EasyGit.DisableDevTools');
+    let GitConfigUserPrompt = config.get('EasyGit.GitConfigUserPrompt');
     let userConfig = {
-        'DisableDevTools': DisableDevTools
+        'DisableDevTools': DisableDevTools,
+        'GitConfigUserPrompt': GitConfigUserPrompt
     };
 
     // 项目管理器所有项目信息
