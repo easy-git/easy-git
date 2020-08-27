@@ -85,6 +85,7 @@ async function show(webviewPanel, userConfig, gitData) {
             let emsg = `日志搜索失败，原因：<span>${gitLogInfo.errorMsg}。</span>请查看: <a href="https://ext.dcloud.net.cn/plugin?id=2475">git log搜索方法</a>`
             hx.window.showErrorMessage(emsg,['关闭']);
         };
+
         gitData = Object.assign(gitData,{
             "logData": gitLogInfo.data
         });
@@ -93,7 +94,29 @@ async function show(webviewPanel, userConfig, gitData) {
         } else {
             delete gitData.searchText;
         };
-        view.html = generateLogHtml(userConfig, uiData, gitData);
+
+        try{
+            let currentBranchName = await utils.gitCurrentBranchName(projectPath);
+            if (currentBranchName) {
+                gitData.currentBranch = currentBranchName;
+            };
+        }catch(e){
+            console.error(e);
+        };
+
+        if (condition != 'default') {
+            try{
+                view.postMessage({
+                    command: "search",
+                    gitData: gitData
+                });
+            }catch(e){
+                console.log(e)
+                view.html = generateLogHtml(userConfig, uiData, gitData);
+            };
+        } else {
+            view.html = generateLogHtml(userConfig, uiData, gitData);
+        };
     };
 
     if (selectedFile != '' && selectedFile != undefined) {
@@ -349,7 +372,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         <div class="row px-3 pt-3">
                             <div class="col">
                                 <h6 class="project-name">
-                                    ${projectName} / ${currentBranch}
+                                    {{ projectName }} / {{ currentBranch }}
                                 </h6>
                                 <div class="d-flex">
                                     <div class="flex-grow-1">
@@ -361,7 +384,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                             style="background: ${background};"
                                             autofocus="autofocus"
                                             v-model.trim="searchText"
-                                            v-on:keyup.enter="searchLog();"/>
+                                            v-on:keyup.enter="searchLog();" />
                                     </div>
                                     <div class="pt-2 px-1">
                                         <span @click.once="searchLog();">${searchIcon}</span>
@@ -457,12 +480,13 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     el: '#app',
                     data: {
                         searchText: '',
+                        currentBranch: '',
                         projectName: '',
+                        gitLogInfoList: [],
                         hoverLogID: '',
                         isShowViewDetails: false,
                         logDetails: {},
-                        logDetailsFiles: [],
-                        gitLogInfoList: []
+                        logDetailsFiles: []
                     },
                     filters: {
                         FormatDate: function(date) {
@@ -477,11 +501,24 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         }
                     },
                     created() {
-                        this.projectName = '${projectName}'
-                        this.gitLogInfoList = ${logData}
+                        this.projectName = '${projectName}';
+                        this.gitLogInfoList = ${logData};
+                        this.currentBranch = '${currentBranch}';
+                        this.searchText = '${searchText}';
                     },
                     mounted() {
-                        this.searchText = '${searchText}'
+                        that = this;
+                        window.onload = function() {
+                            hbuilderx.onDidReceiveMessage((msg) => {
+                                if (msg.command != 'search') {return};
+                                if (msg.gitData) {
+                                    let gitData = msg.gitData;
+                                    that.gitLogInfoList = gitData.logData;
+                                    that.searchText = gitData.searchText;
+                                    that.currentBranch = gitData.currentBranch;
+                                }
+                            });
+                        };
                     },
                     methods: {
                         refresh() {
@@ -548,6 +585,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         },
                         closeViewDetails() {
                             this.isShowViewDetails = false;
+                            document.body.style.overflow = 'auto';
                         },
                         openFile(filename) {
                             hbuilderx.postMessage({
