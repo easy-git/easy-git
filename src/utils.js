@@ -1021,7 +1021,7 @@ async function gitConfigShow(workingDir, isPrint=true) {
  * @param {String} filterCondition 过滤条件，逗号分割
  */
 async function gitLog(workingDir, searchType, filterCondition) {
-    filter = ['-n 100']
+    filter = ['-n 50']
     if (filterCondition != 'default') {
         if (filterCondition.includes('-n')) {
             filter = filterCondition.split(',');

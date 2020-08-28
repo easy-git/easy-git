@@ -6,27 +6,12 @@ const hx = require('hbuilderx');
 const utils = require('../utils.js');
 const icon = require('./static.js');
 
-/**
- * @description 验证是否是日期
- * @param {Object} str
- */
-function validateData(str) {
-    if (['yesterday','today'].includes(str)) {
-        return true;
-    };
-    return  /^(\d{4})(\/|\-)(\d{2})(\/|\-)(\d{2}) (\d{2})(?:\:\d{2}|:(\d{2}):(\d{2}))$/.test(str) || /^(\d{4})\-(\d{2})\-(\d{2})$/.test(str);
-};
-
 
 /**
- * @description log view
- * @param {Object} viewType
- * @param {Object} param
- * @param {Object} webviewPanel
+ * @description 获取图标、各种颜色
+ * @return {Object} UIData
  */
-async function show(webviewPanel, userConfig, gitData) {
-    const view = webviewPanel.webView;
-
+function getUIData() {
     // 根据主题适配颜色
     let colorData = utils.getThemeColor();
     let {fontColor,lineColor} = colorData;
@@ -39,26 +24,46 @@ async function show(webviewPanel, userConfig, gitData) {
 
     let iconData = {helpIcon,refreshIcon,searchIcon,noIcon};
     let uiData = Object.assign(iconData,colorData);
+    return uiData
+};
 
-    // get project info
-    const {projectPath, projectName, selectedFile, currentBranch} = gitData;
 
-    let searchType = 'branch';
+class LogView {
+    constructor(webviewPanel, gitData, uiData, userConfig) {
+        this.webviewPanel = webviewPanel;
+        this.projectPath = gitData.projectPath;
+        this.projectName = gitData.projectName;
+        this.uiData = uiData;
+        this.userConfig = userConfig;
+        this.gitData = gitData;
+    }
 
-    // get webview html content, set html
-    async function setLogView(searchType, condition) {
-        // 引导用户正确的使用日期查询
-        if(validateData(condition)){
-            return hx.window.showErrorMessage(
-                '检测到您只输入了一个日期, 日期查询, 请使用--after、--before、--since、--until。例如:--after=2020/8/1 \n',
-                ['我知道了']
-           );
+    // 验证搜索条件是否是日期
+    validateData(str) {
+        if (['yesterday','today'].includes(str)) {
+            return true;
         };
+        return  /^(\d{4})(\/|\-)(\d{2})(\/|\-)(\d{2}) (\d{2})(?:\:\d{2}|:(\d{2}):(\d{2}))$/.test(str) || /^(\d{4})\-(\d{2})\-(\d{2})$/.test(str);
+    };
 
-        // 引导使用--grep
-        if (!validateData(condition) &&
+    // 验证Email
+    validateEmail(condition) {
+        if (condition!='default' &&
+            !condition.includes(',') &&
+            !condition.includes('--author=') &&
+            (/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(condition))
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    // set --group
+    setGroupSearch(condition) {
+        if (!this.validateData(condition) &&
             condition!='default' &&
-            !(fs.existsSync(path.join(projectPath,condition)))&&
+            !(fs.existsSync(path.join(this.projectPath, condition)))&&
             !(condition.includes('.')) &&
             !condition.includes(',') &&
             !condition.includes('-n ') &&
@@ -67,70 +72,110 @@ async function show(webviewPanel, userConfig, gitData) {
             !(/\-\-([A-Za-z0-9]+)(\=?)/.test(condition)) &&
             !(/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(condition))
         ) {
-            condition = '--grep=' + condition;
+            return true;
+        } else {
+            return false;
+        };
+    };
+
+    // get webview html content, set html
+    async setView(searchType, condition) {
+        // 引导用户正确的使用日期查询
+        if(this.validateData(condition)){
+            return hx.window.showErrorMessage(
+                '检测到您只输入了一个日期, 日期查询, 请使用--after、--before、--since、--until。例如:--after=2020/8/1 \n',
+                ['我知道了']
+           );
         };
 
         // 引导email搜索
-        if (condition!='default' &&
-            !condition.includes(',') &&
-            !condition.includes('--author=') &&
-            (/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(condition))
-        ) {
+        if (this.validateEmail(condition)) {
             condition = '--author=' + condition;
         };
 
-        // 搜索
-        let gitLogInfo = await utils.gitLog(projectPath, searchType, condition);
+        // 引导使用--grep
+        if (this.setGroupSearch(condition)) {
+            condition = '--grep=' + condition;
+        };
+
+        // 搜索，并获取搜索结果
+        let gitLogInfo = await utils.gitLog(this.projectPath, searchType, condition);
 
         if (!gitLogInfo.success && gitLogInfo.errorMsg == '') {
             return hx.window.showErrorMessage('获取日志失败，未知错误。请重新尝试操作，或通过运行日志查看错误。',['关闭']);
         };
         if (!gitLogInfo.success && gitLogInfo.errorMsg != '') {
             let emsg = `日志搜索失败，原因：<span>${gitLogInfo.errorMsg}。</span>请查看: <a href="https://ext.dcloud.net.cn/plugin?id=2475">git log搜索方法</a>`
-            hx.window.showErrorMessage(emsg,['关闭']);
+            return hx.window.showErrorMessage(emsg,['关闭']);
         };
 
-        gitData = Object.assign(gitData,{
-            "logData": gitLogInfo.data
-        });
+        // 设置git log数据
+        this.gitData = Object.assign(
+            this.gitData,
+            { "logData": gitLogInfo.data },
+        );
+
         if (condition != 'default') {
-            gitData.searchText = condition;
+            this.gitData.searchText = condition;
         } else {
-            delete gitData.searchText;
+            delete this.gitData.searchText;
         };
 
+        // 获取当前分支名称, 避免在某些情况下，在外部改变分支，此处未刷新的问题。
         try{
-            let currentBranchName = await utils.gitCurrentBranchName(projectPath);
+            let currentBranchName = await utils.gitCurrentBranchName(this.projectPath);
             if (currentBranchName) {
-                gitData.currentBranch = currentBranchName;
+                this.gitData.currentBranch = currentBranchName;
             };
         }catch(e){};
 
         if (condition != 'default') {
             try{
-                view.postMessage({
+                this.webviewPanel.webView.postMessage({
                     command: "search",
                     searchType: searchType,
-                    gitData: gitData
+                    gitData: this.gitData
                 });
             }catch(e){
-                view.html = generateLogHtml(userConfig, uiData, gitData);
+                this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
             };
         } else {
-            view.html = generateLogHtml(userConfig, uiData, gitData);
+            this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
         };
-    };
+    }
+};
 
+
+/**
+ * @description log view
+ * @param {Object} viewType
+ * @param {Object} param
+ * @param {Object} webviewPanel
+ */
+async function show(webviewPanel, userConfig, gitData) {
+    const view = webviewPanel.webView;
+
+    // UI: color and svg icon
+    let uiData = getUIData();
+
+    // get project info
+    const {projectPath, projectName, selectedFile, currentBranch} = gitData;
+
+    // 默认在当前分支搜索，当搜索全部时，此值为all
+    let searchType = 'branch';
+
+    let Log = new LogView(webviewPanel, gitData, uiData, userConfig);
+
+    // 选中文件或目录，则查看此文件的log记录
     if (selectedFile != '' && selectedFile != undefined) {
-        // 选中文件，则查看此文件的log记录
         let sfile = selectedFile.replace(path.join(projectPath,path.sep),'');
         if (projectPath == selectedFile ) {
-            setLogView(searchType, 'default');
+            Log.setView(searchType, 'default');
         } else {
-            setLogView(searchType, sfile);
+            Log.setView(searchType, sfile);
         }
     } else {
-        setLogView(searchType, 'default');
+        Log.setView(searchType, 'default');
     };
 
 
@@ -138,7 +183,7 @@ async function show(webviewPanel, userConfig, gitData) {
         let action = msg.command;
         switch (action) {
             case 'refresh':
-                setLogView(searchType, 'default');
+                Log.setView(searchType, 'default');
                 break;
             case 'openFile':
                 let furi = path.join(projectPath,msg.filename);
@@ -148,7 +193,7 @@ async function show(webviewPanel, userConfig, gitData) {
                 hx.env.clipboard.writeText(msg.text);
                 break;
             case 'search':
-                setLogView(msg.searchType, msg.condition);
+                Log.setView(msg.searchType, msg.condition);
                 break;
             default:
                 break;
@@ -156,6 +201,7 @@ async function show(webviewPanel, userConfig, gitData) {
     });
 
 };
+
 
 /**
  * @description generationhtml
@@ -369,6 +415,9 @@ function generateLogHtml(userConfig, uiData, gitData) {
                 .change-files ul > li {
                     list-style: none;
                 }
+                .no-result {
+                    color: ${fontColor} !important;
+                }
             </style>
             <script src="https://cdn.jsdelivr.net/npm/vue"></script>
         </head>
@@ -390,7 +439,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                             id="search"
                                             type="text"
                                             class="form-control outline-none pl-0"
-                                            title="按下回车进行搜索，多个条件以逗号分隔。如--author=name,-n 5"
+                                            title="按下回车进行搜索，多个条件以逗号分隔。如--author=name,-n 5。默认返回50条结果，如需要更多条数，请输入: -n 数量。"
                                             placeholder="按下回车进行搜索，多个条件以逗号分隔。如--author=name,-n 5"
                                             style="background: ${background};"
                                             autofocus="autofocus"
@@ -410,7 +459,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     <div class="row mb-5"  style="margin-top:80px;">
                         <div class="col mt-2 px-0" v-if="gitLogInfoList.length == 0">
                             <div class="text-center" style="margin-top: 20%;">
-                                ${noIcon}
+                                <span>${noIcon}</span>
+                                <p class="no-result">没有结果...</p>
                             </div>
                         </div>
                         <div class="col mt-2 px-0" v-else>
