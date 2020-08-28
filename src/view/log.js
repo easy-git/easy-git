@@ -36,14 +36,14 @@ class LogView {
         this.uiData = uiData;
         this.userConfig = userConfig;
         this.gitData = gitData;
-    }
+    };
 
     // 验证搜索条件是否是日期
     validateData(str) {
         if (['yesterday','today'].includes(str)) {
             return true;
         };
-        return  /^(\d{4})(\/|\-)(\d{2})(\/|\-)(\d{2}) (\d{2})(?:\:\d{2}|:(\d{2}):(\d{2}))$/.test(str) || /^(\d{4})\-(\d{2})\-(\d{2})$/.test(str);
+        return  /^(\d{4})(\/|\-)(\d{2})(\/|\-)(\d{2}) (\d{2})(?:\:\d{2}|:(\d{2}):(\d{2}))$/.test(str) || /^(\d{4})\-(\d{2}|\d{1})\-(\d{2}|\d{1})$/.test(str) || /^(\d{4})\/(\d{2}|\d{1})\/(\d{2}|\d{1})$/.test(str);
     };
 
     // 验证Email
