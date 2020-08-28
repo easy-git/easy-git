@@ -43,8 +43,10 @@ async function show(webviewPanel, userConfig, gitData) {
     // get project info
     const {projectPath, projectName, selectedFile, currentBranch} = gitData;
 
+    let searchType = 'branch';
+
     // get webview html content, set html
-    async function setLogView(condition) {
+    async function setLogView(searchType, condition) {
         // 引导用户正确的使用日期查询
         if(validateData(condition)){
             return hx.window.showErrorMessage(
@@ -77,7 +79,9 @@ async function show(webviewPanel, userConfig, gitData) {
             condition = '--author=' + condition;
         };
 
-        let gitLogInfo = await utils.gitLog(projectPath,condition);
+        // 搜索
+        let gitLogInfo = await utils.gitLog(projectPath, searchType, condition);
+
         if (!gitLogInfo.success && gitLogInfo.errorMsg == '') {
             return hx.window.showErrorMessage('获取日志失败，未知错误。请重新尝试操作，或通过运行日志查看错误。',['关闭']);
         };
@@ -100,18 +104,16 @@ async function show(webviewPanel, userConfig, gitData) {
             if (currentBranchName) {
                 gitData.currentBranch = currentBranchName;
             };
-        }catch(e){
-            console.error(e);
-        };
+        }catch(e){};
 
         if (condition != 'default') {
             try{
                 view.postMessage({
                     command: "search",
+                    searchType: searchType,
                     gitData: gitData
                 });
             }catch(e){
-                console.log(e)
                 view.html = generateLogHtml(userConfig, uiData, gitData);
             };
         } else {
@@ -123,12 +125,12 @@ async function show(webviewPanel, userConfig, gitData) {
         // 选中文件，则查看此文件的log记录
         let sfile = selectedFile.replace(path.join(projectPath,path.sep),'');
         if (projectPath == selectedFile ) {
-            setLogView('default');
+            setLogView(searchType, 'default');
         } else {
-            setLogView(sfile);
+            setLogView(searchType, sfile);
         }
     } else {
-        setLogView('default');
+        setLogView(searchType, 'default');
     };
 
 
@@ -136,7 +138,7 @@ async function show(webviewPanel, userConfig, gitData) {
         let action = msg.command;
         switch (action) {
             case 'refresh':
-                setLogView('default');
+                setLogView(searchType, 'default');
                 break;
             case 'openFile':
                 let furi = path.join(projectPath,msg.filename);
@@ -146,8 +148,7 @@ async function show(webviewPanel, userConfig, gitData) {
                 hx.env.clipboard.writeText(msg.text);
                 break;
             case 'search':
-                let condition = msg.condition;
-                setLogView(condition);
+                setLogView(msg.searchType, msg.condition);
                 break;
             default:
                 break;
@@ -229,13 +230,20 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     background-color:${background} !important;
                     z-index: 999;
                 }
-                .project-name {
+                .project-info {
                     font-size: 1rem;
                     font-weight: 400;
                     color: ${fontColor};
                     overflow:hidden;
                     white-space: nowrap;
                     text-overflow:ellipsis;
+                }
+                .project-info .branch {
+                    font-size: 0.95rem;
+                    color: ${fontColor};
+                }
+                .project-info .active {
+                    color: ${inputLineColor};
                 }
                 .outline-none {
                     box-shadow: none !important;
@@ -256,7 +264,6 @@ function generateLogHtml(userConfig, uiData, gitData) {
                 }
                 .form-control:focus , .form-control:active{
                     border-radius: 2px !important;
-                    border-bottom: 1px solid ${lineColor};
                     padding-left: 16px;
                     border-bottom: 1px solid ${inputLineColor};
                     color: ${inputLineColor};
@@ -371,8 +378,11 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     <div id="page-top" class="fixed-top">
                         <div class="row px-3 pt-3">
                             <div class="col">
-                                <h6 class="project-name">
-                                    {{ projectName }} / {{ currentBranch }}
+                                <h6 class="project-info">
+                                    <span>{{ projectName }} / </span>
+                                    <span title="显示当前分支log" class="branch" :class="{ active: searchType == 'branch'}" @click="switchSearchType('branch');">{{ currentBranch }} </span>
+                                    <span> | </span>
+                                    <span title="显示所有分支log" class="branch" :class="{ active: searchType == 'all'}" @click="switchSearchType('all');">all</span>
                                 </h6>
                                 <div class="d-flex">
                                     <div class="flex-grow-1">
@@ -380,6 +390,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                             id="search"
                                             type="text"
                                             class="form-control outline-none pl-0"
+                                            title="按下回车进行搜索，多个条件以逗号分隔。如--author=name,-n 5"
                                             placeholder="按下回车进行搜索，多个条件以逗号分隔。如--author=name,-n 5"
                                             style="background: ${background};"
                                             autofocus="autofocus"
@@ -390,7 +401,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                         <span @click.once="searchLog();">${searchIcon}</span>
                                     </div>
                                     <div class="pt-2">
-                                        <span title="刷新日志" @click.once="refresh();">${refreshIcon}</span>
+                                        <span title="重置：并刷新日志" @click.once="refresh();">${refreshIcon}</span>
                                     </div>
                                 </div>
                             </div>
@@ -421,7 +432,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                     </div>
                                     <div class="d-block">
                                         <div class="text">
-                                            <span class="f11" :title="item.author_email" @click.stop="goSearch('author',item.author_name);">
+                                            <span class="f11" :title="item.author_email" @click.stop="goSearchAuthor('author',item.author_name);">
                                                 {{ item.author_name }}
                                             </span>
                                             <span class="f11 pl-2">
@@ -479,6 +490,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                 var app = new Vue({
                     el: '#app',
                     data: {
+                        searchType: 'branch',
                         searchText: '',
                         currentBranch: '',
                         projectName: '',
@@ -513,6 +525,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 if (msg.command != 'search') {return};
                                 if (msg.gitData) {
                                     let gitData = msg.gitData;
+                                    that.searchType = msg.searchType;
                                     that.gitLogInfoList = gitData.logData;
                                     that.searchText = gitData.searchText;
                                     that.currentBranch = gitData.currentBranch;
@@ -523,7 +536,17 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     methods: {
                         refresh() {
                             hbuilderx.postMessage({
-                                command: 'refresh'
+                                command: 'refresh',
+                                searchType: this.searchType,
+                                condition: this.searchText
+                            });
+                        },
+                        switchSearchType(type) {
+                            this.searchType = type;
+                            hbuilderx.postMessage({
+                                command: 'search',
+                                searchType: this.searchType,
+                                condition: this.searchText
                             });
                         },
                         searchLog() {
@@ -531,10 +554,11 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             this.searchText = (this.searchText).replace(/'/g, '').replace(/"/g, '');
                             hbuilderx.postMessage({
                                 command: 'search',
+                                searchType: this.searchType,
                                 condition: this.searchText
                             });
                         },
-                        goSearch(searchType,keyword) {
+                        goSearchAuthor(searchType,keyword) {
                             keyword = keyword.trim();
                             if (keyword.length == 0) {return;};
                             let w = '--'+searchType+'='+keyword;

@@ -1017,8 +1017,10 @@ async function gitConfigShow(workingDir, isPrint=true) {
 /**
  * @description 获取log
  * @param {Object} workingDir
+ * @param {String} searchType 搜索类型 (all|branch)
+ * @param {String} filterCondition 过滤条件，逗号分割
  */
-async function gitLog(workingDir,filterCondition) {
+async function gitLog(workingDir, searchType, filterCondition) {
     filter = ['-n 100']
     if (filterCondition != 'default') {
         if (filterCondition.includes('-n')) {
@@ -1029,6 +1031,10 @@ async function gitLog(workingDir,filterCondition) {
         };
     };
     filter = filter.filter( s => s && s.trim());
+
+    if (searchType == 'all') {
+        filter.push('--all')
+    };
 
     try {
         let result = {
