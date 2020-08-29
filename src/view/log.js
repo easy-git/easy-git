@@ -143,6 +143,35 @@ class LogView {
             this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
         };
     }
+
+    async switchBranch() {
+        let BranchInfo = await utils.gitBranch(this.projectPath);
+
+        let LocalBranch = [];
+        for (let s of BranchInfo) {
+            if ( !(s.name).includes('remotes/origin') ) {
+                let branch = s.current ? '*' + s.name : s.name;
+                LocalBranch.push({ 'label': branch, 'id': s.name })
+            }
+        };
+
+        let branchID = await hx.window.showQuickPick(LocalBranch, {
+            placeHolder: "请选择您要切换的分支.."
+        }).then(function(result) {
+            if (!result) {
+                return;
+            };
+            return result.id;
+        });
+
+        if (branchID) {
+            let status = utils.gitBranchSwitch(this.projectPath, branchID);
+            if (status == 'success') {
+                this.setView('branch', 'default')
+            }
+        };
+
+    }
 };
 
 
@@ -194,6 +223,9 @@ async function show(webviewPanel, userConfig, gitData) {
                 break;
             case 'search':
                 Log.setView(msg.searchType, msg.condition);
+                break;
+            case 'branch':
+                Log.switchBranch();
                 break;
             default:
                 break;
@@ -429,7 +461,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             <div class="col">
                                 <h6 class="project-info">
                                     <span>{{ projectName }} / </span>
-                                    <span title="显示当前分支log" class="branch" :class="{ active: searchType == 'branch'}" @click="switchSearchType('branch');">{{ currentBranch }} </span>
+                                    <span title="显示当前分支log" class="branch" :class="{ active: searchType == 'branch'}" @click="switchSearchType('branch');" @dblclick='switchBranch();'>{{ currentBranch }} </span>
                                     <span> | </span>
                                     <span title="显示所有分支log" class="branch" :class="{ active: searchType == 'all'}" @click="switchSearchType('all');">all</span>
                                 </h6>
@@ -665,6 +697,12 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             hbuilderx.postMessage({
                                 command: 'openFile',
                                 filename: filename
+                            });
+                        },
+                        switchBranch() {
+                            this.searchType = 'branch';
+                            hbuilderx.postMessage({
+                                command: 'branch'
                             });
                         }
                     }
