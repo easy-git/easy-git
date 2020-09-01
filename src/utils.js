@@ -630,10 +630,11 @@ async function gitCheckout(workingDir, filename) {
 /**
  * @description 分支操作
  */
-async function gitBranch(workingDir) {
+async function gitBranch(workingDir, options='avvv') {
     try {
+        let args = options == 'avvv' ? ['-avvv'] : ['-v'];
         let status = await git(workingDir).init()
-            .branch(['-avv'])
+            .branch(args)
             .then((info) => {
                 let branchs = [];
                 for (let s in info.branches) {
@@ -642,9 +643,8 @@ async function gitBranch(workingDir) {
                 return branchs;
             })
             .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: ${workingDir} 查看分支信息失败'`, errMsg);
-                return 'fail';
+                hx.window.setStatusBarMessage('Git: 获取分支列表失败，请稍后再试', 3000, 'error');
+                return [];
             });
         return status;
     } catch (e) {

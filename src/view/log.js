@@ -145,14 +145,17 @@ class LogView {
     }
 
     async switchBranch() {
-        let BranchInfo = await utils.gitBranch(this.projectPath);
+        let BranchInfo = await utils.gitBranch(this.projectPath, []);
+        if (BranchInfo == 'fail' || BranchInfo == 'error') {
+            return;
+        };
 
         let LocalBranch = [];
-        for (let s of BranchInfo) {
-            if ( !(s.name).includes('remotes/origin') ) {
+        if (BranchInfo && BranchInfo != []) {
+            for (let s of BranchInfo) {
                 let branch = s.current ? '*' + s.name : s.name;
                 LocalBranch.push({ 'label': branch, 'id': s.name })
-            }
+            };
         };
 
         let branchID = await hx.window.showQuickPick(LocalBranch, {
@@ -165,7 +168,7 @@ class LogView {
         });
 
         if (branchID) {
-            let status = utils.gitBranchSwitch(this.projectPath, branchID);
+            let status = await utils.gitBranchSwitch(this.projectPath, branchID);
             if (status == 'success') {
                 this.setView('branch', 'default')
             }
