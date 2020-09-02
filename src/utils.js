@@ -549,6 +549,7 @@ async function gitFetch(workingDir) {
 
 /**
  * @description 取消add (取消暂存)
+ * @description 暂时废弃，采用 git restore --staged <file>
  */
 async function gitCancelAdd(workingDir, filename) {
     // status bar show message
@@ -1170,6 +1171,31 @@ async function gitAddRemote(workingDir, url) {
     };
 };
 
+/**
+ * @description raw
+ * @param {String} workingDir Git工作目录
+ * @param {Array} commands []
+ * @param {String} msg 消息
+ */
+async function gitRaw(workingDir, commands, msg) {
+    try {
+        let status = await git(workingDir).raw(commands)
+            .then((res) => {
+                hx.window.setStatusBarMessage(`Git: ${msg} 操作成功。`, 5000, 'info');
+                return 'success';
+            })
+            .catch((err) => {
+                createOutputChannel('Git: ${msg} 操作失败', err);
+                return 'fail';
+            });
+        return status;
+    } catch (e) {
+        createOutputChannel('Git: ${msg} 操作失败，插件运行异常。', e);
+        return 'error';
+    };
+};
+
+
 module.exports = {
     isGitInstalled,
     getHBuilderXiniConfig,
@@ -1209,5 +1235,6 @@ module.exports = {
     gitLog,
     gitStash,
     gitStashList,
-    gitAddRemote
+    gitAddRemote,
+    gitRaw
 }
