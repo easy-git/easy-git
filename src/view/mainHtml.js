@@ -318,8 +318,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 </div>
                 <div class="row mt-3" id="git_stash" style="visibility: hidden;" :style="{visibility: 'visible'}">
                     <div class="col px-0" v-show="gitStashFileList.length">
-                        <p class="add-title" id="git_add_title">暂存的文件:
+                        <p class="add-title" id="git_add_title">暂存的更改:
                             <span class="gtag">{{ gitStashFileListLength }}</span>
+                            <span title="取消暂存所有更改" class="stash-all" @click="cancelAllStash('all');">
+                                ${CancelIconSvg}
+                            </span>
                         </p>
                         <ul style="list-style-type:none;padding-left:0;" id="git_stash_list">
                             <li class="d-flex px-3 lif gitfile" v-for="(vv,ii) in gitStashFileList" :key="ii"
@@ -333,8 +336,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                     <div class="d-inline" v-if="hoverStashFileID == 'stash_'+ii">
                                         <span title="打开文件" @click="openFile(vv.path);">${OpenFileIconSvg}</span>
                                         <span
-                                            title="取消暂存 &#13;git reset HEAD filename"
-                                            @click="cancelAdd(vv.path);">
+                                            title="取消暂存 git restore --staged <file>"
+                                            @click="cancelStash(vv.path);">
                                             ${CancelIconSvg}
                                         </span>
                                     </div>
@@ -521,10 +524,15 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             text: fileUri
                         });
                     },
-                    cancelAdd(fileUri) {
+                    cancelStash(fileUri) {
                         hbuilderx.postMessage({
                             command: 'cancelStash',
                             text: fileUri
+                        });
+                    },
+                    cancelAllStash() {
+                        hbuilderx.postMessage({
+                            command: 'cancelAllStash'
                         });
                     },
                     gitAdd(fileUri) {

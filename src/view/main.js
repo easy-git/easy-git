@@ -308,8 +308,16 @@ class GitFile {
     };
 
     // Git: cancel add
-    async cancelAdd(fileUri) {
-        let cancelStatus = await utils.gitCancelAdd(this.projectPath, fileUri);
+    async cancelStash(fileUri) {
+        let cancelStatus = await utils.gitRaw(this.projectPath, ['restore', '--staged', fileUri], '取消暂存');
+        if (cancelStatus == 'success') {
+            this.refreshFileList();
+        };
+    };
+
+    // Git: cancel all add
+    async cancelAllStash() {
+        let cancelStatus = await utils.gitRaw(this.projectPath, ['restore', '--staged', '*'], '取消所有暂存');
         if (cancelStatus == 'success') {
             this.refreshFileList();
         };
@@ -469,7 +477,10 @@ function active(webviewPanel, userConfig, gitData) {
                 File.checkoutFile(msg.text);
                 break;
             case 'cancelStash':
-                File.cancelAdd(msg.text);
+                File.cancelStash(msg.text);
+                break;
+            case 'cancelAllStash':
+                File.cancelAllStash();
                 break;
             case 'pull':
                 pull(projectPath,msg);
