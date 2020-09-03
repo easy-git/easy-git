@@ -1,7 +1,12 @@
 const hx = require('hbuilderx');
 
 const os = require('os');
+const path = require('path');
 const osName = os.platform();
+
+const vueFile = path.join(__dirname, 'static', '','vue.min.js');
+const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
+
 
 /**
  * @description 获取webview内容
@@ -64,7 +69,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=249px, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-        <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="${bootstrapCssFile}">
+        <script src="${vueFile}"></script>
         <style type="text/css">
             body {
                 color: ${fontColor};
@@ -261,7 +267,6 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 color: ${lineColor};
             }
         </style>
-        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     </head>
     <body style="background-color:${background};">
         <div id="app" v-cloak>
@@ -703,7 +708,8 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="${bootstrapCssFile}">
+        <script src="${vueFile}"></script>
         <style type="text/css">
             body {
                 color: ${fontColor};
@@ -835,7 +841,6 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
                 transform: scale(0.95);
             }
         </style>
-        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     </head>
     <body style="background-color:${background};">
         <div id="app" v-cloak>

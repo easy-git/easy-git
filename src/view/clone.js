@@ -6,13 +6,14 @@ const process = require('process');
 const ini = require('ini');
 const hx = require('hbuilderx');
 
+const icon = require('./static/icon.js');
 const utils = require('../utils.js');
-const icon = require('./static.js');
 const MainView = require('./main.js');
-
 
 const osName = os.platform();
 
+const vueFile = path.join(__dirname, 'static', '','vue.min.js');
+const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
 
 /**
  * @description 读取HBuilderX.ini, 获取ProjectWizard
@@ -125,7 +126,8 @@ function generateLogHtml(userConfig, uiData, hxData) {
     <html lang="en">
         <head>
             <meta charset="UTF-8">
-            <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+            <link rel="stylesheet" href="${bootstrapCssFile}">
+            <script src="${vueFile}"></script>
             <style type="text/css">
                 body {
                     color: ${fontColor};
@@ -204,7 +206,6 @@ function generateLogHtml(userConfig, uiData, hxData) {
                     background-color: ${inputLineColor} !important;
                 }
             </style>
-            <script src="https://cdn.jsdelivr.net/npm/vue"></script>
         </head>
         <body style="background-color:${background};">
             <div id="app" v-cloak>

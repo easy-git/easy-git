@@ -7,7 +7,7 @@ const file = require('../file.js');
 let utils = require('../utils.js');
 const gitAction = require('../git.js');
 
-const icon = require('./static.js');
+const icon = require('./static/icon.js');
 const html = require('./mainHtml.js')
 
 

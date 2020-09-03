@@ -4,7 +4,10 @@ const path = require('path');
 const hx = require('hbuilderx');
 
 const utils = require('../utils.js');
-const icon = require('./static.js');
+const icon = require('./static/icon.js');
+
+const vueFile = path.join(__dirname, 'static', '','vue.min.js');
+const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
 
 
 /**
@@ -274,7 +277,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
     <html lang="en">
         <head>
             <meta charset="UTF-8">
-            <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+            <link rel="stylesheet" href="${bootstrapCssFile}">
+            <script src="${vueFile}"></script>
             <style type="text/css">
                 body {
                     color: ${fontColor};
@@ -454,7 +458,6 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     color: ${fontColor} !important;
                 }
             </style>
-            <script src="https://cdn.jsdelivr.net/npm/vue"></script>
         </head>
         <body style="background-color:${background};">
             <div id="app" v-cloak>
