@@ -43,7 +43,7 @@ function show(webviewPanel, userConfig) {
     const viewId = webviewPanel.webView._id;
 
     // 根据主题适配颜色
-    let colorData = utils.getThemeColor();
+    let colorData = utils.getThemeColor('left');
     let {fontColor} = colorData;
 
     let uiData = Object.assign(colorData);

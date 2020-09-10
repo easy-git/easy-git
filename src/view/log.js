@@ -16,7 +16,7 @@ const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
  */
 function getUIData() {
     // 根据主题适配颜色
-    let colorData = utils.getThemeColor();
+    let colorData = utils.getThemeColor('right');
     let {fontColor,lineColor} = colorData;
 
     // svg icon

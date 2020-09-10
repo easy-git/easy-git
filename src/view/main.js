@@ -18,7 +18,7 @@ const html = require('./mainHtml.js')
 function getUIData() {
 
     // 根据主题适配颜色
-    let colorData = utils.getThemeColor();
+    let colorData = utils.getThemeColor('siderBar');
     let {fontColor} = colorData;
 
     // svg icon
