@@ -2,7 +2,7 @@
     "name": "easy-git",
     "description": "HBuilderX内唯一的图形化Git工具, vscode源代码管理工具风格, 简单易上手。",
     "displayName": "【easy-git】Git源代码管理工具",
-    "version": "0.0.9",
+    "version": "0.2",
     "publisher": "oneone",
     "engines": {
         "HBuilderX": "^2.8.3"
