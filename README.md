@@ -1,3 +1,5 @@
+# `下载后，请给评价、收藏。您的反馈，是作者前行的动力。`
+
 easy-git, 是基于HBuilderX API开发的可视化图形Git插件，界面参考vscode源代码管理器。
 
 ## 安装
@@ -139,9 +141,10 @@ easy-git, 支持通过快捷键打开git视图。
 
 ![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/08fb87da3924ee29b723f0e5162d1377.jpg)
 
-## 目前存在的问题
+## `问题`
 
-注意：
+### Q1: Error: git: 'restore' is not a git command
 
-- easy-git，webview引用了外部资源（`bootstrap.css`和`vue.js`），所以在`没有网络`的电脑上无法使用。
-- 已适配HBuilderX 绿柔主题、酷黑主题、雅蓝主题
+原因：
+
+1. `git restore` 是Git新版本`2.23` 引入的新命令。 并且`2.23`已发布近一年，所以作者使用了此命令。请升级本地Git解决此问题。
