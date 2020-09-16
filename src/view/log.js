@@ -148,7 +148,7 @@ class LogView {
     }
 
     async switchBranch() {
-        let BranchInfo = await utils.gitBranch(this.projectPath, []);
+        let BranchInfo = await utils.gitRawGetBranch(this.projectPath, 'branch');
         if (BranchInfo == 'fail' || BranchInfo == 'error') {
             return;
         };
@@ -156,8 +156,8 @@ class LogView {
         let LocalBranch = [];
         if (BranchInfo && BranchInfo != []) {
             for (let s of BranchInfo) {
-                let branch = s.current ? '*' + s.name : s.name;
-                LocalBranch.push({ 'label': branch, 'id': s.name })
+                // let branch = s.current ? '*' + s.name : s.name;
+                LocalBranch.push({ 'label': s.name, 'id': s.name })
             };
         };
 

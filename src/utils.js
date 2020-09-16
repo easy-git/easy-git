@@ -26,7 +26,13 @@ function getThemeColor(area) {
     // 背景颜色、输入框颜色、字体颜色、线条颜色
     let background, liHoverBackground,inputColor, inputLineColor, cursorColor, fontColor, lineColor, menuBackground;
 
-    let custom = colorCustomizations[`[${colorScheme}]`];
+    // 修复 0.1版本引出的Bug （当未定义自定义主题时异常的Bug）
+    let custom = {};
+    try{
+        custom = colorCustomizations[`[${colorScheme}]`];
+    }catch(e){
+        custom = {}
+    };
 
     let viewBackgroundOptionName = area == 'siderBar' ? 'sideBar.background' : 'editor.background';
     let viewFontOptionName = area == 'siderBar' ? 'list.foreground' : undefined;
@@ -704,6 +710,39 @@ async function gitBranch(workingDir, options='avvv') {
     }
 };
 
+
+/**
+ * @description 某些情况下，gitBranch无法获取到分支信息
+ * @param {Object} workingDir
+ * @param {Object} commands
+ */
+async function gitRawGetBranch(workingDir, commands) {
+    try {
+        let status = await git(workingDir).raw(commands)
+            .then((res) => {
+                let branchs = res.split('\n');
+                let result = [];
+                for (let s of branchs) {
+                    let tmp = s.replace(/^\s+|\s+$/g,"");
+                    if (tmp) {
+                        let current = tmp.includes('*') ? true : false;
+                        result.push({"name": tmp, "current": current});
+                    };
+                };
+                return result;
+            })
+            .catch((err) => {
+                hx.window.setStatusBarMessage('Git: 获取分支列表失败，请稍后再试', 3000, 'error');
+                return 'fail';
+            });
+        return status;
+    } catch (e) {
+        hx.window.setStatusBarMessage('Git: 获取分支列表失败，请稍后再试', 3000, 'error');
+        return 'error';
+    };
+};
+
+
 /**
  * @description 获取当前分支名称
  */
@@ -1269,6 +1308,7 @@ module.exports = {
     gitCheckout,
     gitDiffFile,
     gitBranch,
+    gitRawGetBranch,
     gitCurrentBranchName,
     gitBranchSwitch,
     gitBranchCreate,
