@@ -120,6 +120,7 @@ function generateLogHtml(userConfig, uiData, hxData) {
     } = uiData;
 
     let { ProjectWizard } = hxData;
+    ProjectWizard = ProjectWizard.split(path.sep).join('/');
 
     return `
     <!DOCTYPE html>
