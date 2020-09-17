@@ -1,6 +1,6 @@
 const hx = require('hbuilderx');
 const axios = require('axios');
-const uuidv1 = require('uuid/v1');
+const uuid = require('uuid');
 
 // get plugin version
 let packageFile = require('../../package.json');
@@ -21,7 +21,7 @@ function getUid() {
         let config = hx.workspace.getConfiguration();
         let uid = config.get('EasyGit.id');
         if (uid == undefined || !uid || uid == '') {
-            uid = uuidv1().replace(/-/g, '');
+            uid = (uuid.v1()).replace(/-/g, '');
             config.update("EasyGit.id", uid).then(() => {});
         };
         return uid;
