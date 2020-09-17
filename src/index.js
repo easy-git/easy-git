@@ -11,8 +11,7 @@ const LogView = require('./view/log.js');
 const initView = require('./view/init.js');
 const cloneView = require('./view/clone.js');
 
-// 记录是否弹窗提示过用户
-var isShowGitConfigBox = false;
+const count = require('./common/count.js');
 
 /**
  * @description 当焦点不在编辑器、项目管理器上
@@ -129,7 +128,7 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
 
         // 用户是否设置过不再提示
         let { GitConfigUserPrompt } = userConfig;
-        
+
         if ((gitEmail == '' || gitUserName == '') && (GitConfigUserPrompt != false)) {
             let msg = `当前项目 ${projectName} 未设置`
             if (gitUserName == '') {
@@ -264,6 +263,7 @@ async function main(viewType, param, webviewPanel, context) {
     let config = hx.workspace.getConfiguration();
     let DisableDevTools = config.get('EasyGit.DisableDevTools');
     let GitConfigUserPrompt = config.get('EasyGit.GitConfigUserPrompt');
+    let isShareUsageData = config.get('EasyGit.isShareUsageData');
     let userConfig = {
         'DisableDevTools': DisableDevTools,
         'GitConfigUserPrompt': GitConfigUserPrompt
@@ -279,6 +279,13 @@ async function main(viewType, param, webviewPanel, context) {
     if (FoldersNum == 0 && ['main', 'clone'].includes(viewType)) {
         hx.commands.executeCommand('workbench.view.explorer');
     };
+    
+    // count
+    try{
+        if (isShareUsageData == undefined && !isShareUsageData) {
+            count(viewType).catch( error=> {});
+        };
+    }catch(e){};
 
     // 从菜单【视图】【显示扩展视图】进入
     if (source == "viewMenu") {
