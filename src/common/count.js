@@ -1,6 +1,7 @@
 const hx = require('hbuilderx');
 const axios = require('axios');
 const uuid = require('uuid');
+const os = require('os');
 
 // get plugin version
 let packageFile = require('../../package.json');
@@ -54,12 +55,14 @@ function count(viewname, context) {
     const uid = getUid();
     const hxVersion = hx.env.appVersion;
     const pluginVersion = packageFile.version;
+    const osName = os.platform() + ' ' + os.release();
 
     let param = {
         'uid': uid,
         'viewname': viewname,
         'hxVersion': hxVersion,
-        'pluginVersion': pluginVersion
+        'pluginVersion': pluginVersion,
+        'osName': osName
     };
     return new Promise((resolve, reject) => {
         try {
