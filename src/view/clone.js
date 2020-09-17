@@ -67,7 +67,7 @@ function show(webviewPanel, userConfig) {
 
     async function clone(info) {
         let {localPath} = info;
-        let projectName = localPath.split(path.sep).pop();
+        let projectName = localPath.split('/').pop();
         info = Object.assign(info,{
             'projectName': projectName
         });
@@ -236,7 +236,7 @@ function generateLogHtml(userConfig, uiData, hxData) {
                             <div class="form-group" v-if="isShowOption">
                                 <input type="password" class="form-control outline-none" id="git-passwd" placeholder="Git仓库密码" v-model="cloneInfo.password">
                             </div>
-                            <button type="button" class="btn-imp" @click.stop="gitClone();">开始克隆</button>
+                            <button type="button" class="btn-imp" @click="gitClone();">开始克隆</button>
                         </form>
                     </div>
                 </div>
@@ -277,7 +277,6 @@ function generateLogHtml(userConfig, uiData, hxData) {
                     mounted() {},
                     methods: {
                         gitClone() {
-                            console.log("开始克隆")
                             this.cloneInfo.repo = this.repo;
                             if (this.isShowOption) {
                                 this.cloneInfo.isAuth = true;
