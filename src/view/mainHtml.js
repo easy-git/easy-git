@@ -302,6 +302,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                         <li class="divider"></li>
                                         <li @click="gitConfigFile('.gitignore');">设置.gitignore</li>
                                         <li @click="gitConfigFile('.gitattributes');">设置.gitattributes</li>
+                                        <li class="divider"></li>
+                                        <li @click="openRemoteServerInBrowser();">浏览器里查看远程仓库</li>
                                     </ul>
                                 </div>
                             </span>
@@ -621,6 +623,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     gitResetSoftHEAD() {
                         hbuilderx.postMessage({
                             command: 'ResetSoftHEAD'
+                        });
+                    },
+                    openRemoteServerInBrowser() {
+                        hbuilderx.postMessage({
+                            command: 'openRemoteServer'
                         });
                     }
                 }

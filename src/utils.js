@@ -1267,12 +1267,16 @@ async function gitAddRemote(workingDir, url) {
  * @param {Array} commands []
  * @param {String} msg 消息
  */
-async function gitRaw(workingDir, commands, msg) {
+async function gitRaw(workingDir, commands, msg, resultType='statusCode') {
     try {
         let status = await git(workingDir).raw(commands)
             .then((res) => {
                 hx.window.setStatusBarMessage(`Git: ${msg} 操作成功。`, 5000, 'info');
-                return 'success';
+                if (resultType != 'statusCode') {
+                    return res;
+                } else {
+                    return 'running state';
+                };
             })
             .catch((err) => {
                 createOutputChannel('Git: ${msg} 操作失败', err);

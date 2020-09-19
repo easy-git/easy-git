@@ -393,6 +393,24 @@ class GitConfig {
         return await utils.gitConfigShow(this.projectPath);
     };
 
+    async getUrl() {
+        let result = await utils.gitRaw(this.projectPath, ['ls-remote', '--get-url', 'origin'], '获取仓库URL', 'result')
+        if (typeof(result) == 'string') {
+            let url = result;
+            if (result.includes('.git')) {
+                if (result.includes('git@') == true) {
+                    url = result.replace('git@', '').replace(':','/').replace('.git','');
+                    url = 'http://' + url;
+                };
+                url = url.replace(/\r\n/g,"").replace(/\n/g,"");
+                setTimeout(function() {
+                    hx.env.openExternal(url);
+                }, 1000);
+            };
+        } else {
+            hx.window.showErrorMessage('获取仓库地址失败');
+        }
+    };
 };
 
 /**
@@ -476,6 +494,14 @@ function active(webviewPanel, userConfig, gitData) {
             case 'checkout':
                 File.checkoutFile(msg.text);
                 break;
+            case 'stash':
+                let param = {
+                    'projectPath': projectPath,
+                    'projectName': projectName,
+                    'easyGitInner': true
+                };
+                gitAction.action(param,msg.option);
+                break;
             case 'cancelStash':
                 File.cancelStash(msg.text);
                 break;
@@ -524,22 +550,17 @@ function active(webviewPanel, userConfig, gitData) {
             case 'clean':
                 File.clean();
                 break;
+            case 'gitConfigFile':
+                gitConfigFileSetting(projectPath, msg.text);
+                break;
             case 'configShow':
                 GitCfg.ConfigShow();
                 break;
             case 'showOrigin':
                 GitCfg.showOrigin();
                 break;;
-            case 'gitConfigFile':
-                gitConfigFileSetting(projectPath, msg.text);
-                break;
-            case 'stash':
-                let param = {
-                    'projectPath': projectPath,
-                    'projectName': projectName,
-                    'easyGitInner': true
-                };
-                gitAction.action(param,msg.option);
+            case 'openRemoteServer':
+                GitCfg.getUrl();
                 break;
             default:
                 break;
