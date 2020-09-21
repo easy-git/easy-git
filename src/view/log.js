@@ -133,14 +133,15 @@ class LogView {
         }catch(e){};
 
         if (condition != 'default') {
-            try{
+            let isHtml = this.webviewPanel.webView._html;
+            if (isHtml == '') {
+                this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
+            } else {
                 this.webviewPanel.webView.postMessage({
                     command: "search",
                     searchType: searchType,
                     gitData: this.gitData
                 });
-            }catch(e){
-                this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
             };
         } else {
             this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
@@ -267,7 +268,6 @@ function generateLogHtml(userConfig, uiData, gitData) {
     let {projectName, currentBranch, logData, searchText} = gitData;
 
     logData = JSON.stringify(logData);
-
     if (!searchText) {
         searchText = '';
     };
@@ -609,16 +609,9 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     mounted() {
                         that = this;
                         window.onload = function() {
-                            hbuilderx.onDidReceiveMessage((msg) => {
-                                if (msg.command != 'search') {return};
-                                if (msg.gitData) {
-                                    let gitData = msg.gitData;
-                                    that.searchType = msg.searchType;
-                                    that.gitLogInfoList = gitData.logData;
-                                    that.searchText = gitData.searchText;
-                                    that.currentBranch = gitData.currentBranch;
-                                }
-                            });
+                            setTimeout(function() {
+                                that.forUpdate();
+                            }, 1000)
                         };
                     },
                     methods: {
@@ -629,6 +622,18 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 condition: this.searchText
                             });
                         },
+						forUpdate() {
+							hbuilderx.onDidReceiveMessage((msg) => {
+							    if (msg.command != 'search') {return};
+							    if (msg.gitData) {
+							        let gitData = msg.gitData;
+							        this.searchType = msg.searchType;
+							        this.gitLogInfoList = gitData.logData;
+							        this.searchText = gitData.searchText;
+							        this.currentBranch = gitData.currentBranch;
+							    }
+							});
+						},
                         switchSearchType(type) {
                             this.searchType = type;
                             hbuilderx.postMessage({
