@@ -549,7 +549,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                             <span class="f11 pl-2">
                                                 {{ item.date | FormatDate }}
                                             </span>
-                                            <span class="hash" title="双击复制commit id" @dblclick="copyCommitID(item);">
+                                            <span class="hash" title="双击复制commit id" @dblclick="copyLogMsg(item, 'commit_id');">
                                                 {{ (item.hash).slice(0,9) }}
                                             </span>
                                         </div>
@@ -599,7 +599,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
 
                 <div v-show="visibleRightMenu">
                     <ul v-show="visibleRightMenu" :style="{left:left+'px',top:top+'px'}" class="contextmenu" @mouseleave="visibleRightMenu = false">
-                        <li @click="copyCommitID(rightClickItem)">复制commit id到剪贴板</li>
+                        <li @click="copyLogMsg(rightClickItem, 'msg')">复制</li>
+                        <li @click="copyLogMsg(rightClickItem, 'commit_id')">复制commit id到剪贴板</li>
                     </ul>
                 </div>
             </div>
@@ -719,11 +720,18 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 this.searchText = w;
                             };
                         },
-                        copyCommitID(data) {
-                            let hash = data.hash;
+                        copyLogMsg(data, type) {
+                            let content = '';
+                            if (type == 'commit_id') {
+                                content = data.hash
+                            }
+                            if (type == 'msg') {
+                                content = data.message + ' ' + data.hash + ' ' + data.author_name + ' ' + data.date;
+                            }
+                            if (content == '') {return;};
                             hbuilderx.postMessage({
                                 command: 'copy',
-                                text: hash
+                                text: content
                             });
                         },
                         symbolRepeat(str, num) {
