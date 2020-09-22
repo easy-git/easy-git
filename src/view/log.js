@@ -457,6 +457,27 @@ function generateLogHtml(userConfig, uiData, gitData) {
                 .no-result {
                     color: ${fontColor} !important;
                 }
+                .contextmenu {
+                    margin: 0;
+                    background: #fff;
+                    z-index: 3000;
+                    position: absolute;
+                    list-style-type: none;
+                    padding: 5px 0;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    font-weight: 400;
+                    color: #333;
+                    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.3);
+                }
+                .contextmenu li {
+                    margin: 0;
+                    padding: 7px 16px;
+                    cursor: pointer;
+                }
+                .contextmenu li:hover {
+                    background: #eee;
+                }
             </style>
         </head>
         <body style="background-color:${background};">
@@ -506,8 +527,10 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 <li class="li-log gitfile"
                                     v-for="(item,idx) of gitLogInfoList" :key="idx"
                                     :id="'msg_'+idx"
+                                    @contextmenu.prevent.stop="openMenu($event,item)"
+                                    @mouseenter="viewDetailsMouseenter();"
                                     @mouseover="hoverLogID = 'msg_'+idx"
-                                    @mouseleave="hoverLogID = false">
+                                    @mouseleave="mouseleaveLogItem()">
                                     <div class="d-flex">
                                         <div class="mr-auto htext" title="点击查看变更的文件列表" @click.stop="viewDetails(item);">
                                             {{ item.message }}
@@ -526,7 +549,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                             <span class="f11 pl-2">
                                                 {{ item.date | FormatDate }}
                                             </span>
-                                            <span class="hash" title="双击复制commit id" @dblclick="copy(item.hash);">
+                                            <span class="hash" title="双击复制commit id" @dblclick="copyCommitID(item);">
                                                 {{ (item.hash).slice(0,9) }}
                                             </span>
                                         </div>
@@ -573,11 +596,20 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         </ul>
                     </div>
                 </div>
+
+                <div v-show="visibleRightMenu">
+                    <ul v-show="visibleRightMenu" :style="{left:left+'px',top:top+'px'}" class="contextmenu" @mouseleave="visibleRightMenu = false">
+                        <li @click="copyCommitID(rightClickItem)">复制commit id到剪贴板</li>
+                    </ul>
+                </div>
             </div>
             <script>
                 var app = new Vue({
                     el: '#app',
                     data: {
+                        visibleRightMenu: false,
+                        top: 0,
+                        left: 0,
                         searchType: 'branch',
                         searchText: '',
                         currentBranch: '',
@@ -587,6 +619,15 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         isShowViewDetails: false,
                         logDetails: {},
                         logDetailsFiles: []
+                    },
+                    watch: {
+                        visibleRightMenu(value) {
+                            if (value) {
+                                document.body.addEventListener('click', this.closeMenu)
+                            } else {
+                                document.body.removeEventListener('click', this.closeMenu)
+                            }
+                        }
                     },
                     filters: {
                         FormatDate: function(date) {
@@ -615,6 +656,21 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         };
                     },
                     methods: {
+                        openMenu(e, item) {
+                            this.rightClickItem = item;
+                            var x = e.pageX;
+                            var y = e.pageY;
+                            this.top = y;
+                            this.left = x;
+                            this.visibleRightMenu = true;
+                        },
+                        closeMenu() {
+                            this.visibleRightMenu = false;
+                        },
+                        mouseleaveLogItem() {
+                            this.viewDetailsMouseleave();
+                            this.hoverLogID = false;
+                        },
                         refresh() {
                             hbuilderx.postMessage({
                                 command: 'refresh',
@@ -663,10 +719,11 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 this.searchText = w;
                             };
                         },
-                        copy(data) {
+                        copyCommitID(data) {
+                            let hash = data.hash;
                             hbuilderx.postMessage({
                                 command: 'copy',
-                                text: data
+                                text: hash
                             });
                         },
                         symbolRepeat(str, num) {
