@@ -462,6 +462,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     background: #fff;
                     z-index: 3000;
                     position: absolute;
+                    display: block;
                     list-style-type: none;
                     padding: 5px 0;
                     border-radius: 4px;
@@ -474,6 +475,9 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     margin: 0;
                     padding: 7px 16px;
                     cursor: pointer;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
                 .contextmenu li:hover {
                     background: #eee;
@@ -599,6 +603,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
 
                 <div v-show="visibleRightMenu">
                     <ul v-show="visibleRightMenu" :style="{left:left+'px',top:top+'px'}" class="contextmenu" @mouseleave="visibleRightMenu = false">
+                        <li @click="cherryPick(rightClickItem);">将当前commit应用于 {{currentBranch}} 分支</li>
+                        <div class="dropdown-divider"></div>
                         <li @click="copyLogMsg(rightClickItem, 'msg')">复制</li>
                         <li @click="copyLogMsg(rightClickItem, 'commit_id')">复制commit id到剪贴板</li>
                     </ul>
@@ -780,6 +786,9 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             hbuilderx.postMessage({
                                 command: 'branch'
                             });
+                        },
+                        cherryPick(item) {
+
                         }
                     }
                 })
