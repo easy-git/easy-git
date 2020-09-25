@@ -180,7 +180,7 @@ class LogView {
     }
 
     async cherryPick(hash) {
-        let cmd = ['cherry-pick', hash];
+        let cmd = ['cherry-pick', '-x', hash];
         let status = await utils.gitRaw(this.projectPath, cmd, 'cherry-pick');
         if (status == 'fail' || status == 'error') {
             hx.window.showErrorMessage(`Git: ${cmd}操作失败`);
