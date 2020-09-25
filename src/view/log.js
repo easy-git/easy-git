@@ -177,7 +177,18 @@ class LogView {
                 this.setView('branch', 'default')
             }
         };
+    }
 
+    async cherryPick(hash) {
+        let cmd = ['cherry-pick', hash];
+        let status = await utils.gitRaw(this.projectPath, cmd, 'cherry-pick');
+        if (status == 'fail' || status == 'error') {
+            hx.window.showErrorMessage(`Git: ${cmd}操作失败`);
+            return;
+        } else {
+            hx.window.showInformationMessage('Git: cherry-pick 操作成功！');
+            return;
+        }
     }
 };
 
@@ -234,6 +245,8 @@ async function show(webviewPanel, userConfig, gitData) {
             case 'branch':
                 Log.switchBranch();
                 break;
+            case 'cherry-pick':
+                Log.cherryPick(msg.hash);
             default:
                 break;
         };
@@ -473,14 +486,15 @@ function generateLogHtml(userConfig, uiData, gitData) {
                 }
                 .contextmenu li {
                     margin: 0;
-                    padding: 7px 16px;
+                    padding: 6px 16px;
                     cursor: pointer;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
                 }
                 .contextmenu li:hover {
-                    background: #eee;
+                    background-color: rgb(84,156,228);
+                    color: #FFFFFF;
                 }
             </style>
         </head>
@@ -603,8 +617,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
 
                 <div v-show="visibleRightMenu">
                     <ul v-show="visibleRightMenu" :style="{left:left+'px',top:top+'px'}" class="contextmenu" @mouseleave="visibleRightMenu = false">
-                        <li @click="cherryPick(rightClickItem);">将当前commit应用于 {{currentBranch}} 分支</li>
-                        <div class="dropdown-divider"></div>
+                        <li @click="cherryPick(rightClickItem);" v-if="searchType == 'all'">将当前commit应用于 {{currentBranch}} 分支</li>
+                        <div class="dropdown-divider"  v-if="searchType == 'all'"></div>
                         <li @click="copyLogMsg(rightClickItem, 'msg')">复制</li>
                         <li @click="copyLogMsg(rightClickItem, 'commit_id')">复制commit id到剪贴板</li>
                     </ul>
@@ -788,7 +802,12 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             });
                         },
                         cherryPick(item) {
-
+                            let hash = item.hash;
+                            if (!hash) {return};
+                            hbuilderx.postMessage({
+                                command: 'cherry-pick',
+                                hash: hash
+                            })
                         }
                     }
                 })
