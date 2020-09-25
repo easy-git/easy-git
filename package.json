@@ -16,6 +16,7 @@
         "onCommand:EasyGit.log",
         "onCommand:EasyGit.clone",
         "onCommand:EasyGit.pull",
+        "onCommand:EasyGit.push",
         "onCommand:EasyGit.stash",
         "onCommand:EasyGit.stashAll",
         "onCommand:EasyGit.stashPop",
@@ -90,6 +91,10 @@
             {
                 "command": "EasyGit.pull",
                 "title": "easy-git: pull - 拉取"
+            },
+            {
+                "command": "EasyGit.push",
+                "title": "easy-git: push - 推送"
             },
             {
                 "command": "EasyGit.stash",

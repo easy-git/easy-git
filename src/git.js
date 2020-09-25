@@ -48,6 +48,9 @@ function action(param,action_name) {
         case 'pull':
             utils.gitPull(projectPath, {'rebase': true});
             break;
+        case 'push':
+            utils.gitPush(projectPath);
+            break;
         case 'stash':
             goStash(ProjectInfo, '', 'Git: 储藏(stash)');
             break;
@@ -98,7 +101,6 @@ async function goStash(ProjectInfo, option, stashMsg) {
     };
     utils.gitStash(ProjectInfo, options, stashMsg);
 };
-
 
 /**
  * @description 弹出储藏

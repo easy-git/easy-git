@@ -186,7 +186,18 @@ class LogView {
             hx.window.showErrorMessage(`Git: ${cmd}操作失败`);
             return;
         } else {
-            hx.window.showInformationMessage('Git: cherry-pick 操作成功！');
+            let data = {
+                'projectPath': this.projectPath,
+                'projectName': this.projectName,
+                'easyGitInner': true
+            };
+            hx.window.showInformationMessage('Git: cherry-pick 操作成功！', ['push','以后push' ,'关闭']).then((result) => {
+                if (result == 'push') {
+                    hx.commands.executeCommand('EasyGit.push', data);
+                } else {
+                    hx.commands.executeCommand('EasyGit.main',data);
+                };
+            });
             return;
         }
     }

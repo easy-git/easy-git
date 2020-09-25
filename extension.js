@@ -87,6 +87,11 @@ function activate(context) {
         git.action(param, 'pull');
     });
 
+    // Git推送
+    let push = hx.commands.registerCommand('EasyGit.push', (param)=> {
+        git.action(param, 'push');
+    });
+
     // Git Stash 储藏
     let stash = hx.commands.registerCommand('EasyGit.stash', (param)=> {
         git.action(param, 'stash');
