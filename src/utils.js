@@ -324,10 +324,12 @@ async function gitClone(info) {
     };
 
     if (isAuth) {
-        if (repo.includes('https://') || repo.includes('https//')) {
+        if (/(http|https):\/\//.test(repo)) {
+            let http = 'http://';
+            if (/https:\/\//.test(repo)) { http = "https://"};
             repo = repo.replace(/(^http:\/\/|^https:\/\/)/, "");
+            repo = `${http}${username}:${password}@${repo}`;
         };
-        repo = `http://${username}:${password}@${repo}`;
     };
 
     try{

@@ -9,6 +9,7 @@ const hx = require('hbuilderx');
 const icon = require('./static/icon.js');
 const utils = require('../utils.js');
 const MainView = require('./main.js');
+const file = require('../file.js');
 
 const osName = os.platform();
 
@@ -87,6 +88,10 @@ function show(webviewPanel, userConfig) {
             hx.commands.executeCommand('EasyGit.main', pinfo);
             hx.commands.executeCommand('workbench.view.explorer');
         } else {
+            try{
+                file.deleteFolderRecursive(projectName);
+            }catch(e){};
+
             view.postMessage({
                 command: 'clone',
                 status: result
