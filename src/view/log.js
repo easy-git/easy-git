@@ -384,6 +384,9 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     -webkit-transform: rotate(0.9);
                     transform: scale(0.9);
                 }
+                #git-log-body {
+                    overflow: auto;
+                }
                 .gitfile:hover .hideicon {
                     opacity: 1;
                 }
@@ -608,7 +611,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         <div class="rect4"></div>
                         <div class="rect5"></div>
                     </div>
-                    <div class="row mb-5"  style="margin-top:80px;" v-else>
+                    <div id="git-log-body" class="row mb-5"  style="margin-top:80px;" v-else>
                         <div class="col mt-2 px-0" v-if="gitLogInfoList.length == 0">
                             <div class="text-center" style="margin-top: 20%;">
                                 <span>${noIcon}</span>
@@ -621,7 +624,6 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                     v-for="(item,idx) of gitLogInfoList" :key="idx"
                                     :id="'msg_'+idx"
                                     @contextmenu.prevent.stop="openMenu($event,item)"
-                                    @mouseenter="viewDetailsMouseenter();"
                                     @mouseover="hoverLogID = 'msg_'+idx"
                                     @mouseleave="mouseleaveLogItem()">
                                     <div class="d-flex">
@@ -777,19 +779,19 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 condition: this.searchText
                             });
                         },
-                        forUpdate() {
-                            hbuilderx.onDidReceiveMessage((msg) => {
+						forUpdate() {
+							hbuilderx.onDidReceiveMessage((msg) => {
                                 this.loading = false;
-                                if (msg.command != 'search') {return};
-                                if (msg.gitData) {
-                                    let gitData = msg.gitData;
-                                    this.searchType = msg.searchType;
-                                    this.gitLogInfoList = gitData.logData;
-                                    this.searchText = gitData.searchText;
-                                    this.currentBranch = gitData.currentBranch;
-                                }
-                            });
-                        },
+							    if (msg.command != 'search') {return};
+							    if (msg.gitData) {
+							        let gitData = msg.gitData;
+							        this.searchType = msg.searchType;
+							        this.gitLogInfoList = gitData.logData;
+							        this.searchText = gitData.searchText;
+							        this.currentBranch = gitData.currentBranch;
+							    }
+							});
+						},
                         switchSearchType(type) {
                             this.loading = true;
                             this.searchType = type;
@@ -836,15 +838,15 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             });
                         },
                         symbolRepeat(str, num) {
-                            return num > 1 ? str.repeat(num): str;
+                        	return num > 1 ? str.repeat(num): str;
                         },
                         viewDetailsMouseenter() {
                             // 解决背景层滚动的问题
-                            document.body.style.overflow = 'hidden !important';
+                            document.body.style.overflow = 'hidden';
                         },
                         viewDetailsMouseleave() {
                             // 解决背景层滚动的问题
-                            document.body.style.overflow = 'auto !important';
+                            document.body.style.overflow = 'auto';
                         },
                         viewDetails(data) {
                             this.isShowViewDetails = true;
@@ -868,7 +870,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         },
                         closeViewDetails() {
                             this.isShowViewDetails = false;
-                            document.body.style.overflow = 'auto';
+                            document.body.style.overflow = 'auto !important';
                         },
                         openFile(filename) {
                             hbuilderx.postMessage({
