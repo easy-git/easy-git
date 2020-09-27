@@ -507,6 +507,63 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     background-color: rgb(84,156,228);
                     color: #FFFFFF;
                 }
+
+                .spinner {
+                    margin: 100px auto;
+                    width: 50px;
+                    height: 60px;
+                    text-align: center;
+                    font-size: 10px;
+                }
+
+                .spinner>div {
+                    background-color: #67CF22;
+                    height: 100%;
+                    width: 6px;
+                    display: inline-block;
+                    -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+                    animation: stretchdelay 1.2s infinite ease-in-out;
+                }
+
+                .spinner .rect2 {
+                    -webkit-animation-delay: -1.1s;
+                    animation-delay: -1.1s;
+                }
+
+                .spinner .rect3 {
+                    -webkit-animation-delay: -1.0s;
+                    animation-delay: -1.0s;
+                }
+
+                .spinner .rect4 {
+                    -webkit-animation-delay: -0.9s;
+                    animation-delay: -0.9s;
+                }
+
+                .spinner .rect5 {
+                    -webkit-animation-delay: -0.8s;
+                    animation-delay: -0.8s;
+                }
+
+                @-webkit-keyframes stretchdelay {
+                    0%,40%,100% {
+                        -webkit-transform: scaleY(0.4)
+                    }
+                    20% {
+                        -webkit-transform: scaleY(1.0)
+                    }
+                }
+
+                @keyframes stretchdelay {
+                    0%,40%,100% {
+                        transform: scaleY(0.4);
+                        -webkit-transform: scaleY(0.4);
+                    }
+                    20% {
+                        transform: scaleY(1.0);
+                        -webkit-transform: scaleY(1.0);
+                    }
+                }
             </style>
         </head>
         <body style="background-color:${background};">
@@ -544,7 +601,14 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-5"  style="margin-top:80px;">
+                    <div class="spinner" v-if="loading">
+                        <div class="rect1"></div>
+                        <div class="rect2"></div>
+                        <div class="rect3"></div>
+                        <div class="rect4"></div>
+                        <div class="rect5"></div>
+                    </div>
+                    <div class="row mb-5"  style="margin-top:80px;" v-else>
                         <div class="col mt-2 px-0" v-if="gitLogInfoList.length == 0">
                             <div class="text-center" style="margin-top: 20%;">
                                 <span>${noIcon}</span>
@@ -650,7 +714,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         hoverLogID: '',
                         isShowViewDetails: false,
                         logDetails: {},
-                        logDetailsFiles: []
+                        logDetailsFiles: [],
+                        loading: false
                     },
                     watch: {
                         visibleRightMenu(value) {
@@ -680,6 +745,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         this.searchText = '${searchText}';
                     },
                     mounted() {
+                        this.loading = false;
                         that = this;
                         window.onload = function() {
                             setTimeout(function() {
@@ -704,25 +770,28 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             this.hoverLogID = false;
                         },
                         refresh() {
+                            this.loading = true;
                             hbuilderx.postMessage({
                                 command: 'refresh',
                                 searchType: this.searchType,
                                 condition: this.searchText
                             });
                         },
-						forUpdate() {
-							hbuilderx.onDidReceiveMessage((msg) => {
-							    if (msg.command != 'search') {return};
-							    if (msg.gitData) {
-							        let gitData = msg.gitData;
-							        this.searchType = msg.searchType;
-							        this.gitLogInfoList = gitData.logData;
-							        this.searchText = gitData.searchText;
-							        this.currentBranch = gitData.currentBranch;
-							    }
-							});
-						},
+                        forUpdate() {
+                            hbuilderx.onDidReceiveMessage((msg) => {
+                                this.loading = false;
+                                if (msg.command != 'search') {return};
+                                if (msg.gitData) {
+                                    let gitData = msg.gitData;
+                                    this.searchType = msg.searchType;
+                                    this.gitLogInfoList = gitData.logData;
+                                    this.searchText = gitData.searchText;
+                                    this.currentBranch = gitData.currentBranch;
+                                }
+                            });
+                        },
                         switchSearchType(type) {
+                            this.loading = true;
                             this.searchType = type;
                             hbuilderx.postMessage({
                                 command: 'search',
@@ -733,6 +802,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         searchLog() {
                             if (this.searchText.length == 0) {return;};
                             this.searchText = (this.searchText).replace(/'/g, '').replace(/"/g, '');
+                            this.loading = true;
                             hbuilderx.postMessage({
                                 command: 'search',
                                 searchType: this.searchType,
@@ -766,15 +836,15 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             });
                         },
                         symbolRepeat(str, num) {
-                        	return num > 1 ? str.repeat(num): str;
+                            return num > 1 ? str.repeat(num): str;
                         },
                         viewDetailsMouseenter() {
                             // 解决背景层滚动的问题
-                            document.body.style.overflow = 'hidden';
+                            document.body.style.overflow = 'hidden !important';
                         },
                         viewDetailsMouseleave() {
                             // 解决背景层滚动的问题
-                            document.body.style.overflow = 'auto';
+                            document.body.style.overflow = 'auto !important';
                         },
                         viewDetails(data) {
                             this.isShowViewDetails = true;
