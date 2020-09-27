@@ -782,6 +782,9 @@ function generateLogHtml(userConfig, uiData, gitData) {
 						forUpdate() {
 							hbuilderx.onDidReceiveMessage((msg) => {
                                 this.loading = false;
+                                if (this.isShowViewDetails) {
+                                    this.isShowViewDetails = false;
+                                };
 							    if (msg.command != 'search') {return};
 							    if (msg.gitData) {
 							        let gitData = msg.gitData;
