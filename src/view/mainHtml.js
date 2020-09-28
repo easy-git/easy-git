@@ -1037,7 +1037,7 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
                     fromToCreate: {
                         newBranchName: '',
                         ref: '',
-                        isPush: false
+                        isPush: true
                     },
                     inputDisabled: false,
                     hoverStampID: false,

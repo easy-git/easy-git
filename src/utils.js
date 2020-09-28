@@ -871,13 +871,13 @@ async function gitBranchCreate(data) {
             let HEAD = "HEAD:" + newBranchName;
             let status = await git(projectPath).init()
                 .checkout(args)
-                .push(["origin",HEAD])
+                .push(["--set-upstream","origin",newBranchName])
                 .then(() => {
                     hx.window.setStatusBarMessage(`Git: ${newBranchName} 新分支创建成功`, 30000, 'info');
                     return 'success';
                 })
                 .catch((err) => {
-                    let errMsg = "\n\n" + (err).toString();
+                    let errMsg = "\n" + (err).toString();
                     createOutputChannel(`Git: 分支${newBranchName}创建失败`, errMsg);
                     return 'fail';
                 });
@@ -894,7 +894,7 @@ async function gitBranchCreate(data) {
                     return 'success';
                 })
                 .catch((err) => {
-                    let errMsg = "\n\n" + (err).toString();
+                    let errMsg = "\n" + (err).toString();
                     createOutputChannel(`Git: 分支${newBranchName}创建失败`, errMsg);
                     return 'fail';
                 });
