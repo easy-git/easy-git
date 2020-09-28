@@ -191,8 +191,8 @@ class LogView {
                 'projectName': this.projectName,
                 'easyGitInner': true
             };
-            hx.window.showInformationMessage('Git: cherry-pick 操作成功！', ['push','以后push' ,'关闭']).then((result) => {
-                if (result == 'push') {
+            hx.window.showInformationMessage('Git: cherry-pick 操作成功！', ['现在push','以后push' ,'关闭']).then((result) => {
+                if (result == '现在push') {
                     hx.commands.executeCommand('EasyGit.push', data);
                 } else {
                     hx.commands.executeCommand('EasyGit.main',data);
