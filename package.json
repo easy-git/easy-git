@@ -180,41 +180,38 @@
                 {
                     "title": "easy-git",
                     "group": "ext_settings",
-                    "id": "toolsMenu"
-                },
-                {
-                    "group": "toolsMenu@1"
+                    "id": "easygit"
                 },
                 {
                     "command": "EasyGit.setUserName",
                     "title": "设置user.name",
-                    "group": "toolsMenu@1"
+                    "group": "easygit@1"
                 },
                 {
                     "command": "EasyGit.setEmail",
                     "title": "设置user.email",
-                    "group": "toolsMenu@1"
+                    "group": "easygit@1"
                 },
                 {
-                    "group": "toolsMenu@2"
+                    "group": "easygit@2"
                 },
                 {
                     "command": "EasyGit.setGitingore",
                     "title": "设置.gitignore",
-                    "group": "toolsMenu@2"
+                    "group": "easygit@2"
                 },
                 {
                     "command": "EasyGit.setGitattributes",
                     "title": "设置.gitattributes",
-                    "group": "toolsMenu@2"
+                    "group": "easygit@2"
                 },
                 {
-                    "group": "toolsMenu@3"
+                    "group": "easygit@3"
                 },
                 {
                     "command": "EasyGit.about",
                     "title": "关于/评价easy-git",
-                    "group": "toolsMenu@3"
+                    "group": "easygit@3"
                 },
                 {
                     "group": "ext_settings"
