@@ -39,6 +39,11 @@ class LogView {
         this.uiData = uiData;
         this.userConfig = userConfig;
         this.gitData = gitData;
+        this.currentProjectInfoForFlush = {
+            'projectPath': gitData.projectPath,
+            'projectName': gitData.projectName,
+            'easyGitInner': true
+        }
     };
 
     // 验证搜索条件是否是日期
@@ -201,6 +206,24 @@ class LogView {
             return;
         }
     }
+
+    // 重置回退代码到某次提交
+    async resetHardCommit(hash) {
+        let shortHashValue = hash.slice(0,12);
+        let options = ['--hard', hash];
+        let status = await utils.gitReset(this.projectPath, options, `回退${shortHashValue}`);
+        if (status == 'fail' || status == 'error') {
+            hx.window.showErrorMessage(`Git: 回退${shortHashValue}操作失败`);
+            return;
+        } else {
+            hx.window.showInformationMessage(`Git: 回退${shortHashValue} 操作成功！\n 后期可在[源代码管理器]视图中进行后续操作。`, ['我知道了']);
+            this.setView('branch', 'default');
+            let that = this;
+            setTimeout(function() {
+                hx.commands.executeCommand('EasyGit.main', that.currentProjectInfoForFlush);
+            }, 1500);
+        }
+    }
 };
 
 
@@ -258,6 +281,10 @@ async function show(webviewPanel, userConfig, gitData) {
                 break;
             case 'cherry-pick':
                 Log.cherryPick(msg.hash);
+                break;
+            case 'reset-hard-commit':
+                Log.resetHardCommit(msg.hash);
+                break;
             default:
                 break;
         };
@@ -694,6 +721,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
 
                 <div v-show="visibleRightMenu">
                     <ul v-show="visibleRightMenu" :style="{left:left+'px',top:top+'px'}" class="contextmenu" @mouseleave="visibleRightMenu = false">
+						<li @click="resetCommit(rightClickItem);" v-if="searchType != 'all'">将 {{currentBranch}} 重置（回退）到这次提交</li>
+                        <div class="dropdown-divider" v-if="searchType != 'all'"></div>
                         <li @click="cherryPick(rightClickItem);" v-if="searchType == 'all'">将当前commit应用于 {{currentBranch}} 分支</li>
                         <div class="dropdown-divider"  v-if="searchType == 'all'"></div>
                         <li @click="copyLogMsg(rightClickItem, 'msg')">复制</li>
@@ -892,6 +921,14 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             if (!hash) {return};
                             hbuilderx.postMessage({
                                 command: 'cherry-pick',
+                                hash: hash
+                            })
+                        },
+                        resetCommit(item) {
+                            let hash = item.hash;
+                            if (!hash) {return};
+                            hbuilderx.postMessage({
+                                command: 'reset-hard-commit',
                                 hash: hash
                             })
                         }
