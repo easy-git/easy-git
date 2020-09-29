@@ -7,7 +7,7 @@ const file = require('./file.js');
 const utils = require('./utils.js');
 
 const MainView = require('./view/main.js');
-const LogView = require('./view/log.js');
+const openLogWebView = require('./view/log/openWebView.js');
 const initView = require('./view/init.js');
 const cloneView = require('./view/clone.js');
 
@@ -36,7 +36,7 @@ async function FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExpl
                 MainView.active(webviewPanel, userConfig, gitData);
             };
             if (viewType == 'log') {
-                LogView.show(webviewPanel, userConfig, gitData);
+                openLogWebView(webviewPanel, userConfig, gitData);
             };
         } else {
             initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
@@ -144,7 +144,7 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
 
     // show git log view
     if (viewType == 'log') {
-        LogView.show(webviewPanel, userConfig, gitData);
+        openLogWebView(webviewPanel, userConfig, gitData);
         hx.window.showView({
            containerid: "EasyGitCommonView"
         });
@@ -182,7 +182,7 @@ async function FromViewMenu(viewType, webviewPanel, userConfig, FilesExplorerPro
                 MainView.active(webviewPanel, userConfig, gitData);
             };
             if (viewType == 'log') {
-                LogView.show(webviewPanel, userConfig, gitData);
+                openLogWebView(webviewPanel, userConfig, gitData);
             };
         };
     };
