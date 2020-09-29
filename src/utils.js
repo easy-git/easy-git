@@ -257,10 +257,44 @@ function isGitInstalled() {
 
 
 /**
- * @description 检查文件列表是否包含node_modules，并返回文件数量
+ * @description 检查是否设置了username和email，如未设置，弹窗提示
+ * @param {String} projectPath 项目路径
+ * @param {String} projectName 项目名称
+ * @param {Object} userConfig
+ */
+async function checkGitUsernameEmail(projectPath, projectName, userConfig) {
+    let configData = await gitConfigShow(projectPath, false);
+    let gitUserName = configData['user.name'];
+    let gitEmail = configData['user.email'];
+
+    // 用户是否设置过不再提示
+    let { GitConfigUserPrompt } = userConfig;
+
+    if ((gitEmail == '' || gitUserName == '') && (GitConfigUserPrompt != false)) {
+        let msg = `当前项目 ${projectName} 未设置`
+        if (gitUserName == '') {
+            msg = msg + 'user.name'
+        };
+        if (gitEmail == '') {
+            msg = msg + 'user.email'
+        };
+        msg = msg + ", 点击菜单【工具】【easy-git】可进行设置。\n"
+        hx.window.showErrorMessage(msg,['我知道了','不再提示']).then((result)=> {
+            if (result == '不再提示') {
+                let config = hx.workspace.getConfiguration();
+                config.update("EasyGit.GitConfigUserPrompt", false).then(() => {});
+            }
+        });
+    }
+};
+
+/**
+ * @description 检查文件列表是否包含node_modules
+ * @param {String} projectPath 项目路径
+ * @param {String} projectName 项目名称
  * @param {Object} GitStatusResult
  */
-function checkNodeModulesFileList(GitStatusResult) {
+function checkNodeModulesFileList(projectPath, projectName, GitStatusResult) {
     let gitFileList = JSON.parse(GitStatusResult.gitStatusResult);
 
     let staged = gitFileList.staged;
@@ -281,7 +315,22 @@ function checkNodeModulesFileList(GitStatusResult) {
             break;
         };
     };
-    return {num,isNodeModules}
+    
+    if (isNodeModules) {
+        hx.window.showErrorMessage(
+            '检测到当前git项目下，包含node_modules，且未设置.gitignore, 是否设置?',['设置.gitignore','以后再说'],
+        ).then((result) => {
+            if (result == '设置.gitignore') {
+                file.gitignore({'projectPath': projectPath});
+            }
+        })
+    };
+    if (num >= 10000) {
+        hx.window.showErrorMessage(
+            `easy-it: 项目${projectName}下, ${num}个文件发生了变化，easy-git插件需要一定的时间来加载。\n`,
+            ['我知道了'],
+        )
+    };
 };
 
 
@@ -1299,6 +1348,7 @@ module.exports = {
     importProjectToExplorer,
     getFilesExplorerProjectInfo,
     checkNodeModulesFileList,
+    checkGitUsernameEmail,
     gitInit,
     gitClone,
     gitStatus,

@@ -16,11 +16,14 @@ const cloneView = require('./view/clone.js');
  * @description 提供webview视图外Git的操作
  */
 function action(param,action_name) {
+    if (param == null) {
+        return hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试。', ['我知道了']);
+    };
 
-    let {easyGitInner} = param;
-    let projectName, projectPath, selectedFile;
+    let projectName, projectPath, selectedFile, easyGitInner;
     try{
-        if (easyGitInner) {
+        let {easyGitInner} = param;
+        if (easyGitInner != undefined) {
             projectName = param.projectName;
             projectPath = param.projectPath;
         } else {
@@ -35,7 +38,7 @@ function action(param,action_name) {
             };
         };
     } catch(e){
-        return hx.window.setStatusBarMessage('easy-git: 无法获取到项目路径，请在项目管理器选中后再试。',4000, 'error');
+        return hx.window.showErrorMessage('easy-git: 无法获取到项目路径，请在项目管理器选中项目后再试。');
     };
 
     const ProjectInfo = {
