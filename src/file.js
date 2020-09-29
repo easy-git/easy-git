@@ -37,6 +37,7 @@ function getPath(parm) {
  * @description 创建文件
  */
 async function create(args) {
+    
     let currentDir = '';
     let {filename,projectPath,param} = args;
 
@@ -72,7 +73,10 @@ async function create(args) {
  * @description 创建.gitignore
  */
 function gitignore(args) {
-    let data = Object.assign(args,{
+    if (args == null) {
+        return hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试。', ['我知道了']);
+    };
+    let data = Object.assign({'param': args},{
         'filename': '.gitignore'
     });
     create(data);
@@ -83,7 +87,10 @@ function gitignore(args) {
  * @description 创建.gitattributes
  */
 function gitattributes(args) {
-    let data = Object.assign(args,{
+    if (args == null) {
+        return hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试。', ['我知道了']);
+    };
+    let data = Object.assign({'param': args},{
         'filename': '.gitattributes'
     });
     create(data);

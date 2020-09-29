@@ -3,9 +3,13 @@ const hx = require("hbuilderx");
 const index = require("./src/index.js");
 const file = require('./src/file.js');
 const git = require('./src/git.js');
+const cmp = require('./src/common/cmp.js');
+
+let hxVersion = hx.env.appVersion;
+hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
+
 
 let source = 'viewMenu';
-
 let FileView = hx.window.createWebView("EasyGitSourceCodeView", {
     enableScritps: true
 });
@@ -13,6 +17,7 @@ let FileView = hx.window.createWebView("EasyGitSourceCodeView", {
 let CommonView = hx.window.createWebView("EasyGitCommonView", {
     enableScritps: true
 });
+
 
 /**
  * @todo 多个视图一起执行的问题
@@ -70,16 +75,12 @@ function activate(context) {
 
     // 菜单 【.gitignore】
     let setGitignore = hx.commands.registerCommand('EasyGit.setGitingore', (param)=> {
-        file.gitignore({
-            'param': param
-        });
+        file.gitignore(param);
     });
 
     // 菜单【.gitattributes】
     let setGitattributes= hx.commands.registerCommand('EasyGit.setGitattributes', (param)=> {
-        file.gitattributes({
-            'param': param
-        });
+        file.gitattributes(param);
     });
 
     // Git拉取
