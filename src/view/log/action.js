@@ -224,6 +224,28 @@ class GitLogAction {
             }, 1500);
         }
     }
+
+    // 检出具体的commit
+    async checkoutCommit(hash) {
+        let result = await hx.window.showInformationMessage('检出该提交将创建一个分离的HEAD, 此时不在任何分支上。', ['确定检出', '取消']).then( (result) => {
+            return result;
+        });
+        if (result == '确定检出') {
+            let options = ['checkout', hash];
+            let shortHashValue = hash.slice(0,12);
+            let status = await utils.gitRaw(this.projectPath, options, `检出${shortHashValue}`);
+            if (status == 'fail' || status == 'error') {
+                hx.window.showErrorMessage(`Git: 检出${shortHashValue}操作失败`);
+                return;
+            } else {
+                this.setView('branch', 'default');
+                let that = this;
+                setTimeout(function() {
+                    hx.commands.executeCommand('EasyGit.main', that.currentProjectInfoForFlush);
+                }, 1500);
+            }
+        };
+    }
 };
 
 

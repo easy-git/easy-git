@@ -59,6 +59,9 @@ async function openLogWebView(webviewPanel, userConfig, gitData) {
             case 'reset-hard-commit':
                 Log.resetHardCommit(msg.hash);
                 break;
+            case 'checkout-commit':
+                Log.checkoutCommit(msg.hash);
+                break;
             default:
                 break;
         };

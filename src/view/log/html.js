@@ -432,6 +432,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
 
                 <div v-show="visibleRightMenu">
                     <ul v-show="visibleRightMenu" :style="{left:left+'px',top:top+'px'}" class="contextmenu" @mouseleave="visibleRightMenu = false">
+                        <li @click="checkoutCommit(rightClickItem);" v-if="searchType != 'all'">检出...</li>
+                        <div class="dropdown-divider" v-if="searchType != 'all'"></div>
 						<li @click="resetCommit(rightClickItem);" v-if="searchType != 'all'">将 {{currentBranch}} 重置（回退）到这次提交</li>
                         <div class="dropdown-divider" v-if="searchType != 'all'"></div>
                         <li @click="cherryPick(rightClickItem);" v-if="searchType == 'all'">将当前commit应用于 {{currentBranch}} 分支</li>
@@ -640,6 +642,14 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             if (!hash) {return};
                             hbuilderx.postMessage({
                                 command: 'reset-hard-commit',
+                                hash: hash
+                            })
+                        },
+                        checkoutCommit(item) {
+                            let hash = item.hash;
+                            if (!hash) {return};
+                            hbuilderx.postMessage({
+                                command: 'checkout-commit',
                                 hash: hash
                             })
                         }

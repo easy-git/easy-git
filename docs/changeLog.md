@@ -1,4 +1,11 @@
 # Change Log
+
+## 0.2.3
+* 新增 日志视图 检出具体commit功能 （选中log，右键菜单【检出】）
+* 新增 日志视图 回退代码功能 （选中log, 右键菜单【将当前分支回退到这次提交】）
+* 修复 当焦点不在项目管理器、编辑器时，点击设置user.name、user.email、.gitignore等，插件运行异常没有任何提示的Bug
+* 修复 菜单【工具】【easy-git]菜单 因为group问题 在某些情况下显示到别处的Bug
+
 ## 0.2.2
 * 新增 git cherry-pick功能 （日志视图，all，右键菜单cherry-pick）
 * 新增 【浏览器里查看远程仓库】菜单
