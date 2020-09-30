@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const hx = require('hbuilderx');
-const {getUIData,GitLogAction} = require('./action.js');
+const {GitLogAction} = require('./action.js');
 
 /**
  * @description log view
@@ -13,16 +13,13 @@ const {getUIData,GitLogAction} = require('./action.js');
 async function openLogWebView(webviewPanel, userConfig, gitData) {
     const view = webviewPanel.webView;
 
-    // UI: color and svg icon
-    let uiData = getUIData();
-
     // get project info
     const {projectPath, projectName, selectedFile, currentBranch} = gitData;
 
     // 默认在当前分支搜索，当搜索全部时，此值为all
     let searchType = 'branch';
 
-    let Log = new GitLogAction(webviewPanel, gitData, uiData, userConfig);
+    let Log = new GitLogAction(webviewPanel, gitData, userConfig);
 
     // 选中文件或目录，则查看此文件的log记录
     if (selectedFile != '' && selectedFile != undefined) {

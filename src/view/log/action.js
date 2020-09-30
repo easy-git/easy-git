@@ -28,9 +28,11 @@ function getUIData() {
     return uiData
 };
 
+// UI: color and svg icon
+let uiData = getUIData();
 
 class GitLogAction {
-    constructor(webviewPanel, gitData, uiData, userConfig) {
+    constructor(webviewPanel, gitData, userConfig) {
         this.webviewPanel = webviewPanel;
         this.projectPath = gitData.projectPath;
         this.projectName = gitData.projectName;

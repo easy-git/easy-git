@@ -7,7 +7,6 @@ const file = require('./file.js');
 const utils = require('./utils.js');
 
 const MainView = require('./view/main.js');
-const LogView = require('./view/log.js');
 const initView = require('./view/init.js');
 const cloneView = require('./view/clone.js');
 
