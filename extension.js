@@ -38,6 +38,13 @@ function activate(context) {
     });
     context.subscriptions.push(f);
 
+    // 菜单【分支管理】，菜单【工具】、及项目管理器右键菜单
+    let b = hx.commands.registerCommand('EasyGit.branch', (param) => {
+        context.source = 'filesExplorer';
+        index.main('branch',param, FileView, context);
+    });
+    context.subscriptions.push(b);
+
     // 菜单【日志】
     let l = hx.commands.registerCommand('EasyGit.log', (param) => {
         context.source = 'filesExplorer';

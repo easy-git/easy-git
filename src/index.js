@@ -7,6 +7,7 @@ const file = require('./file.js');
 const utils = require('./utils.js');
 
 const MainView = require('./view/main.js');
+const GitBranchView = require('./view/branch/branch.js');
 const openLogWebView = require('./view/log/openWebView.js');
 const initView = require('./view/init.js');
 const cloneView = require('./view/clone.js');
@@ -34,6 +35,9 @@ async function FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExpl
             });
             if (viewType == 'main') {
                 MainView.active(webviewPanel, userConfig, gitData);
+            };
+            if (viewType == 'branch') {
+                GitBranchView(webviewPanel, userConfig, gitData);
             };
             if (viewType == 'log') {
                 openLogWebView(webviewPanel, userConfig, gitData);
@@ -65,7 +69,6 @@ async function FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExpl
  *   - 多个页面进入初始页面
  */
 async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo) {
-
     // 获取项目名称、项目路径
     let projectName, projectPath, selectedFile;
 
@@ -142,6 +145,19 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
         return;
     };
 
+    // show git Main view
+    if (viewType == 'branch') {
+        if (isGitProject) {
+            GitBranchView(webviewPanel, userConfig, gitData);
+        } else {
+            initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
+        };
+        hx.window.showView({
+           containerid: "EasyGitSourceCodeView"
+        });
+        return;
+    };
+
     // show git log view
     if (viewType == 'log') {
         openLogWebView(webviewPanel, userConfig, gitData);
@@ -181,6 +197,9 @@ async function FromViewMenu(viewType, webviewPanel, userConfig, FilesExplorerPro
             if (viewType == 'main') {
                 MainView.active(webviewPanel, userConfig, gitData);
             };
+            if (viewType == 'branch') {
+                GitBranchView(webviewPanel, userConfig, gitData);
+            };
             if (viewType == 'log') {
                 openLogWebView(webviewPanel, userConfig, gitData);
             };
@@ -200,7 +219,7 @@ async function FromViewMenu(viewType, webviewPanel, userConfig, FilesExplorerPro
  */
 async function main(viewType, param, webviewPanel, context) {
 
-    if (!['main','log', 'clone'].includes(viewType)) {
+    if (!['main', 'branch', 'log', 'clone'].includes(viewType)) {
         return;
     };
 

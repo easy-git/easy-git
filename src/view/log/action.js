@@ -246,6 +246,11 @@ class GitLogAction {
             }
         };
     }
+    
+    // 检出具体commit并创建新分支
+    async checkoutCommitForCreateBranch() {
+        
+    }
 };
 
 

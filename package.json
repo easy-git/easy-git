@@ -2,7 +2,7 @@
     "name": "easy-git",
     "description": "HBuilderX内唯一的图形化Git工具, vscode源代码管理工具风格, 简单易上手。",
     "displayName": "【easy-git】Git源代码管理工具",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "publisher": "oneone",
     "engines": {
         "HBuilderX": "^2.8.3"
@@ -13,6 +13,7 @@
     "main": "./extension",
     "activationEvents": [
         "onCommand:EasyGit.main",
+        "onCommand:EasyGit.branch",
         "onCommand:EasyGit.log",
         "onCommand:EasyGit.clone",
         "onCommand:EasyGit.pull",
@@ -81,6 +82,10 @@
                 "title": "easy-git: 源代码管理"
             },
             {
+                "command": "EasyGit.branch",
+                "title": "easy-git: 分支管理"
+            },
+            {
                 "command": "EasyGit.log",
                 "title": "easy-git: log - 查看日志"
             },
@@ -145,6 +150,10 @@
             "explorer/context": [
                 {
                     "command": "EasyGit.main",
+                    "group": "z_commands"
+                },
+                {
+                    "command": "EasyGit.branch",
                     "group": "z_commands"
                 },
                 {

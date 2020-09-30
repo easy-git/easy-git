@@ -315,7 +315,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             <div class="col">
                                 <h6 class="project-info">
                                     <span>{{ projectName }} / </span>
-                                    <span title="显示当前分支log" class="branch" :class="{ active: searchType == 'branch'}" @click="switchSearchType('branch');" @dblclick='switchBranch();'>{{ currentBranch }} </span>
+                                    <span title="显示当前分支log, 双击可切换分支" class="branch" :class="{ active: searchType == 'branch'}" @click="switchSearchType('branch');" @dblclick='switchBranch();'>{{ currentBranch }} </span>
                                     <span> | </span>
                                     <span title="显示所有分支log" class="branch" :class="{ active: searchType == 'all'}" @click="switchSearchType('all');">all</span>
                                 </h6>
@@ -433,10 +433,11 @@ function generateLogHtml(userConfig, uiData, gitData) {
                 <div v-show="visibleRightMenu">
                     <ul v-show="visibleRightMenu" :style="{left:left+'px',top:top+'px'}" class="contextmenu" @mouseleave="visibleRightMenu = false">
                         <li @click="checkoutCommit(rightClickItem);" v-if="searchType != 'all'">检出...</li>
+                        <li @click="checkoutCommitForCreateBranch(rightClickItem);" v-if="searchType != 'all'">检出并创建新分支</li>
                         <div class="dropdown-divider" v-if="searchType != 'all'"></div>
 						<li @click="resetCommit(rightClickItem);" v-if="searchType != 'all'">将 {{currentBranch}} 重置（回退）到这次提交</li>
                         <div class="dropdown-divider" v-if="searchType != 'all'"></div>
-                        <li @click="cherryPick(rightClickItem);" v-if="searchType == 'all'">将当前commit应用于 {{currentBranch}} 分支</li>
+                        <li @click="cherryPick(rightClickItem);" v-if="searchType == 'all'">将当前提交应用于 {{currentBranch}} 分支</li>
                         <div class="dropdown-divider"  v-if="searchType == 'all'"></div>
                         <li @click="copyLogMsg(rightClickItem, 'msg')">复制</li>
                         <li @click="copyLogMsg(rightClickItem, 'commit_id')">复制commit id到剪贴板</li>
@@ -650,6 +651,14 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             if (!hash) {return};
                             hbuilderx.postMessage({
                                 command: 'checkout-commit',
+                                hash: hash
+                            })
+                        },
+                        checkoutCommitForCreateBranch() {
+                            let hash = item.hash;
+                            if (!hash) {return};
+                            hbuilderx.postMessage({
+                                command: 'checkout-commit-for-create-branch',
                                 hash: hash
                             })
                         }

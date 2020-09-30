@@ -87,138 +87,6 @@ function gitConfigFileSetting(projectPath, filename) {
 
 
 /**
- * @description Git分支
- */
-class GitBranch {
-    constructor(webviewPanel, projectPath, projectName, uiData, userConfig) {
-        this.webviewPanel = webviewPanel;
-        this.projectPath = projectPath;
-        this.projectName = projectName;
-        this.uiData = uiData;
-        this.userConfig = userConfig;
-    }
-
-    async LoadingBranchData() {
-        let BranchInfo = await utils.gitBranch(this.projectPath);
-        let StatusInfo = await utils.gitStatus(this.projectPath);
-        let TagsList = await utils.gitTagsList(this.projectPath);
-
-        const gitData = Object.assign({
-            'BranchInfo': BranchInfo
-        }, {
-            'TagsList': TagsList
-        }, {
-            'projectName': this.projectName,
-            'projectPath': this.projectPath,
-            'ahead': StatusInfo.ahead,
-            'behind': StatusInfo.behind,
-            'tracking': StatusInfo.tracking,
-            'originurl': StatusInfo.originurl
-        });
-        const bhtml = html.getWebviewBranchContent(this.userConfig, this.uiData, gitData);
-        this.webviewPanel.webView.html = bhtml;
-    };
-
-    // Git branch: switch
-    async switch(branchInfo) {
-        let {name,current} = branchInfo;
-        if (current) {
-            return;
-        };
-        if (name.includes('remote')) {
-            return hx.window.setStatusBarMessage('请勿在远程分支上操作');
-        };
-        let switchStatus = await utils.gitBranchSwitch(this.projectPath,name);
-        if (switchStatus == 'success') {
-            this.LoadingBranchData();
-        };
-    };
-
-    // Git branch: create
-    async create(info) {
-        let { newBranchName, ref } = info;
-        let data = Object.assign(
-            { 'projectPath': this.projectPath }, info
-        );
-        if (newBranchName == '') {
-            return hx.window.showErrorMessage('Git: 在输入框输入分支名称后，再点击创建。',['关闭']);
-        };
-        if (ref == undefined) {
-            let breachCreateStatus = await utils.gitBranchCreate(data);
-            if (breachCreateStatus == 'success') {
-                this.LoadingBranchData();
-            };
-        } else {
-            let breachCreateStatus = await utils.gitBranchCreate(data);
-            if (breachCreateStatus == 'success') {
-                this.LoadingBranchData();
-            };
-        };
-    };
-
-    // Git branch: create and push
-    async FromCurrentBranchCreatePush(branchName) {
-        if (branchName == '') {
-            return hx.window.showErrorMessage('Git: 在输入框输入分支名称后，再点击创建。',['关闭']);
-        };
-        let cpStatus = await utils.gitBranchCreatePush(this.projectPath,branchName);
-        if (cpStatus == 'success') {
-            this.LoadingBranchData();
-        };
-    };
-
-    // Git branch: push local branch to remote
-    async LocalToRemote(branchName) {
-        let toStatus = await utils.gitLocalBranchToRemote(this.projectPath,branchName);
-        if (toStatus == 'success') {
-            this.LoadingBranchData();
-        };
-    };
-
-    // Git branch: merge
-    async merge(fromBranch,toBranch) {
-        let mergeStatus = await utils.gitBranchMerge(this.projectPath,fromBranch,toBranch);
-        if (mergeStatus == 'success') {
-            this.refreshFileList();
-        };
-    };
-
-    // Git branch: delete
-    async delete(branchName) {
-        let delMsg = `Git: 确认删除 ${branchName} 分支?`;
-        let btn = await hx.window.showInformationMessage(delMsg, ['删除','关闭']).then((result) =>{
-            return result;
-        });
-        if (btn == '关闭') {
-            return;
-        };
-        if (branchName.includes('remotes/origin')) {
-            let delStatus1 = await utils.gitDeleteRemoteBranch(this.projectPath,branchName);
-            if (delStatus1 == 'success') {
-                this.LoadingBranchData();
-            };
-        } else {
-            let delStatus2 = await utils.gitDeleteLocalBranch(this.projectPath,branchName);
-            if (delStatus2 == 'success') {
-                this.LoadingBranchData();
-            };
-        };
-    };
-
-    // Git tag: create
-    async TagCreate(tagName) {
-        if (tagName.length == 0) {
-            return hx.window.showErrorMessage('tag名称无效，请重新输入。',['关闭']);
-        };
-        let tagCreateStatus = await utils.gitTagCreate(this.projectPath, tagName);
-        if (tagCreateStatus == 'success') {
-            this.LoadingBranchData();
-        };
-    };
-};
-
-
-/**
  * @description Git文件
  */
 class GitFile {
@@ -413,6 +281,7 @@ class GitConfig {
     };
 };
 
+
 /**
  * @description 显示webview
  * @param {Object} userConfig 用户配置
@@ -427,9 +296,6 @@ function active(webviewPanel, userConfig, gitData) {
 
     // UI: color and svg icon
     let uiData = getUIData();
-
-    // Git: 分支
-    let Branch = new GitBranch(webviewPanel, projectPath, projectName, uiData, userConfig);
 
     // Git: 文件
     let File = new GitFile(webviewPanel, projectPath, projectName, uiData, userConfig);
@@ -446,9 +312,6 @@ function active(webviewPanel, userConfig, gitData) {
     view.onDidReceiveMessage((msg) => {
         let action = msg.command;
         switch (action) {
-            case 'back':
-                File.refreshFileList();
-                break;
             case 'refresh':
                 File.refreshFileList();
                 break;
@@ -519,33 +382,16 @@ function active(webviewPanel, userConfig, gitData) {
                     if (originurl == undefined) {
                         hx.window.showErrorMessage('请发布此项目到远程到后再进行操作。', ['我知道了']);
                     } else {
-                        Branch.LoadingBranchData();
+                        let currentProjectData = {
+                            'projectPath': projectPath,
+                            'projectName': projectName,
+                            'easyGitInner': true
+                        };
+                        hx.commands.executeCommand('EasyGit.branch',currentProjectData);
                     };
                 } else {
                     File.refreshFileList();
                 };
-                break;
-            case 'BranchSwitch':
-                Branch.switch(msg.text);
-                break;
-            case 'BranchCreate':
-                Branch.create(msg);
-                break;
-            case 'pushBranchToRemote':
-                Branch.LocalToRemote(msg.text);
-                break;
-            case 'BranchCreatePush':
-                Branch.FromCurrentBranchCreatePush(msg.text);
-                break;
-            case 'BranchMerge':
-                Branch.merge(msg.from,msg.to);
-                break;
-            case 'BranchDelete':
-                let branch = msg.text;
-                Branch.delete(branch);
-                break;
-            case 'CreateTag':
-                Branch.TagCreate(msg.text);
                 break;
             case 'clean':
                 File.clean();

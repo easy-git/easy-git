@@ -62,6 +62,9 @@ async function openLogWebView(webviewPanel, userConfig, gitData) {
             case 'checkout-commit':
                 Log.checkoutCommit(msg.hash);
                 break;
+            case 'checkout-commit-for-create-branch':
+                Log.checkoutCommitForCreateBranch(msg.hash);
+                break;
             default:
                 break;
         };
