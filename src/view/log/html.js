@@ -10,7 +10,7 @@ const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'boo
 function generateLogHtml(userConfig, uiData, gitData) {
     // 是否启用开发者工具
     let {DisableDevTools} = userConfig;
-
+    
     // ui、color、font
     let {
         background,
@@ -432,12 +432,13 @@ function generateLogHtml(userConfig, uiData, gitData) {
 
                 <div v-show="visibleRightMenu">
                     <ul v-show="visibleRightMenu" :style="{left:left+'px',top:top+'px'}" class="contextmenu" @mouseleave="visibleRightMenu = false">
+                        <li @click="refresh()">刷新</li>
                         <li @click="checkoutCommit(rightClickItem);" v-if="searchType != 'all'">检出...</li>
                         <li @click="checkoutCommitForCreateBranch(rightClickItem);" v-if="searchType != 'all'">检出并创建新分支</li>
                         <div class="dropdown-divider" v-if="searchType != 'all'"></div>
 						<li @click="resetCommit(rightClickItem);" v-if="searchType != 'all'">将 {{currentBranch}} 重置（回退）到这次提交</li>
                         <div class="dropdown-divider" v-if="searchType != 'all'"></div>
-                        <li @click="cherryPick(rightClickItem);" v-if="searchType == 'all'">将当前提交应用于 {{currentBranch}} 分支</li>
+                        <li @click="cherryPick(rightClickItem);" v-if="searchType == 'all'" title="cherry pick">将当前提交应用于 {{currentBranch}} 分支</li>
                         <div class="dropdown-divider"  v-if="searchType == 'all'"></div>
                         <li @click="copyLogMsg(rightClickItem, 'msg')">复制</li>
                         <li @click="copyLogMsg(rightClickItem, 'commit_id')">复制commit id到剪贴板</li>
@@ -654,7 +655,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 hash: hash
                             })
                         },
-                        checkoutCommitForCreateBranch() {
+                        checkoutCommitForCreateBranch(item) {
                             let hash = item.hash;
                             if (!hash) {return};
                             hbuilderx.postMessage({

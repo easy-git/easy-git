@@ -153,6 +153,7 @@ class GitLogAction {
         };
     }
 
+    // 切换分支
     async switchBranch() {
         let BranchInfo = await utils.gitRawGetBranch(this.projectPath, 'branch');
         if (BranchInfo == 'fail' || BranchInfo == 'error') {
@@ -246,10 +247,17 @@ class GitLogAction {
             }
         };
     }
-    
+
     // 检出具体commit并创建新分支
-    async checkoutCommitForCreateBranch() {
-        
+    async checkoutCommitForCreateBranch(hash) {
+        hx.window.setStatusBarMessage('EasyGit: 请在【左侧视图】源代码管理器视图内，进行操作。', 5000, 'info');
+        let data = Object.assign(this.currentProjectInfoForFlush, {
+            "GitAssignAction": {
+                "name": "create-branch",
+                "value": hash
+            }
+        });
+        hx.commands.executeCommand('EasyGit.branch', data);
     }
 };
 

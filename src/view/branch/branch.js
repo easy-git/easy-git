@@ -72,10 +72,11 @@ function getUIData() {
  * @description Git分支
  */
 class GitBranch {
-    constructor(webviewPanel, projectPath, projectName, uiData, userConfig) {
+    constructor(webviewPanel, ProjectGitInfo, uiData, userConfig) {
+        this.initData = ProjectGitInfo;
         this.webviewPanel = webviewPanel;
-        this.projectPath = projectPath;
-        this.projectName = projectName;
+        this.projectPath = ProjectGitInfo.projectPath;
+        this.projectName = ProjectGitInfo.projectName;
         this.uiData = uiData;
         this.userConfig = userConfig;
     }
@@ -85,19 +86,22 @@ class GitBranch {
         let StatusInfo = await utils.gitStatus(this.projectPath);
         let TagsList = await utils.gitTagsList(this.projectPath);
 
-        const gitData = Object.assign({
+        let {GitAssignAction} = this.initData;
+
+        const gitBranchData = Object.assign({
             'BranchInfo': BranchInfo
         }, {
             'TagsList': TagsList
         }, {
             'projectName': this.projectName,
             'projectPath': this.projectPath,
+            'GitAssignAction': GitAssignAction,
             'ahead': StatusInfo.ahead,
             'behind': StatusInfo.behind,
             'tracking': StatusInfo.tracking,
             'originurl': StatusInfo.originurl
         });
-        const bhtml = getWebviewBranchContent(this.userConfig, this.uiData, gitData);
+        const bhtml = getWebviewBranchContent(this.userConfig, this.uiData, gitBranchData);
         this.webviewPanel.webView.html = bhtml;
     };
 
@@ -221,7 +225,8 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
     let uiData = getUIData();
 
     // Git: 分支
-    let Branch = new GitBranch(webviewPanel, projectPath, projectName, uiData, userConfig);
+    let {...ProjectGitInfo} = gitData;
+    let Branch = new GitBranch(webviewPanel, ProjectGitInfo, uiData, userConfig);
     Branch.LoadingBranchData();
 
     view.onDidReceiveMessage((msg) => {

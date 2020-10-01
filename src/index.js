@@ -72,7 +72,9 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
     // 获取项目名称、项目路径
     let projectName, projectPath, selectedFile;
 
-    let {easyGitInner} = param;
+    // easyGitInner: 用于标记外部点击还是插件内部点击
+    // GitAssignAction: 特定操作
+    let {easyGitInner, GitAssignAction} = param;
     if (easyGitInner != undefined || easyGitInner) {
         try{
             projectName = param.projectName;
@@ -102,7 +104,8 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
     let gitData = Object.assign(gitInfo, {
         'projectName': projectName,
         'projectPath': projectPath,
-        'selectedFile': selectedFile
+        'selectedFile': selectedFile,
+        'GitAssignAction': GitAssignAction
     });
 
     if (viewType == 'main' && isGitProject) {

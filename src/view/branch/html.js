@@ -12,9 +12,9 @@ const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'boo
  * @description 获取webview Branch内容
  * @param {Object} userConfig
  * @param {Object} uiData
- * @param {Object} gitData
+ * @param {Object} gitBranchData
  */
-function getWebviewBranchContent(userConfig, uiData, gitData) {
+function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
     // 是否启用开发者工具
     let {DisableDevTools} = userConfig;
 
@@ -48,13 +48,14 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
     let {
         projectPath,
         projectName,
+        GitAssignAction,
         BranchInfo,
         TagsList,
         ahead,
         behind,
         tracking,
         originurl
-    } = gitData;
+    } = gitBranchData;
 
     let currentBranch = '';
     for (let s of BranchInfo) {
@@ -66,6 +67,7 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
 
     let branchs = JSON.stringify(BranchInfo);
     TagsList = JSON.stringify(TagsList.data);
+    GitAssignAction = JSON.stringify(GitAssignAction);
 
     let originurlBoolean = originurl != undefined ? true : false;
     ahead = ahead == 0 ? '' : ahead;
@@ -399,6 +401,7 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
                         ref: '',
                         isPush: true
                     },
+                    AssignAction: {},
                     inputDisabled: false,
                     hoverStampID: false,
                     hoverTagId: false
@@ -442,6 +445,7 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
                 created() {
                     this.projectName = '${projectName}';
                     this.currentBranch = '${currentBranch}';
+                    this.AssignAction = ${GitAssignAction};
                     this.tracking = '${tracking}';
                     this.originurl = '${originurl}';
                     this.originurlBoolean = ${originurlBoolean};
@@ -451,6 +455,16 @@ function getWebviewBranchContent(userConfig, uiData, gitData) {
                     this.TagsList = ${TagsList};
                 },
                 mounted() {
+                    if (this.AssignAction && JSON.stringify(this.AssignAction) != '{}') {
+                        let {name,value} = this.AssignAction;
+                        if (name == 'create-branch') {
+                            this.isShowModel = true;
+                            if (value != undefined && value) {
+                                this.fromToCreate.ref = value;
+                                document.getElementById('newBranchName').focus();
+                            };
+                        };
+                    };
                     document.getElementById('inputBranch').focus();
                 },
                 methods: {

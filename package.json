@@ -153,10 +153,6 @@
                     "group": "z_commands"
                 },
                 {
-                    "command": "EasyGit.branch",
-                    "group": "z_commands"
-                },
-                {
                     "command": "EasyGit.log",
                     "title": "easy-git: 查看日志",
                     "group": "z_commands"
