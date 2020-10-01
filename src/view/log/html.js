@@ -10,7 +10,7 @@ const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'boo
 function generateLogHtml(userConfig, uiData, gitData) {
     // 是否启用开发者工具
     let {DisableDevTools} = userConfig;
-    
+
     // ui、color、font
     let {
         background,
@@ -231,14 +231,17 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     list-style-type: none;
                     padding: 5px 0;
                     border-radius: 4px;
-                    font-size: 12px;
+                    font-size: 14px;
                     font-weight: 400;
                     color: #333;
                     box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.3);
                 }
                 .contextmenu li {
                     margin: 0;
-                    padding: 6px 16px;
+                    padding: 2px 16px;
+                    color: #000000;
+                    font-size: 14px;
+                    letter-spacing: 0px
                     cursor: pointer;
                     white-space: nowrap;
                     overflow: hidden;
@@ -304,6 +307,10 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         transform: scaleY(1.0);
                         -webkit-transform: scaleY(1.0);
                     }
+                }
+                .click-disable {
+                    pointer-events: none;
+                    color: #888888 !important;
                 }
             </style>
         </head>
@@ -438,7 +445,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         <div class="dropdown-divider" v-if="searchType != 'all'"></div>
 						<li @click="resetCommit(rightClickItem);" v-if="searchType != 'all'">将 {{currentBranch}} 重置（回退）到这次提交</li>
                         <div class="dropdown-divider" v-if="searchType != 'all'"></div>
-                        <li @click="cherryPick(rightClickItem);" v-if="searchType == 'all'" title="cherry pick">将当前提交应用于 {{currentBranch}} 分支</li>
+                        <li @click="cherryPick(rightClickItem);" title="cherry pick" :class="{ 'click-disable': searchType != 'all' }"
+>将当前提交应用于 {{currentBranch}} 分支</li>
                         <div class="dropdown-divider"  v-if="searchType == 'all'"></div>
                         <li @click="copyLogMsg(rightClickItem, 'msg')">复制</li>
                         <li @click="copyLogMsg(rightClickItem, 'commit_id')">复制commit id到剪贴板</li>
