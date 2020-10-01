@@ -259,6 +259,30 @@ class GitLogAction {
         });
         hx.commands.executeCommand('EasyGit.branch', data);
     }
+
+    // 创建tag
+    async createTag(hash) {
+        let shortHashValue = hash.slice(0,12);
+        let tagName = await hx.window.showInputBox({
+            prompt:`在${shortHashValue}上创建标签`,
+            placeHolder: '标签名称, 创建后会自动推送到远端......'
+        }).then((result)=>{
+            if (result.length == 0) {
+                hx.window.showErrorMessage('请输入有效的标签', ['我知道了']);
+                return;
+            };
+            return result;
+        });
+        if (tagName.length) {
+            let options = [tagName, hash];
+            let status = await utils.gitTagCreate(this.projectPath, options, tagName);
+            if (status == 'success') {
+                hx.window.showInformationMessage(`Git: 在${hash}上创建标签成功！`, ['我知道了']);
+                this.setView('branch', 'default');
+            }
+        }
+    }
+    
 };
 
 

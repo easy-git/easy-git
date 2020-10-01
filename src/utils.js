@@ -315,7 +315,7 @@ function checkNodeModulesFileList(projectPath, projectName, GitStatusResult) {
             break;
         };
     };
-    
+
     if (isNodeModules) {
         hx.window.showErrorMessage(
             '检测到当前git项目下，包含node_modules，且未设置.gitignore, 是否设置?',['设置.gitignore','以后再说'],
@@ -1073,13 +1073,13 @@ async function gitTagsList(workingDir) {
  * @param {String} workingDir git工作目录
  * @param {String} tagName 标签名称
  */
-async function gitTagCreate(workingDir,tagName) {
+async function gitTagCreate(workingDir,tagOptions, tagName) {
     // status bar show message
     hx.window.setStatusBarMessage('Git: 正在当前分支上创建标签..., 创建后会自动推送到远端。', 2000, 'info');
 
     try {
         let status = await git(workingDir).init()
-            .tag([tagName])
+            .tag(tagOptions)
             .push(['origin',tagName])
             .then(() => {
                 hx.window.setStatusBarMessage(`Git: 标签 ${tagName} 创建成功`, 5000, 'info');
@@ -1092,6 +1092,7 @@ async function gitTagCreate(workingDir,tagName) {
             });
         return status;
     } catch (e) {
+        console.log(e)
         return 'error';
     }
 };

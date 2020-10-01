@@ -196,7 +196,7 @@ class GitBranch {
         if (tagName.length == 0) {
             return hx.window.showErrorMessage('tag名称无效，请重新输入。',['关闭']);
         };
-        let tagCreateStatus = await utils.gitTagCreate(this.projectPath, tagName);
+        let tagCreateStatus = await utils.gitTagCreate(this.projectPath, [tagName], tagName);
         if (tagCreateStatus == 'success') {
             this.LoadingBranchData();
         };

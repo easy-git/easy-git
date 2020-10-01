@@ -440,14 +440,14 @@ function generateLogHtml(userConfig, uiData, gitData) {
                 <div v-show="visibleRightMenu">
                     <ul v-show="visibleRightMenu" :style="{left:left+'px',top:top+'px'}" class="contextmenu" @mouseleave="visibleRightMenu = false">
                         <li @click="refresh()">刷新</li>
-                        <li @click="checkoutCommit(rightClickItem);" v-if="searchType != 'all'">检出...</li>
-                        <li @click="checkoutCommitForCreateBranch(rightClickItem);" v-if="searchType != 'all'">检出并创建新分支</li>
-                        <div class="dropdown-divider" v-if="searchType != 'all'"></div>
-						<li @click="resetCommit(rightClickItem);" v-if="searchType != 'all'">将 {{currentBranch}} 重置（回退）到这次提交</li>
-                        <div class="dropdown-divider" v-if="searchType != 'all'"></div>
-                        <li @click="cherryPick(rightClickItem);" title="cherry pick" :class="{ 'click-disable': searchType != 'all' }"
->将当前提交应用于 {{currentBranch}} 分支</li>
-                        <div class="dropdown-divider"  v-if="searchType == 'all'"></div>
+                        <div class="dropdown-divider"></div>
+                        <li @click="checkoutCommit(rightClickItem)" :class="{ 'click-disable': searchType == 'all' }">检出...</li>
+                        <li @click="checkoutCommitForCreateBranch(rightClickItem)" :class="{ 'click-disable': searchType == 'all' }">检出并创建新分支</li>
+                        <li @click="createTag(rightClickItem)" :class="{ 'click-disable': searchType == 'all' }" title="git tag">创建标签</li>
+                        <div class="dropdown-divider"></div>
+                        <li @click="resetCommit(rightClickItem)" :class="{ 'click-disable': searchType == 'all' }">将 {{currentBranch}} 重置到这次提交</li>
+                        <li @click="cherryPick(rightClickItem)" title="cherry pick" :class="{ 'click-disable': searchType != 'all' }">将当前提交应用于 {{currentBranch}} 分支</li>
+                        <div class="dropdown-divider"></div>
                         <li @click="copyLogMsg(rightClickItem, 'msg')">复制</li>
                         <li @click="copyLogMsg(rightClickItem, 'commit_id')">复制commit id到剪贴板</li>
                     </ul>
@@ -668,6 +668,14 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             if (!hash) {return};
                             hbuilderx.postMessage({
                                 command: 'checkout-commit-for-create-branch',
+                                hash: hash
+                            })
+                        },
+                        createTag(item) {
+                            let hash = item.hash;
+                            if (!hash) {return};
+                            hbuilderx.postMessage({
+                                command: 'create-tag',
                                 hash: hash
                             })
                         }
