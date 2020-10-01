@@ -324,7 +324,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                     <span>{{ projectName }} / </span>
                                     <span title="显示当前分支log, 双击可切换分支" class="branch" :class="{ active: searchType == 'branch'}" @click="switchSearchType('branch');" @dblclick='switchBranch();'>{{ currentBranch }} </span>
                                     <span> | </span>
-                                    <span title="显示所有分支log" class="branch" :class="{ active: searchType == 'all'}" @click="switchSearchType('all');">all</span>
+                                    <span title="显示所有分支log" class="branch" :class="{ active: searchType == 'all'}" @click="switchSearchType('all');">所有分支</span>
                                 </h6>
                                 <div class="d-flex">
                                     <div class="flex-grow-1">
