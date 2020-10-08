@@ -6,20 +6,20 @@ const {GitLogAction} = require('./action.js');
 
 /**
  * @description log view
- * @param {Object} viewType
- * @param {Object} param
  * @param {Object} webviewPanel
+ * @param {Object} userConfig
+ * @param {Object} gitBasicData 基本的Git信息
  */
-async function openLogWebView(webviewPanel, userConfig, gitData) {
+async function openLogWebView(webviewPanel, userConfig, gitBasicData) {
     const view = webviewPanel.webView;
 
-    // get project info
-    const {projectPath, projectName, selectedFile, currentBranch} = gitData;
+    // get basic info
+    const {projectPath, projectName, selectedFile, currentBranch} = gitBasicData;
 
     // 默认在当前分支搜索，当搜索全部时，此值为all
     let searchType = 'branch';
 
-    let Log = new GitLogAction(webviewPanel, gitData, userConfig);
+    let Log = new GitLogAction(webviewPanel, gitBasicData, userConfig);
 
     // 选中文件或目录，则查看此文件的log记录
     if (selectedFile != '' && selectedFile != undefined) {

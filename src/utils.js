@@ -1176,7 +1176,7 @@ async function gitLog(workingDir, searchType, filterCondition) {
     filter = filter.filter( s => s && s.trim());
 
     if (searchType == 'all') {
-        filter.push('--all')
+        filter = ['--all', ...filter];
     };
 
     try {

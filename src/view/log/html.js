@@ -27,7 +27,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
     } = uiData;
 
     // 获取git日志列表
-    let {projectName, currentBranch, logData, searchText} = gitData;
+    let {projectName, currentBranch, logData, searchText, branchNum} = gitData;
 
     logData = JSON.stringify(logData);
     if (!searchText) {
@@ -323,8 +323,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 <h6 class="project-info">
                                     <span>{{ projectName }} / </span>
                                     <span title="显示当前分支log, 双击可切换分支" class="branch" :class="{ active: searchType == 'branch'}" @click="switchSearchType('branch');" @dblclick='switchBranch();'>{{ currentBranch }} </span>
-                                    <span> | </span>
-                                    <span title="显示所有分支log" class="branch" :class="{ active: searchType == 'all'}" @click="switchSearchType('all');">所有分支</span>
+                                    <span v-if="branchNum > 1"> | </span>
+                                    <span title="显示所有分支log" class="branch" :class="{ active: searchType == 'all'}" @click="switchSearchType('all');" v-if="branchNum > 1">所有分支</span>
                                 </h6>
                                 <div class="d-flex">
                                     <div class="flex-grow-1">
@@ -464,6 +464,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         searchText: '',
                         currentBranch: '',
                         projectName: '',
+                        branchNum: 1,
                         gitLogInfoList: [],
                         hoverLogID: '',
                         isShowViewDetails: false,
@@ -497,6 +498,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         this.gitLogInfoList = ${logData};
                         this.currentBranch = '${currentBranch}';
                         this.searchText = '${searchText}';
+                        this.branchNum = ${branchNum};
                     },
                     mounted() {
                         this.loading = false;
@@ -531,22 +533,22 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 condition: this.searchText
                             });
                         },
-						forUpdate() {
-							hbuilderx.onDidReceiveMessage((msg) => {
+                        forUpdate() {
+                            hbuilderx.onDidReceiveMessage((msg) => {
                                 this.loading = false;
                                 if (this.isShowViewDetails) {
                                     this.isShowViewDetails = false;
                                 };
-							    if (msg.command != 'search') {return};
-							    if (msg.gitData) {
-							        let gitData = msg.gitData;
-							        this.searchType = msg.searchType;
-							        this.gitLogInfoList = gitData.logData;
-							        this.searchText = gitData.searchText;
-							        this.currentBranch = gitData.currentBranch;
-							    }
-							});
-						},
+                                if (msg.command != 'search') {return};
+                                if (msg.gitData) {
+                                    let gitData = msg.gitData;
+                                    this.searchType = msg.searchType;
+                                    this.gitLogInfoList = gitData.logData;
+                                    this.searchText = gitData.searchText;
+                                    this.currentBranch = gitData.currentBranch;
+                                }
+                            });
+                        },
                         switchSearchType(type) {
                             this.loading = true;
                             this.searchType = type;
@@ -593,7 +595,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             });
                         },
                         symbolRepeat(str, num) {
-                        	return num > 1 ? str.repeat(num): str;
+                            return num > 1 ? str.repeat(num): str;
                         },
                         viewDetailsMouseenter() {
                             // 解决背景层滚动的问题

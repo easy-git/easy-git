@@ -31,17 +31,18 @@ function getUIData() {
 // UI: color and svg icon
 let uiData = getUIData();
 
+
 class GitLogAction {
-    constructor(webviewPanel, gitData, userConfig) {
+    constructor(webviewPanel, gitBasicData, userConfig) {
         this.webviewPanel = webviewPanel;
-        this.projectPath = gitData.projectPath;
-        this.projectName = gitData.projectName;
+        this.projectPath = gitBasicData.projectPath;
+        this.projectName = gitBasicData.projectName;
         this.uiData = uiData;
         this.userConfig = userConfig;
-        this.gitData = gitData;
+        this.gitData = gitBasicData;
         this.currentProjectInfoForFlush = {
-            'projectPath': gitData.projectPath,
-            'projectName': gitData.projectName,
+            'projectPath': gitBasicData.projectPath,
+            'projectName': gitBasicData.projectName,
             'easyGitInner': true
         }
     };
@@ -88,22 +89,24 @@ class GitLogAction {
 
     // get webview html content, set html
     async setView(searchType, condition) {
-        // 引导用户正确的使用日期查询
-        if(this.validateData(condition)){
-            return hx.window.showErrorMessage(
-                '检测到您只输入了一个日期, 日期查询, 请使用--after、--before、--since、--until。例如:--after=2020/8/1 \n',
-                ['我知道了']
-           );
-        };
+        if (condition != 'default') {
+            // 引导用户正确的使用日期查询
+            if(this.validateData(condition)){
+                return hx.window.showErrorMessage(
+                    '检测到您只输入了一个日期, 日期查询, 请使用--after、--before、--since、--until。例如:--after=2020/8/1 \n',
+                    ['我知道了']
+               );
+            };
 
-        // 引导email搜索
-        if (this.validateEmail(condition)) {
-            condition = '--author=' + condition;
-        };
+            // 引导email搜索
+            if (this.validateEmail(condition)) {
+                condition = '--author=' + condition;
+            };
 
-        // 引导使用--grep
-        if (this.setGroupSearch(condition)) {
-            condition = '--grep=' + condition;
+            // 引导使用--grep
+            if (this.setGroupSearch(condition)) {
+                condition = '--grep=' + condition;
+            };
         };
 
         // 搜索，并获取搜索结果
@@ -120,6 +123,7 @@ class GitLogAction {
         // 设置git log数据
         this.gitData = Object.assign(
             this.gitData,
+            { "branchNum": 1 },
             { "logData": gitLogInfo.data },
         );
 
@@ -131,9 +135,11 @@ class GitLogAction {
 
         // 获取当前分支名称, 避免在某些情况下，在外部改变分支，此处未刷新的问题。
         try{
-            let currentBranchName = await utils.gitCurrentBranchName(this.projectPath);
+            let gitBranchInfo = await utils.gitRawGetBranch(this.projectPath, 'branch');
+            this.gitData.branchNum = gitBranchInfo.length;
+            let currentBranchName = gitBranchInfo.filter( (item) => { return item.current });
             if (currentBranchName) {
-                this.gitData.currentBranch = currentBranchName;
+                this.gitData.currentBranch = (currentBranchName[0]['name']).replace('* ','');
             };
         }catch(e){};
 
@@ -282,7 +288,7 @@ class GitLogAction {
             }
         }
     }
-    
+
 };
 
 
