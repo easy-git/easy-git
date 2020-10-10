@@ -7,9 +7,10 @@ const ini = require('ini');
 const hx = require('hbuilderx');
 
 const icon = require('./static/icon.js');
-const utils = require('../utils.js');
+
 const MainView = require('./main.js');
-const file = require('../file.js');
+const utils = require('../common/utils.js');
+const file = require('../common/file.js');
 
 const osName = os.platform();
 

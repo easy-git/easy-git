@@ -231,6 +231,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     list-style-type: none;
                     padding: 5px 0;
                     border-radius: 4px;
+                    border: 1px solid #eee;
                     font-size: 14px;
                     font-weight: 400;
                     color: #333;

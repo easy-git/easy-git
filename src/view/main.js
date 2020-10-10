@@ -3,8 +3,8 @@ const path = require('path');
 
 const hx = require('hbuilderx');
 
-const file = require('../file.js');
-let utils = require('../utils.js');
+const file = require('../common/file.js');
+let utils = require('../common/utils.js');
 const gitAction = require('../git.js');
 
 const icon = require('./static/icon.js');

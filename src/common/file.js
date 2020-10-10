@@ -37,11 +37,10 @@ function getPath(parm) {
  * @description 创建文件
  */
 async function create(args) {
-    
+
     let currentDir = '';
     let {filename,projectPath,param} = args;
-
-    if (param != undefined) {
+    if (param != undefined && projectPath == undefined) {
        currentDir = getPath(param);
     };
     if (projectPath != undefined) {
@@ -49,7 +48,7 @@ async function create(args) {
     };
 
     // template path
-    let template_path = path.join(path.resolve(__dirname), 'template', filename.slice(1));
+    let template_path = path.join(path.resolve(__dirname, '..'), 'template', filename.slice(1));
 
     // target path
     let target_path = path.join(currentDir, filename);
@@ -76,8 +75,10 @@ function gitignore(args) {
     if (args == null) {
         return hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试。', ['我知道了']);
     };
+    let {projectPath} = args;
     let data = Object.assign({'param': args},{
-        'filename': '.gitignore'
+        'filename': '.gitignore',
+        'projectPath': projectPath
     });
     create(data);
 };
@@ -90,8 +91,10 @@ function gitattributes(args) {
     if (args == null) {
         return hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试。', ['我知道了']);
     };
+    let {projectPath} = args;
     let data = Object.assign({'param': args},{
-        'filename': '.gitattributes'
+        'filename': '.gitattributes',
+        'projectPath': projectPath
     });
     create(data);
 };

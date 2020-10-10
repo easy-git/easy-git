@@ -3,7 +3,7 @@ const path = require('path');
 
 const hx = require('hbuilderx');
 
-const utils = require('../../utils.js');
+const utils = require('../../common/utils.js');
 const icon = require('../static/icon.js');
 const generateLogHtml = require('./html.js');
 
@@ -33,8 +33,7 @@ let uiData = getUIData();
 
 
 class GitLogAction {
-    constructor(webviewPanel, gitBasicData, userConfig) {
-        this.webviewPanel = webviewPanel;
+    constructor(gitBasicData, userConfig) {
         this.projectPath = gitBasicData.projectPath;
         this.projectName = gitBasicData.projectName;
         this.uiData = uiData;
@@ -88,7 +87,7 @@ class GitLogAction {
     };
 
     // get webview html content, set html
-    async setView(searchType, condition) {
+    async setView(renderType, viewInfo, searchType, condition) {
         if (condition != 'default') {
             // 引导用户正确的使用日期查询
             if(this.validateData(condition)){
@@ -143,19 +142,26 @@ class GitLogAction {
             };
         }catch(e){};
 
-        if (condition != 'default') {
-            let isHtml = this.webviewPanel.webView._html;
-            if (isHtml == '') {
-                this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
+        try{
+            // set webview
+            let webviewPanel = viewInfo;
+            if (condition != 'default') {
+                let isHtml = webviewPanel.webView._html;
+                if (isHtml == '') {
+                    let htmlContent = generateLogHtml(this.userConfig, this.uiData, this.gitData);
+                    webviewPanel.webView.html = htmlContent;
+                } else {
+                    webviewPanel.webView.postMessage({
+                        command: "search",
+                        searchType: searchType,
+                        gitData: this.gitData
+                    });
+                };
             } else {
-                this.webviewPanel.webView.postMessage({
-                    command: "search",
-                    searchType: searchType,
-                    gitData: this.gitData
-                });
+                webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
             };
-        } else {
-            this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
+        }catch(e){
+            hx.commands.executeCommand("EasyGit.log");
         };
     }
 

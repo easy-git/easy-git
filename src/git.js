@@ -3,8 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const git = require('simple-git');
 
-const file = require('./file.js');
-const utils = require('./utils.js');
+const file = require('./common/file.js');
+const utils = require('./common/utils.js');
 
 const MainView = require('./view/main.js');
 const initView = require('./view/init.js');

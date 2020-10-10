@@ -1,14 +1,16 @@
 const hx = require("hbuilderx");
+const path = require('path');
 
-const index = require("./src/index.js");
-const file = require('./src/file.js');
-const git = require('./src/git.js');
-const cmp = require('./src/common/cmp.js');
+const index = require("./index.js");
+const file = require('./common/file.js');
+const git = require('./git.js');
+const cmp_hx_version = require('./common/cmp.js');
 
+// hbuilderx version
 let hxVersion = hx.env.appVersion;
 hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
 
-
+// git logView and FileView, use WebView
 let source = 'viewMenu';
 let FileView = hx.window.createWebView("EasyGitSourceCodeView", {
     enableScritps: true
@@ -26,31 +28,38 @@ let CommonView = hx.window.createWebView("EasyGitCommonView", {
 function activate(context) {
     context.source = 'viewMenu';
 
-    // if (source == 'viewMenu') {
-    //     index.main('main', {}, FileView, context);
-    //     index.main('log', {}, CommonView, context);
-    // };
+    // hbuilderx version 2.9.2+ , git log view, use customEditor
+    const cmp = cmp_hx_version(hxVersion, '2.9.2');
+    if (cmp <= 0) {
+        let { CatCustomEditorProvider } = require('./view/log/openCustomEditor.js');
+        let provider = new CatCustomEditorProvider({}, {}, {});
+        hx.window.registerCustomEditorProvider("EasyGit - 日志", provider);
+    };
 
     // 菜单【源代码管理】，菜单【工具】、及项目管理器右键菜单
-    let f = hx.commands.registerCommand('EasyGit.main', (param) => {
+    let fv = hx.commands.registerCommand('EasyGit.main', (param) => {
         context.source = 'filesExplorer';
         index.main('main',param, FileView, context);
     });
-    context.subscriptions.push(f);
+    context.subscriptions.push(fv);
 
     // 菜单【分支管理】，菜单【工具】、及项目管理器右键菜单
-    let b = hx.commands.registerCommand('EasyGit.branch', (param) => {
+    let branch = hx.commands.registerCommand('EasyGit.branch', (param) => {
         context.source = 'filesExplorer';
         index.main('branch',param, FileView, context);
     });
-    context.subscriptions.push(b);
+    context.subscriptions.push(branch);
 
     // 菜单【日志】
-    let l = hx.commands.registerCommand('EasyGit.log', (param) => {
+    let log = hx.commands.registerCommand('EasyGit.log', (param) => {
+        if (cmp <= 0) {
+            let LogCscratFile = path.join(__dirname, 'view',  'log', 'cscrat', 'EasyGit - 日志');
+            hx.workspace.openTextDocument(LogCscratFile);
+        };
         context.source = 'filesExplorer';
         index.main('log',param, CommonView, context);
     });
-    context.subscriptions.push(l);
+    context.subscriptions.push(log);
 
     // 菜单【工具】【克隆存储库】
     let clone = hx.commands.registerCommand('EasyGit.clone',(param) => {

@@ -3,16 +3,51 @@ const fs = require('fs');
 const path = require('path');
 const git = require('simple-git');
 
-const file = require('./file.js');
-const utils = require('./utils.js');
+const file = require('./common/file.js');
+const utils = require('./common/utils.js');
+const count = require('./common/count.js');
+const cmp_hx_version = require('./common/cmp.js');
 
 const MainView = require('./view/main.js');
 const GitBranchView = require('./view/branch/branch.js');
-const openLogWebView = require('./view/log/openWebView.js');
 const initView = require('./view/init.js');
 const cloneView = require('./view/clone.js');
 
-const count = require('./common/count.js');
+// Easy-Git log view, hbuilderx 2.9.2-, use webview
+const openLogWebView = require('./view/log/openWebView.js');
+
+// Easy-Git log view, hbuilderx 2.9.2+, use customEditor
+let { RenderGitLogCustomEditor } = require('./view/log/openCustomEditor.js');
+
+// get hbuilderx version
+let hxVersion = hx.env.appVersion;
+hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
+
+// CustomEditor 首次启动缓慢，因此在状态栏增加提示
+let isShowLogMessage = false;
+
+/**
+ * @description 打开日志视图
+ * @param {Object} userConfig
+ * @param {Object} gitData
+ * @param {Object} webviewPanel. hbuilderx 2.9.2-, use webview; hbuilderx 2.9.2+, use customEditor
+ */
+async function openGitLog(userConfig, gitData, webviewPanel) {
+    let cmp = cmp_hx_version(hxVersion, '2.9.2');
+    if (cmp <= 0) {
+        if (isShowLogMessage == false) {
+            hx.window.setStatusBarMessage('EasyGit: 正在加载Git日志，首次加载较慢，请耐心等待......', 5000, 'info');
+            isShowLogMessage = true;
+        };
+        RenderGitLogCustomEditor(gitData, userConfig);
+    } else {
+        openLogWebView(webviewPanel, userConfig, gitData);
+        hx.window.showView({
+           containerid: "EasyGitCommonView"
+        });
+    };
+};
+
 
 /**
  * @description 当焦点不在编辑器、项目管理器上
@@ -40,7 +75,7 @@ async function FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExpl
                 GitBranchView(webviewPanel, userConfig, gitData);
             };
             if (viewType == 'log') {
-                openLogWebView(webviewPanel, userConfig, gitData);
+                openGitLog(userConfig, gitData, webviewPanel);
             };
         } else {
             initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
@@ -163,10 +198,7 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
 
     // show git log view
     if (viewType == 'log') {
-        openLogWebView(webviewPanel, userConfig, gitData);
-        hx.window.showView({
-           containerid: "EasyGitCommonView"
-        });
+        openGitLog(userConfig, gitData, webviewPanel);
         return;
     };
 
@@ -204,7 +236,7 @@ async function FromViewMenu(viewType, webviewPanel, userConfig, FilesExplorerPro
                 GitBranchView(webviewPanel, userConfig, gitData);
             };
             if (viewType == 'log') {
-                openLogWebView(webviewPanel, userConfig, gitData);
+                openGitLog(userConfig, gitData, webviewPanel);
             };
         };
     };
