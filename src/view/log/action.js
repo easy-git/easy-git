@@ -142,26 +142,22 @@ class GitLogAction {
             };
         }catch(e){};
 
-        try{
-            // set webview
-            let webviewPanel = viewInfo;
-            if (condition != 'default') {
-                let isHtml = webviewPanel.webView._html;
-                if (isHtml == '') {
-                    let htmlContent = generateLogHtml(this.userConfig, this.uiData, this.gitData);
-                    webviewPanel.webView.html = htmlContent;
-                } else {
-                    webviewPanel.webView.postMessage({
-                        command: "search",
-                        searchType: searchType,
-                        gitData: this.gitData
-                    });
-                };
+        // set webview
+        let webviewPanel = viewInfo;
+        if (condition != 'default') {
+            let isHtml = webviewPanel.webView._html;
+            if (isHtml == '') {
+                let htmlContent = generateLogHtml(this.userConfig, this.uiData, this.gitData);
+                webviewPanel.webView.html = htmlContent;
             } else {
-                webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
+                webviewPanel.webView.postMessage({
+                    command: "search",
+                    searchType: searchType,
+                    gitData: this.gitData
+                });
             };
-        }catch(e){
-            hx.commands.executeCommand("EasyGit.log");
+        } else {
+            webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
         };
     }
 

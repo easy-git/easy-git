@@ -52,7 +52,8 @@ function activate(context) {
 
     // 菜单【日志】
     let log = hx.commands.registerCommand('EasyGit.log', (param) => {
-        if (cmp <= 0) {
+        if (param == undefined) {return};
+        if (cmp <=0) {
             let LogCscratFile = path.join(__dirname, 'view',  'log', 'cscrat', 'EasyGit - 日志');
             hx.workspace.openTextDocument(LogCscratFile);
         };

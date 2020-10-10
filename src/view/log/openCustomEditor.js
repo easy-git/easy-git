@@ -6,6 +6,7 @@ const {GitLogAction} = require('./action.js');
 // 解决hx启动后，已打开的自定义编辑器空白的问题
 let HistoryProjectPath;
 let HistoryProjectName;
+let isCustomFirstOpen = false;
 
 let CustomDocument = class {};
 let CustomEditorProvider = class {};
@@ -41,8 +42,12 @@ class CatCustomEditorProvider extends CustomEditorProvider {
     resolveCustomEditor(document, webViewPanel) {
         CustomWebViewPanal = webViewPanel;
 
-        RenderGitLogCustomEditor({},{});
+        // render html to customEditor
+        if (isCustomFirstOpen == false) {
+            RenderGitLogCustomEditor({},{});
+        };
 
+        // close customEditor
         webViewPanel.onDidDispose(function() {});
 
         let provider = this;
@@ -83,7 +88,6 @@ class CatCustomEditorProvider extends CustomEditorProvider {
  * @description 解决hx启动后，已打开的自定义编辑器空白的问题
  */
 function history(gitData) {
-    console.log('--->hisotyr')
     const {projectPath, projectName} = gitData;
     if (HistoryProjectPath == projectPath && HistoryProjectName == projectName) {
         return;
@@ -100,18 +104,19 @@ function history(gitData) {
 
 
 function RenderGitLogCustomEditor(gitData, userConfig) {
+    isCustomFirstOpen = true;
     let {projectPath, projectName, selectedFile, currentBranch} = gitData;
 
     if (JSON.stringify(gitData) == '{}') {
-        return;
-        // history(gitData);
-        // let config = hx.workspace.getConfiguration();
-        // projectPath = config.get("EasyGit.HistoryProjectPath");
-        // projectName = config.get("EasyGit.HistoryProjectName");
-        // if (projectPath == undefined || projectName == undefined) {return;};
-        // gitData.projectPath = projectPath;
-        // gitData.projectName = projectName;
+        let config = hx.workspace.getConfiguration();
+        projectPath = config.get("EasyGit.HistoryProjectPath");
+        projectName = config.get("EasyGit.HistoryProjectName");
+        if (projectPath == undefined || projectName == undefined) {return;};
+        gitData.projectPath = projectPath;
+        gitData.projectName = projectName;
     };
+
+    history(gitData);
 
     let Log = new GitLogAction(gitData, userConfig);
 

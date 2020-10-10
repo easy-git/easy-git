@@ -22,6 +22,7 @@ let { RenderGitLogCustomEditor } = require('./view/log/openCustomEditor.js');
 // get hbuilderx version
 let hxVersion = hx.env.appVersion;
 hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
+let cmp = cmp_hx_version(hxVersion, '2.9.2');
 
 // CustomEditor 首次启动缓慢，因此在状态栏增加提示
 let isShowLogMessage = false;
@@ -33,13 +34,16 @@ let isShowLogMessage = false;
  * @param {Object} webviewPanel. hbuilderx 2.9.2-, use webview; hbuilderx 2.9.2+, use customEditor
  */
 async function openGitLog(userConfig, gitData, webviewPanel) {
-    let cmp = cmp_hx_version(hxVersion, '2.9.2');
     if (cmp <= 0) {
         if (isShowLogMessage == false) {
             hx.window.setStatusBarMessage('EasyGit: 正在加载Git日志，首次加载较慢，请耐心等待......', 5000, 'info');
             isShowLogMessage = true;
+            setTimeout(function() {
+                RenderGitLogCustomEditor(gitData, userConfig);
+            }, 800);
+        } else {
+            RenderGitLogCustomEditor(gitData, userConfig);
         };
-        RenderGitLogCustomEditor(gitData, userConfig);
     } else {
         openLogWebView(webviewPanel, userConfig, gitData);
         hx.window.showView({
@@ -76,6 +80,7 @@ async function FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExpl
             };
             if (viewType == 'log') {
                 openGitLog(userConfig, gitData, webviewPanel);
+                return;
             };
         } else {
             initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
@@ -253,7 +258,6 @@ async function FromViewMenu(viewType, webviewPanel, userConfig, FilesExplorerPro
  * @param {Object} webviewPanel
  */
 async function main(viewType, param, webviewPanel, context) {
-
     if (!['main', 'branch', 'log', 'clone'].includes(viewType)) {
         return;
     };
@@ -326,7 +330,7 @@ async function main(viewType, param, webviewPanel, context) {
     };
 
     // 没有获取到焦点
-    if (source == "filesExplorer" && param == null) {
+    if (source == "filesExplorer" && param == null && param != undefined) {
         param = param;
         FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo);
         return;
