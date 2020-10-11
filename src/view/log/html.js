@@ -547,6 +547,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                     this.gitLogInfoList = gitData.logData;
                                     this.searchText = gitData.searchText;
                                     this.currentBranch = gitData.currentBranch;
+                                    this.projectName = msg.projectName;
                                 }
                             });
                         },

@@ -6,7 +6,9 @@ const {GitLogAction} = require('./action.js');
 // 解决hx启动后，已打开的自定义编辑器空白的问题
 let HistoryProjectPath;
 let HistoryProjectName;
+
 let isCustomFirstOpen = false;
+let GitLogCustomEditorStatus;
 
 let CustomDocument = class {};
 let CustomEditorProvider = class {};
@@ -18,7 +20,7 @@ try{
     CustomDocumentEditEvent = hx.CustomEditor.CustomDocumentEditEvent;
 }catch(e){}
 
-let CustomWebViewPanal = {};
+let GitLogCustomWebViewPanal = {};
 
 class CatCustomDocument extends CustomDocument {
     constructor(uri) {
@@ -40,15 +42,18 @@ class CatCustomEditorProvider extends CustomEditorProvider {
     }
 
     resolveCustomEditor(document, webViewPanel) {
-        CustomWebViewPanal = webViewPanel;
+        GitLogCustomEditorStatus = true;
+        GitLogCustomWebViewPanal = webViewPanel;
 
         // render html to customEditor
         if (isCustomFirstOpen == false) {
-            RenderGitLogCustomEditor({},{});
+            GitLogCustomEditorRenderHtml({},{});
         };
 
         // close customEditor
-        webViewPanel.onDidDispose(function() {});
+        webViewPanel.onDidDispose(function() {
+            GitLogCustomEditorStatus = false;
+        });
 
         let provider = this;
         webViewPanel.webView.onDidReceiveMessage(function(msg) {
@@ -103,15 +108,18 @@ function history(gitData) {
 };
 
 
-function RenderGitLogCustomEditor(gitData, userConfig) {
+function GitLogCustomEditorRenderHtml(gitData, userConfig) {
     isCustomFirstOpen = true;
+
     let {projectPath, projectName, selectedFile, currentBranch} = gitData;
 
     if (JSON.stringify(gitData) == '{}') {
         let config = hx.workspace.getConfiguration();
         projectPath = config.get("EasyGit.HistoryProjectPath");
         projectName = config.get("EasyGit.HistoryProjectName");
+
         if (projectPath == undefined || projectName == undefined) {return;};
+
         gitData.projectPath = projectPath;
         gitData.projectName = projectName;
     };
@@ -124,18 +132,20 @@ function RenderGitLogCustomEditor(gitData, userConfig) {
     if (selectedFile != '' && selectedFile != undefined) {
         let sfile = selectedFile.replace(path.join(projectPath,path.sep), '');
         if (projectPath == selectedFile ) {
-            Log.setView('CustomEditor', CustomWebViewPanal, 'branch', 'default');
+            Log.setView('CustomEditor', GitLogCustomWebViewPanal, 'branch', 'default');
         } else {
-            Log.setView('CustomEditor', CustomWebViewPanal, 'branch', sfile);
+            Log.setView('CustomEditor', GitLogCustomWebViewPanal, 'branch', sfile);
         }
     } else {
-        Log.setView('CustomEditor', CustomWebViewPanal, 'branch', 'default');
+        Log.setView('CustomEditor', GitLogCustomWebViewPanal, 'branch', 'default');
     };
 
 }
 
 
 module.exports = {
-    RenderGitLogCustomEditor,
-    CatCustomEditorProvider
+    CatCustomEditorProvider,
+    GitLogCustomWebViewPanal,
+    GitLogCustomEditorStatus,
+    GitLogCustomEditorRenderHtml
 }

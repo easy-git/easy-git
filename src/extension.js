@@ -31,7 +31,7 @@ function activate(context) {
     // hbuilderx version 2.9.2+ , git log view, use customEditor
     const cmp = cmp_hx_version(hxVersion, '2.9.2');
     if (cmp <= 0) {
-        let { CatCustomEditorProvider } = require('./view/log/openCustomEditor.js');
+        var { CatCustomEditorProvider } = require('./view/log/openCustomEditor.js');
         let provider = new CatCustomEditorProvider({}, {}, {});
         hx.window.registerCustomEditorProvider("EasyGit - 日志", provider);
     };

@@ -17,7 +17,7 @@ const cloneView = require('./view/clone.js');
 const openLogWebView = require('./view/log/openWebView.js');
 
 // Easy-Git log view, hbuilderx 2.9.2+, use customEditor
-let { RenderGitLogCustomEditor } = require('./view/log/openCustomEditor.js');
+let { GitLogCustomEditorRenderHtml, GitLogCustomWebViewPanal } = require('./view/log/openCustomEditor.js');
 
 // get hbuilderx version
 let hxVersion = hx.env.appVersion;
@@ -39,10 +39,10 @@ async function openGitLog(userConfig, gitData, webviewPanel) {
             hx.window.setStatusBarMessage('EasyGit: 正在加载Git日志，首次加载较慢，请耐心等待......', 5000, 'info');
             isShowLogMessage = true;
             setTimeout(function() {
-                RenderGitLogCustomEditor(gitData, userConfig);
+                GitLogCustomEditorRenderHtml(gitData, userConfig);
             }, 800);
         } else {
-            RenderGitLogCustomEditor(gitData, userConfig);
+            GitLogCustomEditorRenderHtml(gitData, userConfig);
         };
     } else {
         openLogWebView(webviewPanel, userConfig, gitData);

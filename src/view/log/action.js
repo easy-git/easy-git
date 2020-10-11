@@ -153,6 +153,7 @@ class GitLogAction {
                 webviewPanel.webView.postMessage({
                     command: "search",
                     searchType: searchType,
+                    projectName: this.projectName,
                     gitData: this.gitData
                 });
             };
