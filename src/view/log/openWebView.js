@@ -19,18 +19,18 @@ async function openLogWebView(webviewPanel, userConfig, gitBasicData) {
     // 默认在当前分支搜索，当搜索全部时，此值为all
     let searchType = 'branch';
 
-    let Log = new GitLogAction(gitBasicData, userConfig);
+    let Log = new GitLogAction(webviewPanel, gitBasicData, userConfig);
 
     // 选中文件或目录，则查看此文件的log记录
     if (selectedFile != '' && selectedFile != undefined) {
         let sfile = selectedFile.replace(path.join(projectPath,path.sep),'');
         if (projectPath == selectedFile ) {
-            Log.setView('webView', webviewPanel, searchType, 'default');
+            Log.setView(searchType, 'default');
         } else {
-            Log.setView('webView', webviewPanel, searchType, sfile);
+            Log.setView(searchType, sfile);
         }
     } else {
-        Log.setView('webView', webviewPanel, searchType, 'default');
+        Log.setView(searchType, 'default');
     };
 
 
@@ -38,7 +38,7 @@ async function openLogWebView(webviewPanel, userConfig, gitBasicData) {
         let action = msg.command;
         switch (action) {
             case 'refresh':
-                Log.setView('webView', webviewPanel, searchType, 'default');
+                Log.setView(searchType, 'default');
                 break;
             case 'openFile':
                 let furi = path.join(projectPath,msg.filename);

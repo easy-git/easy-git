@@ -33,7 +33,8 @@ let uiData = getUIData();
 
 
 class GitLogAction {
-    constructor(gitBasicData, userConfig) {
+    constructor(gitBasicData, userConfig, webView) {
+        this.webviewPanel = webView;
         this.projectPath = gitBasicData.projectPath;
         this.projectName = gitBasicData.projectName;
         this.uiData = uiData;
@@ -87,8 +88,9 @@ class GitLogAction {
     };
 
     // get webview html content, set html
-    async setView(renderType, viewInfo, searchType, condition) {
-        if (condition != 'default') {
+    async setView(searchType, condition) {
+
+        if (condition != 'default' && condition == undefined) {
             // 引导用户正确的使用日期查询
             if(this.validateData(condition)){
                 return hx.window.showErrorMessage(
@@ -143,14 +145,13 @@ class GitLogAction {
         }catch(e){};
 
         // set webview
-        let webviewPanel = viewInfo;
         if (condition != 'default') {
-            let isHtml = webviewPanel.webView._html;
+            let isHtml = this.webviewPanel.webView._html;
             if (isHtml == '') {
                 let htmlContent = generateLogHtml(this.userConfig, this.uiData, this.gitData);
-                webviewPanel.webView.html = htmlContent;
+                this.webviewPanel.webView.html = htmlContent;
             } else {
-                webviewPanel.webView.postMessage({
+                this.webviewPanel.webView.postMessage({
                     command: "search",
                     searchType: searchType,
                     projectName: this.projectName,
@@ -158,7 +159,7 @@ class GitLogAction {
                 });
             };
         } else {
-            webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
+            this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
         };
     }
 

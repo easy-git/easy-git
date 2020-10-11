@@ -224,14 +224,14 @@ function generateLogHtml(userConfig, uiData, gitData) {
                 }
                 .contextmenu {
                     margin: 0;
-                    background: #fff;
+                    background: #F4F4F4;
                     z-index: 3000;
                     position: absolute;
                     display: block;
                     list-style-type: none;
                     padding: 5px 0;
                     border-radius: 4px;
-                    border: 1px solid #eee;
+                    border: 1px solid #d3d8d7;
                     font-size: 14px;
                     font-weight: 400;
                     color: #333;
@@ -247,6 +247,9 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                }
+                .contextmenu .dropdown-divider {
+                    border-top: 1px solid #c9cfd9 !important;
                 }
                 .contextmenu li:hover {
                     background-color: rgb(84,156,228);

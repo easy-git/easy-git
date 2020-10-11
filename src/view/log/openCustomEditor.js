@@ -55,36 +55,7 @@ class CatCustomEditorProvider extends CustomEditorProvider {
             GitLogCustomEditorStatus = false;
         });
 
-        let provider = this;
-        webViewPanel.webView.onDidReceiveMessage(function(msg) {
-            let action = msg.command;
-            switch (action) {
-                case 'refresh':
-                    Log.setView('webview', webviewPanel, searchType, 'default');
-                    break;
-                case 'openFile':
-                    let furi = path.join(projectPath,msg.filename);
-                    hx.workspace.openTextDocument(furi);
-                    break;
-                case 'copy':
-                    hx.env.clipboard.writeText(msg.text);
-                    break;
-                case 'search':
-                    Log.setView('webview', webviewPanel, msg.searchType, msg.condition);
-                    break;
-                case 'branch':
-                    Log.switchBranch();
-                    break;
-                case 'cherry-pick':
-                    Log.cherryPick(msg.hash);
-                    break;
-                case 'reset-hard-commit':
-                    Log.resetHardCommit(msg.hash);
-                    break;
-                default:
-                    break;
-            };
-        });
+
     }
 };
 
@@ -126,20 +97,61 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
 
     history(gitData);
 
-    let Log = new GitLogAction(gitData, userConfig);
+    let Log = new GitLogAction(gitData, userConfig, GitLogCustomWebViewPanal);
+
+    // 默认在当前分支搜索，当搜索全部时，此值为all
+    let searchType = 'branch';
 
     // 选中文件或目录，则查看此文件的log记录
     if (selectedFile != '' && selectedFile != undefined) {
         let sfile = selectedFile.replace(path.join(projectPath,path.sep), '');
         if (projectPath == selectedFile ) {
-            Log.setView('CustomEditor', GitLogCustomWebViewPanal, 'branch', 'default');
+            Log.setView(searchType, 'default');
         } else {
-            Log.setView('CustomEditor', GitLogCustomWebViewPanal, 'branch', sfile);
+            Log.setView(searchType, sfile);
         }
     } else {
-        Log.setView('CustomEditor', GitLogCustomWebViewPanal, 'branch', 'default');
+        Log.setView(searchType, 'default');
     };
 
+    GitLogCustomWebViewPanal.webView.onDidReceiveMessage(function(msg) {
+        let action = msg.command;
+        switch (action) {
+            case 'refresh':
+                Log.setView(searchType, 'default');
+                break;
+            case 'openFile':
+                let furi = path.join(projectPath,msg.filename);
+                hx.workspace.openTextDocument(furi);
+                break;
+            case 'copy':
+                hx.env.clipboard.writeText(msg.text);
+                break;
+            case 'search':
+                Log.setView(msg.searchType, msg.condition);
+                break;
+            case 'branch':
+                Log.switchBranch();
+                break;
+            case 'cherry-pick':
+                Log.cherryPick(msg.hash);
+                break;
+            case 'reset-hard-commit':
+                Log.resetHardCommit(msg.hash);
+                break;
+            case 'checkout-commit':
+                Log.checkoutCommit(msg.hash);
+                break;
+            case 'checkout-commit-for-create-branch':
+                Log.checkoutCommitForCreateBranch(msg.hash);
+                break;
+            case 'create-tag':
+                Log.createTag(msg.hash);
+                break;
+            default:
+                break;
+        };
+    });
 }
 
 
