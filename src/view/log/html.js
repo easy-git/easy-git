@@ -326,7 +326,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             <div class="col">
                                 <h6 class="project-info">
                                     <span>{{ projectName }} / </span>
-                                    <span title="显示当前分支log, 双击可切换分支" class="branch" :class="{ active: searchType == 'branch'}" @click="switchSearchType('branch');" @dblclick='switchBranch();'>{{ currentBranch }} </span>
+                                    <span title="显示当前分支log" class="branch" :class="{ active: searchType == 'branch'}" @click="switchSearchType('branch');">{{ currentBranch }} </span>
                                     <span v-if="branchNum > 1"> | </span>
                                     <span title="显示所有分支log" class="branch" :class="{ active: searchType == 'all'}" @click="switchSearchType('all');" v-if="branchNum > 1">所有分支</span>
                                 </h6>
@@ -444,6 +444,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                 <div v-show="visibleRightMenu">
                     <ul v-show="visibleRightMenu" :style="{left:left+'px',top:top+'px'}" class="contextmenu" @mouseleave="visibleRightMenu = false">
                         <li @click="refresh()">刷新</li>
+                        <li @click="switchBranch()">切换分支</li>
                         <div class="dropdown-divider"></div>
                         <li @click="checkoutCommit(rightClickItem)" :class="{ 'click-disable': searchType == 'all' }">检出...</li>
                         <li @click="checkoutCommitForCreateBranch(rightClickItem)" :class="{ 'click-disable': searchType == 'all' }">检出并创建新分支</li>
