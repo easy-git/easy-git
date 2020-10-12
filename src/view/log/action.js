@@ -121,10 +121,17 @@ class GitLogAction {
             return hx.window.showErrorMessage(emsg,['关闭']);
         };
 
+        // 获取提交数量
+        let logTotal = 0;
+        try{
+            logTotal = await utils.gitRaw(this.projectPath, ["rev-list", "--all", "--count"], "获取commit提交总数", "result");
+            logTotal = parseInt(logTotal)
+        }catch(e){}
+
         // 设置git log数据
         this.gitData = Object.assign(
             this.gitData,
-            { "branchNum": 1 },
+            { "branchNum": 1, "logTotal": logTotal },
             { "logData": gitLogInfo.data },
         );
 
