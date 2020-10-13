@@ -122,16 +122,16 @@ class GitLogAction {
         };
 
         // 获取提交数量
-        let logTotal = 0;
+        let CommitTotal = 0;
         try{
-            logTotal = await utils.gitRaw(this.projectPath, ["rev-list", "--all", "--count"], "获取commit提交总数", "result");
-            logTotal = parseInt(logTotal)
+            CommitTotal = await utils.gitRaw(this.projectPath, ["rev-list", "--all", "--count"], "获取commit提交总数", "result");
+            CommitTotal = parseInt(CommitTotal);
         }catch(e){}
 
         // 设置git log数据
         this.gitData = Object.assign(
             this.gitData,
-            { "branchNum": 1, "logTotal": logTotal },
+            { "branchNum": 1, "CommitTotal": CommitTotal },
             { "logData": gitLogInfo.data },
         );
 
@@ -162,7 +162,8 @@ class GitLogAction {
                     command: "search",
                     searchType: searchType,
                     projectName: this.projectName,
-                    gitData: this.gitData
+                    gitData: this.gitData,
+                    CommitTotal: CommitTotal,
                 });
             };
         } else {

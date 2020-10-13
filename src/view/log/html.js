@@ -27,7 +27,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
     } = uiData;
 
     // 获取git日志列表
-    let {projectName, currentBranch, logData, searchText, branchNum} = gitData;
+    let {projectName, currentBranch, logData, searchText, branchNum, CommitTotal} = gitData;
 
     logData = JSON.stringify(logData);
     if (!searchText) {
@@ -400,6 +400,10 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                     </div>
                                 </li>
                             </ul>
+                            <div class="my-3 text-center">
+                                <div v-if="logNum < CommitTotal" @click="moreLog();">加载更多</div>
+                                <div v-if="logNum >= CommitTotal">我是有底线的</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -470,6 +474,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         currentBranch: '',
                         projectName: '',
                         branchNum: 1,
+                        CommitTotal: 0,
+                        logNum: 0,
                         gitLogInfoList: [],
                         hoverLogID: '',
                         isShowViewDetails: false,
@@ -504,6 +510,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         this.currentBranch = '${currentBranch}';
                         this.searchText = '${searchText}';
                         this.branchNum = ${branchNum};
+                        this.CommitTotal = ${CommitTotal};
+                        this.logNum = (this.gitLogInfoList).length;
                     },
                     mounted() {
                         this.loading = false;
@@ -538,6 +546,12 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 condition: this.searchText
                             });
                         },
+                        moreLog() {
+                            if (this.logNum < 1) {return;};
+                            let num = this.logNum + 100;
+                            this.searchText = '-n ' + num.toString();
+                            this.searchLog();
+                        },
                         forUpdate() {
                             hbuilderx.onDidReceiveMessage((msg) => {
                                 this.loading = false;
@@ -552,6 +566,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                     this.searchText = gitData.searchText;
                                     this.currentBranch = gitData.currentBranch;
                                     this.projectName = msg.projectName;
+                                    this.logNum = (gitData.logData).length;
+                                    this.CommitTotal = msg.CommitTotal;
                                 }
                             });
                         },
