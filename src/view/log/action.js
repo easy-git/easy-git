@@ -124,7 +124,11 @@ class GitLogAction {
         // 获取提交数量
         let CommitTotal = 0;
         try{
-            CommitTotal = await utils.gitRaw(this.projectPath, ["rev-list", "--all", "--count"], "获取commit提交总数", "result");
+            let query = ["rev-list", "--branches", "--count"];
+            if (condition.includes("all")) {
+                query = ["rev-list", "--all", "--count"];
+            };
+            CommitTotal = await utils.gitRaw(this.projectPath, query, undefined, "result");
             CommitTotal = parseInt(CommitTotal);
         }catch(e){}
 

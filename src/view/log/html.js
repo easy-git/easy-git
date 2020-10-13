@@ -316,6 +316,9 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     pointer-events: none;
                     color: #888888 !important;
                 }
+                .load-more-log {
+                    font-size: 14px;
+                }
             </style>
         </head>
         <body style="background-color:${background};">
@@ -344,7 +347,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                             v-on:keyup.enter="searchLog();" />
                                     </div>
                                     <div class="pt-2 px-1">
-                                        <span @click.once="searchLog();">${searchIcon}</span>
+                                        <span @click="searchLog();">${searchIcon}</span>
                                     </div>
                                     <div class="pt-2">
                                         <span title="重置：并刷新日志" @click.once="refresh();">${refreshIcon}</span>
@@ -365,6 +368,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             <div class="text-center" style="margin-top: 20%;">
                                 <span>${noIcon}</span>
                                 <p class="no-result">没有结果...</p>
+                                <p class="no-result" v-if="searchText">请检查查询条件，如存在多个查询条件，请以逗号分隔</p>
                             </div>
                         </div>
                         <div class="col mt-2 px-0" v-else>
@@ -400,9 +404,9 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                     </div>
                                 </li>
                             </ul>
-                            <div class="my-3 text-center">
-                                <div v-if="logNum < CommitTotal" @click="moreLog();">加载更多</div>
-                                <div v-if="logNum >= CommitTotal">我是有底线的</div>
+                            <div class="mt-3 text-center load-more-log">
+                                <div v-if="logNum + 1 < CommitTotal" @click="moreLog();">加载更多</div>
+                                <div v-if="logNum + 1 >= CommitTotal">我是有底线的</div>
                             </div>
                         </div>
                     </div>
@@ -447,6 +451,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
 
                 <div v-show="visibleRightMenu">
                     <ul v-show="visibleRightMenu" :style="{left:left+'px',top:top+'px'}" class="contextmenu" @mouseleave="visibleRightMenu = false">
+                        <li @click="viewDetails(rightClickItem)">查看详情</li>
+                        <div class="dropdown-divider"></div>
                         <li @click="refresh()">刷新</li>
                         <li @click="switchBranch()">切换分支</li>
                         <div class="dropdown-divider"></div>
@@ -549,7 +555,24 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         moreLog() {
                             if (this.logNum < 1) {return;};
                             let num = this.logNum + 100;
-                            this.searchText = '-n ' + num.toString();
+                            if (this.searchText.includes("-n")) {
+                                let tmp = this.searchText.split(',');
+                                for (let i in tmp) {
+                                    console.log(i)
+                                    if (/\-n ([0-9]{1,9})$/.test(tmp[i])) {
+                                        tmp[i] = '-n ' + num.toString();
+                                        break;
+                                    }
+                                }
+                                this.searchText = tmp.toString();
+                            } else {
+                                if (this.searchText != '') {
+                                    this.searchText = this.searchText + ',-n ' + num.toString();
+                                } else {
+                                    this.searchText = '-n ' + num.toString();
+                                }
+                            }
+                            console.log(this.searchText)
                             this.searchLog();
                         },
                         forUpdate() {

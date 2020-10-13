@@ -329,6 +329,9 @@ function active(webviewPanel, userConfig, gitData) {
             case 'open':
                 let fileUri = path.join(projectPath, msg.text);
                 hx.workspace.openTextDocument(fileUri);
+                setTimeout(function() {
+                    hx.request('internaltest.executeCommand', 'file.compareWithLastVersion')
+                }, 1000);
                 break;
             case 'add':
                 File.add(msg.text);

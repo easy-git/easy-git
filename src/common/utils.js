@@ -1179,6 +1179,13 @@ async function gitLog(workingDir, searchType, filterCondition) {
         filter = ['--all', ...filter];
     };
 
+    // 去除数组中元素两边的空格
+    let tmpFilter = [];
+    for (let s of filter) {
+        tmpFilter.push(s.trim())
+    };
+    filter = [...tmpFilter];
+
     try {
         let result = {
             "success": true,
@@ -1323,7 +1330,9 @@ async function gitRaw(workingDir, commands, msg, resultType='statusCode') {
     try {
         let status = await git(workingDir).raw(commands)
             .then((res) => {
-                hx.window.setStatusBarMessage(`Git: ${msg} 操作成功。`, 5000, 'info');
+                if (msg != undefined) {
+                    hx.window.setStatusBarMessage(`Git: ${msg} 操作成功。`, 5000, 'info');
+                };
                 if (resultType != 'statusCode') {
                     return res;
                 } else {
@@ -1331,12 +1340,16 @@ async function gitRaw(workingDir, commands, msg, resultType='statusCode') {
                 };
             })
             .catch((err) => {
-                createOutputChannel('Git: ${msg} 操作失败', err);
+                if (msg != undefined) {
+                    createOutputChannel('Git: ${msg} 操作失败', err);
+                }
                 return 'fail';
             });
         return status;
     } catch (e) {
-        createOutputChannel('Git: ${msg} 操作失败，插件运行异常。', e);
+        if (msg != undefined) {
+            createOutputChannel('Git: ${msg} 操作失败，插件运行异常。', e);
+        }
         return 'error';
     };
 };
