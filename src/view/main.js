@@ -178,6 +178,7 @@ class GitFile {
     // Git: cancel add
     async cancelStash(fileUri) {
         let cancelStatus = await utils.gitRaw(this.projectPath, ['restore', '--staged', fileUri], '取消暂存');
+        console.log('-->', cancelStatus)
         if (cancelStatus == 'success') {
             this.refreshFileList();
         };
@@ -216,7 +217,7 @@ class GitFile {
             fpath = fileinfo;
         };
         if (fileinfo == 'all' || fstatus != 'not_added') {
-            let checkoutlStatus = await utils.gitCheckout(this.projectPath, fpath);
+            let checkoutlStatus = await utils.gitCheckoutFile(this.projectPath, fpath);
             if (checkoutlStatus == 'success') {
                 this.refreshFileList();
             };
@@ -329,9 +330,9 @@ function active(webviewPanel, userConfig, gitData) {
             case 'open':
                 let fileUri = path.join(projectPath, msg.text);
                 hx.workspace.openTextDocument(fileUri);
-                setTimeout(function() {
-                    hx.request('internaltest.executeCommand', 'file.compareWithLastVersion')
-                }, 1000);
+                // setTimeout(function() {
+                //     hx.request('internaltest.executeCommand', 'file.compareWithLastVersion')
+                // }, 1000);
                 break;
             case 'add':
                 File.add(msg.text);
@@ -357,7 +358,7 @@ function active(webviewPanel, userConfig, gitData) {
                 let fileAbsPath = path.join(projectPath, msg.text);
                 hx.commands.executeCommand('file.compareWithLastVersion', fileAbsPath);
                 break;
-            case 'checkout':
+            case 'checkoutFile':
                 File.checkoutFile(msg.text);
                 break;
             case 'stash':

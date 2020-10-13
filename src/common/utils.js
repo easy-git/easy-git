@@ -489,7 +489,7 @@ async function gitAddCommitPush(workingDir, commitComment) {
  */
 async function gitAdd(workingDir, files) {
     // status bar show message
-    hx.window.setStatusBarMessage('Git: 正在添加...');
+    hx.window.setStatusBarMessage('Git: 正在添加文件到暂存区...');
     if (files == 'all') {
         files = './*'
     };
@@ -497,7 +497,7 @@ async function gitAdd(workingDir, files) {
         let status = await git(workingDir).init()
             .add(files)
             .then(() => {
-                hx.window.setStatusBarMessage('Git: 添加成功', 3000, 'info');
+                hx.window.setStatusBarMessage('Git: 成功添加文件到暂存区。', 3000, 'info');
                 return 'success';
             })
             .catch((err) => {
@@ -709,9 +709,9 @@ async function gitReset(workingDir, options, msg) {
 /**
  * @description 撤销对文件的修改
  */
-async function gitCheckout(workingDir, filename) {
+async function gitCheckoutFile(workingDir, filename) {
     // status bar show message
-    hx.window.setStatusBarMessage(`Git: ${filename} 正在撤销对文件的修改`,2000,'info');
+    hx.window.setStatusBarMessage(`Git: ${filename} 正在撤销对文件的修改!`,2000,'info');
 
     let args = ['--', filename]
     if (filename == 'all') {
@@ -721,12 +721,12 @@ async function gitCheckout(workingDir, filename) {
         let status = await git(workingDir).init()
             .checkout(args)
             .then(() => {
-                hx.window.setStatusBarMessage('Git: 操作成功', 3000, 'info');
+                hx.window.setStatusBarMessage(`Git: ${filename} 成功撤销修改!`, 3000, 'info');
                 return 'success'
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: ${filename} 操作失败`, errMsg);
+                createOutputChannel(`Git: ${filename} 撤销修改操作失败。`, errMsg);
                 return 'fail';
             });
         return status;
@@ -1336,7 +1336,7 @@ async function gitRaw(workingDir, commands, msg, resultType='statusCode') {
                 if (resultType != 'statusCode') {
                     return res;
                 } else {
-                    return 'running state';
+                    return 'success';
                 };
             })
             .catch((err) => {
@@ -1375,7 +1375,7 @@ module.exports = {
     gitPush,
     gitPull,
     gitFetch,
-    gitCheckout,
+    gitCheckoutFile,
     gitDiffFile,
     gitBranch,
     gitRawGetBranch,

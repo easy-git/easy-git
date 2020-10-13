@@ -599,7 +599,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     },
                     gitCheckout(file) {
                         hbuilderx.postMessage({
-                            command: 'checkout',
+                            command: 'checkoutFile',
                             text: file
                         });
                     },
