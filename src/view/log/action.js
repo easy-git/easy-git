@@ -89,7 +89,7 @@ class GitLogAction {
 
     // get webview html content, set html
     async setView(searchType, condition) {
-
+        console.log('----------->', condition)
         if (condition != 'default' && condition == undefined) {
             // 引导用户正确的使用日期查询
             if(this.validateData(condition)){
@@ -122,6 +122,7 @@ class GitLogAction {
         };
 
         // 获取提交数量
+        // todo: 当查询具体文件的log时，CommitTotal计算错误
         let CommitTotal = 0;
         try{
             let query = ["rev-list", "--branches", "--count"];
@@ -130,7 +131,9 @@ class GitLogAction {
             };
             CommitTotal = await utils.gitRaw(this.projectPath, query, undefined, "result");
             CommitTotal = parseInt(CommitTotal);
-        }catch(e){}
+        }catch(e){
+            console.log(e)
+        }
 
         // 设置git log数据
         this.gitData = Object.assign(

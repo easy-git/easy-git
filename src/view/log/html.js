@@ -28,7 +28,6 @@ function generateLogHtml(userConfig, uiData, gitData) {
 
     // 获取git日志列表
     let {projectName, currentBranch, logData, searchText, branchNum, CommitTotal} = gitData;
-
     logData = JSON.stringify(logData);
     if (!searchText) {
         searchText = '';
@@ -567,7 +566,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 this.searchText = tmp.toString();
                             } else {
                                 if (this.searchText != '') {
-                                    this.searchText = this.searchText + ',-n ' + num.toString();
+                                    this.searchText = '-n ' + num.toString() + ',' + this.searchText;
                                 } else {
                                     this.searchText = '-n ' + num.toString();
                                 }
