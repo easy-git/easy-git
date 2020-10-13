@@ -557,7 +557,6 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             if (this.searchText.includes("-n")) {
                                 let tmp = this.searchText.split(',');
                                 for (let i in tmp) {
-                                    console.log(i)
                                     if (/\-n ([0-9]{1,9})$/.test(tmp[i])) {
                                         tmp[i] = '-n ' + num.toString();
                                         break;
@@ -571,7 +570,6 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                     this.searchText = '-n ' + num.toString();
                                 }
                             }
-                            console.log(this.searchText)
                             this.searchLog();
                         },
                         forUpdate() {

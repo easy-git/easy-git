@@ -54,8 +54,6 @@ class CatCustomEditorProvider extends CustomEditorProvider {
         webViewPanel.onDidDispose(function() {
             GitLogCustomEditorStatus = false;
         });
-
-
     }
 };
 
@@ -80,11 +78,10 @@ function history(gitData) {
 
 
 function GitLogCustomEditorRenderHtml(gitData, userConfig) {
-    isCustomFirstOpen = true;
-
     let {projectPath, projectName, selectedFile, currentBranch} = gitData;
 
-    if (JSON.stringify(gitData) == '{}') {
+    if (JSON.stringify(gitData) == '{}' && isCustomFirstOpen == false) {
+        isCustomFirstOpen = true;
         let config = hx.workspace.getConfiguration();
         projectPath = config.get("EasyGit.HistoryProjectPath");
         projectName = config.get("EasyGit.HistoryProjectName");

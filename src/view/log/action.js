@@ -89,7 +89,6 @@ class GitLogAction {
 
     // get webview html content, set html
     async setView(searchType, condition) {
-        console.log('----------->', condition)
         if (condition != 'default' && condition == undefined) {
             // 引导用户正确的使用日期查询
             if(this.validateData(condition)){

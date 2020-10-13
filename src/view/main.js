@@ -178,7 +178,6 @@ class GitFile {
     // Git: cancel add
     async cancelStash(fileUri) {
         let cancelStatus = await utils.gitRaw(this.projectPath, ['restore', '--staged', fileUri], '取消暂存');
-        console.log('-->', cancelStatus)
         if (cancelStatus == 'success') {
             this.refreshFileList();
         };
