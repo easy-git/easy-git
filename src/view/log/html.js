@@ -439,9 +439,10 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                     <span>二进制文件</span>
                                 </div>
                                 <div class="d-inline htext pl-3">
-                                    <span class="fname" :title="'insertions:'+ v5.insertions + ';' + 'deletions:'+ v5.deletions" @click="openFile(v5.file);">
+                                    <span class="fname" :title="'insertions:'+ v5.insertions + ';' + 'deletions:'+ v5.deletions" @click="showCommitFileChange(v5.file)">
                                         {{ v5.file }}
                                     </span>
+                                    <span @click="openFile(v5.file);">打开</span>
                                 </div>
                             </li>
                         </ul>
@@ -486,7 +487,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         isShowViewDetails: false,
                         logDetails: {},
                         logDetailsFiles: [],
-                        loading: false
+                        loading: false,
+                        CommitFileChangeDetails: {}
                     },
                     watch: {
                         visibleRightMenu(value) {
@@ -524,6 +526,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         window.onload = function() {
                             setTimeout(function() {
                                 that.forUpdate();
+                                that.forShowCommitFileChange()
                             }, 1000)
                         };
                     },
@@ -574,11 +577,11 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         },
                         forUpdate() {
                             hbuilderx.onDidReceiveMessage((msg) => {
+                                if (msg.command != 'search') {return};
                                 this.loading = false;
                                 if (this.isShowViewDetails) {
                                     this.isShowViewDetails = false;
                                 };
-                                if (msg.command != 'search') {return};
                                 if (msg.gitData) {
                                     let gitData = msg.gitData;
                                     this.searchType = msg.searchType;
@@ -722,6 +725,25 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 command: 'create-tag',
                                 hash: hash
                             })
+                        },
+                        // 显示commit 文件具体修改
+                        showCommitFileChange(filePath) {
+                            let data = {
+                                "commitId": this.logDetails.hash,
+                                "filePath": filePath
+                            };
+                            hbuilderx.postMessage({
+                                command: 'showCommitFileChange',
+                                data: data
+                            })
+                        },
+                        forShowCommitFileChange() {
+                            hbuilderx.onDidReceiveMessage((msg) => {
+                                this.CommitFileChangeDetails = {};
+                                if (msg.command != 'showCommitFileChange') {return};
+                                this.CommitFileChangeDetails = msg.result;
+                                console.log(this.CommitFileChangeDetails)
+                            });
                         }
                     }
                 })

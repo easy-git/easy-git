@@ -177,6 +177,17 @@ class GitLogAction {
         };
     }
 
+    // 显示commit 文件具体修改
+    async showCommitFileChange(msg) {
+        let {commitId, filePath} = msg;
+        let options = [commitId, filePath];
+        let result = await utils.gitShowCommitFileChange(this.projectPath, options);
+        this.webviewPanel.webView.postMessage({
+            command: "showCommitFileChange",
+            result: result,
+        });
+    }
+
     // 切换分支
     async switchBranch() {
         let BranchInfo = await utils.gitRawGetBranch(this.projectPath, 'branch');

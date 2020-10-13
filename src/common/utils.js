@@ -1355,6 +1355,35 @@ async function gitRaw(workingDir, commands, msg, resultType='statusCode') {
 };
 
 
+/**
+ * @description
+ */
+async function gitShowCommitFileChange(workingDir, options) {
+    try {
+        let result = {
+            "success": true,
+            "errorMsg": '',
+            "data": []
+        }
+        let status = await git(workingDir).init()
+            .show(options)
+            .then((res) => {
+                result.data = res
+                return result;
+            })
+            .catch((err) => {
+                result.errorMsg = err.message;
+                result.success = false;
+                return result;
+            });
+        return result;
+    } catch (e) {
+        result.success = false;
+        return result;
+    };
+}
+
+
 module.exports = {
     isGitInstalled,
     getHBuilderXiniConfig,
@@ -1377,6 +1406,7 @@ module.exports = {
     gitFetch,
     gitCheckoutFile,
     gitDiffFile,
+    gitShowCommitFileChange,
     gitBranch,
     gitRawGetBranch,
     gitCurrentBranchName,

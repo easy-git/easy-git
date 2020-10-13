@@ -145,6 +145,9 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
             case 'create-tag':
                 Log.createTag(msg.hash);
                 break;
+            case 'showCommitFileChange':
+                Log.showCommitFileChange(msg.data);
+                break;
             default:
                 break;
         };
