@@ -28,7 +28,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
     } = uiData;
 
     // 获取git日志列表
-    let {projectName, currentBranch, logData, searchText, branchNum, CommitTotal} = gitData;
+    let {projectName, projectPath, currentBranch, logData, searchText, branchNum, CommitTotal} = gitData;
     logData = JSON.stringify(logData);
     if (!searchText) {
         searchText = '';
@@ -588,7 +588,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                     let gitData = msg.gitData;
                                     this.searchType = msg.searchType;
                                     this.gitLogInfoList = gitData.logData;
-                                    this.searchText = gitData.searchText;
+                                    this.searchText = msg.searchText;
                                     this.currentBranch = gitData.currentBranch;
                                     this.projectName = msg.projectName;
                                     this.logNum = (gitData.logData).length;
@@ -621,7 +621,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             let w = '--'+searchType+'='+keyword;
                             if ((this.searchText).length != 0) {
                                 if (!(this.searchText).includes(w)) {
-                                    this.searchText = this.searchText + ',' + w;
+                                    this.searchText = w + ',' + this.searchText;
                                 };
                             } else {
                                 this.searchText = w;

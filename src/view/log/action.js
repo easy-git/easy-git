@@ -162,8 +162,7 @@ class GitLogAction {
         if (condition != 'default') {
             let isHtml = this.webviewPanel.webView._html;
             if (isHtml == '') {
-                let htmlContent = generateLogHtml(this.userConfig, this.uiData, this.gitData);
-                this.webviewPanel.webView.html = htmlContent;
+                this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
             } else {
                 this.webviewPanel.webView.postMessage({
                     command: "search",
@@ -171,6 +170,7 @@ class GitLogAction {
                     projectName: this.projectName,
                     gitData: this.gitData,
                     CommitTotal: CommitTotal,
+                    searchText: condition
                 });
             };
         } else {

@@ -45,10 +45,10 @@ class CatCustomEditorProvider extends CustomEditorProvider {
         GitLogCustomEditorStatus = true;
         GitLogCustomWebViewPanal = webViewPanel;
 
-        // render html to customEditor
-        if (isCustomFirstOpen == false) {
-            GitLogCustomEditorRenderHtml({},{});
-        };
+        // First Open: render html to customEditor
+        // if (isCustomFirstOpen == false) {
+        //     GitLogCustomEditorRenderHtml({},{});
+        // };
 
         // close customEditor
         webViewPanel.onDidDispose(function() {
@@ -99,12 +99,16 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
     // 默认在当前分支搜索，当搜索全部时，此值为all
     let searchType = 'branch';
 
-    // 选中文件或目录，则查看此文件的log记录
-    if (selectedFile != '' && selectedFile != undefined) {
+    try{
         selectedFile = path.normalize(selectedFile);
         projectPath = path.normalize(projectPath);
+    }catch(e){}
+
+    // 选中文件或目录，则查看此文件的log记录
+    if (selectedFile != '' && selectedFile != undefined) {
+        let sfile = selectedFile.replace(path.join(projectPath, path.sep), '');
         if (selectedFile != projectPath) {
-            Log.setView(searchType, selectedFile.replace(path.join(projectPath, path.sep), ''));
+            Log.setView(searchType, sfile);
         } else {
             Log.setView(searchType, 'default');
         }
