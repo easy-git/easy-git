@@ -23,7 +23,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
         helpIcon,
         refreshIcon,
         searchIcon,
-        noIcon
+        noIcon,
+        OpenFileIconSvg
     } = uiData;
 
     // 获取git日志列表
@@ -442,7 +443,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                     <span class="fname" :title="'insertions:'+ v5.insertions + ';' + 'deletions:'+ v5.deletions" @click="showCommitFileChange(v5.file)">
                                         {{ v5.file }}
                                     </span>
-                                    <span @click="openFile(v5.file);">打开</span>
+                                    <span @click="openFile(v5.file);">${OpenFileIconSvg}</span>
                                 </div>
                             </li>
                         </ul>

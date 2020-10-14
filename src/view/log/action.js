@@ -22,8 +22,9 @@ function getUIData() {
     let refreshIcon = icon.getRefreshIcon(fontColor);
     let searchIcon = icon.getSearchIcon(fontColor);
     let noIcon = icon.getNoIcon(lineColor);
+    let OpenFileIconSvg = icon.getOpenFileIcon(fontColor);
 
-    let iconData = {helpIcon,refreshIcon,searchIcon,noIcon};
+    let iconData = {helpIcon, refreshIcon, searchIcon, noIcon, OpenFileIconSvg};
     let uiData = Object.assign(iconData,colorData);
     return uiData
 };
