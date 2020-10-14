@@ -101,11 +101,12 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
 
     // 选中文件或目录，则查看此文件的log记录
     if (selectedFile != '' && selectedFile != undefined) {
-        let sfile = selectedFile.replace(path.join(projectPath,path.sep), '');
-        if (projectPath == selectedFile ) {
-            Log.setView(searchType, 'default');
+        selectedFile = path.normalize(selectedFile);
+        projectPath = path.normalize(projectPath);
+        if (selectedFile != projectPath) {
+            Log.setView(searchType, selectedFile.replace(path.join(projectPath, path.sep), ''));
         } else {
-            Log.setView(searchType, sfile);
+            Log.setView(searchType, 'default');
         }
     } else {
         Log.setView(searchType, 'default');

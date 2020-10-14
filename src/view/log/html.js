@@ -405,7 +405,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 </li>
                             </ul>
                             <div class="mt-3 text-center load-more-log">
-                                <div v-if="logNum + 1 < CommitTotal" @click="moreLog();">加载更多</div>
+                                <!-- 此处存在问题，50不应该写死。 +1也存在问题。先这样 -->
+                                <div v-if="logNum + 1 < CommitTotal && logNum >= 50" @click="moreLog();">加载更多</div>
                                 <div v-if="logNum + 1 >= CommitTotal">我是有底线的</div>
                             </div>
                         </div>
@@ -743,7 +744,6 @@ function generateLogHtml(userConfig, uiData, gitData) {
                                 this.CommitFileChangeDetails = {};
                                 if (msg.command != 'showCommitFileChange') {return};
                                 this.CommitFileChangeDetails = msg.result;
-                                console.log(this.CommitFileChangeDetails)
                             });
                         }
                     }
