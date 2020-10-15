@@ -19,7 +19,7 @@ async function openLogWebView(webviewPanel, userConfig, gitBasicData) {
     // 默认在当前分支搜索，当搜索全部时，此值为all
     let searchType = 'branch';
 
-    let Log = new GitLogAction(webviewPanel, gitBasicData, userConfig, 'webView');
+    let Log = new GitLogAction(gitBasicData, userConfig, webviewPanel, 'webView');
 
     // 选中文件或目录，则查看此文件的log记录
     if (selectedFile != '' && selectedFile != undefined) {
