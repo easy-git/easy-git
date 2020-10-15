@@ -185,7 +185,8 @@ class GitLogAction {
         let {commitId, filePath} = msg;
         let options = [commitId, filePath];
         let result = await utils.gitShowCommitFileChange(this.projectPath, options);
-
+        
+        result.filePath = filePath;
         if ((result.data).length) {
             result.data = (result.data).split('\n');
             let tmp = [...result.data];

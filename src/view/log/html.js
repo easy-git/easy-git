@@ -226,6 +226,9 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                 .change-files ul > li {
                     list-style: none;
                 }
+                .commit-file-details {
+                    border-left: 1px solid ${lineColor};
+                }
                 .commit-file-details p {
                     margin-bottom: 0 !important;
                 }
@@ -453,7 +456,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     <p class="intro">
 						{{ logDetails.author_name }} {{ logDetails.date  | FormatDate}}
                         <span v-if="renderType != 'webView'">
-                            {{ logDetails.diff.changed }} file changed,
+                            ; {{ logDetails.diff.changed }} file changed,
                             {{ logDetails.diff.insertions }} insertions(+),
                             {{ logDetails.diff.deletions }} deletions(-)
                         </span>
@@ -476,7 +479,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                         <div class="d-inline-block binary" v-else-if="v5.binary" style="width: 115px !important;">
                                             <span>二进制文件</span>
                                         </div>
-                                        <div class="d-inline htext pl-3">
+                                        <div class="d-inline htext">
                                             <span class="fname"
                                                 :title="'点击查看文件变化，' +'insertions:'+ v5.insertions + ';' + 'deletions:'+ v5.deletions"
                                                 @click="showCommitFileChange(v5.file)">
@@ -487,9 +490,10 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                     </li>
                                 </ul>
                              </div>
-                             <div class="flex-average change-files commit-file-details" v-if="CommitFileChangeDetails.length">
+                             <div class="flex-average change-files commit-file-details" v-if="JSON.stringify(CommitFileChangeDetails) != '{}'">
                                 <p
-                                    v-for="(c,i) in CommitFileChangeDetails" :key="i"
+                                    v-for="(c,i) in CommitFileChangeDetails.data" :key="i"
+                                    class="px-2"
                                     :class="{ 'line-add': c.substr(0,1) == '+', 'line-sub': c.substr(0,1) == '-'}"
                                     v-html="c">
                                 </p>
@@ -726,6 +730,12 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                 tmp.push(f);
                             };
                             this.logDetailsFiles = tmp;
+
+                            let firstFile = files.length ? files[0] : {};
+                            if (JSON.stringify(firstFile) != '{}') {
+                                let {file} = firstFile;
+                                this.showCommitFileChange(file);
+                            }
                         },
                         closeViewDetails() {
                             this.isShowViewDetails = false;
@@ -798,7 +808,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             hbuilderx.onDidReceiveMessage((msg) => {
                                 this.CommitFileChangeDetails = {};
                                 if (msg.command != 'showCommitFileChange') {return};
-                                this.CommitFileChangeDetails = msg.result.data;
+                                this.CommitFileChangeDetails = msg.result;
                             });
                         }
                     }
