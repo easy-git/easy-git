@@ -450,8 +450,15 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             </button>
                         </div>
                     </div>
-                    <p class="intro">{{ logDetails.author_name }} {{ logDetails.date  | FormatDate}}</p>
                     <p class="intro">
+						{{ logDetails.author_name }} {{ logDetails.date  | FormatDate}}
+                        <span v-if="renderType != 'webView'">
+                            {{ logDetails.diff.changed }} file changed,
+                            {{ logDetails.diff.insertions }} insertions(+),
+                            {{ logDetails.diff.deletions }} deletions(-)
+                        </span>
+					</p>
+                    <p class="intro" v-if="renderType == 'webView'">
                         {{ logDetails.diff.changed }} file changed,
                         {{ logDetails.diff.insertions }} insertions(+),
                         {{ logDetails.diff.deletions }} deletions(-)

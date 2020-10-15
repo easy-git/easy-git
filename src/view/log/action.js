@@ -113,6 +113,7 @@ class GitLogAction {
 
         // 搜索，并获取搜索结果
         let gitLogInfo = await utils.gitLog(this.projectPath, searchType, condition);
+        // let gitLogInfo = await utils.gitLog(this.projectPath, searchType, "-n 2");
 
         if (!gitLogInfo.success && gitLogInfo.errorMsg == '') {
             return hx.window.showErrorMessage('获取日志失败，未知错误。请重新尝试操作，或通过运行日志查看错误。',['关闭']);
@@ -185,20 +186,20 @@ class GitLogAction {
         let options = [commitId, filePath];
         let result = await utils.gitShowCommitFileChange(this.projectPath, options);
 
-        result.data = (result.data).split('\n')
         if ((result.data).length) {
+            result.data = (result.data).split('\n');
             let tmp = [...result.data];
             tmp = tmp.splice(11);
             let tmp2 = [];
             for (let s of tmp) {
                 tmp2.push(s.replace(new RegExp(" ", "gm"), '&nbsp;'));
-            }
+            };
             result.data = tmp2;
+            this.webviewPanel.webView.postMessage({
+                command: "showCommitFileChange",
+                result: result,
+            });
         };
-        this.webviewPanel.webView.postMessage({
-            command: "showCommitFileChange",
-            result: result,
-        });
     }
 
     // 切换分支

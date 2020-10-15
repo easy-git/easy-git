@@ -42,13 +42,14 @@ class CatCustomEditorProvider extends CustomEditorProvider {
     }
 
     resolveCustomEditor(document, webViewPanel) {
+        console.error('----', webViewPanel);
         GitLogCustomEditorStatus = true;
         GitLogCustomWebViewPanal = webViewPanel;
 
         // First Open: render html to customEditor
-        // if (isCustomFirstOpen == false) {
-        //     GitLogCustomEditorRenderHtml({},{});
-        // };
+        if (isCustomFirstOpen == false) {
+            GitLogCustomEditorRenderHtml({},{});
+        };
 
         // close customEditor
         webViewPanel.onDidDispose(function() {
