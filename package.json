@@ -50,33 +50,46 @@
             }
         },
         "viewsContainers": {
-            "activitybar": [{
-                "id": "EasyGitSourceCodeView",
-                "title": "easy-git"
-            }],
-            "rightside": [{
-                "id": "EasyGitCommonView",
-                "title": "easy-git-log"
-            }]
+            "activitybar": [
+                {
+                    "id": "EasyGitSourceCodeView",
+                    "title": "easy-git"
+                }
+            ],
+            "rightside": [
+                {
+                    "id": "EasyGitCommonView",
+                    "title": "easy-git-log"
+                }
+            ]
         },
         "views": {
-            "EasyGitSourceCodeView": [{
-                "id": "EasyGitSourceCodeView",
-                "title": "easy-git"
-            }],
-            "EasyGitCommonView": [{
-                "id": "EasyGitCommonView",
-                "title": "easy-git-log"
-            }]
+            "EasyGitSourceCodeView": [
+                {
+                    "id": "EasyGitSourceCodeView",
+                    "title": "easy-git"
+                }
+            ],
+            "EasyGitCommonView": [
+                {
+                    "id": "EasyGitCommonView",
+                    "title": "easy-git-log"
+                }
+            ]
         },
-        "customEditors": [{
-            "viewType": "EasyGit - 日志",
-            "selector": [{
-                "fileNamePattern": "EasyGit - 日志"
-            }],
-            "priority": "default"
-        }],
-        "commands": [{
+        "customEditors": [
+            {
+                "viewType": "EasyGit - 日志",
+                "selector": [
+                    {
+                        "fileNamePattern": "EasyGit - 日志"
+                    }
+                ],
+                "priority": "default"
+            }
+        ],
+        "commands": [
+            {
                 "command": "EasyGit.main",
                 "title": "easy-git: 源代码管理"
             },
@@ -146,7 +159,8 @@
             }
         ],
         "menus": {
-            "explorer/context": [{
+            "explorer/context": [
+                {
                     "command": "EasyGit.main",
                     "group": "z_commands"
                 },
@@ -159,7 +173,8 @@
                     "group": "z_commands"
                 }
             ],
-            "editor/context": [{
+            "editor/context": [
+                {
                     "command": "EasyGit.log",
                     "title": "easy-git: 查看日志",
                     "group": "z_commands"
@@ -168,7 +183,8 @@
                     "group": "z_commands"
                 }
             ],
-            "menubar/tool": [{
+            "menubar/tool": [
+                {
                     "command": "EasyGit.clone",
                     "title": "Git: 克隆仓库",
                     "group": "ext_settings"
@@ -228,7 +244,7 @@
         "cross-spawn": "^7.0.3",
         "git-remote-origin-url": "^3.1.0",
         "ini": "^1.3.5",
-        "simple-git": "^2.17.0",
+        "simple-git": "^2.21.0",
         "uuid": "^8.3.0"
     }
 }
