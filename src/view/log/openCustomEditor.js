@@ -94,7 +94,7 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
 
     history(gitData);
 
-    let Log = new GitLogAction(gitData, userConfig, GitLogCustomWebViewPanal);
+    let Log = new GitLogAction(gitData, userConfig, GitLogCustomWebViewPanal, 'customEditor');
 
     // 默认在当前分支搜索，当搜索全部时，此值为all
     let searchType = 'branch';

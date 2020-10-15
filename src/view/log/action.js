@@ -34,7 +34,8 @@ let uiData = getUIData();
 
 
 class GitLogAction {
-    constructor(gitBasicData, userConfig, webView) {
+    constructor(gitBasicData, userConfig, webView, renderType) {
+        this.renderType = renderType;
         this.webviewPanel = webView;
         this.projectPath = gitBasicData.projectPath;
         this.projectName = gitBasicData.projectName;
@@ -162,7 +163,7 @@ class GitLogAction {
         if (condition != 'default') {
             let isHtml = this.webviewPanel.webView._html;
             if (isHtml == '') {
-                this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
+                this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData, this.renderType);
             } else {
                 this.webviewPanel.webView.postMessage({
                     command: "search",
@@ -174,7 +175,7 @@ class GitLogAction {
                 });
             };
         } else {
-            this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData);
+            this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData, this.renderType);
         };
     }
 
@@ -183,6 +184,17 @@ class GitLogAction {
         let {commitId, filePath} = msg;
         let options = [commitId, filePath];
         let result = await utils.gitShowCommitFileChange(this.projectPath, options);
+
+        result.data = (result.data).split('\n')
+        if ((result.data).length) {
+            let tmp = [...result.data];
+            tmp = tmp.splice(11);
+            let tmp2 = [];
+            for (let s of tmp) {
+                tmp2.push(s.replace(new RegExp(" ", "gm"), '&nbsp;'));
+            }
+            result.data = tmp2;
+        };
         this.webviewPanel.webView.postMessage({
             command: "showCommitFileChange",
             result: result,

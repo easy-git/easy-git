@@ -6,8 +6,12 @@ const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'boo
 
 /**
  * @description generationhtml
+ * @param {Object} userConfig
+ * @param {Object} uiData
+ * @param {Object} gitData
+ * @param {String} renderType = [customEditor|webView]
  */
-function generateLogHtml(userConfig, uiData, gitData) {
+function generateLogHtml(userConfig, uiData, gitData, renderType) {
     // 是否启用开发者工具
     let {DisableDevTools} = userConfig;
 
@@ -209,6 +213,9 @@ function generateLogHtml(userConfig, uiData, gitData) {
                     white-space: nowrap;
                     text-overflow:ellipsis;
                 }
+                .flex-average {
+                    flex: 1 1 50% !important;
+                }
                 .change-files .num {
                     width: 28px;
                     display:inline-block;
@@ -218,6 +225,22 @@ function generateLogHtml(userConfig, uiData, gitData) {
                 }
                 .change-files ul > li {
                     list-style: none;
+                }
+                .commit-file-details p {
+                    margin-bottom: 0 !important;
+                }
+                @media screen and (max-width: 992px) {
+                    .commit-file-details {
+                        display: none !important;
+                    }
+                }
+                .commit-file-details .line-add {
+                    color: #2A6745;
+                    background-color: #E3FDEF;
+                }
+                .commit-file-details .line-sub {
+                    color: #C12A22;
+                    background-color: #FCEBE6;
                 }
                 .no-result {
                     color: ${fontColor} !important;
@@ -329,9 +352,13 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             <div class="col">
                                 <h6 class="project-info">
                                     <span>{{ projectName }} / </span>
-                                    <span title="显示当前分支log" class="branch" :class="{ active: searchType == 'branch'}" @click="switchSearchType('branch');">{{ currentBranch }} </span>
+                                    <span title="显示当前分支log" class="branch"
+                                        :class="{ active: searchType == 'branch'}"
+                                        @click="switchSearchType('branch');">{{ currentBranch }} </span>
                                     <span v-if="branchNum > 1"> | </span>
-                                    <span title="显示所有分支log" class="branch" :class="{ active: searchType == 'all'}" @click="switchSearchType('all');" v-if="branchNum > 1">所有分支</span>
+                                    <span title="显示所有分支log" class="branch"
+                                        :class="{ active: searchType == 'all'}"
+                                        @click="switchSearchType('all');" v-if="branchNum > 1">所有分支</span>
                                 </h6>
                                 <div class="d-flex">
                                     <div class="flex-grow-1">
@@ -429,30 +456,46 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         {{ logDetails.diff.insertions }} insertions(+),
                         {{ logDetails.diff.deletions }} deletions(-)
                     </p>
-                    <div class="change-files mt-3">
-                        <ul class="pl-0">
-                            <li v-for="(v5,i5) in logDetailsFiles" :key="i5">
-                                <div class="d-inline-block" v-if="!v5.binary" style="width: 115px !important;">
-                                    <span class="num">{{ v5.changes }}</span>
-                                    <span class="fgreen">{{ v5.add_str }}</span>
-                                    <span class="fred">{{ v5.del_str }}</span>
-                                </div>
-                                <div class="d-inline-block binary" v-else-if="v5.binary" style="width: 115px !important;">
-                                    <span>二进制文件</span>
-                                </div>
-                                <div class="d-inline htext pl-3">
-                                    <span class="fname" :title="'insertions:'+ v5.insertions + ';' + 'deletions:'+ v5.deletions" @click="showCommitFileChange(v5.file)">
-                                        {{ v5.file }}
-                                    </span>
-                                    <span @click="openFile(v5.file);">${OpenFileIconSvg}</span>
-                                </div>
-                            </li>
-                        </ul>
+                    <div class="mt-3">
+                        <div class="d-flex flex-row">
+                            <div class="flex-average change-files">
+                                <ul class="pl-0">
+                                    <li v-for="(v5,i5) in logDetailsFiles" :key="i5">
+                                        <div class="d-inline-block" v-if="!v5.binary" style="width: 110px !important;">
+                                            <!-- <span class="num">{{ v5.changes }}</span> -->
+                                            <span class="fgreen">{{ v5.add_str }}</span>
+                                            <span class="fred">{{ v5.del_str }}</span>
+                                        </div>
+                                        <div class="d-inline-block binary" v-else-if="v5.binary" style="width: 115px !important;">
+                                            <span>二进制文件</span>
+                                        </div>
+                                        <div class="d-inline htext pl-3">
+                                            <span class="fname"
+                                                :title="'点击查看文件变化，' +'insertions:'+ v5.insertions + ';' + 'deletions:'+ v5.deletions"
+                                                @click="showCommitFileChange(v5.file)">
+                                                {{ v5.file }}
+                                            </span>
+                                            <span @click="openFile(v5.file);" title="在编辑器打开文件">${OpenFileIconSvg}</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                             </div>
+                             <div class="flex-average change-files commit-file-details" v-if="CommitFileChangeDetails.length">
+                                <p
+                                    v-for="(c,i) in CommitFileChangeDetails" :key="i"
+                                    :class="{ 'line-add': c.substr(0,1) == '+', 'line-sub': c.substr(0,1) == '-'}"
+                                    v-html="c">
+                                </p>
+                             </div>
+                        </div>
                     </div>
                 </div>
 
                 <div v-show="visibleRightMenu">
-                    <ul v-show="visibleRightMenu" :style="{left:left+'px',top:top+'px'}" class="contextmenu" @mouseleave="visibleRightMenu = false">
+                    <ul v-show="visibleRightMenu"
+                        :style="{left:left+'px',top:top+'px'}"
+                        class="contextmenu"
+                        @mouseleave="visibleRightMenu = false">
                         <li @click="viewDetails(rightClickItem)">查看详情</li>
                         <div class="dropdown-divider"></div>
                         <li @click="refresh()">刷新</li>
@@ -463,7 +506,9 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         <li @click="createTag(rightClickItem)" :class="{ 'click-disable': searchType == 'all' }" title="git tag">创建标签</li>
                         <div class="dropdown-divider"></div>
                         <li @click="resetCommit(rightClickItem)" :class="{ 'click-disable': searchType == 'all' }">将 {{currentBranch}} 重置到这次提交</li>
-                        <li @click="cherryPick(rightClickItem)" title="cherry pick" :class="{ 'click-disable': searchType != 'all' }">将当前提交应用于 {{currentBranch}} 分支</li>
+                        <li @click="cherryPick(rightClickItem)" title="cherry pick" :class="{ 'click-disable': searchType != 'all' }">
+                            将当前提交应用于 {{currentBranch}} 分支
+                        </li>
                         <div class="dropdown-divider"></div>
                         <li @click="copyLogMsg(rightClickItem, 'msg')">复制</li>
                         <li @click="copyLogMsg(rightClickItem, 'commit_id')">复制commit id到剪贴板</li>
@@ -490,7 +535,8 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         logDetails: {},
                         logDetailsFiles: [],
                         loading: false,
-                        CommitFileChangeDetails: {}
+                        CommitFileChangeDetails: {},
+                        renderType: 'webView'
                     },
                     watch: {
                         visibleRightMenu(value) {
@@ -521,6 +567,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                         this.branchNum = ${branchNum};
                         this.CommitTotal = ${CommitTotal};
                         this.logNum = (this.gitLogInfoList).length;
+                        this.renderType = '${renderType}'
                     },
                     mounted() {
                         this.loading = false;
@@ -653,6 +700,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             document.body.style.overflow = 'auto';
                         },
                         viewDetails(data) {
+                            this.CommitFileChangeDetails = [];
                             this.isShowViewDetails = true;
                             this.logDetails = data;
                             let files = data.diff.files;
@@ -743,7 +791,7 @@ function generateLogHtml(userConfig, uiData, gitData) {
                             hbuilderx.onDidReceiveMessage((msg) => {
                                 this.CommitFileChangeDetails = {};
                                 if (msg.command != 'showCommitFileChange') {return};
-                                this.CommitFileChangeDetails = msg.result;
+                                this.CommitFileChangeDetails = msg.result.data;
                             });
                         }
                     }
