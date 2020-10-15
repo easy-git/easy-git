@@ -7,6 +7,7 @@ const {GitLogAction} = require('./action.js');
 let HistoryProjectPath;
 let HistoryProjectName;
 
+let isSelectedFile;
 let isCustomFirstOpen = false;
 let GitLogCustomEditorStatus;
 
@@ -42,13 +43,22 @@ class CatCustomEditorProvider extends CustomEditorProvider {
     }
 
     resolveCustomEditor(document, webViewPanel) {
-        console.error('----', webViewPanel);
         GitLogCustomEditorStatus = true;
         GitLogCustomWebViewPanal = webViewPanel;
 
         // First Open: render html to customEditor
         if (isCustomFirstOpen == false) {
-            GitLogCustomEditorRenderHtml({},{});
+            let isHtml = webViewPanel.webView._html;
+            // 使用setTimeout主要是解决首次激活customEditor，重复渲染的问题
+            setTimeout(function() {
+                if (isSelectedFile == undefined) {
+                    setTimeout(function() {
+                        if (isHtml == '') {
+                            GitLogCustomEditorRenderHtml({},{});
+                        }
+                    }, 1000);
+                };
+            }, 3000);
         };
 
         // close customEditor
@@ -80,6 +90,7 @@ function history(gitData) {
 
 function GitLogCustomEditorRenderHtml(gitData, userConfig) {
     let {projectPath, projectName, selectedFile, currentBranch} = gitData;
+    isSelectedFile = selectedFile;
 
     if (JSON.stringify(gitData) == '{}' && isCustomFirstOpen == false) {
         isCustomFirstOpen = true;

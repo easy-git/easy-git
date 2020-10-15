@@ -1191,7 +1191,14 @@ async function gitLog(workingDir, searchType, filterCondition) {
             "success": true,
             "errorMsg": '',
             "data": []
-        }
+        };
+
+        if (workingDir == undefined || workingDir == '') {
+            result.errorMsg = '无法获取项目路径，git log执行失败。请关闭当前Git日志视图后重试。';
+            result.success = false;
+            return result;
+        };
+
         let status = await git(workingDir).init()
             .log(filter)
             .then((res) => {
