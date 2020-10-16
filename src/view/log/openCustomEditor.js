@@ -3,7 +3,7 @@ const path = require('path');
 
 const {GitLogAction} = require('./action.js');
 
-// ���hx�������Ѵ򿪵��Զ���༭���հ׵�����
+// 解决hx启动后，已打开的自定义编辑器空白的问题
 let HistoryProjectPath;
 let HistoryProjectName;
 
@@ -49,16 +49,17 @@ class CatCustomEditorProvider extends CustomEditorProvider {
         // First Open: render html to customEditor
         if (isCustomFirstOpen == false) {
             let isHtml = webViewPanel.webView._html;
-            // ʹ��setTimeout��Ҫ�ǽ���״μ���customEditor���ظ���Ⱦ������
+            // 使用setTimeout主要是解决首次激活customEditor，重复渲染的问题
             setTimeout(function() {
+                hx.window.setStatusBarMessage('EasyGit: 正在加载Git日志，首次加载较慢，请耐心等待......', 5000, 'info');
                 if (isSelectedFile == undefined) {
                     setTimeout(function() {
                         if (isHtml == '') {
                             GitLogCustomEditorRenderHtml({},{});
                         }
-                    }, 1000);
+                    }, 2000);
                 };
-            }, 3000);
+            }, 2000);
         };
 
         // close customEditor
@@ -70,7 +71,7 @@ class CatCustomEditorProvider extends CustomEditorProvider {
 
 /**
  * @param {Object} gitData
- * @description ���hx�������Ѵ򿪵��Զ���༭���հ׵�����
+ * @description 解决hx启动后，已打开的自定义编辑器空白的问题
  */
 function history(gitData) {
     const {projectPath, projectName} = gitData;
@@ -108,7 +109,7 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
 
     let Log = new GitLogAction(gitData, userConfig, GitLogCustomWebViewPanal, 'customEditor');
 
-    // Ĭ���ڵ�ǰ��֧������������ȫ��ʱ����ֵΪall
+    // 默认在当前分支搜索，当搜索全部时，此值为all
     let searchType = 'branch';
 
     try{
@@ -116,7 +117,7 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
         projectPath = path.normalize(projectPath);
     }catch(e){}
 
-    // ѡ���ļ���Ŀ¼����鿴���ļ���log��¼
+    // 选中文件或目录，则查看此文件的log记录
     if (selectedFile != '' && selectedFile != undefined) {
         let sfile = selectedFile.replace(path.join(projectPath, path.sep), '');
         if (selectedFile != projectPath) {
