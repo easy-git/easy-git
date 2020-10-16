@@ -196,6 +196,9 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     line-heigh: 1.7rem;
                     margin-bottom: 0;
                 }
+                .view-log-details .close {
+                    font-size: 1.5rem !important;
+                }
                 .change-files {
                     height: 270px;
                     overflow-y: auto;
@@ -231,6 +234,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                 }
                 .commit-file-details p {
                     margin-bottom: 0 !important;
+                    font-size: 14px;
                 }
                 @media screen and (max-width: 992px) {
                     .commit-file-details {
