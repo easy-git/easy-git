@@ -7,6 +7,7 @@ const file = require('./common/file.js');
 const utils = require('./common/utils.js');
 const count = require('./common/count.js');
 const cmp_hx_version = require('./common/cmp.js');
+const upgrade = require('./common/upgrade.js');
 
 const MainView = require('./view/main.js');
 const GitBranchView = require('./view/branch/branch.js');
@@ -300,11 +301,14 @@ async function main(viewType, param, webviewPanel, context) {
         hx.commands.executeCommand('workbench.view.explorer');
     };
 
-    // count
     try{
+        // count data
         if (isShareUsageData == undefined && !isShareUsageData) {
             count(viewType).catch( error=> {});
         };
+
+        // check update
+        upgrade.checkUpdate('auto');
     }catch(e){};
 
     // 从菜单【视图】【显示扩展视图】进入

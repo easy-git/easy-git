@@ -1,0 +1,90 @@
+const hx = require('hbuilderx');
+
+var isPopUpWindow = false
+
+
+function isJSON(str) {
+    if (typeof str == 'string') {
+        try {
+            var obj = JSON.parse(str);
+            if (typeof obj == 'object' && obj) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (e) {
+            return false;
+        }
+    }
+};
+
+
+/**
+ * @description show box
+ * @更新弹窗，点击【以后再说】，则本周内不再自动弹窗提示
+ */
+function showUpgradeBox() {
+    let msg = '插件【easry-git】 发布了新版本！快去HBuilderX插件市场更新吧！\n';
+    let btn = ['立即更新','以后再说'];
+
+    hx.window.showInformationMessage(msg, btn).then(result => {
+        if (result === '立即更新') {
+            const url = 'https://ext.dcloud.net.cn/plugin?name=easy-git';
+            hx.env.openExternal(url);
+        } else {
+            let config = hx.workspace.getConfiguration();
+            config.update('EasyGit.updatePrompt', false);
+        }
+    });
+    isPopUpWindow = true;
+};
+
+
+/**
+ * @description check plugin update
+ * @param {String} mode (manual|auto) 手动检查、自动检查
+ */
+async function checkUpdate(mode) {
+    if (isPopUpWindow && mode == 'auto') {
+        return;
+    };
+
+    // get week
+    let week = new Date().getDay();
+    let config = await hx.workspace.getConfiguration();
+    let updatePrompt = config.get('EasyGit.updatePrompt');
+    if (!updatePrompt && week !== 1 && mode == 'auto') {
+        return;
+    };
+
+    let http = require('http');
+    const versionUrl = 'http://update.dcloud.net.cn/hbuilderx/alpha/win32/plugins/index.json';
+    http.get(versionUrl, (res) => {
+        let data = "";
+        res.on("data", (chunk) => {
+            data += chunk;
+        });
+        res.on("end", () => {
+            try{
+                const { version } = require('../../package.json');
+                if (isJSON(data)) {
+                    let allPlugins = JSON.parse(data);
+                    let {plugins} = allPlugins;
+                    for (let s of plugins) {
+                        if (s.name == 'easy-git') {
+                            if (s.version != version) {
+                                showUpgradeBox();
+                            }
+                        }
+                    };
+                }
+            }catch(e){};
+        });
+        res.on("error", (e) => {
+            console.error('获取更新文件错误!', e);
+            isPopUpWindow = true;
+        });
+    });
+};
+
+module.exports = {checkUpdate};

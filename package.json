@@ -29,6 +29,7 @@
         "onCommand:EasyGit.setEmail",
         "onCommand:EasyGit.setGitingore",
         "onCommand:EasyGit.setGitattributes",
+        "onCommand:EasyGit.checkUpdate",
         "onView:EasyGitSourceCodeView",
         "onView:EasyGitCommonView",
         "onCustomEditor:EasyGit - 日志"
@@ -89,6 +90,10 @@
             }
         ],
         "commands": [
+            {
+                "command": "EasyGit.checkUpdate",
+                "title": "easy-git: 检查更新"
+            },
             {
                 "command": "EasyGit.main",
                 "title": "easy-git: 源代码管理"
@@ -223,6 +228,11 @@
                     "group": "easygit@2"
                 },
                 {
+                    "group": "easygit@3"
+                },
+                {
+                    "command": "EasyGit.checkUpdate",
+                    "title": "检查更新",
                     "group": "easygit@3"
                 },
                 {

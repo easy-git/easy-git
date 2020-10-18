@@ -6,6 +6,8 @@ const file = require('./common/file.js');
 const git = require('./git.js');
 const cmp_hx_version = require('./common/cmp.js');
 
+const upgrade = require('./common/upgrade.js');
+
 // hbuilderx version
 let hxVersion = hx.env.appVersion;
 hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
@@ -133,6 +135,11 @@ function activate(context) {
     // git Stash 清除所有储藏
     let stashClear = hx.commands.registerCommand('EasyGit.stashClear', (param)=> {
         git.action(param, 'stashClear')
+    });
+
+    // check update
+    let checkUpdate = hx.commands.registerCommand('EasyGit.checkUpdate', ()=> {
+        upgrade.checkUpdate('manual');
     })
 
 };
