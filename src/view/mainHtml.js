@@ -279,9 +279,9 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         <div class="col-auto p-0">
                             <span class="top" @click="refresh();" title="刷新">${iconRefresh}</span>
                             <span class="top" @click="gitCommit();" title="commit">${CheckMarkIcon}</span>
-                            <span class="top" @click="gitLog();">${HistoryIcon}</span>
+                            <span class="top" @click="gitLog();" title="查看日志">${HistoryIcon}</span>
                             <span class="top" @click.stop="clickMenu();">
-                                <i>${MenuIcon}</i>
+                                <i title="更多操作">${MenuIcon}</i>
                                 <div id="menu" :class="[ isShowMenu ? 'menu' : 'd-none' ]" @mouseleave="isShowMenu=false">
                                     <ul>
                                         <li title="git pull" @click="gitPull('');">拉取</li>
