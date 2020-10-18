@@ -521,7 +521,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         <li @click="createTag(rightClickItem)" :class="{ 'click-disable': searchType == 'all' }" title="git tag">创建标签</li>
                         <div class="dropdown-divider"></div>
                         <li @click="resetCommit(rightClickItem)" :class="{ 'click-disable': searchType == 'all' }">将 {{currentBranch}} 重置到这次提交</li>
-                        <li @click="cherryPick(rightClickItem)" title="cherry pick" :class="{ 'click-disable': searchType != 'all' }">
+                        <li @click="cherryPick(rightClickItem)" title="cherry pick，如置灰无法点击，请点击顶部：所有分支，查看所有log" :class="{ 'click-disable': searchType != 'all' }">
                             将当前提交应用于 {{currentBranch}} 分支
                         </li>
                         <div class="dropdown-divider"></div>
