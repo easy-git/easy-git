@@ -32,8 +32,11 @@ function showUpgradeBox() {
             const url = 'https://ext.dcloud.net.cn/plugin?name=easy-git';
             hx.env.openExternal(url);
         } else {
+            let timestamp = Math.round(new Date() / 1000) + 604800;
             let config = hx.workspace.getConfiguration();
-            config.update('EasyGit.updatePrompt', false);
+            config.update('EasyGit.updatePrompt', false).then( () => {
+                config.update('EasyGit.updatePromptTime', timestamp);
+            });
         }
     });
     isPopUpWindow = true;
@@ -50,11 +53,16 @@ async function checkUpdate(mode) {
     };
 
     // get week
-    let week = new Date().getDay();
+    let currentTimestamp = Math.round(new Date() / 1000);
     let config = await hx.workspace.getConfiguration();
     let updatePrompt = config.get('EasyGit.updatePrompt');
-    if (!updatePrompt && week !== 1 && mode == 'auto') {
-        return;
+    let updatePromptTime = config.get('EasyGit.updatePromptTime');
+    if (updatePromptTime && mode == 'auto') {
+        try{
+            if (updatePromptTime > currentTimestamp) {
+                return;
+            }
+        }catch(e){};
     };
 
     let http = require('http');
