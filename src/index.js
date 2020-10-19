@@ -303,10 +303,8 @@ async function main(viewType, param, webviewPanel, context) {
 
     try{
         // count data
-        if (isShareUsageData == undefined && !isShareUsageData) {
-            count(viewType).catch( error=> {});
-        };
-
+        count(viewType).catch( error=> {});
+        
         // check update
         upgrade.checkUpdate('auto');
     }catch(e){};
