@@ -133,6 +133,12 @@ easy-git, 支持通过快捷键打开git视图。
     "key": "",
     "command": "EasyGit.stashClear"
 }
+
+// Git Blame 显示git文件当前行最后一次修改信息
+{
+    "key": "",
+    "command": "EasyGit.gitBlameForLineChange"
+}
 ```
 
 ## 数据统计
