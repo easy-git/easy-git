@@ -140,7 +140,12 @@ function activate(context) {
     // check update
     let checkUpdate = hx.commands.registerCommand('EasyGit.checkUpdate', ()=> {
         upgrade.checkUpdate('manual');
-    })
+    });
+
+    // 显示git文件当前行最后一次修改信息
+    let ForLineChange = hx.commands.registerCommand('EasyGit.gitBlameForLineChange', (param)=> {
+        git.action(param, 'BlameForLineChange')
+    });
 
 };
 

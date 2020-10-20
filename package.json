@@ -30,6 +30,7 @@
         "onCommand:EasyGit.setGitingore",
         "onCommand:EasyGit.setGitattributes",
         "onCommand:EasyGit.checkUpdate",
+        "onCommand:EasyGit.gitBlameForLineChange",
         "onView:EasyGitSourceCodeView",
         "onView:EasyGitCommonView",
         "onCustomEditor:EasyGit - 日志"
@@ -139,6 +140,10 @@
                 "title": "easy-git: stashClear - 删除所有储藏..."
             },
             {
+                "command": "EasyGit.gitBlameForLineChange",
+                "title": "easy-git: 显示当前行最后一次修改信息"
+            },
+            {
                 "command": "EasyGit.about",
                 "title": "关于easy-git"
             },
@@ -182,6 +187,11 @@
                 {
                     "command": "EasyGit.log",
                     "title": "easy-git: 查看日志",
+                    "group": "z_commands"
+                },
+                {
+                    "command": "EasyGit.gitBlameForLineChange",
+                    "title": "easy-git: 显示当前行最后一次修改信息",
                     "group": "z_commands"
                 },
                 {
