@@ -35,7 +35,7 @@ function showUpgradeBox() {
             let timestamp = Math.round(new Date() / 1000) + 604800;
             let config = hx.workspace.getConfiguration();
             config.update('EasyGit.updatePrompt', false).then( () => {
-                config.update('EasyGit.updatePromptTime', timestamp);
+                config.update('EasyGit.updatePromptTime', `${timestamp}`);
             });
         }
     });
