@@ -48,7 +48,8 @@ async function openGitLog(userConfig, gitData, webviewPanel) {
     } else {
         openLogWebView(webviewPanel, userConfig, gitData);
         hx.window.showView({
-           containerid: "EasyGitCommonView"
+            viewid: "EasyGitCommonView",
+            containerid: "EasyGitCommonView"
         });
     };
 };
@@ -93,7 +94,8 @@ async function FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExpl
 
     let containerid = viewType == 'log' ? 'EasyGitCommonView': 'EasyGitSourceCodeView';
     hx.window.showView({
-       containerid: containerid
+        viewid: containerid,
+        containerid: containerid
     });
 };
 
@@ -150,10 +152,15 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
     });
 
     if (viewType == 'main' && isGitProject) {
-        // Git文件视图：检查git项目是否包含node_modules
-        utils.checkNodeModulesFileList(projectPath, projectName, gitInfo);
         // 检查是否设置了user.name和user.email
-        utils.checkGitUsernameEmail(projectPath, projectName, userConfig)
+        setTimeout(function() {
+            utils.checkGitUsernameEmail(projectPath, projectName, userConfig);
+        }, 5000);
+
+        // Git文件视图：检查git项目是否包含node_modules
+        setTimeout(function() {
+            utils.checkNodeModulesFileList(projectPath, projectName, gitInfo);
+        }, 10000);
     };
 
     // 设置项目路径(暂时无用)
@@ -184,7 +191,8 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
             initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
         };
         hx.window.showView({
-           containerid: "EasyGitSourceCodeView"
+            viewid: "EasyGitSourceCodeView",
+            containerid: "EasyGitSourceCodeView"
         });
         return;
     };
@@ -197,7 +205,8 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
             initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
         };
         hx.window.showView({
-           containerid: "EasyGitSourceCodeView"
+            viewid: "EasyGitSourceCodeView",
+            containerid: "EasyGitSourceCodeView"
         });
         return;
     };
@@ -304,7 +313,7 @@ async function main(viewType, param, webviewPanel, context) {
     try{
         // count data
         count(viewType).catch( error=> {});
-        
+
         // check update
         upgrade.checkUpdate('auto');
     }catch(e){};
@@ -319,7 +328,8 @@ async function main(viewType, param, webviewPanel, context) {
     if (viewType == 'clone') {
         cloneView.show(webviewPanel, userConfig);
         hx.window.showView({
-           containerid: "EasyGitSourceCodeView"
+            viewid: "EasyGitSourceCodeView",
+            containerid: "EasyGitSourceCodeView"
         });
         return;
     };
