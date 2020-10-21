@@ -144,7 +144,16 @@ function activate(context) {
 
     // 显示git文件当前行最后一次修改信息
     let ForLineChange = hx.commands.registerCommand('EasyGit.gitBlameForLineChange', (param)=> {
-        git.action(param, 'BlameForLineChange')
+        const cmp3 = cmp_hx_version(hxVersion, '2.9.5');
+        if (cmp3 <= 0) {
+            git.action(param, 'BlameForLineChange')
+        } else {
+            hx.window.showErrorMessage('Git: 此功能适用于HBuilderX 2.9.5+版本。', ['升级HBuilderX', '关闭']).then( (res) => {
+                if (res == '升级HBuilderX') {
+                    hx.commands.executeCommand('update.checkForUpdate');
+                }
+            })
+        }
     });
 
 };
