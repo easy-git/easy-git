@@ -41,6 +41,8 @@ function getUIData() {
     let MenuIcon = icon.getMenuIcon(fontColor);
     let HistoryIcon = icon.getHistoryIcon(fontColor);
     let uploadIcon = icon.getUploadIcon(fontColor);
+    let ChevronDownIcon = icon.getChevronDown(fontColor);
+    let ChevronRightIcon = icon.getChevronRight(fontColor);
 
     let iconData = {
         CancelIconSvg,
@@ -61,7 +63,9 @@ function getUIData() {
         TagIcon,
         MenuIcon,
         HistoryIcon,
-        uploadIcon
+        uploadIcon,
+        ChevronRightIcon,
+        ChevronDownIcon
     };
 
     let uiData = Object.assign(iconData,colorData);

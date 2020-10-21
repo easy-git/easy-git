@@ -40,13 +40,15 @@ function getWebviewContent(userConfig, uiData, gitData) {
         checkoutIconSvg,
         MenuIcon,
         HistoryIcon,
-        uploadIcon
+        uploadIcon,
+        ChevronDownIcon,
+        ChevronRightIcon
     } = uiData;
 
     let {
         projectPath,
         projectName,
-        gitStatusResult,
+        FileResult,
         currentBranch,
         tracking,
         ahead,
@@ -54,10 +56,10 @@ function getWebviewContent(userConfig, uiData, gitData) {
         originurl
     } = gitData;
 
+    let gitFileResult = JSON.stringify(FileResult);
     let originurlBoolean = originurl != undefined ? true : false;
     ahead = ahead == 0 ? '' : ahead;
     behind = behind == 0 ? '': behind;
-    gitStatusResult = gitStatusResult;
 
     let ctrl = 'ctrl';
     if (osName == 'darwin') {
@@ -155,13 +157,17 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 color: ${fontColor};
             }
             .add-title {
-                font-size: 15px;
+                font-size: 14px;
                 padding-left:18px;
                 line-height: 2rem;
                 margin-bottom: 3px;
             }
             .add-title:hover .stash-all{
                 display: inline;
+            }
+            .add-title > .a-icon {
+                margin-left: -5px;
+                margin-right: 5px;
             }
             .stash-all {
                 display: none;
@@ -257,14 +263,14 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 border-top: 1px solid ${lineColor};
             }
             .gtag {
-                border: 1px solid ${lineColor};
+                border: 1px solid ${liHoverBackground};
                 border-radius: 5px;
-                margin: 0 8px;
-                padding: 1px 7px;
+                margin: 0 6px;
+                padding: 1px 6px;
                 font-size: 0.6rem;
                 top: -1px;
                 position: relative;
-                color: ${lineColor};
+                color: ${fontColor};
             }
         </style>
     </head>
@@ -323,21 +329,50 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         </div>
                     </div>
                 </div>
-                <div class="row mt-3" id="git_stash" style="visibility: hidden;" :style="{visibility: 'visible'}">
-                    <div class="col px-0" v-show="gitStashFileList.length">
-                        <p class="add-title" id="git_add_title">暂存的更改:
-                            <span class="gtag">{{ gitStashFileListLength }}</span>
+                <div class="row mt-3" id="git_add" style="visibility: hidden;" :style="{visibility: 'visible'}">
+                    <div class="col px-0">
+                        <p class="add-title" id="git_add_title">
+                            <span class="a-icon" v-html="ConflictedIcon" @click="isShowConflictedList();"></span>合并更改:
+                            <span class="gtag">{{ gitConflictedFileListLength }}</span>
+                        </p>
+                        <ul style="list-style-type:none;padding-left:0;" id="git_add_data" v-show="isShowConflicted">
+                            <li class="d-flex px-3 lif gitfile" v-for="(v1,i1) in gitConflictedFileList" :key="i1"
+                                :id="'conflicted_'+i1"
+                                @mouseover="hoverConflictedFileID = 'conflicted_'+i1"
+                                @mouseleave="hoverConflictedFileID = false">
+                                <div class="flex-grow-1 text-hidden">
+                                    <span @click="openFile(v1.path);">{{ v1.path }}</span>
+                                </div>
+                                <div class="d-inline float-right" :id="'change_'+i1">
+                                    <div class="d-inline"  v-if="hoverConflictedFileID == 'change_'+i1">
+                                        <span title="打开文件" @click="openFile(v.path);">${OpenFileIconSvg}</span>
+                                        <span title="加入暂存 (git add)" @click="gitAdd(v1.path);">${AddIconSvg}</span>
+                                    </div>
+                                    <div class="d-inline ml-1 pt-2">
+                                        <span class="file-label" class="fred"> {{ v1.tag }} </span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row mt-0" id="git_stash" style="visibility: hidden;" :style="{visibility: 'visible'}">
+                    <div class="col px-0" v-show="gitStagedFileList.length">
+                        <p class="add-title" id="git_add_title">
+                            <span class="a-icon" v-html="StagedIcon" @click="isShowStagedList();"></span>暂存的更改:
+                            <span class="gtag">{{ gitStagedFileListLength }}</span>
                             <span title="取消暂存所有更改" class="stash-all" @click="cancelAllStash('all');">
                                 ${CancelIconSvg}
                             </span>
                         </p>
-                        <ul style="list-style-type:none;padding-left:0;" id="git_stash_list">
-                            <li class="d-flex px-3 lif gitfile" v-for="(vv,ii) in gitStashFileList" :key="ii"
+                        <ul style="list-style-type:none;padding-left:0;" id="git_stash_list" v-if="isShowStaged">
+                            <li class="d-flex px-3 lif gitfile"
+                                v-for="(vv,ii) in gitStagedFileList" :key="ii"
                                 :id="'stash'+ii"
                                 @mouseover="hoverStashFileID = 'stash_'+ii"
                                 @mouseleave="hoverStashFileID = false">
                                 <div class="flex-grow-1 text-hidden">
-                                    <span @click="openFile(vv.path);">{{ vv.path }}</span>
+                                    <span :class="[vv.tag == 'D' ? 'line-through' : '']" @click="openFile(vv.path);">{{ vv.path }}</span>
                                 </div>
                                 <div class="d-inline float-right">
                                     <div class="d-inline" v-if="hoverStashFileID == 'stash_'+ii">
@@ -349,7 +384,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                         </span>
                                     </div>
                                     <div class="d-inline ml-1 pt-2">
-                                        <span class="file-label" :class="[vv.tag == 'A' ? 'fgreen':'f111']">{{ vv.tag }}</span>
+                                        <span class="file-label" :class="[vv.tag == 'D' ? 'fred' : vv.tag == 'U' ? 'fgreen':'f111']">{{ vv.tag }}</span>
                                     </div>
                                 </div>
                             </li>
@@ -359,13 +394,13 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 <div class="row mt-0" id="git_add" style="visibility: hidden;" :style="{visibility: 'visible'}">
                     <div class="col px-0" v-show="gitChangeFileList.length">
                         <p class="add-title" id="git_add_title">
-                            更改:
+                            <span class="a-icon" v-html="ChangeIcon" @click="isShowChangeList();"></span>更改:
                             <span class="gtag">{{ gitChangeFileListLength }}</span>
                             <span title="暂存所有文件" class="stash-all" @click="gitAdd('all');">
                                 ${AddAllIcon}
                             </span>
                         </p>
-                        <ul style="list-style-type:none;padding-left:0;" id="git_add_data">
+                        <ul style="list-style-type:none;padding-left:0;" id="git_add_data" v-if="isShowChange">
                             <li class="d-flex px-3 lif gitfile" v-for="(v,i) in gitChangeFileList" :key="i"
                                 :id="'change_'+i"
                                 @mouseover="hoverChangeFileID = 'change_'+i"
@@ -426,16 +461,25 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     originurl: "",
                     originurlBoolean: "",
                     commitMessage: "",
-                    GitStatusResult: {},
+                    gitFileResult: {},
                     codeComment: '',
                     isShowMenu: false,
                     bodyWidth: 0,
+                    hoverConflictedFileID: false,
                     hoverChangeFileID: false,
                     hoverStashFileID: false,
+                    ConflictedIcon: '',
+                    isShowConflicted: true,
+                    gitConflictedFileList: [],
+                    gitConflictedFileListLength:0,
+                    ChangeIcon: '',
+                    isShowChange: true,
                     gitChangeFileList: [],
-                    gitStashFileList: [],
                     gitChangeFileListLength: 0,
-                    gitStashFileListLength: 0
+                    StagedIcon: '',
+                    isShowStaged: true,
+                    gitStagedFileList: [],
+                    gitStagedFileListLength: 0
                 },
                 computed: {
                     GitAssociationRemote() {
@@ -447,41 +491,56 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     if (ctrl == 'meta') {
                         ctrl = '⌘';
                     };
-                    this.commitMessage = '消息（' + ctrl + '+Enter 在"${currentBranch}"提交）'
-                    this.GitStatusResult = ${gitStatusResult};
+                    this.commitMessage = '消息（' + ctrl + '+Enter 提交）'
+                    this.gitFileResult = ${gitFileResult};
                     this.projectName = '${projectName}';
                     this.tracking = '${tracking}';
                     this.originurl = '${originurl}';
                     this.originurlBoolean = ${originurlBoolean};
                     this.currentBranch = '${currentBranch}';
+                    this.ConflictedIcon = '${ChevronDownIcon}';
+                    this.StagedIcon = '${ChevronDownIcon}';
+                    this.ChangeIcon = '${ChevronDownIcon}';
                 },
                 mounted() {
-                    this.getGitChangeFileList();
-                    this.getGitStashFileList();
+                    this.getGitFileList();
                 },
                 methods: {
-                    getGitChangeFileList() {
-                        let staged = this.GitStatusResult.staged;
-                        let modified = this.GitStatusResult.modified;
-                        let deleted = this.GitStatusResult.deleted;
-                        let not_added = this.GitStatusResult.not_added;
-                        let renamed = this.GitStatusResult.renamed;
-
-                        let tm = modified.filter((val)=>!new Set(staged).has(val));
-                        let m = tm.map( i => ({'path': i, 'status': 'modified', 'tag': 'M'}) );
-                        let d = deleted.map( i => ( {'path': i, 'status': 'deleted', 'tag': 'D'}) );
-                        let na = not_added.map( i => ({'path': i, 'status': 'not_added', 'tag': 'U'}) );
-                        let r = renamed.map( i => ({'path': i, 'status': 'renamed', 'tag': 'R'}) );
-                        this.gitChangeFileList = [...m,...d,...na,...r];
-                        this.gitChangeFileListLength = (this.gitChangeFileList).length;
+                    isShowConflictedList() {
+                        if (this.ConflictedIcon == '${ChevronDownIcon}') {
+                            this.isShowConflicted = false;
+                            this.ConflictedIcon = '${ChevronRightIcon}';
+                        } else {
+                            this.isShowConflicted = true;
+                            this.ConflictedIcon = '${ChevronDownIcon}';
+                        }
                     },
-                    getGitStashFileList() {
-                        let staged = this.GitStatusResult.staged;
-                        let created = this.GitStatusResult.created;
-                        let m1 = staged.map( i => ({'path': i, 'status': 'staged', 'tag': 'M'}) );
-                        let c1 = created.map( i => ( {'path': i, 'status': 'created', 'tag': 'A'}) );
-                        this.gitStashFileList = [...m1,...c1];
-                        this.gitStashFileListLength = (this.gitStashFileList).length;
+                    isShowChangeList() {
+                        if (this.ChangeIcon == '${ChevronDownIcon}') {
+                            this.isShowChange = false;
+                            this.ChangeIcon = '${ChevronRightIcon}';
+                        } else {
+                            this.isShowChange = true;
+                            this.ChangeIcon = '${ChevronDownIcon}';
+                        }
+                    },
+                    isShowStagedList() {
+                        if (this.StagedIcon == '${ChevronDownIcon}') {
+                            this.isShowStaged = false;
+                            this.StagedIcon = '${ChevronRightIcon}';
+                        } else {
+                            this.isShowStaged = true;
+                            this.StagedIcon = '${ChevronDownIcon}';
+                        }
+                    },
+                    getGitFileList() {
+                        this.gitConflictedFileList = this.gitFileResult.conflicted;
+                        this.gitStagedFileList = this.gitFileResult.staged;
+                        this.gitChangeFileList = this.gitFileResult.not_add;
+
+                        this.gitStagedFileListLength = (this.gitStagedFileList).length;
+                        this.gitChangeFileListLength = (this.gitChangeFileList).length;
+                        this.gitConflictedFileListLength = (this.gitConflictedFileList).length;
                     },
                     clickMenu() {
                         this.bodyWidth = document.body.clientWidth;
@@ -550,7 +609,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     },
                     gitCommit() {
                         let ChangeFile = this.gitChangeFileList;
-                        let stagedList = this.gitStashFileList;
+                        let stagedList = this.gitStagedFileList;
 
                         let isStaged = stagedList.length == 0 ? false : true;
                         let exist = (stagedList.length) + (ChangeFile.length);

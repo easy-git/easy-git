@@ -183,6 +183,20 @@ function getUploadIcon(color) {
     return `<svg t="1598278287586" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1860" width="24" height="24"><path d="M525.333 516.672a21.312 21.312 0 0 0-26.666 0L392 602.005a21.333 21.333 0 0 0 26.667 33.323l72-57.6v296.939a21.333 21.333 0 0 0 42.666 0V577.728l72 57.6A21.333 21.333 0 1 0 632 602.005z" fill="${color}" p-id="1861"></path><path d="M810.667 384c-1.131 0-2.219 0-3.328 0.043a298.475 298.475 0 0 0-565.398-84.907A213.333 213.333 0 0 0 256 725.333h21.333a21.333 21.333 0 0 0 0-42.666H256a170.667 170.667 0 0 1 0-341.334 21.333 21.333 0 0 0 19.69-13.12 255.808 255.808 0 0 1 491.393 80.832 21.376 21.376 0 0 0 24.576 19.627 123.904 123.904 0 0 1 19.008-2.005 128 128 0 0 1 0 256h-64a21.333 21.333 0 0 0 0 42.666h64a170.667 170.667 0 0 0 0-341.333z" fill="${color}" p-id="1862"></path></svg>`
 }
 
+/**
+ * @description 下填充箭头
+ */
+function getChevronDown(color) {
+    return `<svg width="0.85em" height="0.85em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="${color}" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>`
+}
+
+/**
+ * @description 右填充箭头
+ */
+function getChevronRight(color) {
+    return `<svg width="0.85em" height="0.85em" viewBox="0 0 16 16" class="bi bi-chevron-right" fill="${color}" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>`
+}
+
 module.exports = {
     getRefreshIcon,
     getMenuIcon,
@@ -206,5 +220,7 @@ module.exports = {
     getHelpIcon,
     getSearchIcon,
     getNoIcon,
-    getUploadIcon
+    getUploadIcon,
+    getChevronRight,
+    getChevronDown
 }
