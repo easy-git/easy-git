@@ -330,7 +330,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     </div>
                 </div>
                 <div class="row mt-3" id="git_add" style="visibility: hidden;" :style="{visibility: 'visible'}">
-                    <div class="col px-0">
+                    <div class="col px-0" v-if="gitConflictedFileListLength != 0">
                         <p class="add-title" id="git_add_title">
                             <span class="a-icon" v-html="ConflictedIcon" @click="isShowConflictedList();"></span>合并更改:
                             <span class="gtag">{{ gitConflictedFileListLength }}</span>
@@ -357,7 +357,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     </div>
                 </div>
                 <div class="row mt-0" id="git_stash" style="visibility: hidden;" :style="{visibility: 'visible'}">
-                    <div class="col px-0" v-show="gitStagedFileList.length">
+                    <div class="col px-0" v-show="gitStagedFileListLength != 0">
                         <p class="add-title" id="git_add_title">
                             <span class="a-icon" v-html="StagedIcon" @click="isShowStagedList();"></span>暂存的更改:
                             <span class="gtag">{{ gitStagedFileListLength }}</span>
@@ -392,16 +392,16 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     </div>
                 </div>
                 <div class="row mt-0" id="git_add" style="visibility: hidden;" :style="{visibility: 'visible'}">
-                    <div class="col px-0" v-show="gitChangeFileList.length">
+                    <div class="col px-0" v-show="gitNotStagedileListLength != 0">
                         <p class="add-title" id="git_add_title">
                             <span class="a-icon" v-html="ChangeIcon" @click="isShowChangeList();"></span>更改:
-                            <span class="gtag">{{ gitChangeFileListLength }}</span>
+                            <span class="gtag">{{ gitNotStagedileListLength }}</span>
                             <span title="暂存所有文件" class="stash-all" @click="gitAdd('all');">
                                 ${AddAllIcon}
                             </span>
                         </p>
                         <ul style="list-style-type:none;padding-left:0;" id="git_add_data" v-if="isShowChange">
-                            <li class="d-flex px-3 lif gitfile" v-for="(v,i) in gitChangeFileList" :key="i"
+                            <li class="d-flex px-3 lif gitfile" v-for="(v,i) in gitNotStagedileList" :key="i"
                                 :id="'change_'+i"
                                 @mouseover="hoverChangeFileID = 'change_'+i"
                                 @mouseleave="hoverChangeFileID = false">
@@ -474,8 +474,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     gitConflictedFileListLength:0,
                     ChangeIcon: '',
                     isShowChange: true,
-                    gitChangeFileList: [],
-                    gitChangeFileListLength: 0,
+                    gitNotStagedileList: [],
+                    gitNotStagedileListLength: 0,
                     StagedIcon: '',
                     isShowStaged: true,
                     gitStagedFileList: [],
@@ -536,10 +536,10 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     getGitFileList() {
                         this.gitConflictedFileList = this.gitFileResult.conflicted;
                         this.gitStagedFileList = this.gitFileResult.staged;
-                        this.gitChangeFileList = this.gitFileResult.not_add;
+                        this.gitNotStagedileList = this.gitFileResult.notStaged;
 
                         this.gitStagedFileListLength = (this.gitStagedFileList).length;
-                        this.gitChangeFileListLength = (this.gitChangeFileList).length;
+                        this.gitNotStagedileListLength = (this.gitNotStagedileList).length;
                         this.gitConflictedFileListLength = (this.gitConflictedFileList).length;
                     },
                     clickMenu() {
@@ -608,7 +608,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         });
                     },
                     gitCommit() {
-                        let ChangeFile = this.gitChangeFileList;
+                        let ChangeFile = this.gitNotStagedileList;
                         let stagedList = this.gitStagedFileList;
 
                         let isStaged = stagedList.length == 0 ? false : true;
