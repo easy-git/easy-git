@@ -212,20 +212,20 @@ class GitFile {
 
     // Git: 撤销更改 git checkout -- filename
     async checkoutFile(fileinfo) {
-        let fpath,fstatus;
+        let fpath,ftag;
         if (fileinfo instanceof Object) {
             fpath = fileinfo.path;
-            fstatus = fileinfo.status;
+            ftag = fileinfo.tag;
         } else {
             fpath = fileinfo;
         };
-        if (fileinfo == 'all' || fstatus != 'not_added') {
+        if (fileinfo == 'all' || !ftag.includes('?')) {
             let checkoutlStatus = await utils.gitCheckoutFile(this.projectPath, fpath);
             if (checkoutlStatus == 'success') {
                 this.refreshFileList();
             };
         };
-        if (fpath != 'all' && fstatus == 'not_added') {
+        if (fpath != 'all' && ftag.includes('?')) {
             let absPath = path.join(this.projectPath, fpath);
             let status = await file.remove(absPath, fpath);
             if (status) {
