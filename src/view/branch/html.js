@@ -209,6 +209,15 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                 -webkit-transform: rotate(0.95);
                 transform: scale(0.95);
             }
+            .major-title:hover .is-show{
+                display: inline;
+            }
+            .is-show {
+                display: none;
+                float: right;
+                font-size: 14px;
+            }
+
         </style>
     </head>
     <body style="background-color:${background};">
@@ -250,7 +259,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     </div>
                 </div>
                 <div class="row"  style="margin-top:198px;">
-                    <div class="col mt-2 px-0">
+                    <div class="col-12 mt-2 px-0">
                         <ul class="pl-0 mb-0" style="list-style-type:none;">
                             <li class="lif gitfile" v-for="(item,idx) in BranchList" :key="idx"
                                 :id="'branch_'+idx"
@@ -300,6 +309,15 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                     </span>
                                 </div>
                             </li>
+                        </ul>
+                    </div>
+                    <div class="col-12 mt-2 px-0">
+                        <p class="mx-3 mb-1 major-title">
+                            <span @click="isShowTagList();">${TagIcon}&nbsp;&nbsp;标签</span>
+                            <span v-if="!isShowTag" @click="isShowTagList();" class="is-show">显示</span>
+                            <span v-else @click="isShowTagList();" class="is-show">隐藏</span>
+                        </p>
+                        <ul class="pl-3 mb-0" style="list-style-type:none;" v-if="isShowTag">
                             <li class="lif gitfile" v-for="(v3,i3) in TagsList" :key="i3"
                                 :id="'tag_'+i3"
                                 @mouseover="hoverTagId = 'tag_'+i3"
@@ -393,6 +411,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     isShowModel: false,
                     inputBranch: '',
                     rawBranchList: '',
+                    isShowTag: false,
                     rawTagsList: '',
                     BranchList: [],
                     TagsList: [],
@@ -556,6 +575,13 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             from: select,
                             to: this.currentBranch
                         });
+                    },
+                    isShowTagList() {
+                        if (this.isShowTag) {
+                            this.isShowTag = false;
+                        } else {
+                            this.isShowTag = true;
+                        }
                     },
                     CreateTag() {
                         hbuilderx.postMessage({
