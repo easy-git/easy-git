@@ -929,7 +929,7 @@ async function gitDeleteRemoteBranch(workingDir, branchName) {
     hx.window.setStatusBarMessage(`Git: 正在对 ${branchName} 远程分支进行删除，请耐心等待!`, 5000, 'info');
 
     try {
-        branchName = await branchName.replace('remotes/origin/','');
+        branchName = await branchName.replace('remotes/origin/','').replace('origin/','');
         let status = await git(workingDir).init()
             .push(['origin', '--delete', branchName])
             .then(() => {

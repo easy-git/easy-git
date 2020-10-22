@@ -426,7 +426,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             <label class="form-check-label" for="isPush">推送</label>
                           </div>
                           <div class="mt-3">
-                            <button type="submit" class="btnd" @click="gitCreateBranchFromRemote();">创建</button>
+                            <button type="submit" class="btnd" @click="gitCreateBranchFromRef();">创建</button>
                             <button type="submit" class="btnd" @click='isShowModel=false'>关闭</button>
                           </div>
                         </form>
@@ -568,13 +568,13 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         });
                     },
                     openModelBox(source) {
-                      this.isShowModel = true;
-                      if (source != 'none') {
-                          this.fromToCreate.ref = branchname;
-                          this.inputDisabled = true;
-                      };
+                        this.isShowModel = true;
+                        if (source != 'none') {
+                            this.fromToCreate.ref = source;
+                            this.inputDisabled = true;
+                        };
                     },
-                    gitCreateBranchFromRemote() {
+                    gitCreateBranchFromRef() {
                         let {newBranchName,ref,isPush} = this.fromToCreate;
                         hbuilderx.postMessage({
                             command: 'BranchCreate',
