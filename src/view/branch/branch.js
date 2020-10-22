@@ -21,13 +21,8 @@ function getUIData() {
     let {fontColor} = colorData;
 
     // svg icon
-    let CancelIconSvg = icon.getDelIcon(fontColor);
-    let OpenFileIconSvg = icon.getOpenFileIcon(fontColor);
     let AddIconSvg = icon.getAddIcon(fontColor);
-    let AddAllIcon = icon.getAddAllIcon(fontColor);
-    let checkoutIconSvg = icon.getCheckoutIcon(fontColor);
     let iconRefresh = icon.getRefreshIcon(fontColor);
-    let CheckMarkIcon = icon.getCheckMarkIcon(fontColor);
     let UpArrowIcon = icon.getUpArrowIcon(fontColor);
     let UpArrowIcon2 = icon.getUpArrowIcon2(fontColor);
     let BackIcon = icon.getBackIcon(fontColor);
@@ -37,19 +32,12 @@ function getUIData() {
     let SyncIcon = icon.getSyncIcon(fontColor);
     let MergeIcon = icon.getMergeIcon(fontColor);
     let TagIcon = icon.getTagIcon(fontColor);
-    let MenuIcon = icon.getMenuIcon(fontColor);
-    let HistoryIcon = icon.getHistoryIcon(fontColor);
     let uploadIcon = icon.getUploadIcon(fontColor);
     let cloudIcon = icon.getCloudIcon(fontColor);
 
     let iconData = {
-        CancelIconSvg,
-        OpenFileIconSvg,
         AddIconSvg,
-        AddAllIcon,
-        checkoutIconSvg,
         iconRefresh,
-        CheckMarkIcon,
         UpArrowIcon,
         UpArrowIcon2,
         BackIcon,
@@ -59,8 +47,6 @@ function getUIData() {
         SyncIcon,
         MergeIcon,
         TagIcon,
-        MenuIcon,
-        HistoryIcon,
         uploadIcon,
         cloudIcon
     };

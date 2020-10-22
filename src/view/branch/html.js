@@ -27,17 +27,11 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
         cursorColor,
         fontColor,
         lineColor,
-        iconRefresh,
-        CheckMarkIcon,
         UpArrowIcon,
-        UpArrowIcon2,
         BackIcon,
         BranchIcon,
         DownArrowIcon,
-        CancelIconSvg,
-        OpenFileIconSvg,
         AddIconSvg,
-        checkoutIconSvg,
         XIcon,
         SyncIcon,
         MergeIcon,
@@ -212,6 +206,9 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
             .btnd:active {
                 -webkit-transform: rotate(0.95);
                 transform: scale(0.95);
+            }
+            .major-title > span {
+                font-size: 14px;
             }
             .major-title:hover .is-show{
                 display: inline;
@@ -445,12 +442,13 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     originurlBoolean: '',
                     isShowModel: false,
                     inputBranch: '',
-                    rawBranchList: '',
                     isShowOrigin: false,
+                    rawOriginBranchList: [],
                     OriginBranchList: [],
                     isShowTag: false,
-                    rawTagsList: '',
+                    rawBranchList: [],
                     BranchList: [],
+                    rawTagsList: [],
                     TagsList: [],
                     fromToCreate: {
                         newBranchName: '',
@@ -484,18 +482,16 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                 },
                 watch: {
                     inputBranch: function (newv, oldv) {
-                        let raw = this.rawBranchList;
+                        if ((this.inputBranch).replace(/(^\s*)|(\s*$)/g,"") == '') {
+                            this.BranchList = this.rawBranchList;
+                            return;
+                        };
+                        let raw = [ ...this.rawBranchList ];
                         let tmp = raw.filter( item => {
                             let name = item.name;
                             return name.includes(this.inputBranch) || item.current;
                         });
                         this.BranchList = tmp;
-
-                        let raw1 = this.rawTagsList;
-                        let tmp1 = raw1.filter( item => {
-                            return item.includes(this.inputBranch);
-                        });
-                        this.TagsList = tmp1;
                     }
                 },
                 created() {
@@ -505,9 +501,13 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     this.tracking = '${tracking}';
                     this.originurl = '${originurl}';
                     this.originurlBoolean = ${originurlBoolean};
+
                     this.rawBranchList = ${branchs};
                     this.BranchList = ${branchs};
+
+                    this.rawOriginBranchList = ${OriginBranchList};
                     this.OriginBranchList = ${OriginBranchList};
+
                     this.rawTagsList = ${TagsList};
                     this.TagsList = ${TagsList};
                 },
