@@ -40,6 +40,7 @@ function getUIData() {
     let MenuIcon = icon.getMenuIcon(fontColor);
     let HistoryIcon = icon.getHistoryIcon(fontColor);
     let uploadIcon = icon.getUploadIcon(fontColor);
+    let cloudIcon = icon.getCloudIcon(fontColor);
 
     let iconData = {
         CancelIconSvg,
@@ -60,7 +61,8 @@ function getUIData() {
         TagIcon,
         MenuIcon,
         HistoryIcon,
-        uploadIcon
+        uploadIcon,
+        cloudIcon
     };
 
     let uiData = Object.assign(iconData,colorData);
@@ -82,14 +84,16 @@ class GitBranch {
     }
 
     async LoadingBranchData() {
-        let BranchInfo = await utils.gitBranch(this.projectPath);
+        let BranchInfo = await utils.gitBranch(this.projectPath, ['-vvv']);
+        let OriginBranchList = await utils.gitBranch(this.projectPath, ['-rv']);
         let StatusInfo = await utils.gitStatus(this.projectPath);
         let TagsList = await utils.gitTagsList(this.projectPath);
 
         let {GitAssignAction} = this.initData;
 
         const gitBranchData = Object.assign({
-            'BranchInfo': BranchInfo
+            'BranchInfo': BranchInfo,
+            'OriginBranchList': OriginBranchList,
         }, {
             'TagsList': TagsList
         }, {
@@ -178,7 +182,7 @@ class GitBranch {
         if (btn == '关闭') {
             return;
         };
-        if (branchName.includes('remotes/origin')) {
+        if (branchName.includes('origin/')) {
             let delStatus1 = await utils.gitDeleteRemoteBranch(this.projectPath,branchName);
             if (delStatus1 == 'success') {
                 this.LoadingBranchData();

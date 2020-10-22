@@ -795,7 +795,7 @@ async function gitCheckoutFile(workingDir, filename) {
  */
 async function gitBranch(workingDir, options='avvv') {
     try {
-        let args = options == 'avvv' ? ['-avvv'] : ['-v'];
+        let args = options;
         let status = await git(workingDir).init()
             .branch(args)
             .then((info) => {

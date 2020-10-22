@@ -42,7 +42,8 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
         SyncIcon,
         MergeIcon,
         TagIcon,
-        uploadIcon
+        uploadIcon,
+        cloudIcon
     } = uiData;
 
     let {
@@ -50,6 +51,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
         projectName,
         GitAssignAction,
         BranchInfo,
+        OriginBranchList,
         TagsList,
         ahead,
         behind,
@@ -66,6 +68,8 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
     };
 
     let branchs = JSON.stringify(BranchInfo);
+
+    OriginBranchList = JSON.stringify(OriginBranchList);
     TagsList = JSON.stringify(TagsList.data);
     GitAssignAction = JSON.stringify(GitAssignAction);
 
@@ -258,7 +262,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         </div>
                     </div>
                 </div>
-                <div class="row"  style="margin-top:198px;">
+                <div id="gather-local-branchs" class="row"  style="margin-top:198px;">
                     <div class="col-12 mt-2 px-0">
                         <ul class="pl-0 mb-0" style="list-style-type:none;">
                             <li class="lif gitfile" v-for="(item,idx) in BranchList" :key="idx"
@@ -270,10 +274,10 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                         :style="{'color': BranchStyle(item)}"
                                         @click="switchBranch(item);"
                                         :title="'点击即可切换分支'+item.name">
-                                        {{ item.current ? '*' + item.name : (item.name).replace('remotes/','') }}
+                                        {{ item.current ? '*' + item.name : (item.name).replace('origin/','') }}
                                     </span>
                                 </div>
-                                <div id="branch_action" class="d-inline float-right" v-if="hoverStampID == 'branch_'+idx">
+                                <div id="branch_action_local" class="d-inline float-right" v-if="hoverStampID == 'branch_'+idx">
                                     <span class="ml-1"
                                         title="打标签, 创建后会自动推送到远端"
                                         @click="CreateTag();"
@@ -282,15 +286,14 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                     </span>
                                     <span class="ml-1"
                                         title="从此分支上创建新分支"
-                                        @click="openModelBox(item.name);"
-                                        v-if="(item.name).includes('remotes/origin/')">
+                                        @click="openModelBox(item.name);">
                                         ${AddIconSvg}
                                     </span>
                                     <span
                                         class="ml-1"
                                         @click="deleteBranch(item.name);"
-                                        :title="item.name.includes('remote') ? '删除远程此分支' : '强制删除本地此分支'"
-                                        v-if="item.name != 'master' && item.name != 'remotes/origin/master' && !item.current">
+                                        title="强制删除本地此分支"
+                                        v-if="item.name != 'master' && !item.current">
                                         ${XIcon}
                                     </span>
                                     <span
@@ -311,7 +314,39 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             </li>
                         </ul>
                     </div>
-                    <div class="col-12 mt-2 px-0">
+                    <div id="gather-origin-branchs" class="col-12 mt-2 px-0">
+                        <p class="mx-3 mb-1 major-title">
+                            <span @click="isShowOriginList();">${cloudIcon}&nbsp;&nbsp;远端(origin)分支</span>
+                            <span v-if="!isShowOrigin" @click="isShowOriginList();" class="is-show">显示</span>
+                            <span v-else @click="isShowOriginList();" class="is-show">隐藏</span>
+                        </p>
+                        <ul class="pl-3 mb-0" style="list-style-type:none;" v-if="isShowOrigin">
+                            <li class="lif gitfile" v-for="(item,idx) in OriginBranchList" :key="idx"
+                                :id="'origin_'+idx"
+                                @mouseover="hoverStampID = 'origin_'+idx"
+                                @mouseleave="hoverStampID = false">
+                                <div class="d-inline">
+                                    <span>{{ item.name }}</span>
+                                </div>
+                                <div id="branch_action_origin" class="d-inline float-right" v-if="hoverStampID == 'origin_'+idx">
+                                    <span class="ml-1"
+                                        title="从此分支上创建新分支"
+                                        @click="openModelBox(item.name);"
+                                        v-if="(item.name).includes('origin/')">
+                                        ${AddIconSvg}
+                                    </span>
+                                    <span
+                                        class="ml-1"
+                                        @click="deleteBranch(item.name);"
+                                        title="删除远程此分支"
+                                        v-if="item.name != 'origin/master'">
+                                        ${XIcon}
+                                    </span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="gather-tags" class="col-12 mt-2 px-0">
                         <p class="mx-3 mb-1 major-title">
                             <span @click="isShowTagList();">${TagIcon}&nbsp;&nbsp;标签</span>
                             <span v-if="!isShowTag" @click="isShowTagList();" class="is-show">显示</span>
@@ -411,6 +446,8 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     isShowModel: false,
                     inputBranch: '',
                     rawBranchList: '',
+                    isShowOrigin: false,
+                    OriginBranchList: [],
                     isShowTag: false,
                     rawTagsList: '',
                     BranchList: [],
@@ -470,6 +507,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     this.originurlBoolean = ${originurlBoolean};
                     this.rawBranchList = ${branchs};
                     this.BranchList = ${branchs};
+                    this.OriginBranchList = ${OriginBranchList};
                     this.rawTagsList = ${TagsList};
                     this.TagsList = ${TagsList};
                 },
@@ -575,6 +613,13 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             from: select,
                             to: this.currentBranch
                         });
+                    },
+                    isShowOriginList() {
+                        if (this.isShowOrigin) {
+                            this.isShowOrigin = false;
+                        } else {
+                            this.isShowOrigin = true;
+                        }
                     },
                     isShowTagList() {
                         if (this.isShowTag) {
