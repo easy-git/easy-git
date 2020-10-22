@@ -1446,6 +1446,7 @@ async function gitShowCommitFileChange(workingDir, options) {
 
 
 module.exports = {
+    createOutputChannel,
     isGitInstalled,
     getHBuilderXiniConfig,
     getThemeColor,

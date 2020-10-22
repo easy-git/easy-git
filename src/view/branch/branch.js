@@ -34,6 +34,7 @@ function getUIData() {
     let TagIcon = icon.getTagIcon(fontColor);
     let uploadIcon = icon.getUploadIcon(fontColor);
     let cloudIcon = icon.getCloudIcon(fontColor);
+    let ShowIcon = icon.getShowIcon(fontColor);
 
     let iconData = {
         AddIconSvg,
@@ -48,7 +49,8 @@ function getUIData() {
         MergeIcon,
         TagIcon,
         uploadIcon,
-        cloudIcon
+        cloudIcon,
+        ShowIcon
     };
 
     let uiData = Object.assign(iconData,colorData);
@@ -191,6 +193,18 @@ class GitBranch {
             this.LoadingBranchData();
         };
     };
+
+    // Git tag: Detail
+    async TagDetails(tagName) {
+        if (tagName.length == 0) {
+            return hx.window.showErrorMessage('tag名称无效。',['关闭']);
+        };
+        let options = [ 'show', '-s', '--format=medium', tagName ]
+        let details = await utils.gitRaw(this.projectPath, options, undefined, 'result');
+        if (details) {
+            utils.createOutputChannel(`Git: ${tagName} 标签详情如下: `, details);
+        };
+    }
 };
 
 
@@ -269,6 +283,9 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
                 break;
             case 'CreateTag':
                 Branch.TagCreate(msg.text);
+                break;
+            case 'TagDetails':
+                Branch.TagDetails(msg.name);
                 break;
             default:
                 break;

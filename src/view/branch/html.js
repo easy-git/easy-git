@@ -37,7 +37,8 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
         MergeIcon,
         TagIcon,
         uploadIcon,
-        cloudIcon
+        cloudIcon,
+        ShowIcon
     } = uiData;
 
     let {
@@ -355,12 +356,19 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                 @mouseover="hoverTagId = 'tag_'+i3"
                                 @mouseleave="hoverTagId = false">
                                 <span title="tag">{{ v3 }}</span>
-                                <span id="tag_action" class="hideicon ml-1"
-                                    title="从此tag上签出新分支"
-                                    @click="openModelBox(v3);"
-                                    v-if="hoverTagId == 'tag_'+i3">
-                                    ${AddIconSvg}
-                                </span>
+                                <div id="tag_action" class="d-inline float-right" v-if="hoverTagId == 'tag_'+i3">
+                                    <span class="ml-1"
+                                        title="从此tag上签出新分支"
+                                        @click="openModelBox(v3);">
+                                        ${AddIconSvg}
+                                    </span>
+                                    <span
+                                        class="ml-1"
+                                        @click="getTagDetails(v3);"
+                                        title="查看标签详情">
+                                        ${ShowIcon}
+                                    </span>
+                                </div>
                             </li>
                         </ul>
                     </div>
@@ -632,6 +640,12 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         hbuilderx.postMessage({
                             command: 'CreateTag',
                             text: this.inputBranch
+                        });
+                    },
+                    getTagDetails(tagName) {
+                        hbuilderx.postMessage({
+                            command: 'TagDetails',
+                            name: tagName
                         });
                     }
                 }
