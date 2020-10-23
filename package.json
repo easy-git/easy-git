@@ -2,7 +2,7 @@
     "name": "easy-git",
     "description": "HBuilderX内唯一的图形化Git工具, vscode源代码管理工具风格, 简单易上手。",
     "displayName": "【easy-git】Git源代码管理工具",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "publisher": "oneone",
     "engines": {
         "HBuilderX": "^2.8.3"
@@ -10,12 +10,14 @@
     "categories": [
         "Other"
     ],
-    "main": "./extension",
+    "main": "./src/extension",
     "activationEvents": [
         "onCommand:EasyGit.main",
+        "onCommand:EasyGit.branch",
         "onCommand:EasyGit.log",
         "onCommand:EasyGit.clone",
         "onCommand:EasyGit.pull",
+        "onCommand:EasyGit.push",
         "onCommand:EasyGit.stash",
         "onCommand:EasyGit.stashAll",
         "onCommand:EasyGit.stashPop",
@@ -27,8 +29,11 @@
         "onCommand:EasyGit.setEmail",
         "onCommand:EasyGit.setGitingore",
         "onCommand:EasyGit.setGitattributes",
+        "onCommand:EasyGit.checkUpdate",
+        "onCommand:EasyGit.gitBlameForLineChange",
         "onView:EasyGitSourceCodeView",
-        "onView:EasyGitCommonView"
+        "onView:EasyGitCommonView",
+        "onCustomEditor:EasyGit - 日志"
     ],
     "contributes": {
         "configuration": {
@@ -74,10 +79,29 @@
                 }
             ]
         },
+        "customEditors": [
+            {
+                "viewType": "EasyGit - 日志",
+                "selector": [
+                    {
+                        "fileNamePattern": "EasyGit - 日志"
+                    }
+                ],
+                "priority": "default"
+            }
+        ],
         "commands": [
+            {
+                "command": "EasyGit.checkUpdate",
+                "title": "easy-git: 检查更新"
+            },
             {
                 "command": "EasyGit.main",
                 "title": "easy-git: 源代码管理"
+            },
+            {
+                "command": "EasyGit.branch",
+                "title": "easy-git: 分支管理"
             },
             {
                 "command": "EasyGit.log",
@@ -90,6 +114,10 @@
             {
                 "command": "EasyGit.pull",
                 "title": "easy-git: pull - 拉取"
+            },
+            {
+                "command": "EasyGit.push",
+                "title": "easy-git: push - 推送"
             },
             {
                 "command": "EasyGit.stash",
@@ -110,6 +138,10 @@
             {
                 "command": "EasyGit.stashClear",
                 "title": "easy-git: stashClear - 删除所有储藏..."
+            },
+            {
+                "command": "EasyGit.gitBlameForLineChange",
+                "title": "easy-git: 显示当前行最后一次修改信息"
             },
             {
                 "command": "EasyGit.about",
@@ -158,6 +190,11 @@
                     "group": "z_commands"
                 },
                 {
+                    "command": "EasyGit.gitBlameForLineChange",
+                    "title": "easy-git: 显示当前行最后一次修改信息",
+                    "group": "z_commands"
+                },
+                {
                     "group": "z_commands"
                 }
             ],
@@ -175,41 +212,43 @@
                 {
                     "title": "easy-git",
                     "group": "ext_settings",
-                    "id": "toolsMenu"
-                },
-                {
-                    "group": "toolsMenu@1"
+                    "id": "easygit"
                 },
                 {
                     "command": "EasyGit.setUserName",
                     "title": "设置user.name",
-                    "group": "toolsMenu@1"
+                    "group": "easygit@1"
                 },
                 {
                     "command": "EasyGit.setEmail",
                     "title": "设置user.email",
-                    "group": "toolsMenu@1"
+                    "group": "easygit@1"
                 },
                 {
-                    "group": "toolsMenu@2"
+                    "group": "easygit@2"
                 },
                 {
                     "command": "EasyGit.setGitingore",
                     "title": "设置.gitignore",
-                    "group": "toolsMenu@2"
+                    "group": "easygit@2"
                 },
                 {
                     "command": "EasyGit.setGitattributes",
                     "title": "设置.gitattributes",
-                    "group": "toolsMenu@2"
+                    "group": "easygit@2"
                 },
                 {
-                    "group": "toolsMenu@3"
+                    "group": "easygit@3"
+                },
+                {
+                    "command": "EasyGit.checkUpdate",
+                    "title": "检查更新",
+                    "group": "easygit@3"
                 },
                 {
                     "command": "EasyGit.about",
                     "title": "关于/评价easy-git",
-                    "group": "toolsMenu@3"
+                    "group": "easygit@3"
                 },
                 {
                     "group": "ext_settings"
@@ -225,7 +264,7 @@
         "cross-spawn": "^7.0.3",
         "git-remote-origin-url": "^3.1.0",
         "ini": "^1.3.5",
-        "simple-git": "^2.17.0",
+        "simple-git": "^2.21.0",
         "uuid": "^8.3.0"
     }
 }

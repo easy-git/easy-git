@@ -6,28 +6,28 @@ const os = require('os');
 // get plugin version
 let packageFile = require('../../package.json');
 
-// 全局记录是否已上传统计数据，每天仅上传一次
-global.currentDate = undefined;
-global.logFlags = false;
-global.mainFlags = false;
-global.initFlags = false;
-global.cloneFlags = false;
+let currentDate = undefined;
+let logFlags = false;
+let mainFlags = false;
+let initFlags = false;
+let cloneFlags = false;
 
 
 /**
  * @description 生成用户UID
  */
-function getUid() {
+function getEasyGitConfig() {
     try{
         let config = hx.workspace.getConfiguration();
         let uid = config.get('EasyGit.id');
+        let isShareUsageData = config.get('EasyGit.isShareUsageData');
         if (uid == undefined || !uid || uid == '') {
             uid = (uuid.v1()).replace(/-/g, '');
             config.update("EasyGit.id", uid).then(() => {});
         };
-        return uid;
+        return uid, isShareUsageData;
     }catch(e){
-        return '';
+        return '', '';
     };
 };
 
@@ -44,7 +44,7 @@ function getCurrentData() {
  * @description count
  * @param {Object} viewname
  */
-function count(viewname, context) {
+function count(viewname) {
     let view_flags = eval(viewname+ "Flags");
     let view_flags_date = getCurrentData();
     // only count once
@@ -52,10 +52,15 @@ function count(viewname, context) {
         return;
     };
 
-    const uid = getUid();
+    let uid, isShareUsageData = getEasyGitConfig();
+
     const hxVersion = hx.env.appVersion;
     const pluginVersion = packageFile.version;
-    const osName = os.platform() + ' ' + os.release();
+
+    let osName = os.platform() + ' ' + os.release();
+    if (isShareUsageData == false) {
+        osName = 'unKnow';
+    };
 
     let param = {
         'uid': uid,
@@ -64,6 +69,7 @@ function count(viewname, context) {
         'pluginVersion': pluginVersion,
         'osName': osName
     };
+
     return new Promise((resolve, reject) => {
         try {
             const instance = axios.create({

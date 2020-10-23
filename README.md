@@ -133,6 +133,22 @@ easy-git, 支持通过快捷键打开git视图。
     "key": "",
     "command": "EasyGit.stashClear"
 }
+
+// Git Blame 显示git文件当前行最后一次修改信息
+{
+    "key": "",
+    "command": "EasyGit.gitBlameForLineChange"
+}
+```
+
+## 数据统计
+
+为了更好的的改进插件，上报了`当天插件是否启动`、`电脑操作系统信息（字段内容windows、mac）`。
+
+如不希望上传如上信息, 请在【设置】【源码视图】内，增加如下字段:
+
+```js
+"EasyGit.isShareUsageData": false
 ```
 
 ## 数据统计

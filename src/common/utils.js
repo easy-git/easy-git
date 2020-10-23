@@ -255,12 +255,65 @@ function isGitInstalled() {
   return true;
 };
 
+/**
+ * @description get git version
+ */
+function getGitVersion() {
+    return new Promise((resolve, reject) => {
+        exec('git --version', function(error, stdout, stderr) {
+            if (error) {
+                reject(undefined)
+            };
+            try {
+                let gitLocalVersion = stdout.match(/(\d{1,3}.\d{1,3}.\d{1,3})/g)[0];
+                resolve(gitLocalVersion);
+            } catch (e) {
+                reject(undefined)
+            };
+        });
+    });
+};
 
 /**
- * @description 检查文件列表是否包含node_modules，并返回文件数量
+ * @description 检查是否设置了username和email，如未设置，弹窗提示
+ * @param {String} projectPath 项目路径
+ * @param {String} projectName 项目名称
+ * @param {Object} userConfig
+ */
+async function checkGitUsernameEmail(projectPath, projectName, userConfig) {
+    let configData = await gitConfigShow(projectPath, false);
+    let gitUserName = configData['user.name'];
+    let gitEmail = configData['user.email'];
+
+    // 用户是否设置过不再提示
+    let { GitConfigUserPrompt } = userConfig;
+
+    if ((gitEmail == '' || gitUserName == '') && (GitConfigUserPrompt != false)) {
+        let msg = `当前项目 ${projectName} 未设置`
+        if (gitUserName == '') {
+            msg = msg + 'user.name'
+        };
+        if (gitEmail == '') {
+            msg = msg + 'user.email'
+        };
+        msg = msg + ", 点击菜单【工具】【easy-git】可进行设置。\n"
+        hx.window.showErrorMessage(msg,['我知道了','不再提示']).then((result)=> {
+            if (result == '不再提示') {
+                let config = hx.workspace.getConfiguration();
+                config.update("EasyGit.GitConfigUserPrompt", false).then(() => {});
+            }
+        });
+    }
+};
+
+/**
+ * @description 检查文件列表是否包含node_modules
+ * @param {String} projectPath 项目路径
+ * @param {String} projectName 项目名称
  * @param {Object} GitStatusResult
  */
-function checkNodeModulesFileList(GitStatusResult) {
+let gitignorePrompt = false;
+function checkNodeModulesFileList(projectPath, projectName, GitStatusResult) {
     let gitFileList = JSON.parse(GitStatusResult.gitStatusResult);
 
     let staged = gitFileList.staged;
@@ -281,7 +334,27 @@ function checkNodeModulesFileList(GitStatusResult) {
             break;
         };
     };
-    return {num,isNodeModules}
+
+    if (isNodeModules) {
+        if (gitignorePrompt) {
+            return;
+        };
+        hx.window.showErrorMessage(
+            '检测到当前git项目下，包含node_modules，且未设置.gitignore, 是否设置?',['设置.gitignore','以后再说'],
+        ).then((result) => {
+            if (result == '设置.gitignore') {
+                file.gitignore({'projectPath': projectPath});
+            } else {
+                gitignorePrompt = true;
+            }
+        })
+    };
+    if (num >= 10000) {
+        hx.window.showErrorMessage(
+            `easy-it: 项目${projectName}下, ${num}个文件发生了变化，easy-git插件需要一定的时间来加载。\n`,
+            ['我知道了'],
+        )
+    };
 };
 
 
@@ -324,10 +397,12 @@ async function gitClone(info) {
     };
 
     if (isAuth) {
-        if (repo.includes('https://') || repo.includes('https//')) {
+        if (/(http|https):\/\//.test(repo)) {
+            let http = 'http://';
+            if (/https:\/\//.test(repo)) { http = "https://"};
             repo = repo.replace(/(^http:\/\/|^https:\/\/)/, "");
+            repo = `${http}${username}:${password}@${repo}`;
         };
-        repo = `http://${username}:${password}@${repo}`;
     };
 
     try{
@@ -369,7 +444,12 @@ async function gitStatus(workingDir) {
         'gitEnvironment': true,
         'isGit': false,
         'tracking': '',
-        'gitStatusResult': [],
+        'gitStatusResult': {},
+        'FileResult': {
+            'conflicted': [],
+            'notStaged': [],
+            'staged': []
+        },
         'ahead': '',
         'behind': '',
         'currentBranch': '',
@@ -384,14 +464,53 @@ async function gitStatus(workingDir) {
 
     try {
         let statusSummary = await git(workingDir).status();
+        result.gitStatusResult = JSON.stringify(statusSummary);
+
         result.isGit = true;
         result.tracking = statusSummary.tracking
+
         // set branch info
         result.currentBranch = statusSummary.current;
         result.BranchTracking = statusSummary.tracking;
+
         result.ahead = statusSummary.ahead;
         result.behind = statusSummary.behind;
-        result.gitStatusResult = JSON.stringify(statusSummary);
+
+        // 所有文件列表
+        let files = statusSummary.files;
+
+        // 合并更改（冲突）
+        let conflicted = statusSummary.conflicted ? statusSummary.conflicted : [];
+        let conflicted_list = conflicted.map(function(v,i) {
+            return {'path':v, 'tag': 'C'}
+        });
+        result.FileResult.conflicted = conflicted_list;
+
+        // 更改(未暂存)
+        let not_add = statusSummary.not_added ? statusSummary.not_added : [];
+        let not_staged_list = [];
+        if (files.length && files != undefined) {
+            let tmp = [...not_add];
+            for (let s of files) {
+               if (!conflicted.includes(s.path) && ((s.index == ' ') || tmp.includes(s.path))) {
+                    not_staged_list.push({'path': s.path, 'tag': s.working_dir});
+               };
+           };
+        };
+        result.FileResult.notStaged = not_staged_list;
+
+        // 暂存的变更
+        let staged_list = [];
+        if (files.length && files != undefined) {
+            let tmp2 = not_staged_list.map(function(v1,i1) { return v1.path });
+            let tmp3 = [...tmp2, ...conflicted];
+            for (let s1 of files) {
+                if (!tmp3.includes(s1.path)) {
+                    staged_list.push({'path': s1.path, 'tag': s1.index});
+                };
+            };
+        };
+        result.FileResult.staged = staged_list;
     } catch (e) {
         result.gitEnvironment = false;
         return result;
@@ -438,7 +557,7 @@ async function gitAddCommitPush(workingDir, commitComment) {
  */
 async function gitAdd(workingDir, files) {
     // status bar show message
-    hx.window.setStatusBarMessage('Git: 正在添加...');
+    hx.window.setStatusBarMessage('Git: 正在添加文件到暂存区...');
     if (files == 'all') {
         files = './*'
     };
@@ -446,7 +565,7 @@ async function gitAdd(workingDir, files) {
         let status = await git(workingDir).init()
             .add(files)
             .then(() => {
-                hx.window.setStatusBarMessage('Git: 添加成功', 3000, 'info');
+                hx.window.setStatusBarMessage('Git: 成功添加文件到暂存区。', 3000, 'info');
                 return 'success';
             })
             .catch((err) => {
@@ -658,9 +777,9 @@ async function gitReset(workingDir, options, msg) {
 /**
  * @description 撤销对文件的修改
  */
-async function gitCheckout(workingDir, filename) {
+async function gitCheckoutFile(workingDir, filename) {
     // status bar show message
-    hx.window.setStatusBarMessage(`Git: ${filename} 正在撤销对文件的修改`,2000,'info');
+    hx.window.setStatusBarMessage(`Git: ${filename} 正在撤销对文件的修改!`,2000,'info');
 
     let args = ['--', filename]
     if (filename == 'all') {
@@ -670,12 +789,12 @@ async function gitCheckout(workingDir, filename) {
         let status = await git(workingDir).init()
             .checkout(args)
             .then(() => {
-                hx.window.setStatusBarMessage('Git: 操作成功', 3000, 'info');
+                hx.window.setStatusBarMessage(`Git: ${filename} 成功撤销修改!`, 3000, 'info');
                 return 'success'
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: ${filename} 操作失败`, errMsg);
+                createOutputChannel(`Git: ${filename} 撤销修改操作失败。`, errMsg);
                 return 'fail';
             });
         return status;
@@ -690,7 +809,7 @@ async function gitCheckout(workingDir, filename) {
  */
 async function gitBranch(workingDir, options='avvv') {
     try {
-        let args = options == 'avvv' ? ['-avvv'] : ['-v'];
+        let args = options;
         let status = await git(workingDir).init()
             .branch(args)
             .then((info) => {
@@ -824,7 +943,7 @@ async function gitDeleteRemoteBranch(workingDir, branchName) {
     hx.window.setStatusBarMessage(`Git: 正在对 ${branchName} 远程分支进行删除，请耐心等待!`, 5000, 'info');
 
     try {
-        branchName = await branchName.replace('remotes/origin/','');
+        branchName = await branchName.replace('remotes/origin/','').replace('origin/','');
         let status = await git(workingDir).init()
             .push(['origin', '--delete', branchName])
             .then(() => {
@@ -869,13 +988,13 @@ async function gitBranchCreate(data) {
             let HEAD = "HEAD:" + newBranchName;
             let status = await git(projectPath).init()
                 .checkout(args)
-                .push(["origin",HEAD])
+                .push(["--set-upstream","origin",newBranchName])
                 .then(() => {
                     hx.window.setStatusBarMessage(`Git: ${newBranchName} 新分支创建成功`, 30000, 'info');
                     return 'success';
                 })
                 .catch((err) => {
-                    let errMsg = "\n\n" + (err).toString();
+                    let errMsg = "\n" + (err).toString();
                     createOutputChannel(`Git: 分支${newBranchName}创建失败`, errMsg);
                     return 'fail';
                 });
@@ -892,7 +1011,7 @@ async function gitBranchCreate(data) {
                     return 'success';
                 })
                 .catch((err) => {
-                    let errMsg = "\n\n" + (err).toString();
+                    let errMsg = "\n" + (err).toString();
                     createOutputChannel(`Git: 分支${newBranchName}创建失败`, errMsg);
                     return 'fail';
                 });
@@ -1022,13 +1141,13 @@ async function gitTagsList(workingDir) {
  * @param {String} workingDir git工作目录
  * @param {String} tagName 标签名称
  */
-async function gitTagCreate(workingDir,tagName) {
+async function gitTagCreate(workingDir,tagOptions, tagName) {
     // status bar show message
     hx.window.setStatusBarMessage('Git: 正在当前分支上创建标签..., 创建后会自动推送到远端。', 2000, 'info');
 
     try {
         let status = await git(workingDir).init()
-            .tag([tagName])
+            .tag(tagOptions)
             .push(['origin',tagName])
             .then(() => {
                 hx.window.setStatusBarMessage(`Git: 标签 ${tagName} 创建成功`, 5000, 'info');
@@ -1041,6 +1160,7 @@ async function gitTagCreate(workingDir,tagName) {
             });
         return status;
     } catch (e) {
+        console.log(e)
         return 'error';
     }
 };
@@ -1124,15 +1244,29 @@ async function gitLog(workingDir, searchType, filterCondition) {
     filter = filter.filter( s => s && s.trim());
 
     if (searchType == 'all') {
-        filter.push('--all')
+        filter = ['--all', ...filter];
     };
+
+    // 去除数组中元素两边的空格
+    let tmpFilter = [];
+    for (let s of filter) {
+        tmpFilter.push(s.trim())
+    };
+    filter = [...tmpFilter];
 
     try {
         let result = {
             "success": true,
             "errorMsg": '',
             "data": []
-        }
+        };
+
+        if (workingDir == undefined || workingDir == '') {
+            result.errorMsg = '无法获取项目路径，git log执行失败。请关闭当前Git日志视图后重试。';
+            result.success = false;
+            return result;
+        };
+
         let status = await git(workingDir).init()
             .log(filter)
             .then((res) => {
@@ -1179,12 +1313,19 @@ async function gitStash(projectInfo, options, msg) {
         let status = await git(projectPath).init()
             .stash(options)
             .then((res) => {
-                hx.window.setStatusBarMessage(msg + '成功', 5000, 'info');
-                hx.commands.executeCommand('EasyGit.main', projectInfo);
-                return 'success';
+                if (res.includes('Saved') || res == '') {
+                    hx.window.setStatusBarMessage(msg + '成功', 5000, 'info');
+                    hx.commands.executeCommand('EasyGit.main', projectInfo);
+                    return 'success';
+                };
+                if (res.includes('needs merge')) {
+                    throw `可能有文件存在冲突，请解决后再进行储藏！\n\n${res}`;
+                } else {
+                    throw res;
+                };
             })
             .catch((err) => {
-                createOutputChannel(msg + '失败', err);
+                createOutputChannel(msg + '操作失败！', err);
                 return 'fail';
             });
         return status;
@@ -1267,32 +1408,74 @@ async function gitAddRemote(workingDir, url) {
  * @param {Array} commands []
  * @param {String} msg 消息
  */
-async function gitRaw(workingDir, commands, msg) {
+async function gitRaw(workingDir, commands, msg, resultType='statusCode') {
     try {
         let status = await git(workingDir).raw(commands)
             .then((res) => {
-                hx.window.setStatusBarMessage(`Git: ${msg} 操作成功。`, 5000, 'info');
-                return 'success';
+                if (msg != undefined) {
+                    hx.window.setStatusBarMessage(`Git: ${msg} 操作成功。`, 5000, 'info');
+                };
+                if (resultType != 'statusCode') {
+                    return res;
+                } else {
+                    return 'success';
+                };
             })
             .catch((err) => {
-                createOutputChannel('Git: ${msg} 操作失败', err);
+                if (msg != undefined) {
+                    createOutputChannel('Git: ${msg} 操作失败', err);
+                }
                 return 'fail';
             });
         return status;
     } catch (e) {
-        createOutputChannel('Git: ${msg} 操作失败，插件运行异常。', e);
+        if (msg != undefined) {
+            createOutputChannel('Git: ${msg} 操作失败，插件运行异常。', e);
+        }
         return 'error';
     };
 };
 
 
+/**
+ * @description
+ */
+async function gitShowCommitFileChange(workingDir, options) {
+    try {
+        let result = {
+            "success": true,
+            "errorMsg": '',
+            "data": []
+        }
+        let status = await git(workingDir).init()
+            .show(options)
+            .then((res) => {
+                result.data = res
+                return result;
+            })
+            .catch((err) => {
+                result.errorMsg = err.message;
+                result.success = false;
+                return result;
+            });
+        return result;
+    } catch (e) {
+        result.success = false;
+        return result;
+    };
+}
+
+
 module.exports = {
+    createOutputChannel,
     isGitInstalled,
+    getGitVersion,
     getHBuilderXiniConfig,
     getThemeColor,
     importProjectToExplorer,
     getFilesExplorerProjectInfo,
     checkNodeModulesFileList,
+    checkGitUsernameEmail,
     gitInit,
     gitClone,
     gitStatus,
@@ -1305,8 +1488,9 @@ module.exports = {
     gitPush,
     gitPull,
     gitFetch,
-    gitCheckout,
+    gitCheckoutFile,
     gitDiffFile,
+    gitShowCommitFileChange,
     gitBranch,
     gitRawGetBranch,
     gitCurrentBranchName,

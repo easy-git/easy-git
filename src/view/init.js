@@ -3,7 +3,7 @@ const path = require('path');
 
 const hx = require('hbuilderx');
 
-const utils = require('../utils.js');
+const utils = require('../common/utils.js');
 const icon = require('./static/icon.js');
 
 const vueFile = path.join(__dirname, 'static', '','vue.min.js');

@@ -3,15 +3,57 @@ const fs = require('fs');
 const path = require('path');
 const git = require('simple-git');
 
-const file = require('./file.js');
-const utils = require('./utils.js');
+const file = require('./common/file.js');
+const utils = require('./common/utils.js');
+const count = require('./common/count.js');
+const cmp_hx_version = require('./common/cmp.js');
+const upgrade = require('./common/upgrade.js');
 
 const MainView = require('./view/main.js');
-const LogView = require('./view/log.js');
+const GitBranchView = require('./view/branch/branch.js');
 const initView = require('./view/init.js');
 const cloneView = require('./view/clone.js');
 
-const count = require('./common/count.js');
+// Easy-Git log view, hbuilderx 2.9.2-, use webview
+const openLogWebView = require('./view/log/openWebView.js');
+
+// Easy-Git log view, hbuilderx 2.9.2+, use customEditor
+let { GitLogCustomEditorRenderHtml, GitLogCustomWebViewPanal } = require('./view/log/openCustomEditor.js');
+
+// get hbuilderx version
+let hxVersion = hx.env.appVersion;
+hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
+let cmp = cmp_hx_version(hxVersion, '2.9.2');
+
+// CustomEditor 首次启动缓慢，因此在状态栏增加提示
+let isShowLogMessage = false;
+
+/**
+ * @description 打开日志视图
+ * @param {Object} userConfig
+ * @param {Object} gitData
+ * @param {Object} webviewPanel. hbuilderx 2.9.2-, use webview; hbuilderx 2.9.2+, use customEditor
+ */
+async function openGitLog(userConfig, gitData, webviewPanel) {
+    if (cmp <= 0) {
+        if (isShowLogMessage == false) {
+            hx.window.setStatusBarMessage('EasyGit: 正在加载Git日志，首次加载较慢，请耐心等待......', 5000, 'info');
+            isShowLogMessage = true;
+            setTimeout(function() {
+                GitLogCustomEditorRenderHtml(gitData, userConfig);
+            }, 800);
+        } else {
+            GitLogCustomEditorRenderHtml(gitData, userConfig);
+        };
+    } else {
+        openLogWebView(webviewPanel, userConfig, gitData);
+        hx.window.showView({
+            viewid: "EasyGitCommonView",
+            containerid: "EasyGitCommonView"
+        });
+    };
+};
+
 
 /**
  * @description 当焦点不在编辑器、项目管理器上
@@ -35,8 +77,12 @@ async function FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExpl
             if (viewType == 'main') {
                 MainView.active(webviewPanel, userConfig, gitData);
             };
+            if (viewType == 'branch') {
+                GitBranchView(webviewPanel, userConfig, gitData);
+            };
             if (viewType == 'log') {
-                LogView.show(webviewPanel, userConfig, gitData);
+                openGitLog(userConfig, gitData, webviewPanel);
+                return;
             };
         } else {
             initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
@@ -48,7 +94,8 @@ async function FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExpl
 
     let containerid = viewType == 'log' ? 'EasyGitCommonView': 'EasyGitSourceCodeView';
     hx.window.showView({
-       containerid: containerid
+        viewid: containerid,
+        containerid: containerid
     });
 };
 
@@ -65,11 +112,12 @@ async function FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExpl
  *   - 多个页面进入初始页面
  */
 async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo) {
-
     // 获取项目名称、项目路径
     let projectName, projectPath, selectedFile;
 
-    let {easyGitInner} = param;
+    // easyGitInner: 用于标记外部点击还是插件内部点击
+    // GitAssignAction: 特定操作
+    let {easyGitInner, GitAssignAction} = param;
     if (easyGitInner != undefined || easyGitInner) {
         try{
             projectName = param.projectName;
@@ -99,52 +147,20 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
     let gitData = Object.assign(gitInfo, {
         'projectName': projectName,
         'projectPath': projectPath,
-        'selectedFile': selectedFile
+        'selectedFile': selectedFile,
+        'GitAssignAction': GitAssignAction
     });
 
     if (viewType == 'main' && isGitProject) {
+        // 检查是否设置了user.name和user.email
+        setTimeout(function() {
+            utils.checkGitUsernameEmail(projectPath, projectName, userConfig);
+        }, 5000);
+
         // Git文件视图：检查git项目是否包含node_modules
-        let {num,isNodeModules} = utils.checkNodeModulesFileList(gitInfo);
-        if (isNodeModules) {
-            hx.window.showErrorMessage(
-                '检测到当前git项目下，包含node_modules，且未设置.gitignore, 是否设置?',['设置.gitignore','以后再说'],
-            ).then((result) => {
-                if (result == '设置.gitignore') {
-                    file.gitignore({'projectPath': projectPath});
-                }
-            })
-        };
-        if (num >= 10000) {
-            hx.window.showErrorMessage(
-                `easy-it: 项目${projectName}下, ${num}个文件发生了变化，easy-git插件需要一定的时间来加载。\n`,
-                ['我知道了'],
-            )
-        };
-
-        // 检查是否设置了username和email，如未设置，弹窗提示
-        let configData = await utils.gitConfigShow(projectPath, false);
-        let gitUserName = configData['user.name'];
-        let gitEmail = configData['user.email'];
-
-        // 用户是否设置过不再提示
-        let { GitConfigUserPrompt } = userConfig;
-
-        if ((gitEmail == '' || gitUserName == '') && (GitConfigUserPrompt != false)) {
-            let msg = `当前项目 ${projectName} 未设置`
-            if (gitUserName == '') {
-                msg = msg + 'user.name'
-            };
-            if (gitEmail == '') {
-                msg = msg + 'user.email'
-            };
-            msg = msg + ", 点击菜单【工具】【easy-git】可进行设置。\n"
-            hx.window.showErrorMessage(msg,['我知道了','不再提示']).then((result)=> {
-                if (result == '不再提示') {
-                    let config = hx.workspace.getConfiguration();
-                    config.update("EasyGit.GitConfigUserPrompt", false).then(() => {});
-                }
-            });
-        };
+        setTimeout(function() {
+            utils.checkNodeModulesFileList(projectPath, projectName, gitInfo);
+        }, 10000);
     };
 
     // 设置项目路径(暂时无用)
@@ -175,17 +191,29 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
             initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
         };
         hx.window.showView({
-           containerid: "EasyGitSourceCodeView"
+            viewid: "EasyGitSourceCodeView",
+            containerid: "EasyGitSourceCodeView"
+        });
+        return;
+    };
+
+    // show git Main view
+    if (viewType == 'branch') {
+        if (isGitProject) {
+            GitBranchView(webviewPanel, userConfig, gitData);
+        } else {
+            initView.show(webviewPanel, userConfig, FilesExplorerProjectInfo);
+        };
+        hx.window.showView({
+            viewid: "EasyGitSourceCodeView",
+            containerid: "EasyGitSourceCodeView"
         });
         return;
     };
 
     // show git log view
     if (viewType == 'log') {
-        LogView.show(webviewPanel, userConfig, gitData);
-        hx.window.showView({
-           containerid: "EasyGitCommonView"
-        });
+        openGitLog(userConfig, gitData, webviewPanel);
         return;
     };
 
@@ -219,8 +247,11 @@ async function FromViewMenu(viewType, webviewPanel, userConfig, FilesExplorerPro
             if (viewType == 'main') {
                 MainView.active(webviewPanel, userConfig, gitData);
             };
+            if (viewType == 'branch') {
+                GitBranchView(webviewPanel, userConfig, gitData);
+            };
             if (viewType == 'log') {
-                LogView.show(webviewPanel, userConfig, gitData);
+                openGitLog(userConfig, gitData, webviewPanel);
             };
         };
     };
@@ -237,8 +268,7 @@ async function FromViewMenu(viewType, webviewPanel, userConfig, FilesExplorerPro
  * @param {Object} webviewPanel
  */
 async function main(viewType, param, webviewPanel, context) {
-
-    if (!['main','log', 'clone'].includes(viewType)) {
+    if (!['main', 'branch', 'log', 'clone'].includes(viewType)) {
         return;
     };
 
@@ -279,12 +309,13 @@ async function main(viewType, param, webviewPanel, context) {
     if (FoldersNum == 0 && ['main', 'clone'].includes(viewType)) {
         hx.commands.executeCommand('workbench.view.explorer');
     };
-    
-    // count
+
     try{
-        if (isShareUsageData == undefined && !isShareUsageData) {
-            count(viewType).catch( error=> {});
-        };
+        // count data
+        count(viewType).catch( error=> {});
+
+        // check update
+        upgrade.checkUpdate('auto');
     }catch(e){};
 
     // 从菜单【视图】【显示扩展视图】进入
@@ -297,7 +328,8 @@ async function main(viewType, param, webviewPanel, context) {
     if (viewType == 'clone') {
         cloneView.show(webviewPanel, userConfig);
         hx.window.showView({
-           containerid: "EasyGitSourceCodeView"
+            viewid: "EasyGitSourceCodeView",
+            containerid: "EasyGitSourceCodeView"
         });
         return;
     };
@@ -310,7 +342,7 @@ async function main(viewType, param, webviewPanel, context) {
     };
 
     // 没有获取到焦点
-    if (source == "filesExplorer" && param == null) {
+    if (source == "filesExplorer" && param == null && param != undefined) {
         param = param;
         FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo);
         return;

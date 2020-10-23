@@ -3,11 +3,10 @@ const fs = require('fs');
 const path = require('path');
 const git = require('simple-git');
 
-const file = require('./file.js');
-const utils = require('./utils.js');
+const file = require('./common/file.js');
+const utils = require('./common/utils.js');
 
 const MainView = require('./view/main.js');
-const LogView = require('./view/log.js');
 const initView = require('./view/init.js');
 const cloneView = require('./view/clone.js');
 
@@ -16,11 +15,14 @@ const cloneView = require('./view/clone.js');
  * @description 提供webview视图外Git的操作
  */
 function action(param,action_name) {
+    if (param == null) {
+        return hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试。', ['我知道了']);
+    };
 
-    let {easyGitInner} = param;
-    let projectName, projectPath, selectedFile;
+    let projectName, projectPath, selectedFile, easyGitInner;
     try{
-        if (easyGitInner) {
+        let {easyGitInner} = param;
+        if (easyGitInner != undefined) {
             projectName = param.projectName;
             projectPath = param.projectPath;
         } else {
@@ -35,7 +37,7 @@ function action(param,action_name) {
             };
         };
     } catch(e){
-        return hx.window.setStatusBarMessage('easy-git: 无法获取到项目路径，请在项目管理器选中后再试。',4000, 'error');
+        return hx.window.showErrorMessage('easy-git: 无法获取到项目路径，请在项目管理器选中项目后再试。');
     };
 
     const ProjectInfo = {
@@ -47,6 +49,9 @@ function action(param,action_name) {
     switch (action_name){
         case 'pull':
             utils.gitPull(projectPath, {'rebase': true});
+            break;
+        case 'push':
+            utils.gitPush(projectPath);
             break;
         case 'stash':
             goStash(ProjectInfo, '', 'Git: 储藏(stash)');
@@ -69,6 +74,9 @@ function action(param,action_name) {
         case 'setEmail':
             goSetConfig(projectPath, action_name);
             break;
+        case 'BlameForLineChange':
+            gitBlameForLineChange(projectPath, selectedFile);
+            break;
         default:
             break;
     };
@@ -79,13 +87,14 @@ function action(param,action_name) {
  * @description 储藏
  */
 async function goStash(ProjectInfo, option, stashMsg) {
+    let msg = option == '-a' ? '消息必填' : '消息选填';
     let inputResult = await hx.window.showInputBox({
         prompt: "stash - 储藏消息",
-        placeHolder: "消息可选"
+        placeHolder: msg
     }).then((result)=>{
         return result
     });
-
+    
     let options = [];
     if (inputResult != '' && inputResult) {
         if (option == '-a') {
@@ -93,12 +102,9 @@ async function goStash(ProjectInfo, option, stashMsg) {
         } else {
             options = ['save', inputResult]
         };
-    } else {
-        options.push(option)
     };
     utils.gitStash(ProjectInfo, options, stashMsg);
 };
-
 
 /**
  * @description 弹出储藏
@@ -173,6 +179,40 @@ async function goSetConfig(projectPath, action_name) {
 
     utils.gitConfigSet(projectPath, {'key':key, 'value':inputResult});
 };
+
+
+/**
+ * @description 显示文件的每一行最后修改的版本和作者
+ */
+async function gitBlameForLineChange(projectPath, selectedFile) {
+    let activeEditor = hx.window.getActiveTextEditor();
+    let lineNumber = await activeEditor.then(function(editor){
+        let linePromise = editor.document.lineFromPosition(editor.selection.active);
+        return linePromise.then((line)=>{
+            return line.lineNumber;
+        });
+    });
+    if (typeof(lineNumber) == 'number') {
+        let tmp = (lineNumber + 1).toString();
+
+        let range = tmp + ',' + tmp;
+        let commands = ['blame', '-L', range, selectedFile];
+
+        let errorMsg = 'Git: 获取当前行，最后修改的信息失败!'
+        try{
+            let result = await utils.gitRaw(projectPath, commands, undefined, 'result');
+            let m = result.match(/(?<=\()[^\(\)]+(?=\))/g)[0];
+            if (m == '' || m == undefined) {
+                return hx.window.setStatusBarMessage(errorMsg, 5000, 'error');
+            };
+            hx.window.setStatusBarMessage(`Git: 当前行最后修改信息, ${m}`, 5000, 'info');
+        }catch(e){
+            return hx.window.setStatusBarMessage(errorMsg, 5000, 'error');
+        };
+    } else {
+        return hx.window.showErrorMessage('EasyGit: 请将焦点置于打开的文件内容行上。', ['我知道了']);
+    };
+}
 
 
 module.exports = {
