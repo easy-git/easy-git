@@ -255,6 +255,24 @@ function isGitInstalled() {
   return true;
 };
 
+/**
+ * @description get git version
+ */
+function getGitVersion() {
+    return new Promise((resolve, reject) => {
+        exec('git --version', function(error, stdout, stderr) {
+            if (error) {
+                reject(undefined)
+            };
+            try {
+                let gitLocalVersion = stdout.match(/(\d{1,3}.\d{1,3}.\d{1,3})/g)[0];
+                resolve(gitLocalVersion);
+            } catch (e) {
+                reject(undefined)
+            };
+        });
+    });
+};
 
 /**
  * @description 检查是否设置了username和email，如未设置，弹窗提示
@@ -461,25 +479,21 @@ async function gitStatus(workingDir) {
         // 所有文件列表
         let files = statusSummary.files;
 
-        // 冲突
+        // 合并更改（冲突）
         let conflicted = statusSummary.conflicted ? statusSummary.conflicted : [];
         let conflicted_list = conflicted.map(function(v,i) {
             return {'path':v, 'tag': 'C'}
         });
         result.FileResult.conflicted = conflicted_list;
 
-        // 未暂存
+        // 更改(未暂存)
         let not_add = statusSummary.not_added ? statusSummary.not_added : [];
         let not_staged_list = [];
         if (files.length && files != undefined) {
-            let tmp = [...conflicted, ...not_add];
+            let tmp = [...not_add];
             for (let s of files) {
-               if (tmp.includes(s.path) || (s.index == ' ' && s.working_dir == 'M')) {
-                   if (s.index == ' ' && s.working_dir == 'M') {
-                       not_staged_list.push({'path': s.path, 'tag': 'M'});
-                   } else {
-                       not_staged_list.push({'path': s.path, 'tag': s.index});
-                   }
+               if (!conflicted.includes(s.path) && ((s.index == ' ') || tmp.includes(s.path))) {
+                    not_staged_list.push({'path': s.path, 'tag': s.working_dir});
                };
            };
         };
@@ -1448,6 +1462,7 @@ async function gitShowCommitFileChange(workingDir, options) {
 module.exports = {
     createOutputChannel,
     isGitInstalled,
+    getGitVersion,
     getHBuilderXiniConfig,
     getThemeColor,
     importProjectToExplorer,
