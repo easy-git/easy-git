@@ -137,7 +137,11 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
                 break;
             case 'openFile':
                 let furi = path.join(projectPath,msg.filename);
-                hx.workspace.openTextDocument(furi);
+                hx.workspace.openTextDocument(furi).then((res) => {
+                    if (res == null) {
+                        hx.window.showErrorMessage('Git: 打开文件失败，文件不存在，可能被删除！', ['我知道了']);
+                    }
+                });
                 break;
             case 'copy':
                 hx.env.clipboard.writeText(msg.text);
