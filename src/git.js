@@ -101,8 +101,6 @@ async function goStash(ProjectInfo, option, stashMsg) {
         } else {
             options = ['save', inputResult]
         };
-    } else {
-        options.push(option)
     };
     utils.gitStash(ProjectInfo, options, stashMsg);
 };

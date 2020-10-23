@@ -1313,12 +1313,19 @@ async function gitStash(projectInfo, options, msg) {
         let status = await git(projectPath).init()
             .stash(options)
             .then((res) => {
-                hx.window.setStatusBarMessage(msg + '成功', 5000, 'info');
-                hx.commands.executeCommand('EasyGit.main', projectInfo);
-                return 'success';
+                if (res.includes('Saved')) {
+                    hx.window.setStatusBarMessage(msg + '成功', 5000, 'info');
+                    hx.commands.executeCommand('EasyGit.main', projectInfo);
+                    return 'success';
+                };
+                if (res.includes('needs merge')) {
+                    throw `可能有文件存在冲突，请解决后再进行储藏！\n\n${res}`;
+                } else {
+                    throw res;
+                };
             })
             .catch((err) => {
-                createOutputChannel(msg + '失败', err);
+                createOutputChannel(msg + '操作失败！', err);
                 return 'fail';
             });
         return status;
