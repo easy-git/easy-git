@@ -101,7 +101,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 height: 30px;
             }
             .fred {
-                color: red;
+                color: red !important;
             }
             .fgreen {
                 color: green;
@@ -349,7 +349,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                         <span title="加入暂存 (git add)" @click="gitAdd(v1.path);">${AddIconSvg}</span>
                                     </div>
                                     <div class="d-inline ml-1 pt-2">
-                                        <span class="file-label" class="fred"> {{ v1.tag }} </span>
+                                        <span class="file-label fred"> {{ v1.tag }} </span>
                                     </div>
                                 </div>
                             </li>
@@ -608,11 +608,12 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         });
                     },
                     gitCommit() {
-                        let ChangeFile = this.gitNotStagedileList;
+                        let ChangeList = this.gitNotStagedileList;
                         let stagedList = this.gitStagedFileList;
+                        let ConflictedList = this.gitConflictedFileList;
 
                         let isStaged = stagedList.length == 0 ? false : true;
-                        let exist = (stagedList.length) + (ChangeFile.length);
+                        let exist = (stagedList.length) + (ChangeList.length) + (ConflictedList.length);
 
                         hbuilderx.postMessage({
                             command: 'commit',
