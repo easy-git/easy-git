@@ -1313,7 +1313,7 @@ async function gitStash(projectInfo, options, msg) {
         let status = await git(projectPath).init()
             .stash(options)
             .then((res) => {
-                if (res.includes('Saved')) {
+                if (res.includes('Saved') || res == '') {
                     hx.window.setStatusBarMessage(msg + '成功', 5000, 'info');
                     hx.commands.executeCommand('EasyGit.main', projectInfo);
                     return 'success';

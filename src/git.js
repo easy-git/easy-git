@@ -87,13 +87,14 @@ function action(param,action_name) {
  * @description 储藏
  */
 async function goStash(ProjectInfo, option, stashMsg) {
+    let msg = option == '-a' ? '消息必填' : '消息选填';
     let inputResult = await hx.window.showInputBox({
         prompt: "stash - 储藏消息",
-        placeHolder: "消息可选"
+        placeHolder: msg
     }).then((result)=>{
         return result
     });
-
+    
     let options = [];
     if (inputResult != '' && inputResult) {
         if (option == '-a') {
