@@ -332,7 +332,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 <div class="row mt-3" id="git_add" style="visibility: hidden;" :style="{visibility: 'visible'}">
                     <div class="col px-0" v-if="gitConflictedFileListLength != 0">
                         <p class="add-title" id="git_add_title">
-                            <span class="a-icon" v-html="ConflictedIcon" @click="isShowConflictedList();"></span>合并更改:
+                            <span class="a-icon" v-html="ConflictedIcon" @click="isShowConflictedList();"></span>合并更改 (冲突):
                             <span class="gtag">{{ gitConflictedFileListLength }}</span>
                         </p>
                         <ul style="list-style-type:none;padding-left:0;" id="git_add_data" v-show="isShowConflicted">
@@ -343,9 +343,9 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 <div class="flex-grow-1 text-hidden">
                                     <span @click="openFile(v1.path);">{{ v1.path }}</span>
                                 </div>
-                                <div class="d-inline float-right" :id="'change_'+i1">
-                                    <div class="d-inline"  v-if="hoverConflictedFileID == 'change_'+i1">
-                                        <span title="打开文件" @click="openFile(v.path);">${OpenFileIconSvg}</span>
+                                <div class="d-inline float-right" :id="'conflicted_'+i1">
+                                    <div class="d-inline" v-if="hoverConflictedFileID == 'conflicted_'+i1">
+                                        <span title="打开文件" @click="openFile(v1.path);">${OpenFileIconSvg}</span>
                                         <span title="加入暂存 (git add)" @click="gitAdd(v1.path);">${AddIconSvg}</span>
                                     </div>
                                     <div class="d-inline ml-1 pt-2">
