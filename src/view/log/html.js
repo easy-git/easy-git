@@ -458,13 +458,13 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         </div>
                     </div>
                     <p class="intro">
-						{{ logDetails.author_name }} {{ logDetails.date  | FormatDate}}
+                        {{ logDetails.author_name }} {{ logDetails.date  | FormatDate}}
                         <span v-if="renderType != 'webView'">
                             ; {{ logDetails.diff.changed }} file changed,
                             {{ logDetails.diff.insertions }} insertions(+),
                             {{ logDetails.diff.deletions }} deletions(-)
                         </span>
-					</p>
+                    </p>
                     <p class="intro" v-if="renderType == 'webView'">
                         {{ logDetails.diff.changed }} file changed,
                         {{ logDetails.diff.insertions }} insertions(+),
@@ -799,6 +799,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         },
                         // 显示commit 文件具体修改
                         showCommitFileChange(filePath) {
+                            this.CommitFileChangeDetails = {};
                             let data = {
                                 "commitId": this.logDetails.hash,
                                 "filePath": filePath
