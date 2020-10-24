@@ -262,7 +262,9 @@ class Tag {
             let status = await utils.gitTagCreate(this.projectPath, options, tagName);
             if (status == 'success') {
                 hx.window.showInformationMessage(`Git: 在${titleLabel}上创建标签成功！`, ['立即推送到远端','以后再说']).then( (result)=> {
-                    utils.gitPush(this.projectPath, ['origin', tagName]);
+                    if (result == '立即推送到远端') {
+                        utils.gitPush(this.projectPath, ['origin', tagName]);
+                    }
                 });
                 if (param != null && JSON.stringify(param) != '{}') {
                     hx.commands.executeCommand('EasyGit.branch', param);
