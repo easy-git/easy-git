@@ -158,7 +158,12 @@ function activate(context) {
 
     // git tag 标签创建
     let tagCreate = hx.commands.registerCommand('EasyGit.tagCreate', (param)=> {
-        git.action(param, 'tagCreate')
+        git.action(param, 'tagCreate');
+    });
+
+    // git tag 标签详情
+    let tagDetails = hx.commands.registerCommand('EasyGit.tagDetails', (param)=> {
+        git.action(param, 'tagDetails');
     });
 
 };

@@ -201,14 +201,13 @@ class GitBranch {
 
     // Git tag: Detail
     async TagDetails(tagName) {
-        if (tagName.length == 0) {
-            return hx.window.showErrorMessage('tag名称无效。',['关闭']);
+        let param = {
+            "tagName": tagName,
+            "projectPath": this.projectPath,
+            "projectName": this.projectName,
+            "easyGitInner": true
         };
-        let options = [ 'show', '-s', '--format=medium', tagName ]
-        let details = await utils.gitRaw(this.projectPath, options, undefined, 'result');
-        if (details) {
-            utils.createOutputChannel(`Git: ${tagName} 标签详情如下: `, details);
-        };
+        hx.commands.executeCommand('EasyGit.tagDetails', param);
     }
 };
 

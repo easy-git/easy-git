@@ -46,6 +46,9 @@ function action(param,action_name) {
         'easyGitInner': true
     };
 
+    // git tag: 标签相关操作
+    let tag = new Tag(projectPath);
+
     switch (action_name){
         case 'pull':
             utils.gitPull(projectPath, {'rebase': true});
@@ -78,9 +81,12 @@ function action(param,action_name) {
             gitBlameForLineChange(projectPath, selectedFile);
             break;
         case 'tagCreate':
-            let tag = new Tag(projectPath);
             let { hash } = param;
             tag.create(hash, param);
+            break;
+        case 'tagDetails':
+            let { tagName } = param;
+            tag.showDetails(tagName);
             break;
         default:
             break;
@@ -223,6 +229,17 @@ async function gitBlameForLineChange(projectPath, selectedFile) {
 class Tag {
     constructor(projectPath) {
         this.projectPath = projectPath;
+    }
+
+    async showDetails(tagName) {
+        if (tagName.length == 0) {
+            return hx.window.showErrorMessage('tag名称无效。',['关闭']);
+        };
+        let options = [ 'show', '-s', '--format=medium', tagName ]
+        let details = await utils.gitRaw(this.projectPath, options, undefined, 'result');
+        if (details) {
+            utils.createOutputChannel(`Git: ${tagName} 标签详情如下: `, details);
+        };
     }
 
     async create(hash=null, param=null) {
