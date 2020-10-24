@@ -45,7 +45,7 @@ class CatCustomEditorProvider extends CustomEditorProvider {
     resolveCustomEditor(document, webViewPanel) {
         GitLogCustomEditorStatus = true;
         GitLogCustomWebViewPanal = webViewPanel;
-
+        
         // First Open: render html to customEditor
         if (isCustomFirstOpen == false) {
             let isHtml = webViewPanel.webView._html;
@@ -64,6 +64,8 @@ class CatCustomEditorProvider extends CustomEditorProvider {
 
         // close customEditor
         webViewPanel.onDidDispose(function() {
+            // GitLogCustomWebViewPanal = {};
+            // isCustomFirstOpen = true;
             GitLogCustomEditorStatus = false;
         });
     }
@@ -103,6 +105,8 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
 
         gitData.projectPath = projectPath;
         gitData.projectName = projectName;
+    } else {
+        isCustomFirstOpen = true;
     };
 
     history(gitData);

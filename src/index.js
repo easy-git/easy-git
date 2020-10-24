@@ -43,7 +43,9 @@ async function openGitLog(userConfig, gitData, webviewPanel) {
                 GitLogCustomEditorRenderHtml(gitData, userConfig);
             }, 800);
         } else {
-            GitLogCustomEditorRenderHtml(gitData, userConfig);
+            setTimeout(function() {
+                GitLogCustomEditorRenderHtml(gitData, userConfig);
+            }, 300);
         };
     } else {
         openLogWebView(webviewPanel, userConfig, gitData);
