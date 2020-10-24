@@ -156,8 +156,13 @@ class GitBranch {
     // Git branch: merge
     async merge(fromBranch,toBranch) {
         let mergeStatus = await utils.gitBranchMerge(this.projectPath,fromBranch,toBranch);
-        if (mergeStatus == 'success') {
-            this.refreshFileList();
+        if (mergeStatus == 'success' || mergeStatus == 'fail') {
+            let param = {
+                'projectPath': this.projectPath,
+                'projectName': this.projectName,
+                'easyGitInner': true
+            };
+            hx.commands.executeCommand('EasyGit.main', param);
         };
     };
 
@@ -191,7 +196,7 @@ class GitBranch {
             "projectName": this.projectName,
             "easyGitInner": true
         };
-        hx.commands.executeCommand('EasyGit.tagCreate', param)
+        hx.commands.executeCommand('EasyGit.tagCreate', param);
     };
 
     // Git tag: Detail

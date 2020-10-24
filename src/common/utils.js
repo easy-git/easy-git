@@ -1086,19 +1086,20 @@ async function gitBranchCreatePush(workingDir,branchName) {
  */
 async function gitBranchMerge(workingDir,fromBranch,toBranch) {
     // status bar show message
-    hx.window.setStatusBarMessage('Git: 正在进行合并...', 3000, 'info');
-
+    hx.window.setStatusBarMessage(`'Git: 正在将 ${fromBranch} 合并到 ${toBranch}...`, 2000, 'info');
+    
     try {
         let status = await git(workingDir).init()
             .mergeFromTo(fromBranch,toBranch)
             .then((res) => {
+                console.log(res)
                 let Msg = "\n\n" + (res).toString();
                 createOutputChannel(`Git: 分支合并`, Msg);
                 return 'success';
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: 分支合并失败`, errMsg);
+                createOutputChannel(`Git: 分支合并失败, 请根据控制台提示手动处理。`, errMsg);
                 return 'fail';
             });
         return status
