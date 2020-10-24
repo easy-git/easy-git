@@ -77,6 +77,11 @@ function action(param,action_name) {
         case 'BlameForLineChange':
             gitBlameForLineChange(projectPath, selectedFile);
             break;
+        case 'tagCreate':
+            let tag = new Tag(projectPath);
+            let { hash } = param;
+            tag.create(hash, param);
+            break;
         default:
             break;
     };
@@ -94,7 +99,7 @@ async function goStash(ProjectInfo, option, stashMsg) {
     }).then((result)=>{
         return result
     });
-    
+
     let options = [];
     if (inputResult != '' && inputResult) {
         if (option == '-a') {
@@ -212,6 +217,42 @@ async function gitBlameForLineChange(projectPath, selectedFile) {
     } else {
         return hx.window.showErrorMessage('EasyGit: 请将焦点置于打开的文件内容行上。', ['我知道了']);
     };
+};
+
+
+class Tag {
+    constructor(projectPath) {
+        this.projectPath = projectPath;
+    }
+
+    async create(hash=null, param=null) {
+        let titleLabel = '当前代码';
+        if (hash != null && hash != undefined) {
+            titleLabel = hash.slice(0,12);
+        };
+        let tagName = await hx.window.showInputBox({
+            prompt:`在${titleLabel}上创建标签`,
+            placeHolder: '标签名称，必填'
+        }).then((result)=>{
+            if (result.length == 0) {
+                hx.window.showErrorMessage('请输入有效的标签名称', ['我知道了']);
+                return;
+            };
+            return result;
+        });
+        if (tagName.length) {
+            let options = hash == null ? [tagName] : [tagName, hash];
+            let status = await utils.gitTagCreate(this.projectPath, options, tagName);
+            if (status == 'success') {
+                hx.window.showInformationMessage(`Git: 在${titleLabel}上创建标签成功！`, ['立即推送到远端','以后再说']).then( (result)=> {
+                    utils.gitPush(this.projectPath, ['origin', tagName]);
+                });
+                if (param != null && JSON.stringify(param) != '{}') {
+                    hx.commands.executeCommand('EasyGit.branch', param);
+                };
+            }
+        }
+    }
 }
 
 

@@ -184,14 +184,14 @@ class GitBranch {
     };
 
     // Git tag: create
-    async TagCreate(tagName) {
-        if (tagName.length == 0) {
-            return hx.window.showErrorMessage('tag名称无效，请重新输入。',['关闭']);
+    async TagCreate() {
+        let param = {
+            "hash": null,
+            "projectPath": this.projectPath,
+            "projectName": this.projectName,
+            "easyGitInner": true
         };
-        let tagCreateStatus = await utils.gitTagCreate(this.projectPath, [tagName], tagName);
-        if (tagCreateStatus == 'success') {
-            this.LoadingBranchData();
-        };
+        hx.commands.executeCommand('EasyGit.tagCreate', param)
     };
 
     // Git tag: Detail

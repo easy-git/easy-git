@@ -31,6 +31,7 @@
         "onCommand:EasyGit.setGitattributes",
         "onCommand:EasyGit.checkUpdate",
         "onCommand:EasyGit.gitBlameForLineChange",
+        "onCommand:EasyGit.tagCreate",
         "onView:EasyGitSourceCodeView",
         "onView:EasyGitCommonView",
         "onCustomEditor:EasyGit - 日志"
@@ -166,6 +167,10 @@
             {
                 "command": "EasyGit.setGitattributes",
                 "title": "设置.gitattributes"
+            },
+            {
+                "command": "EasyGit.tagCreate",
+                "title": "标签创建"
             }
         ],
         "menus": {

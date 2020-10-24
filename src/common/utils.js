@@ -644,7 +644,7 @@ async function gitPush(workingDir, options=[]) {
         let status = await git(workingDir).init()
             .push(options)
             .then(() => {
-                hx.window.setStatusBarMessage('Git: push success', 3000, 'info');
+                hx.window.setStatusBarMessage('Git: push操作成功', 3000, 'info');
                 return 'success';
             })
             .catch((err) => {
@@ -1143,19 +1143,17 @@ async function gitTagsList(workingDir) {
  */
 async function gitTagCreate(workingDir,tagOptions, tagName) {
     // status bar show message
-    hx.window.setStatusBarMessage('Git: 正在当前分支上创建标签..., 创建后会自动推送到远端。', 2000, 'info');
+    hx.window.setStatusBarMessage(`Git: 正在创建标签 ${tagName} ....`, 2000, 'info');
 
     try {
         let status = await git(workingDir).init()
             .tag(tagOptions)
-            .push(['origin',tagName])
             .then(() => {
-                hx.window.setStatusBarMessage(`Git: 标签 ${tagName} 创建成功`, 5000, 'info');
                 return 'success';
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: 标签${tagName}创建失败`, errMsg);
+                createOutputChannel(`Git: 标签 ${tagName} 创建失败!`, errMsg);
                 return 'fail';
             });
         return status;
