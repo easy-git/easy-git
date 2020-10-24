@@ -12,11 +12,10 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 
 ## 界面预览
 
-![插件预览.jpg](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200823/01e5e92f365f34d11460574ceaad7b91.jpg)
+![插件预览.jpg](https://img-cdn-qiniu.dcloud.net.cn/uploads/article/20201024/a4b936d51b56f9966d19370f85936b06.png)
 
 在项目管理器，选中`Git`项目，右键菜单，点击【easy-git】【源代码管理】即可打开`git视图`
 
-![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/f0ca4bd0510bfbddeb2ba7f85d8dc114.png)
 
 ## Git仓库克隆
 
@@ -34,7 +33,7 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 - `push`
 - `分支查看`,`分支切换`, `打开log`等
 
-![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/d342084a4516c60bf0f2b2035954c769.jpg)
+![](https://img-cdn-qiniu.dcloud.net.cn/uploads/article/20201024/aa12112946cab6fb3142b907e528b30b.png)
 
 
 ## 分支管理
@@ -43,7 +42,7 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 
 点击本地分支名称，即可快速切换分支 。
 
-![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/10df7f3442c244b05bd8e3e2d5458726.jpg)
+![](https://img-cdn-qiniu.dcloud.net.cn/uploads/article/20201024/6d7ed84ffa07688a490409b6b9cba1b0.png)
 
 ## 查看log
 
@@ -65,6 +64,12 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 > 更多见：[http://git-scm.com/docs/git-log](http://git-scm.com/docs/git-log)
 
 ![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/e4213df52a4faf5e3d3f43a673e1c42c.jpg)
+
+## 查看当前行最后一次修改信息
+
+打开文件，将光标置于要查看的行，右键菜单，点击【显示当前行最后一次修改信息】
+
+![](https://img-cdn-qiniu.dcloud.net.cn/uploads/article/20201024/cf0159155981d42a20eab352d685f71c.png)
 
 ## 更多功能
 
@@ -138,6 +143,18 @@ easy-git, 支持通过快捷键打开git视图。
 {
     "key": "",
     "command": "EasyGit.gitBlameForLineChange"
+}
+
+// Git tag 创建标签
+{
+    "key": "",
+    "command": "EasyGit.tagCreate"
+}
+
+// Git tag 查看标签详情
+{
+    "key": "",
+    "command": "EasyGit.tagDetails"
 }
 ```
 
