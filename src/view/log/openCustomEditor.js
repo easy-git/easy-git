@@ -51,7 +51,7 @@ class CatCustomEditorProvider extends CustomEditorProvider {
             let isHtml = webViewPanel.webView._html;
             // 使用setTimeout主要是解决首次激活customEditor，重复渲染的问题
             setTimeout(function() {
-                hx.window.setStatusBarMessage('EasyGit: 正在加载Git日志，首次加载较慢，请耐心等待......', 5000, 'info');
+                hx.window.setStatusBarMessage('EasyGit: 正在加载Git日志，请耐心等待......', 3000, 'info');
                 if (isSelectedFile == undefined) {
                     setTimeout(function() {
                         if (isHtml == '') {
@@ -59,7 +59,7 @@ class CatCustomEditorProvider extends CustomEditorProvider {
                         }
                     }, 2000);
                 };
-            }, 2000);
+            }, 3000);
         };
 
         // close customEditor
