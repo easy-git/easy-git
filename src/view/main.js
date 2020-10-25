@@ -362,7 +362,12 @@ function active(webviewPanel, userConfig, gitData) {
                 File.refreshFileList();
                 break;
             case 'diff':
-                utils.gitDiffFile(projectPath,msg.filename);
+                let f = path.join(projectPath, msg.filename)
+                hx.workspace.openTextDocument(f);
+                // setTimeout(function() {
+                //     hx.request('internaltest.executeCommand', 'file.compareWithLastVersion');
+                // }, 2000);
+                // utils.gitDiffFile(projectPath,msg.filename);
                 break;
             case 'log':
                 let data = {
@@ -375,9 +380,6 @@ function active(webviewPanel, userConfig, gitData) {
             case 'open':
                 let fileUri = path.join(projectPath, msg.text);
                 hx.workspace.openTextDocument(fileUri);
-                // setTimeout(function() {
-                //     hx.request('internaltest.executeCommand', 'file.compareWithLastVersion')
-                // }, 1000);
                 break;
             case 'add':
                 File.add(msg.text);

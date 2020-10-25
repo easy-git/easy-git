@@ -341,7 +341,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 @mouseover="hoverConflictedFileID = 'conflicted_'+i1"
                                 @mouseleave="hoverConflictedFileID = false">
                                 <div class="flex-grow-1 text-hidden">
-                                    <span @click="openFile(v1.path);">{{ v1.path }}</span>
+                                    <span @click="gitDiff(v1.path);">{{ v1.path }}</span>
                                 </div>
                                 <div class="d-inline float-right" :id="'conflicted_'+i1">
                                     <div class="d-inline" v-if="hoverConflictedFileID == 'conflicted_'+i1">
@@ -372,7 +372,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 @mouseover="hoverStashFileID = 'stash_'+ii"
                                 @mouseleave="hoverStashFileID = false">
                                 <div class="flex-grow-1 text-hidden">
-                                    <span :class="[vv.tag == 'D' ? 'line-through' : '']" @click="openFile(vv.path);">{{ vv.path }}</span>
+                                    <span :class="[vv.tag == 'D' ? 'line-through' : '']" @click="gitDiff(vv.path);">{{ vv.path }}</span>
                                 </div>
                                 <div class="d-inline float-right">
                                     <div class="d-inline" v-if="hoverStashFileID == 'stash_'+ii">
