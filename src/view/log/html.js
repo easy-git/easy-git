@@ -129,6 +129,9 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                 #git-log-body {
                     overflow: auto;
                 }
+                .tmp-log-body {
+                    margin-bottom: 360px !important;
+                }
                 .gitfile:hover .hideicon {
                     opacity: 1;
                 }
@@ -397,7 +400,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         <div class="rect4"></div>
                         <div class="rect5"></div>
                     </div>
-                    <div id="git-log-body" class="row mb-5"  style="margin-top:80px;" v-else>
+                    <div id="git-log-body" class="row mb-5"  style="margin-top:80px;" v-else :class="{ 'tmp-log-body' :isShowViewDetails }">
                         <div class="col mt-2 px-0" v-if="gitLogInfoList.length == 0">
                             <div class="text-center" style="margin-top: 20%;">
                                 <span>${noIcon}</span>
@@ -739,7 +742,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             if (JSON.stringify(firstFile) != '{}') {
                                 let {file} = firstFile;
                                 this.showCommitFileChange(file);
-                            }
+                            };
                         },
                         closeViewDetails() {
                             this.isShowViewDetails = false;
