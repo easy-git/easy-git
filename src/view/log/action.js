@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const hx = require('hbuilderx');
+const Diff2Html = require('diff2html');
 
 const utils = require('../../common/utils.js');
 const icon = require('../static/icon.js');
@@ -188,14 +189,12 @@ class GitLogAction {
 
         result.filePath = filePath;
         if ((result.data).length) {
-            result.data = (result.data).split('\n');
-            let tmp = [...result.data];
-            tmp = tmp.splice(11);
-            let tmp2 = [];
-            for (let s of tmp) {
-                tmp2.push(s.replace(new RegExp(" ", "gm"), '&nbsp;'));
-            };
-            result.data = tmp2;
+            let diffHtml = Diff2Html.html(result.data, {
+                drawFileList: false,
+                matching: 'lines',
+                outputFormat: 'line-by-line',
+            });
+            result.data = diffHtml;
             this.webviewPanel.webView.postMessage({
                 command: "showCommitFileChange",
                 result: result,

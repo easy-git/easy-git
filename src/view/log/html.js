@@ -2,6 +2,7 @@ const path = require('path');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
+const diff2htmlCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'diff2html.min.css');
 
 
 /**
@@ -44,6 +45,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
         <head>
             <meta charset="UTF-8">
             <link rel="stylesheet" href="${bootstrapCssFile}">
+            <link rel="stylesheet" href="${diff2htmlCssFile}">
             <script src="${vueFile}"></script>
             <style type="text/css">
                 body {
@@ -497,13 +499,8 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                     </li>
                                 </ul>
                              </div>
-                             <div class="flex-average change-files commit-file-details" v-if="JSON.stringify(CommitFileChangeDetails) != '{}'">
-                                <p
-                                    v-for="(c,i) in CommitFileChangeDetails.data" :key="i"
-                                    class="px-2"
-                                    :class="{ 'line-add': c.substr(0,1) == '+', 'line-sub': c.substr(0,1) == '-'}"
-                                    v-html="c">
-                                </p>
+                             <div class="flex-average change-files commit-file-details" v-if="CommitFileChangeDetails != ''">
+                                <div v-html="CommitFileChangeDetails"></div>
                              </div>
                         </div>
                     </div>
@@ -553,7 +550,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         logDetails: {},
                         logDetailsFiles: [],
                         loading: false,
-                        CommitFileChangeDetails: {},
+                        CommitFileChangeDetails: '',
                         renderType: 'webView'
                     },
                     watch: {
@@ -718,7 +715,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             document.body.style.overflow = 'auto';
                         },
                         viewDetails(data) {
-                            this.CommitFileChangeDetails = [];
+                            this.CommitFileChangeDetails = '';
                             this.isShowViewDetails = true;
                             this.logDetails = data;
                             let files = data.diff.files;
@@ -802,7 +799,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         },
                         // 显示commit 文件具体修改
                         showCommitFileChange(filePath) {
-                            this.CommitFileChangeDetails = {};
+                            this.CommitFileChangeDetails = '';
                             let data = {
                                 "commitId": this.logDetails.hash,
                                 "filePath": filePath
@@ -814,9 +811,9 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         },
                         forShowCommitFileChange() {
                             hbuilderx.onDidReceiveMessage((msg) => {
-                                this.CommitFileChangeDetails = {};
+                                this.CommitFileChangeDetails = '';
                                 if (msg.command != 'showCommitFileChange') {return};
-                                this.CommitFileChangeDetails = msg.result;
+                                this.CommitFileChangeDetails = msg.result.data;
                             });
                         }
                     }
