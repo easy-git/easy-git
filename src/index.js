@@ -19,6 +19,7 @@ const openLogWebView = require('./view/log/openWebView.js');
 
 // Easy-Git log view, hbuilderx 2.9.2+, use customEditor
 let { GitLogCustomEditorRenderHtml, GitLogCustomWebViewPanal } = require('./view/log/openCustomEditor.js');
+let { GitDiffCustomEditorRenderHtml, GitDiffCustomWebViewPanal } = require('./view/diff/openCustomEditor.js');
 
 // get hbuilderx version
 let hxVersion = hx.env.appVersion;
@@ -27,6 +28,8 @@ let cmp = cmp_hx_version(hxVersion, '2.9.2');
 
 // CustomEditor 首次启动缓慢，因此在状态栏增加提示
 let isShowLogMessage = false;
+let isShowDiffMessage = false;
+
 
 /**
  * @description 打开日志视图
@@ -56,6 +59,33 @@ async function openGitLog(userConfig, gitData, webviewPanel) {
     };
 };
 
+
+
+/**
+ * @param {Object} ProjectData
+ * @param {Object} userConfig
+ */
+async function openDiffFile(ProjectData, userConfig) {
+    if (cmp <= 0) {
+        if (isShowDiffMessage == false) {
+            hx.window.setStatusBarMessage('EasyGit: 正在加载Diff自定义编辑器，首次加载较慢，请耐心等待......', 5000, 'info');
+            isShowDiffMessage = true;
+            setTimeout(function() {
+                GitDiffCustomEditorRenderHtml(ProjectData, userConfig);
+            }, 800);
+        } else {
+            setTimeout(function() {
+                GitDiffCustomEditorRenderHtml(ProjectData, userConfig);
+            }, 300);
+        };
+    } else {
+        hx.window.showErrorMessage('Git: 此功能适用于HBuilderX 2.9.2+版本。', ['升级HBuilderX', '关闭']).then( (res) => {
+            if (res == '升级HBuilderX') {
+                hx.commands.executeCommand('update.checkForUpdate');
+            };
+        });
+    };
+};
 
 /**
  * @description 当焦点不在编辑器、项目管理器上
@@ -143,13 +173,16 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
         }
     };
 
+    let ProjectData = {
+        'projectName': projectName,
+        'projectPath': projectPath,
+        'selectedFile': selectedFile
+    };
+
     // git project status
     let gitInfo = await utils.gitStatus(projectPath);
     isGitProject = gitInfo.isGit;
-    let gitData = Object.assign(gitInfo, {
-        'projectName': projectName,
-        'projectPath': projectPath,
-        'selectedFile': selectedFile,
+    let gitData = Object.assign(gitInfo, ProjectData, {
         'GitAssignAction': GitAssignAction
     });
 
@@ -165,16 +198,6 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
         }, 10000);
     };
 
-    // 设置项目路径(暂时无用)
-    webviewPanel._projectPath = projectPath;
-
-    // 清空webview html
-    let isActive = webviewPanel._webView._html;
-    if (isActive != '') {
-        webviewPanel._webView._html = '';
-        webviewPanel._webView._msgListeners = [];
-    };
-
     // 如果在项目管理器，当前选择的项目不是git项目
     let currentSelectedProject = {
         'FolderPath': projectPath,
@@ -184,6 +207,22 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
     FilesExplorerProjectInfo = Object.assign(
         FilesExplorerProjectInfo, {'currentSelectedProject':currentSelectedProject}
     );
+
+    // git diff
+    if (viewType == 'diff') {
+        openDiffFile(ProjectData, userConfig);
+        return;
+    };
+
+    // 设置项目路径(暂时无用)
+    webviewPanel._projectPath = projectPath;
+
+    // 清空webview html
+    let isActive = webviewPanel._webView._html;
+    if (isActive != '') {
+        webviewPanel._webView._html = '';
+        webviewPanel._webView._msgListeners = [];
+    };
 
     // show git Main view
     if (viewType == 'main') {
@@ -218,7 +257,6 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
         openGitLog(userConfig, gitData, webviewPanel);
         return;
     };
-
 };
 
 
@@ -270,7 +308,7 @@ async function FromViewMenu(viewType, webviewPanel, userConfig, FilesExplorerPro
  * @param {Object} webviewPanel
  */
 async function main(viewType, param, webviewPanel, context) {
-    if (!['main', 'branch', 'log', 'clone'].includes(viewType)) {
+    if (!['main', 'branch', 'log', 'clone', 'diff'].includes(viewType)) {
         return;
     };
 
@@ -315,7 +353,6 @@ async function main(viewType, param, webviewPanel, context) {
     try{
         // count data
         count(viewType).catch( error=> {});
-
         // check update
         upgrade.checkUpdate('auto');
     }catch(e){};
@@ -333,6 +370,12 @@ async function main(viewType, param, webviewPanel, context) {
             viewid: "EasyGitSourceCodeView",
             containerid: "EasyGitSourceCodeView"
         });
+        return;
+    };
+
+    // diff
+    if (viewType == 'diff' && param == null && param != undefined) {
+        hx.window.showErrorMessage('EasyGit: 在项目管理器或编辑器，选中具体的文件后，再进行操作！', ['我知道了']);
         return;
     };
 

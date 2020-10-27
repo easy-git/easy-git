@@ -25,7 +25,6 @@ let CommonView = hx.window.createWebView("EasyGitCommonView", {
 
 /**
  * @todo 多个视图一起执行的问题
- * @todo 通过工具菜单触发视图，第一次点击打开后，第二次点击没有反应的问题
  */
 function activate(context) {
     context.source = 'viewMenu';
@@ -33,9 +32,15 @@ function activate(context) {
     // hbuilderx version 2.9.2+ , git log view, use customEditor
     const cmp = cmp_hx_version(hxVersion, '2.9.2');
     if (cmp <= 0) {
+        // git log customEditor view
         var { CatCustomEditorProvider, GitLogCustomWebViewPanal } = require('./view/log/openCustomEditor.js');
         let provider = new CatCustomEditorProvider({}, {}, {});
         hx.window.registerCustomEditorProvider("EasyGit - 日志", provider);
+
+        // git file diff cusomtEditor view
+        var { CatDiffCustomEditorProvider, GitDiffCustomWebViewPanal } = require('./view/diff/openCustomEditor.js');
+        let providerForDiff = new CatDiffCustomEditorProvider({}, {}, {});
+        hx.window.registerCustomEditorProvider("EasyGit - 对比差异", providerForDiff);
     };
 
     // 菜单【源代码管理】，菜单【工具】、及项目管理器右键菜单
@@ -102,37 +107,37 @@ function activate(context) {
         file.gitattributes(param);
     });
 
-    // Git拉取
+    // Git pull
     let pull = hx.commands.registerCommand('EasyGit.pull', (param)=> {
         git.action(param, 'pull');
     });
 
-    // Git推送
+    // Git push
     let push = hx.commands.registerCommand('EasyGit.push', (param)=> {
         git.action(param, 'push');
     });
 
-    // Git Stash 储藏
+    // Git Stash
     let stash = hx.commands.registerCommand('EasyGit.stash', (param)=> {
         git.action(param, 'stash');
     });
 
-    // Git Stash 储藏全部
+    // Git Stash all
     let stashAll = hx.commands.registerCommand('EasyGit.stashAll', (param)=> {
         git.action(param, 'stashAll');
     });
 
-    // git Stash 弹出指定储藏
+    // git Stash pop
     let stashPop = hx.commands.registerCommand('EasyGit.stashPop', (param)=> {
         git.action(param, 'stashPop')
     });
 
-    // git Stash 弹出最新储藏
+    // git Stash pop new
     let stashPopNew = hx.commands.registerCommand('EasyGit.stashPopNew', (param)=> {
         git.action(param, 'stashPopNew')
     });
 
-    // git Stash 清除所有储藏
+    // git Stash clear
     let stashClear = hx.commands.registerCommand('EasyGit.stashClear', (param)=> {
         git.action(param, 'stashClear')
     });
@@ -142,7 +147,7 @@ function activate(context) {
         upgrade.checkUpdate('manual');
     });
 
-    // 显示git文件当前行最后一次修改信息
+    // git blame: show line last change info
     let ForLineChange = hx.commands.registerCommand('EasyGit.gitBlameForLineChange', (param)=> {
         const cmp3 = cmp_hx_version(hxVersion, '2.9.5');
         if (cmp3 <= 0) {
@@ -156,16 +161,26 @@ function activate(context) {
         }
     });
 
-    // git tag 标签创建
+    // git tag create
     let tagCreate = hx.commands.registerCommand('EasyGit.tagCreate', (param)=> {
         git.action(param, 'tagCreate');
     });
 
-    // git tag 标签详情
+    // git tag details
     let tagDetails = hx.commands.registerCommand('EasyGit.tagDetails', (param)=> {
         git.action(param, 'tagDetails');
     });
 
+    // git diff
+    let diffFile = hx.commands.registerCommand('EasyGit.diffFile', (param)=> {
+        if (param == undefined) {return};
+        if (cmp <=0) {
+            let DiffCscratFile = path.join(__dirname, 'view',  'diff', 'cscrat', 'EasyGit - 对比差异');
+            hx.workspace.openTextDocument(DiffCscratFile);
+        };
+        context.source = 'filesExplorer';
+        index.main('diff', param, {}, context);
+    })
 };
 
 

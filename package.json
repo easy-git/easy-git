@@ -33,9 +33,11 @@
         "onCommand:EasyGit.gitBlameForLineChange",
         "onCommand:EasyGit.tagCreate",
         "onCommand:EasyGit.tagDetails",
+        "onCommand:EasyGit.diffFile",
         "onView:EasyGitSourceCodeView",
         "onView:EasyGitCommonView",
-        "onCustomEditor:EasyGit - 日志"
+        "onCustomEditor:EasyGit - 日志",
+        "onCustomEditor:EasyGit - 对比差异"
     ],
     "contributes": {
         "configuration": {
@@ -90,6 +92,14 @@
                     }
                 ],
                 "priority": "default"
+            },
+            {
+                "viewType": "EasyGit - 对比差异",
+                "selector": [
+                    {
+                        "fileNamePattern": "EasyGit - 对比差异"
+                    }
+                ]
             }
         ],
         "commands": [
@@ -176,6 +186,10 @@
             {
                 "command": "EasyGit.tagDetails",
                 "title": "标签查看详情"
+            },
+            {
+                "command": "EasyGit.diffFile",
+                "title": "对比差异"
             }
         ],
         "menus": {
@@ -197,6 +211,11 @@
                 {
                     "command": "EasyGit.log",
                     "title": "easy-git: 查看日志",
+                    "group": "z_commands"
+                },
+                {
+                    "command": "EasyGit.diffFile",
+                    "title": "easy-git: 比较差异",
                     "group": "z_commands"
                 },
                 {
