@@ -2,7 +2,7 @@ const hx = require('hbuilderx');
 const fs = require('fs');
 const path = require('path');
 
-const {Diff, getUIData} = require('./diff.js');
+const {Diff} = require('./diff.js');
 const getWebviewDiffContent = require('./html.js');
 
 let isSelectedFile;
@@ -22,7 +22,6 @@ try{
 // 用于保存自定义编辑器信息
 let GitDiffCustomWebViewPanal = {};
 
-let uiData = getUIData();
 
 class CatCustomDocument extends CustomDocument {
     constructor(uri) {
@@ -89,7 +88,7 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
 
     let GitDiff = new Diff(ProjectData, userConfig, GitDiffCustomWebViewPanal);
     GitDiff.SetView(selectedFile);
-
+    
     GitDiffCustomWebViewPanal.webView.onDidReceiveMessage(function(msg) {
         let action = msg.command;
         switch (action) {

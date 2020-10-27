@@ -434,6 +434,27 @@ async function gitClone(info) {
     };
 };
 
+/**
+ * @description 获取文件状态
+ * @param {Object} workingDir
+ * @param {Object} options
+ */
+async function gitFileStatus(workingDir, options) {
+    try {
+        let statusSummary = await git(workingDir)
+            .status(options)
+            .then( (res) => {
+                return res['files'][0];
+            })
+            .catch( (error)=> {
+                return 'error';
+            })
+        return statusSummary;
+    } catch (e) {
+        return 'error';
+    };
+};
+
 
 /**
  * @description 获取git信息
@@ -1087,7 +1108,7 @@ async function gitBranchCreatePush(workingDir,branchName) {
 async function gitBranchMerge(workingDir,fromBranch,toBranch) {
     // status bar show message
     hx.window.setStatusBarMessage(`'Git: 正在将 ${fromBranch} 合并到 ${toBranch}...`, 2000, 'info');
-    
+
     try {
         let status = await git(workingDir).init()
             .mergeFromTo(fromBranch,toBranch)
@@ -1478,6 +1499,7 @@ module.exports = {
     gitInit,
     gitClone,
     gitStatus,
+    gitFileStatus,
     gitAdd,
     gitAddCommit,
     gitAddCommitPush,

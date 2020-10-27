@@ -52,7 +52,7 @@ function getWebviewDiffContent(selectedFile, userConfig, uiData, diffResult='') 
             body {
                 color: ${fontColor};
                 font-size: 0.92rem;
-                background-color: ${background};
+                background-color: ${background} !important;
             }
             body::-webkit-scrollbar {
                 display: none;
@@ -60,12 +60,49 @@ function getWebviewDiffContent(selectedFile, userConfig, uiData, diffResult='') 
             [v-cloak] {
                 display: none;
             }
+            .diff-head {
+                height: 40px;
+                background-color: ${background} !important;
+                z-index: 100;
+            }
+            .diff-body {
+                margin-top: 40px !important;
+            }
+            .d2h-file-header {
+                display: none !important;
+            }
+            .d2h-info {
+                background-color: ${background} !important;
+            }
+            .d2h-file-wrapper {
+                border: none !important;
+            }
+            .d2h-files-diff {
+                height: calc(100vh - 50px) !important;
+            }
+            .d2h-file-side-diff {
+                border-right: 1px solid ${lineColor};
+            }
+            .d2h-code-wrapper {
+                height: calc(100vh - 50px) !important;
+            }
+            .d2h-code-side-linenumber {
+                background-color: ${background} !important;
+                border: none !important;
+            }
+            .d2h-code-side-linenumber::after {
+                background-color: ${background} !important;
+            }
         </style>
     </head>
     <body>
         <div id="app" v-cloak>
-            <div class="container-fluid pb-5">
-                <div id="gather-local-branchs" class="row">
+            <div class="container-fluid">
+                <div id="diff-head" class="row diff-head fixed-top">
+                    <div class="col-6">mina.js</div>
+                    <div class="col-6">adfa.js</div>
+                </div>
+                <div id="diff-body" class="row diff-body">
                     <div class="col p-0">
                         <div v-html="gitDiffResult"></div>
                     </div>
@@ -93,7 +130,7 @@ function getWebviewDiffContent(selectedFile, userConfig, uiData, diffResult='') 
                 },
                 methods: {
                     forInit() {
-                        this.gitDiffResult = \`${diffResult}'\`
+                        this.gitDiffResult = \`${diffResult}\`
                     },
                     forRefresh() {
                         hbuilderx.postMessage({

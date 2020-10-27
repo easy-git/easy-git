@@ -18,7 +18,7 @@ const getWebviewDiffContent = require('./html.js')
 function getUIData() {
 
     // 根据主题适配颜色
-    let colorData = utils.getThemeColor('siderBar');
+    let colorData = utils.getThemeColor('right');
     let {fontColor} = colorData;
 
     // svg icon
@@ -58,7 +58,7 @@ function getUIData() {
     return uiData;
 };
 
-let uiData = getUIData;
+let uiData = getUIData();
 
 
 class Diff {
@@ -69,10 +69,30 @@ class Diff {
         this.userConfig = userConfig;
     }
 
-    async SetView(selectedFile) {
-        let options = ['diff', '--staged', selectedFile];
-        let result = await utils.gitRaw(this.projectPath, options, '获取Git差异', 'result');
+    async getDiffOptions(selectedFile) {
+        let statusInfo = await utils.gitFileStatus(this.projectPath, ['-s', selectedFile]);
+        let options = ['diff', selectedFile];
 
+        let gitIndex = statusInfo.index;
+        let gitWorking_dir = (statusInfo.working_dir).trim();
+
+        switch (gitIndex){
+            case 'M':
+                options = ['diff','--staged', selectedFile];
+                break;
+            case ('A' || '?'):
+                options = ['diff', selectedFile];
+                break;
+            default:
+                break;
+        }
+        return options;
+    }
+
+    async SetView(selectedFile) {
+        let diff_options = await this.getDiffOptions(selectedFile);
+
+        let result = await utils.gitRaw(this.projectPath, diff_options, '获取Git差异', 'result');
         if (result == 'success' || result == 'fail' || result == 'error') {
             return;
         };
@@ -84,6 +104,7 @@ class Diff {
             outputFormat: 'side-by-side',
         });
 
+        diffResult = diffResult.replace(new RegExp("`","gm"), '&#x60;').replace(new RegExp("{","gm"), '&#123;').replace(new RegExp("}","gm"), '&#125;');
         this.webviewPanel.webView.html = getWebviewDiffContent(
             this.selectedFile,
             this.userConfig,
