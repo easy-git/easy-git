@@ -74,6 +74,10 @@ function getWebviewDiffContent(selectedFile, userConfig, uiData, diffData) {
                 font-size: 15px;
                 font-style: oblique;
                 color: ${fontColor} !important;
+                display: block;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
             }
             .diff-body {
                 margin-top: 40px !important;
