@@ -14,7 +14,7 @@ const diff2htmlCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'dif
  * @param {Object} uiData
  * @param {Object} gitBranchData
  */
-function getWebviewDiffContent(selectedFile, userConfig, uiData, diffResult='') {
+function getWebviewDiffContent(selectedFile, userConfig, uiData, diffData) {
     // 是否启用开发者工具
     let {DisableDevTools} = userConfig;
 
@@ -41,6 +41,8 @@ function getWebviewDiffContent(selectedFile, userConfig, uiData, diffResult='') 
         ShowIcon
     } = uiData;
 
+    let { titleLeft, titleRight, diffResult } = diffData;
+
     return `<!DOCTYPE html>
 <html lang="en">
     <head>
@@ -62,8 +64,16 @@ function getWebviewDiffContent(selectedFile, userConfig, uiData, diffResult='') 
             }
             .diff-head {
                 height: 40px;
+                line-height: 40px;
                 background-color: ${background} !important;
                 z-index: 100;
+            }
+            .diff-head .file-title {
+                display: inline;
+                padding-left: 1.5rem;
+                font-size: 15px;
+                font-style: oblique;
+                color: ${fontColor} !important;
             }
             .diff-body {
                 margin-top: 40px !important;
@@ -80,15 +90,15 @@ function getWebviewDiffContent(selectedFile, userConfig, uiData, diffResult='') 
             .d2h-files-diff {
                 height: calc(100vh - 50px) !important;
             }
-            .d2h-file-side-diff {
-                border-right: 1px solid ${lineColor};
+            .d2h-files-diff .d2h-file-side-diff:last-child {
+                border-left: 1px solid ${lineColor} !important;
             }
             .d2h-code-wrapper {
                 height: calc(100vh - 50px) !important;
             }
             .d2h-code-side-linenumber {
                 background-color: ${background} !important;
-                border: none !important;
+                border: 1px solid ${background} !important;
             }
             .d2h-code-side-linenumber::after {
                 background-color: ${background} !important;
@@ -99,8 +109,12 @@ function getWebviewDiffContent(selectedFile, userConfig, uiData, diffResult='') 
         <div id="app" v-cloak>
             <div class="container-fluid">
                 <div id="diff-head" class="row diff-head fixed-top">
-                    <div class="col-6">mina.js</div>
-                    <div class="col-6">adfa.js</div>
+                    <div class="col-6">
+                        <span class="file-title">{{ titleLeft }}</span>
+                    </div>
+                    <div class="col-6">
+                        <span class="file-title">{{ titleRight }}</span>
+                    </div>
                 </div>
                 <div id="diff-body" class="row diff-body">
                     <div class="col p-0">
@@ -113,10 +127,14 @@ function getWebviewDiffContent(selectedFile, userConfig, uiData, diffResult='') 
             var app = new Vue({
                 el: '#app',
                 data: {
+                    titleLeft: '',
+                    titleRight: '',
                     selectedFile: '',
                     gitDiffResult: ''
                 },
                 created() {
+                    this.titleLeft = '${titleLeft}';
+                    this.titleRight = '${titleRight}';
                     this.selectedFile = '${selectedFile}'
                 },
                 mounted() {
@@ -132,17 +150,13 @@ function getWebviewDiffContent(selectedFile, userConfig, uiData, diffResult='') 
                     forInit() {
                         this.gitDiffResult = \`${diffResult}\`
                     },
-                    forRefresh() {
-                        hbuilderx.postMessage({
-                            command: 'update',
-                            selectedFile: this.selectedFile
-                        })
-                    },
                     forUpdate() {
                         hbuilderx.onDidReceiveMessage((msg) => {
                             this.gitDiffResult = '';
                             if (msg.command != 'update') {return};
                             this.gitDiffResult = msg.result;
+                            this.titleLeft = '';
+                            this.titleRight = '';
                         });
                     }
                 }

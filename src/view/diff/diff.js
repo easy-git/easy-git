@@ -105,11 +105,17 @@ class Diff {
         });
 
         diffResult = diffResult.replace(new RegExp("`","gm"), '&#x60;').replace(new RegExp("{","gm"), '&#123;').replace(new RegExp("}","gm"), '&#125;');
+
+        let diffData = {
+            "diffResult": diffResult,
+            "titleLeft": selectedFile,
+            "titleRight": selectedFile
+        }
         this.webviewPanel.webView.html = getWebviewDiffContent(
             this.selectedFile,
             this.userConfig,
             this.uiData,
-            diffResult
+            diffData
         );
     }
 }
