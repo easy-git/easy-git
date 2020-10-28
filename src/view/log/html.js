@@ -354,9 +354,22 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                 .load-more-log {
                     font-size: 14px;
                 }
+                .d2h-file-wrapper {
+                    border: none !important;
+                }
+                .d2h-file-header {
+                    display: none !important;
+                }
+                .d2h-code-linenumber {
+                    background-color: ${background} !important;
+                    border: 1px solid ${background} !important;
+                }
+                .d2h-info {
+                    background-color: ${background} !important;
+                }
             </style>
         </head>
-        <body style="background-color:${background};">
+        <body style="background-color:${background} !important;">
             <div id="app" v-cloak>
                 <div id="log-list" class="container-fluid">
                     <div id="page-top" class="fixed-top">
