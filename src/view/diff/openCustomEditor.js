@@ -4,10 +4,9 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 
-const {Diff} = require('./diff.js');
-const getWebviewDiffContent = require('./html.js');
+const { Diff } = require('./diff.js');
+const { getDefaultContent, getWebviewDiffContent } = require('./html.js');
 
-let osName = os.platform();
 
 let isSelectedFile;
 let isCustomFirstOpen = false;
@@ -78,7 +77,10 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
     isSelectedFile = selectedFile;
     isCustomFirstOpen = true;
 
-    if (selectedFile == undefined || selectedFile == null) { return };
+    if (selectedFile == undefined || selectedFile == null) {
+        GitDiffCustomWebViewPanal.webView.html = getDefaultContent();
+        return;
+    };
 
     try{
         projectPath = path.normalize(projectPath);
