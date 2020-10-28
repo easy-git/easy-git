@@ -72,7 +72,7 @@ async function openDiffFile(ProjectData, userConfig) {
             isShowDiffMessage = true;
             setTimeout(function() {
                 GitDiffCustomEditorRenderHtml(ProjectData, userConfig);
-            }, 800);
+            }, 1500);
         } else {
             setTimeout(function() {
                 GitDiffCustomEditorRenderHtml(ProjectData, userConfig);
@@ -154,6 +154,7 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
         try{
             projectName = param.projectName;
             projectPath = param.projectPath;
+            selectedFile = param.selectedFile;
         }catch(e){
             return hx.window.showErrorMessage('easy-git: 插件运行异常, 无法获取到项目。', ['我知道了']);
         }

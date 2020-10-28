@@ -1,9 +1,13 @@
 const hx = require('hbuilderx');
+
+const os = require('os');
 const fs = require('fs');
 const path = require('path');
 
 const {Diff} = require('./diff.js');
 const getWebviewDiffContent = require('./html.js');
+
+let osName = os.platform();
 
 let isSelectedFile;
 let isCustomFirstOpen = false;
@@ -77,18 +81,19 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
     if (selectedFile == undefined || selectedFile == null) { return };
 
     try{
-        selectedFile = path.normalize(selectedFile);
         projectPath = path.normalize(projectPath);
-    }catch(e){};
+        ProjectData.projectPath = projectPath;
 
-    let fstate = fs.statSync(selectedFile);
-    if (fstate.isFile() != true) {
-        return hx.window.showErrorMessage('EasyGit: 选中有效的文件后，再进行操作！', ['我知道了']);
-    };
+        let fileAbsPath = path.join(projectPath, selectedFile);
+        let fstate = fs.statSync(fileAbsPath);
+        if (fstate.isFile() != true) {
+            return hx.window.showErrorMessage('EasyGit: 选中有效的文件后，再进行操作！', ['我知道了']);
+        };
+    }catch(e){};
 
     let GitDiff = new Diff(ProjectData, userConfig, GitDiffCustomWebViewPanal);
     GitDiff.SetView(selectedFile);
-    
+
     GitDiffCustomWebViewPanal.webView.onDidReceiveMessage(function(msg) {
         let action = msg.command;
         switch (action) {

@@ -71,26 +71,42 @@ class Diff {
 
     async getDiffOptions(selectedFile) {
         let statusInfo = await utils.gitFileStatus(this.projectPath, ['-s', selectedFile]);
-        let options = ['diff', selectedFile];
 
         let gitIndex = statusInfo.index;
         let gitWorking_dir = (statusInfo.working_dir).trim();
 
+        let options = ['diff', selectedFile];
+
+        let fileName = selectedFile.replace(this.projectPath, '').replace(/\\/g, '\/');
+        let titleLeft = fileName;
+        let titleRight = fileName;
+
         switch (gitIndex){
             case 'M':
                 options = ['diff','--staged', selectedFile];
+                titleRight = 'Working Tree : ' + titleRight;
                 break;
-            case ('A' || '?'):
-                options = ['diff', selectedFile];
+            case 'A':
+                options = ['diff','--cached', selectedFile];
+                break;
+            case 'U':
+                options = ['diff','HEAD', selectedFile];
+                titleRight = 'HEAD : ' + titleRight;
                 break;
             default:
                 break;
         }
-        return options;
+        let data = {
+            "diff_options": options,
+            "titleLeft": titleLeft,
+            "titleRight": titleRight
+        }
+        return data;
     }
 
     async SetView(selectedFile) {
-        let diff_options = await this.getDiffOptions(selectedFile);
+        let init = await this.getDiffOptions(selectedFile);
+        let {diff_options, titleLeft, titleRight} = init;
 
         let result = await utils.gitRaw(this.projectPath, diff_options, '获取Git差异', 'result');
         if (result == 'success' || result == 'fail' || result == 'error') {
@@ -104,12 +120,13 @@ class Diff {
             outputFormat: 'side-by-side',
         });
 
+        // 替换特殊字符
         diffResult = diffResult.replace(new RegExp("`","gm"), '&#x60;').replace(new RegExp("{","gm"), '&#123;').replace(new RegExp("}","gm"), '&#125;');
 
         let diffData = {
             "diffResult": diffResult,
-            "titleLeft": selectedFile,
-            "titleRight": selectedFile
+            "titleLeft": titleLeft,
+            "titleRight": titleRight
         }
         this.webviewPanel.webView.html = getWebviewDiffContent(
             this.selectedFile,

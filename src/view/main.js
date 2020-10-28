@@ -362,12 +362,22 @@ function active(webviewPanel, userConfig, gitData) {
                 File.refreshFileList();
                 break;
             case 'diff':
-                let f = path.join(projectPath, msg.filename)
-                hx.workspace.openTextDocument(f);
-                // setTimeout(function() {
-                //     hx.request('internaltest.executeCommand', 'file.compareWithLastVersion');
-                // }, 2000);
-                // utils.gitDiffFile(projectPath,msg.filename);
+                let { filename, tag } = msg;
+                let fpath = path.join(projectPath, filename);
+                if ( tag == 'D') {
+                    return hx.window.showErrorMessage(`EasyGit: ${filename} 已被删除，无法查看信息。`, ['我知道了']);
+                };
+                if ( tag == '?') {
+                    hx.workspace.openTextDocument(fpath);
+                    return;
+                };
+                let diff_parms = {
+                    "easyGitInner": true,
+                    "projectPath": projectPath,
+                    "projectName": projectName,
+                    "selectedFile": msg.filename,
+                };
+                hx.commands.executeCommand('EasyGit.diffFile',diff_parms);
                 break;
             case 'log':
                 let data = {
