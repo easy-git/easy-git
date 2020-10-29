@@ -156,6 +156,18 @@ easy-git, 支持通过快捷键打开git视图。
     "key": "",
     "command": "EasyGit.tagDetails"
 }
+
+// Git init
+{
+    "key": "",
+    "command": "EasyGit.init"
+}
+
+// Git add Remote Origin
+{
+    "key": "",
+    "command": "EasyGit.addRemoteOrigin"
+}
 ```
 
 ## 数据统计
