@@ -106,6 +106,28 @@ function getThemeColor(area) {
         lineColor = 'rgb(225,212,178)';
     };
 
+    // 文件对比相关颜色
+    let d2h_ins_bg, d2h_ins_border;
+    let d2h_del_bg, d2h_del_border;
+    let d2h_code_side_line_del_bg, d2h_code_side_line_ins_bg;
+    let d2h_emptyplaceholder_bg, d2h_emptyplaceholder_border;
+    if (colorScheme == 'Monokai' || colorScheme == 'Atom One Dark') {
+        d2h_ins_bg = '#252C2F';
+        d2h_del_bg = '#2E2527';
+        d2h_code_side_line_del_bg = '#423133';
+        d2h_code_side_line_ins_bg = '#303D44';
+        d2h_emptyplaceholder_bg = '#303131';
+    } else {
+        d2h_ins_bg = '#dfd';
+        d2h_ins_border = '#b4e2b4'
+        d2h_del_bg = '#fee8e9';
+        d2h_del_border = '#e9aeae';
+        d2h_code_side_line_del_bg = '#ffb6ba';
+        d2h_code_side_line_ins_bg = '#97f295';
+        d2h_emptyplaceholder_bg = '#f1f1f1';
+        d2h_emptyplaceholder_border = '#e1e1e1';
+    };
+
     return {
         background,
         menuBackground,
@@ -114,7 +136,15 @@ function getThemeColor(area) {
         inputLineColor,
         cursorColor,
         fontColor,
-        lineColor
+        lineColor,
+        d2h_ins_bg,
+        d2h_ins_border,
+        d2h_del_bg,
+        d2h_del_border,
+        d2h_code_side_line_del_bg,
+        d2h_code_side_line_ins_bg,
+        d2h_emptyplaceholder_bg,
+        d2h_emptyplaceholder_border,
     };
 };
 

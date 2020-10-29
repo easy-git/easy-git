@@ -68,7 +68,7 @@ let uiData = getUIData();
  */
 function getWebviewDiffContent(selectedFile, userConfig, diffData) {
     // 是否启用开发者工具
-    let {DisableDevTools} = userConfig;
+    let { DisableDevTools } = userConfig;
 
     // icon
     let {
@@ -79,6 +79,14 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
         cursorColor,
         fontColor,
         lineColor,
+        d2h_ins_bg,
+        d2h_ins_border,
+        d2h_del_bg,
+        d2h_del_border,
+        d2h_code_side_line_del_bg,
+        d2h_code_side_line_ins_bg,
+        d2h_emptyplaceholder_bg,
+        d2h_emptyplaceholder_border,
         UpArrowIcon,
         BackIcon,
         BranchIcon,
@@ -152,12 +160,33 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
             .d2h-code-wrapper {
                 height: calc(100vh - 50px) !important;
             }
-            .d2h-code-side-linenumber {
-                background-color: ${background} !important;
-                border: 1px solid ${background} !important;
-            }
             .d2h-code-side-linenumber::after {
                 background-color: ${background} !important;
+            }
+            .d2h-code-side-linenumber {
+               background-color: ${background} !important;
+               border: none !important;
+            }
+            .d2h-info {
+                border: none !important;
+            }
+            .d2h-ins {
+                background-color: ${d2h_ins_bg} !important;
+                border: none !important;
+            }
+            .d2h-del {
+                background-color: ${d2h_del_bg} !important;
+                border: none !important;
+            }
+            .d2h-code-side-line ins {
+                background-color: ${d2h_code_side_line_ins_bg} !important;
+            }
+            .d2h-code-side-line del {
+                background-color: ${d2h_code_side_line_del_bg} !important;
+            }
+            .d2h-code-side-emptyplaceholder, .d2h-emptyplaceholder {
+                border: none !important;
+                background-color: ${d2h_emptyplaceholder_bg} !important;
             }
         </style>
     </head>
@@ -219,13 +248,13 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
             })
         </script>
         <script>
-            let devStatus = ${DisableDevTools};
-            if (devStatus != undefined) {
-                window.oncontextmenu = function() {
-                    event.preventDefault();
-                    return false;
-                }
-            }
+            // let devStatus = ${DisableDevTools};
+            // if (devStatus) {
+            //     window.oncontextmenu = function() {
+            //         event.preventDefault();
+            //         return false;
+            //     }
+            // }
         </script>
     </body>
 </html>
@@ -272,7 +301,7 @@ function getDefaultContent(userConfig) {
             <div class="container-fluid">
                 <div id="diff-head" class="row">
                     <div class="col text-center">
-                        <p class="mt-5 pt-5">打开要对比的文件，右键菜单，点击【比较差异】</p>
+                        <p class="mt-5">打开要对比的文件，右键菜单，点击【比较差异】</p>
                     </div>
                 </div>
             </div>

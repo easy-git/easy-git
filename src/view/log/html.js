@@ -25,6 +25,14 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
         cursorColor,
         fontColor,
         lineColor,
+        d2h_ins_bg,
+        d2h_ins_border,
+        d2h_del_bg,
+        d2h_del_border,
+        d2h_code_side_line_del_bg,
+        d2h_code_side_line_ins_bg,
+        d2h_emptyplaceholder_bg,
+        d2h_emptyplaceholder_border,
         helpIcon,
         refreshIcon,
         searchIcon,
@@ -354,18 +362,59 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                 .load-more-log {
                     font-size: 14px;
                 }
-                .d2h-file-wrapper {
-                    border: none !important;
-                }
                 .d2h-file-header {
                     display: none !important;
                 }
-                .d2h-code-linenumber {
-                    background-color: ${background} !important;
-                    border: 1px solid ${background} !important;
-                }
                 .d2h-info {
                     background-color: ${background} !important;
+                }
+                .d2h-file-wrapper {
+                    border: none !important;
+                }
+                .d2h-files-diff {
+                    height: calc(100vh - 50px) !important;
+                }
+                .d2h-files-diff .d2h-file-side-diff:last-child {
+                    border-left: 1px solid ${lineColor} !important;
+                }
+                .d2h-code-wrapper {
+                    height: calc(100vh - 50px) !important;
+                }
+                .d2h-code-side-linenumber::after {
+                    background-color: ${background} !important;
+                }
+                .d2h-code-side-linenumber {
+                   background-color: ${background} !important;
+                   border: none !important;
+                }
+                .d2h-info {
+                    border: none !important;
+                    color: ${fontColor} !important;
+                }
+                .line-num1, .line-num2 {
+                    color: ${fontColor} !important;
+                }
+                .d2h-ins {
+                    background-color: ${d2h_ins_bg} !important;
+                    border: none !important;
+                }
+                .d2h-del {
+                    background-color: ${d2h_del_bg} !important;
+                    border: none !important;
+                }
+                ins {
+                    background-color: ${d2h_code_side_line_ins_bg} !important;
+                }
+                del {
+                    background-color: ${d2h_code_side_line_del_bg} !important;
+                }
+                .d2h-code-side-emptyplaceholder, .d2h-emptyplaceholder {
+                    border: none !important;
+                    background-color: ${d2h_emptyplaceholder_bg} !important;
+                }
+                .d2h-code-linenumber {
+                    background-color: ${background} !important;
+                    border: none !important;
                 }
             </style>
         </head>

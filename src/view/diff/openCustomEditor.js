@@ -78,7 +78,11 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
     isCustomFirstOpen = true;
 
     if (selectedFile == undefined || selectedFile == null) {
-        GitDiffCustomWebViewPanal.webView.html = getDefaultContent();
+        setTimeout(function() {
+            if (selectedFile == undefined || selectedFile == null) {
+                GitDiffCustomWebViewPanal.webView.html = getDefaultContent();
+            };
+        }, 2000);
         return;
     };
 
