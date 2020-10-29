@@ -54,7 +54,8 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
         d2h_code_side_line_del_bg,
         d2h_code_side_line_ins_bg,
         d2h_emptyplaceholder_bg,
-        d2h_emptyplaceholder_border
+        d2h_emptyplaceholder_border,
+        d2h_linenum_color
     } = uiData;
 
     let { titleLeft, titleRight, diffResult } = diffData;
@@ -122,6 +123,7 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
             .d2h-code-side-linenumber {
                background-color: ${background} !important;
                border: none !important;
+               color: ${d2h_linenum_color} !important;
             }
             .d2h-info {
                 border: none !important;
