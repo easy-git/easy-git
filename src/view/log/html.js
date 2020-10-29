@@ -384,9 +384,6 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                    background-color: ${background} !important;
                    border: none !important;
                 }
-                .d2h-code-linenumber {
-                    position:relatvie !important;
-                }
                 .d2h-info {
                     border: none !important;
                     color: ${fontColor} !important;
@@ -415,6 +412,10 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                 .d2h-code-linenumber {
                     background-color: ${background} !important;
                     border: none !important;
+                    position: relative !important;
+                }
+                .d2h-code-line {
+                    padding: 0 1.5rem !important;
                 }
             </style>
         </head>

@@ -19,58 +19,26 @@ function getUIData() {
 
     // 根据主题适配颜色
     let colorData = utils.getThemeColor('right');
-    let {fontColor} = colorData;
 
-    // svg icon
-    let AddIconSvg = icon.getAddIcon(fontColor);
-    let iconRefresh = icon.getRefreshIcon(fontColor);
-    let UpArrowIcon = icon.getUpArrowIcon(fontColor);
-    let UpArrowIcon2 = icon.getUpArrowIcon2(fontColor);
-    let BackIcon = icon.getBackIcon(fontColor);
-    let DownArrowIcon = icon.getDownArrowIcon(fontColor);
-    let BranchIcon = icon.getBranchIcon(fontColor);
-    let XIcon = icon.getXIcon(fontColor);
-    let SyncIcon = icon.getSyncIcon(fontColor);
-    let MergeIcon = icon.getMergeIcon(fontColor);
-    let TagIcon = icon.getTagIcon(fontColor);
-    let uploadIcon = icon.getUploadIcon(fontColor);
-    let cloudIcon = icon.getCloudIcon(fontColor);
-    let ShowIcon = icon.getShowIcon(fontColor);
+    // let {fontColor} = colorData;
 
-    let iconData = {
-        AddIconSvg,
-        iconRefresh,
-        UpArrowIcon,
-        UpArrowIcon2,
-        BackIcon,
-        DownArrowIcon,
-        BranchIcon,
-        XIcon,
-        SyncIcon,
-        MergeIcon,
-        TagIcon,
-        uploadIcon,
-        cloudIcon,
-        ShowIcon
-    };
-
-    let uiData = Object.assign(iconData,colorData);
-    return uiData;
+    // let uiData = Object.assign(iconData,colorData);
+    return colorData;
 };
-
-let uiData = getUIData();
 
 /**
  * @description 获取webview Branch内容
+ * @param {String} selectedFile
  * @param {Object} userConfig
- * @param {Object} uiData
  * @param {Object} gitBranchData
  */
 function getWebviewDiffContent(selectedFile, userConfig, diffData) {
     // 是否启用开发者工具
     let { DisableDevTools } = userConfig;
 
-    // icon
+    let uiData = getUIData();
+
+    // color
     let {
         background,
         liHoverBackground,
@@ -86,19 +54,7 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
         d2h_code_side_line_del_bg,
         d2h_code_side_line_ins_bg,
         d2h_emptyplaceholder_bg,
-        d2h_emptyplaceholder_border,
-        UpArrowIcon,
-        BackIcon,
-        BranchIcon,
-        DownArrowIcon,
-        AddIconSvg,
-        XIcon,
-        SyncIcon,
-        MergeIcon,
-        TagIcon,
-        uploadIcon,
-        cloudIcon,
-        ShowIcon
+        d2h_emptyplaceholder_border
     } = uiData;
 
     let { titleLeft, titleRight, diffResult } = diffData;
@@ -248,13 +204,13 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
             })
         </script>
         <script>
-            // let devStatus = ${DisableDevTools};
-            // if (devStatus) {
-            //     window.oncontextmenu = function() {
-            //         event.preventDefault();
-            //         return false;
-            //     }
-            // }
+            let devStatus = ${DisableDevTools};
+            if (devStatus) {
+                window.oncontextmenu = function() {
+                    event.preventDefault();
+                    return false;
+                }
+            }
         </script>
     </body>
 </html>
@@ -263,6 +219,8 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
 
 
 function getDefaultContent(userConfig) {
+
+    let uiData = getUIData();
 
     // icon
     let {
