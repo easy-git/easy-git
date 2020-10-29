@@ -32,7 +32,12 @@ function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
         let action = msg.command;
         switch (action) {
             case 'init':
-                init(msg);
+                let data = {
+                    'projectPath': projectPath,
+                    'projectName': projectName,
+                    'easyGitInner': true
+                };
+                hx.commands.executeCommand('EasyGit.init',data);
                 break;
             case 'select':
                 hx.commands.executeCommand('workbench.view.explorer');
@@ -47,26 +52,6 @@ function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
                 break;
         };
     });
-
-    async function init(msg) {
-        let {projectPath,projectName} = msg;
-        let status = await utils.gitInit(projectPath,projectName);
-        if (status == 'success') {
-            let data = {
-                'projectPath': projectPath,
-                'projectName': projectName,
-                'easyGitInner': true
-            };
-            if (viewId == 'EasyGitSourceCodeView') {
-                hx.commands.executeCommand('EasyGit.main',data);
-            };
-            if (viewId == 'EasyGitCommonView') {
-                hx.commands.executeCommand('EasyGit.main',data);
-                hx.commands.executeCommand('EasyGit.log',data);
-            };
-
-        }
-    };
 };
 
 

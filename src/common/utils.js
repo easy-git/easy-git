@@ -400,7 +400,6 @@ async function gitInit(projectPath,projectName) {
     try{
         let status = await git(projectPath).init()
             .then(() => {
-                hx.window.showInformationMessage(`项目【${projectName}】初始化Git存储库成功！`,['好的']);
                 return 'success'
             })
             .catch((err) => {
@@ -410,7 +409,7 @@ async function gitInit(projectPath,projectName) {
             });
         return status
     } catch(e) {
-        hx.window.showErrorMessage(`项目【${projectName}】初始化Git存储库异常！`, ['我知道了']);
+        hx.window.showErrorMessage(`Git: 项目【${projectName}】初始化存储库异常！`, ['我知道了']);
         return 'error';
     }
 };
@@ -1517,7 +1516,29 @@ async function gitShowCommitFileChange(workingDir, options) {
         result.success = false;
         return result;
     };
-}
+};
+
+/**
+ * @description 关联远程仓库
+ * @param {Object} projectPath
+ */
+async function gitAddRemoteOrigin(projectPath) {
+    let originUrl = await hx.window.showInputBox({
+        prompt:"Git远程仓库地址",
+        placeHolder: "必填"
+    }).then((result)=>{
+        return result
+    });
+    let reg = /^(https:\/\/|http:\/\/|git@)/g;
+    if (reg.test(originUrl)) {
+        let commands = ['remote', 'add', 'origin', originUrl];
+        let rResult = await gitRaw(projectPath, commands, '关联远程仓库', 'statusCode');
+        return rResult;
+    } else {
+        hx.window.showErrorMessage('EasyGit: 远程仓库地址无效。如还需要进行关联，请在源代码管理器底部操作。', ['我知道了']);
+        return 'fail';
+    };
+};
 
 
 module.exports = {
@@ -1531,6 +1552,7 @@ module.exports = {
     checkNodeModulesFileList,
     checkGitUsernameEmail,
     gitInit,
+    gitAddRemoteOrigin,
     gitClone,
     gitStatus,
     gitFileStatus,

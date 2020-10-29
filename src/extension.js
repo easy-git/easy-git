@@ -107,6 +107,18 @@ function activate(context) {
         file.gitattributes(param);
     });
 
+    // Git init
+    let init = hx.commands.registerCommand('EasyGit.init',(param) => {
+        git.action(param, 'init');
+    });
+    context.subscriptions.push(init);
+
+    // Git add remote origin
+    let addRemoteOrigin = hx.commands.registerCommand('EasyGit.addRemoteOrigin',(param) => {
+        git.action(param, 'addRemoteOrigin');
+    });
+    context.subscriptions.push(addRemoteOrigin);
+
     // Git pull
     let pull = hx.commands.registerCommand('EasyGit.pull', (param)=> {
         git.action(param, 'pull');

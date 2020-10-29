@@ -50,6 +50,12 @@ function action(param,action_name) {
     let tag = new Tag(projectPath);
 
     switch (action_name){
+        case 'init':
+            gitInitProject(ProjectInfo);
+            break;
+        case 'addRemoteOrigin':
+            utils.gitAddRemoteOrigin(projectPath);
+            break;
         case 'pull':
             utils.gitPull(projectPath, {'rebase': true});
             break;
@@ -93,6 +99,30 @@ function action(param,action_name) {
     };
 };
 
+/**
+ * @description Git项目初始化
+ */
+async function gitInitProject(ProjectInfo) {
+    let {projectPath,projectName} = ProjectInfo;
+    let status = await utils.gitInit(projectPath,projectName);
+
+    if (status == 'success') {
+        let data = {
+            'projectPath': projectPath,
+            'projectName': projectName,
+            'easyGitInner': true
+        };
+        hx.commands.executeCommand('EasyGit.main',data);
+        hx.window.showInformationMessage(
+            `EasyGit: 项目【${projectName}】初始化存储库成功！当前仓库，还未关联到远程仓库上。\n`,
+            ['关联远程仓库','关闭'],
+        ).then( (result)=> {
+            if (result == '关联远程仓库') {
+                utils.gitAddRemoteOrigin(projectPath);
+            };
+        });
+    }
+};
 
 /**
  * @description 储藏

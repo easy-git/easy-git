@@ -16,6 +16,8 @@
         "onCommand:EasyGit.branch",
         "onCommand:EasyGit.log",
         "onCommand:EasyGit.clone",
+        "onCommand:EasyGit.init",
+        "onCommand:EasyGit.addRemoteOrigin",
         "onCommand:EasyGit.pull",
         "onCommand:EasyGit.push",
         "onCommand:EasyGit.stash",
@@ -114,6 +116,14 @@
             {
                 "command": "EasyGit.branch",
                 "title": "easy-git: 分支管理"
+            },
+            {
+                "command": "EasyGit.addRemoteOrigin",
+                "title": "easy-git: 关联远程仓库"
+            },
+            {
+                "command": "EasyGit.init",
+                "title": "easy-git: 初始化仓库"
             },
             {
                 "command": "EasyGit.log",

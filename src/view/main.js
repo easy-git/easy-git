@@ -486,7 +486,7 @@ function active(webviewPanel, userConfig, gitData) {
     // git publish
     async function goPublish(projectName, msg) {
         let branchName = msg.text;
-        let pushStatus = await utils.gitPush(projectPath,[]);
+        let pushStatus = await utils.gitAddRemoteOrigin(projectPath);
         if (pushStatus == 'success') {
             File.refreshFileList();
         };
