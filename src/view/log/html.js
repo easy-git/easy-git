@@ -371,14 +371,11 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                 .d2h-file-wrapper {
                     border: none !important;
                 }
-                .d2h-files-diff {
-                    height: calc(100vh - 50px) !important;
-                }
                 .d2h-files-diff .d2h-file-side-diff:last-child {
                     border-left: 1px solid ${lineColor} !important;
                 }
-                .d2h-code-wrapper {
-                    height: calc(100vh - 50px) !important;
+                .d2h-file-diff::-webkit-scrollbar {
+                    height: 0 !important
                 }
                 .d2h-code-side-linenumber::after {
                     background-color: ${background} !important;
@@ -386,6 +383,9 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                 .d2h-code-side-linenumber {
                    background-color: ${background} !important;
                    border: none !important;
+                }
+                .d2h-code-linenumber {
+                    position:relatvie !important;
                 }
                 .d2h-info {
                     border: none !important;

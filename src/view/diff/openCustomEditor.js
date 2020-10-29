@@ -56,7 +56,7 @@ class CatDiffCustomEditorProvider extends CustomEditorProvider {
                 if (isSelectedFile == undefined) {
                     setTimeout(function() {
                         if (isHtml == '') {
-                            GitDiffCustomEditorRenderHtml({},{});
+                            GitDiffCustomWebViewPanal.webView.html = getDefaultContent();
                         }
                     }, 2000);
                 };
@@ -75,17 +75,17 @@ class CatDiffCustomEditorProvider extends CustomEditorProvider {
 function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
     let { projectPath, projectName, selectedFile } = ProjectData;
     isSelectedFile = selectedFile;
-    isCustomFirstOpen = true;
+
 
     if (selectedFile == undefined || selectedFile == null) {
-        setTimeout(function() {
-            if (selectedFile == undefined || selectedFile == null) {
-                GitDiffCustomWebViewPanal.webView.html = getDefaultContent();
-            };
-        }, 2000);
         return;
     };
 
+    isCustomFirstOpen = true;
+    try{
+        GitDiffCustomWebViewPanal.webView._html = '';
+    }catch(e){};
+    
     try{
         projectPath = path.normalize(projectPath);
         ProjectData.projectPath = projectPath;

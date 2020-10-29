@@ -151,14 +151,14 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
             .d2h-file-wrapper {
                 border: none !important;
             }
-            .d2h-files-diff {
-                height: calc(100vh - 50px) !important;
-            }
             .d2h-files-diff .d2h-file-side-diff:last-child {
                 border-left: 1px solid ${lineColor} !important;
             }
-            .d2h-code-wrapper {
-                height: calc(100vh - 50px) !important;
+            .d2h-file-side-diff::-webkit-scrollbar {
+                height: 0 !important
+            }
+            .d2h-code-line-ctn, .d2h-code-line-prefix {
+                white-space: normal !important;
             }
             .d2h-code-side-linenumber::after {
                 background-color: ${background} !important;
@@ -294,14 +294,18 @@ function getDefaultContent(userConfig) {
             [v-cloak] {
                 display: none;
             }
+            p {
+                font-size: 14px;
+            }
         </style>
     </head>
     <body>
         <div id="app" v-cloak>
             <div class="container-fluid">
                 <div id="diff-head" class="row">
-                    <div class="col text-center">
-                        <p class="mt-5">打开要对比的文件，右键菜单，点击【比较差异】</p>
+                    <div class="col text-center pt-5">
+                        <p>没有要对比的文件内容</p>
+                        <p>打开要对比的文件，右键菜单，点击【比较差异】</p>
                     </div>
                 </div>
             </div>

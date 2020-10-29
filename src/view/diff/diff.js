@@ -21,7 +21,7 @@ class Diff {
 
     async getDiffOptions(selectedFile) {
         let statusInfo = await utils.gitFileStatus(this.projectPath, ['-s', selectedFile]);
-
+        
         let gitIndex = statusInfo.index;
         let gitWorking_dir = (statusInfo.working_dir).trim();
 
@@ -40,7 +40,11 @@ class Diff {
                 options = ['diff','--cached', selectedFile];
                 break;
             case 'U':
-                options = ['diff','HEAD', selectedFile];
+                if (gitWorking_dir == 'U') {
+                    options = ['diff', selectedFile];
+                } else {
+                    options = ['diff','HEAD', selectedFile];
+                }
                 titleRight = 'HEAD : ' + titleRight;
                 break;
             default:
