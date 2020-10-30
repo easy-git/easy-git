@@ -426,7 +426,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
             <div class="container-fluid">
                 <div class="row m-0 fixedBottom" id="git_branch">
                     <div class="col-auto mr-auto" title="点击：切换/管理分支">
-                        <span class="cactive" @click="showBranchWindow();" @click.middle="switchLastBranch();">
+                        <span class="cactive" @click.once="showBranchWindow();" @click.middle="switchLastBranch();">
                             ${BranchIcon} {{ currentBranch }}
                         </span>
                     </div>
@@ -670,7 +670,6 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         });
                     },
                     switchLastBranch() {
-                        console.log('----last')
                         hbuilderx.postMessage({
                             command: 'switchLastBranch'
                         });
