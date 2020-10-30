@@ -171,8 +171,16 @@
                 "title": "easy-git: 显示当前行最后一次修改信息"
             },
             {
-                "command": "EasyGit.about",
-                "title": "关于easy-git"
+                "command": "EasyGit.tagCreate",
+                "title": "标签创建"
+            },
+            {
+                "command": "EasyGit.tagDetails",
+                "title": "标签查看详情"
+            },
+            {
+                "command": "EasyGit.diffFile",
+                "title": "对比差异"
             },
             {
                 "command": "EasyGit.set",
@@ -195,16 +203,8 @@
                 "title": "设置.gitattributes"
             },
             {
-                "command": "EasyGit.tagCreate",
-                "title": "标签创建"
-            },
-            {
-                "command": "EasyGit.tagDetails",
-                "title": "标签查看详情"
-            },
-            {
-                "command": "EasyGit.diffFile",
-                "title": "对比差异"
+                "command": "EasyGit.about",
+                "title": "关于easy-git"
             }
         ],
         "menus": {
