@@ -955,7 +955,7 @@ async function gitBranchSwitch(workingDir,branchName) {
                 return 'success';
             })
             .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
+                let errMsg = (err).toString();
                 createOutputChannel(`Git: 分支${branchName}切换失败`, errMsg);
                 return 'fail';
             });

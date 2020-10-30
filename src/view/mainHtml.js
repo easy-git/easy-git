@@ -426,7 +426,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
             <div class="container-fluid">
                 <div class="row m-0 fixedBottom" id="git_branch">
                     <div class="col-auto mr-auto" title="点击：切换/管理分支">
-                        <span class="cactive" @click="showBranchWindow();">
+                        <span class="cactive" @click="showBranchWindow();" @click.middle="switchLastBranch();">
                             ${BranchIcon} {{ currentBranch }}
                         </span>
                     </div>
@@ -651,7 +651,6 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         }
                         hbuilderx.postMessage(req);
                     },
-                    // 链式操作: add -> commit -> push
                     gitACP() {
                         hbuilderx.postMessage({
                             command: 'commit',
@@ -668,6 +667,12 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         hbuilderx.postMessage({
                             command: 'stash',
                             option: option
+                        });
+                    },
+                    switchLastBranch() {
+                        console.log('----last')
+                        hbuilderx.postMessage({
+                            command: 'switchLastBranch'
                         });
                     },
                     showBranchWindow() {

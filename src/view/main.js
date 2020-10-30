@@ -469,11 +469,20 @@ function active(webviewPanel, userConfig, gitData) {
             case 'openRemoteServer':
                 GitCfg.getUrl();
                 break;
+            case 'switchLastBranch':
+                switchLastBranch(projectPath);
+                break;
             default:
                 break;
         };
     });
 
+    async function switchLastBranch(projectPath) {
+        let switchResult = await utils.gitBranchSwitch(projectPath, '-');
+        if (switchResult == 'success') {
+            File.refreshFileList();
+        }
+    };
 
     // git push
     async function push(projectPath) {
