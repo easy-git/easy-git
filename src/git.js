@@ -40,10 +40,11 @@ function action(param,action_name) {
         return hx.window.showErrorMessage('easy-git: 无法获取到项目路径，请在项目管理器选中项目后再试。');
     };
 
-    const ProjectInfo = {
+    let ProjectInfo = {
         'projectName': projectName,
         'projectPath': projectPath,
-        'easyGitInner': true
+        'selectedFile': selectedFile,
+        'easyGitInner': easyGitInner
     };
 
     // git tag: 标签相关操作
@@ -57,7 +58,7 @@ function action(param,action_name) {
             utils.gitAddRemoteOrigin(projectPath);
             break;
         case 'add':
-            gitAddFile(projectPath, selectedFile);
+            gitAddFile(ProjectInfo);
             break;
         case 'pull':
             utils.gitPull(projectPath, {'rebase': true});
@@ -110,29 +111,52 @@ async function gitInitProject(ProjectInfo) {
     let status = await utils.gitInit(projectPath,projectName);
 
     if (status == 'success') {
-        let data = {
-            'projectPath': projectPath,
-            'projectName': projectName,
-            'easyGitInner': true
-        };
-        hx.commands.executeCommand('EasyGit.main',data);
-        hx.window.showInformationMessage(
+        ProjectInfo.easyGitInner = true;
+        hx.commands.executeCommand('EasyGit.main', ProjectInfo);
+
+        let btnSelect = await hx.window.showInformationMessage(
             `EasyGit: 项目【${projectName}】初始化存储库成功！当前仓库，还未关联到远程仓库上。\n`,
             ['关联远程仓库','关闭'],
         ).then( (result)=> {
-            if (result == '关联远程仓库') {
-                utils.gitAddRemoteOrigin(projectPath);
-            };
+            return result;
         });
-    }
+
+        if (btnSelect == '关联远程仓库') {
+            let relationResult = await utils.gitAddRemoteOrigin(projectPath);
+            if (relationResult == 'success') {
+                hx.commands.executeCommand('EasyGit.main', ProjectInfo);
+            };
+        };
+    };
 };
 
 /**
  * @description 添加文件到暂存区
  */
-async function gitAddFile(projectPath, selectedFile) {
-    console.log("add->>,", selectedFile);
+async function gitAddFile(ProjectInfo) {
+    let options = [];
+    let { projectPath, selectedFile, easyGitInner} = ProjectInfo;
+
+    projectPath = path.normalize(projectPath);
+    selectedFile = path.normalize(selectedFile);
+
+    // 选择：整个项目
+    if (projectPath == selectedFile) {
+        options = '*';
+    } else {
+        let state = fs.statSync(selectedFile);
+        if (state.isFile()) {
+            options = selectedFile;
+        };
+        if (state.isDirectory()) {
+            let dirName = selectedFile.replace(projectPath, '');
+            options = path.join('.', path.sep, dirName.slice(1), path.sep, '*');
+        };
+    };
     let addResult = await utils.gitAdd(projectPath, selectedFile);
+    if (easyGitInner && addResult == 'success') {
+        hx.commands.executeCommand('EasyGit.main', ProjectInfo);
+    };
 };
 
 /**
