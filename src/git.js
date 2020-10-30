@@ -56,6 +56,9 @@ function action(param,action_name) {
         case 'addRemoteOrigin':
             utils.gitAddRemoteOrigin(projectPath);
             break;
+        case 'add':
+            gitAddFile(projectPath, selectedFile);
+            break;
         case 'pull':
             utils.gitPull(projectPath, {'rebase': true});
             break;
@@ -122,6 +125,14 @@ async function gitInitProject(ProjectInfo) {
             };
         });
     }
+};
+
+/**
+ * @description 添加文件到暂存区
+ */
+async function gitAddFile(projectPath, selectedFile) {
+    console.log("add->>,", selectedFile);
+    let addResult = await utils.gitAdd(projectPath, selectedFile);
 };
 
 /**

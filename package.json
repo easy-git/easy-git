@@ -18,6 +18,7 @@
         "onCommand:EasyGit.clone",
         "onCommand:EasyGit.init",
         "onCommand:EasyGit.addRemoteOrigin",
+        "onCommand:EasyGit.add",
         "onCommand:EasyGit.pull",
         "onCommand:EasyGit.push",
         "onCommand:EasyGit.stash",
@@ -132,6 +133,10 @@
             {
                 "command": "EasyGit.clone",
                 "title": "easy-git: clone - 克隆"
+            },
+            {
+                "command": "EasyGit.add",
+                "title": "easy-git: add - 添加文件到暂存区"
             },
             {
                 "command": "EasyGit.pull",

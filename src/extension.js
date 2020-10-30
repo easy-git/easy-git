@@ -119,45 +119,59 @@ function activate(context) {
     });
     context.subscriptions.push(addRemoteOrigin);
 
+    // Git add
+    let add = hx.commands.registerCommand('EasyGit.add', (param)=> {
+        git.action(param, 'add');
+    });
+    context.subscriptions.push(add);
+
     // Git pull
     let pull = hx.commands.registerCommand('EasyGit.pull', (param)=> {
         git.action(param, 'pull');
     });
+    context.subscriptions.push(pull);
 
     // Git push
     let push = hx.commands.registerCommand('EasyGit.push', (param)=> {
         git.action(param, 'push');
     });
+    context.subscriptions.push(push);
 
     // Git Stash
     let stash = hx.commands.registerCommand('EasyGit.stash', (param)=> {
         git.action(param, 'stash');
     });
+    context.subscriptions.push(stash);
 
     // Git Stash all
     let stashAll = hx.commands.registerCommand('EasyGit.stashAll', (param)=> {
         git.action(param, 'stashAll');
     });
+    context.subscriptions.push(stashAll);
 
     // git Stash pop
     let stashPop = hx.commands.registerCommand('EasyGit.stashPop', (param)=> {
         git.action(param, 'stashPop')
     });
+    context.subscriptions.push(stashPop);
 
     // git Stash pop new
     let stashPopNew = hx.commands.registerCommand('EasyGit.stashPopNew', (param)=> {
         git.action(param, 'stashPopNew')
     });
+    context.subscriptions.push(stashPopNew);
 
     // git Stash clear
     let stashClear = hx.commands.registerCommand('EasyGit.stashClear', (param)=> {
         git.action(param, 'stashClear')
     });
+    context.subscriptions.push(stashClear);
 
     // check update
     let checkUpdate = hx.commands.registerCommand('EasyGit.checkUpdate', ()=> {
         upgrade.checkUpdate('manual');
     });
+    context.subscriptions.push(checkUpdate);
 
     // git blame: show line last change info
     let ForLineChange = hx.commands.registerCommand('EasyGit.gitBlameForLineChange', (param)=> {
@@ -172,16 +186,19 @@ function activate(context) {
             })
         }
     });
+    context.subscriptions.push(ForLineChange);
 
     // git tag create
     let tagCreate = hx.commands.registerCommand('EasyGit.tagCreate', (param)=> {
         git.action(param, 'tagCreate');
     });
+    context.subscriptions.push(tagCreate);
 
     // git tag details
     let tagDetails = hx.commands.registerCommand('EasyGit.tagDetails', (param)=> {
         git.action(param, 'tagDetails');
     });
+    context.subscriptions.push(tagDetails);
 
     // git diff
     let diffFile = hx.commands.registerCommand('EasyGit.diffFile', (param)=> {
@@ -192,7 +209,8 @@ function activate(context) {
         };
         context.source = 'filesExplorer';
         index.main('diff', param, {}, context);
-    })
+    });
+    context.subscriptions.push(diffFile);
 };
 
 
