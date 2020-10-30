@@ -7,6 +7,7 @@ const git = require('./git.js');
 const cmp_hx_version = require('./common/cmp.js');
 
 const upgrade = require('./common/upgrade.js');
+let showCommandPanel = require('./commands/index.js');
 
 // hbuilderx version
 let hxVersion = hx.env.appVersion;
@@ -42,6 +43,12 @@ function activate(context) {
         let providerForDiff = new CatDiffCustomEditorProvider({}, {}, {});
         hx.window.registerCustomEditorProvider("EasyGit - 对比差异", providerForDiff);
     };
+
+    // 命令面板
+    let CommandPanel = hx.commands.registerCommand('EasyGit.CommandPanel', (param) => {
+        showCommandPanel(param);
+    });
+    context.subscriptions.push(CommandPanel);
 
     // 菜单【源代码管理】，菜单【工具】、及项目管理器右键菜单
     let fv = hx.commands.registerCommand('EasyGit.main', (param) => {

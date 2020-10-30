@@ -12,6 +12,7 @@
     ],
     "main": "./src/extension",
     "activationEvents": [
+        "onCommand:EasyGit.CommandPanel",
         "onCommand:EasyGit.main",
         "onCommand:EasyGit.branch",
         "onCommand:EasyGit.log",
@@ -119,16 +120,16 @@
                 "title": "easy-git: 分支管理"
             },
             {
-                "command": "EasyGit.addRemoteOrigin",
-                "title": "easy-git: 关联远程仓库"
+                "command": "EasyGit.log",
+                "title": "easy-git: log - 查看日志"
             },
             {
                 "command": "EasyGit.init",
                 "title": "easy-git: 初始化仓库"
             },
             {
-                "command": "EasyGit.log",
-                "title": "easy-git: log - 查看日志"
+                "command": "EasyGit.addRemoteOrigin",
+                "title": "easy-git: 关联远程仓库"
             },
             {
                 "command": "EasyGit.clone",
@@ -172,39 +173,43 @@
             },
             {
                 "command": "EasyGit.tagCreate",
-                "title": "标签创建"
+                "title": "easy-git: 标签创建"
             },
             {
                 "command": "EasyGit.tagDetails",
-                "title": "标签查看详情"
+                "title": "easy-git: 标签查看详情"
             },
             {
                 "command": "EasyGit.diffFile",
-                "title": "对比差异"
+                "title": "easy-git: 对比差异"
             },
             {
                 "command": "EasyGit.set",
-                "title": "设置easy-git"
+                "title": "easy-git: 设置easy-git"
             },
             {
                 "command": "EasyGit.setGitingore",
-                "title": "设置.gitignore"
+                "title": "easy-git: 设置.gitignore"
             },
             {
                 "command": "EasyGit.setUserName",
-                "title": "设置user.name"
+                "title": "easy-git: 设置user.name"
             },
             {
                 "command": "EasyGit.setEmail",
-                "title": "设置user.email"
+                "title": "easy-git: 设置user.email"
             },
             {
                 "command": "EasyGit.setGitattributes",
-                "title": "设置.gitattributes"
+                "title": "easy-git: 设置.gitattributes"
             },
             {
                 "command": "EasyGit.about",
-                "title": "关于easy-git"
+                "title": "easy-git: 关于"
+            },
+            {
+                "command": "EasyGit.CommandPanel",
+                "title": "easy-git: 打开命令面板"
             }
         ],
         "menus": {
@@ -257,6 +262,14 @@
                     "title": "easy-git",
                     "group": "ext_settings",
                     "id": "easygit"
+                },
+                {
+                    "command": "EasyGit.CommandPanel",
+                    "title": "打开命令面板",
+                    "group": "easygit@1"
+                },
+                {
+                    "group": "easygit@2"
                 },
                 {
                     "command": "EasyGit.setUserName",
