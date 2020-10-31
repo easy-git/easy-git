@@ -7,7 +7,7 @@ const utils = require('../common/utils.js');
 
 const { goStash, goStashPop, goStashClear } = require('./stash.js');
 const { gitInitProject } = require('./repository.js');
-const { gitAddFile, gitRestore, goCleanFile } = require('./file.js');
+const { gitAddFile, gitRestore, goCleanFile, goCommitAmend } = require('./file.js');
 const { goSetConfig } = require('./base.js');
 
 const Tag = require('./tag.js');
@@ -64,6 +64,9 @@ function action(param,action_name) {
             break;
         case 'add':
             gitAddFile(ProjectInfo);
+            break;
+        case 'commitAmend':
+            goCommitAmend(ProjectInfo);
             break;
         case 'resetLastCommit':
             utils.gitReset(projectPath, ['--soft', 'HEAD^'], 'Git: 插销上次commit');

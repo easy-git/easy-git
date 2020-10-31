@@ -55,6 +55,34 @@ async function goCleanFile(ProjectInfo) {
 };
 
 
+/**
+ * @description 修改最后一次提交的注释
+ */
+async function goCommitAmend(ProjectInfo) {
+    let inputResult = await hx.window.showInputBox({
+        prompt: "commit - 请输入要修改的注释信息",
+        placeHolder: '消息必填'
+    }).then((result)=>{
+        return result
+    });
+    if (inputResult.trim() == '' && inputResult.length <= 3) {
+        hx.window.showErrorMessage('EasyGit: 请输入有效的注释信息！', ['我知道了']);
+        return;
+    };
+
+    let { projectPath } = ProjectInfo;
+    ProjectInfo.easyGitInner = true;
+
+    let options = ['commit', '--amend', '-m', inputResult];
+    let amendResult = await gitRaw(projectPath, options, '修改注释');
+    if (amendResult == 'success') {
+        setTimeout(function() {
+            hx.commands.executeCommand('EasyGit.log', ProjectInfo);
+        }, 2000);
+    };
+};
+
+
 class gitRestore {
     constructor() {
         this.isUseRestore = undefined
@@ -133,7 +161,7 @@ class gitRestore {
                 cmd = ['checkout', '--', options];
                 msg = '撤消对文件的修改，';
             };
-            
+
             let cancelStatus = await gitRaw(projectPath, cmd, msg);
             if (cancelStatus == 'success') {
                 SelectedInfo.easyGitInner = true;
@@ -165,5 +193,6 @@ class gitRestore {
 module.exports = {
     gitAddFile,
     gitRestore,
-    goCleanFile
+    goCleanFile,
+    goCommitAmend
 }
