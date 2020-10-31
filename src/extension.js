@@ -132,6 +132,12 @@ function activate(context) {
     });
     context.subscriptions.push(add);
 
+    // Git reset last commit
+    let resetLastCommit = hx.commands.registerCommand('EasyGit.resetLastCommit', (param)=> {
+        git.action(param, 'resetLastCommit');
+    });
+    context.subscriptions.push(resetLastCommit);
+
     // Git pull
     let pull = hx.commands.registerCommand('EasyGit.pull', (param)=> {
         git.action(param, 'pull');

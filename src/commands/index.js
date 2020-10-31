@@ -64,6 +64,9 @@ function action(param,action_name) {
         case 'add':
             gitAddFile(ProjectInfo);
             break;
+        case 'resetLastCommit':
+            utils.gitReset(projectPath, ['--soft', 'HEAD^'], 'Git: 插销上次commit');
+            break;
         case 'pull':
             utils.gitPull(projectPath, {'rebase': true});
             break;
