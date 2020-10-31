@@ -138,6 +138,18 @@ function activate(context) {
     });
     context.subscriptions.push(resetLastCommit);
 
+    // git restore --staged file
+    let restoreStaged = hx.commands.registerCommand('EasyGit.restoreStaged', (param)=> {
+        git.action(param, 'restoreStaged');
+    });
+    context.subscriptions.push(restoreStaged);
+
+    // git restore --staged file
+    let restoreChanged = hx.commands.registerCommand('EasyGit.restore', (param)=> {
+        git.action(param, 'restoreChanged');
+    });
+    context.subscriptions.push(restoreChanged);
+
     // Git pull
     let pull = hx.commands.registerCommand('EasyGit.pull', (param)=> {
         git.action(param, 'pull');

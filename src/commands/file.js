@@ -5,8 +5,12 @@ const path = require('path');
 
 const {
     gitAdd,
+    getGitVersion,
+    gitRaw
 } = require('../common/utils.js');
 
+const cmp_hx_version = require('../common/cmp.js');
+let cmp_git;
 
 /**
  * @description 添加文件到暂存区
@@ -38,6 +42,114 @@ async function gitAddFile(ProjectInfo) {
 };
 
 
+
+class gitRestore {
+    constructor() {
+        this.isUseRestore = undefined
+    }
+
+    // 提示框
+    showGitVersionPrompt() {
+        hx.window.showErrorMessage('Git: 此操作，用到了restore命令。\n本机Git命令行版本太低, 没有restore命令，将使用旧版命令。建议升级电脑的Git命令行工具！', ['安装高版本Git工具', '关闭']).then( (res)=> {
+            if (res == '安装高版本Git工具') {
+                hx.env.openExternal('https://git-scm.com/downloads');
+            };
+        });
+    };
+
+    // Git: resotre git 2.23.0版本的命令
+    async JudgeGitRestore() {
+        try{
+            if (cmp_git == undefined) {
+                let version = await getGitVersion();
+                cmp_git = cmp_hx_version(version, '2.23.0');
+                if (cmp_git > 0 ) {
+                    this.showGitVersionPrompt();
+                    return false;
+                };
+                return true;
+            } else {
+                if (cmp_git > 0 ) {
+                    this.showGitVersionPrompt();
+                    return false;
+                }
+                return true;
+            };
+        }catch(e){
+            return true;
+        };
+    };
+
+    // get option
+    getRestoreOptions(projectPath, selectedFile) {
+      let options = selectedFile;
+
+      projectPath = path.normalize(projectPath);
+      selectedFile = path.normalize(selectedFile);
+
+      // 选择：整个项目
+      if (projectPath == selectedFile) {
+          options = '*';
+      } else {
+          let state = fs.statSync(selectedFile);
+          if (state.isFile()) {
+              options = selectedFile;
+          };
+          if (state.isDirectory()) {
+              let dirName = selectedFile.replace(projectPath, '');
+              options = path.join('.', path.sep, dirName.slice(1), path.sep, '*');
+          };
+      };
+      return options;
+    };
+
+    async restore(SelectedInfo, actionName) {
+        if (this.isUseRestore == undefined) {
+            this.isUseRestore = await this.JudgeGitRestore();
+        };
+
+        let { projectPath, selectedFile, easyGitInner} = SelectedInfo;
+        let options = this.getRestoreOptions(projectPath, selectedFile);
+
+        if (this.isUseRestore == false) {
+            let cmd, msg;
+            if (actionName == 'restoreStaged') {
+                cmd = ['reset', 'HEAD', options];
+                msg = '取消暂存的文件，';
+            };
+            if (actionName == 'restoreChanged') {
+                cmd = ['checkout', '--', options];
+                msg = '撤消对文件的修改，';
+            };
+            let cancelStatus = await gitRaw(projectPath, cmd, msg);
+            if (cancelStatus == 'success') {
+                SelectedInfo.easyGitInner = true;
+                hx.commands.executeCommand('EasyGit.main', SelectedInfo);
+            };
+            return;
+        };
+
+        if (this.isUseRestore == true) {
+            let cmd1, msg1;
+            if (actionName == 'restoreStaged') {
+                cmd1 = ['restore', '--staged', options];
+                msg1 = '取消暂存的文件，';
+            };
+            if (actionName == 'restoreChanged') {
+                cmd1 = ['restore', options];
+                msg1 = '撤消对文件的修改，';
+            };
+            let cancelStatus = await gitRaw(projectPath, cmd1, msg1);
+            if (cancelStatus == 'success') {
+                SelectedInfo.easyGitInner = true;
+                hx.commands.executeCommand('EasyGit.main', SelectedInfo);
+            };
+        };
+    };
+}
+
+
 module.exports = {
-    gitAddFile
+    gitAddFile,
+    gitRestore
 }

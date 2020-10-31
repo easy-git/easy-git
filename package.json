@@ -21,6 +21,8 @@
         "onCommand:EasyGit.addRemoteOrigin",
         "onCommand:EasyGit.add",
         "onCommand:EasyGit.resetLastCommit",
+        "onCommand:EasyGit.restore",
+        "onCommand:EasyGit.restoreStaged",
         "onCommand:EasyGit.pull",
         "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
@@ -144,6 +146,14 @@
             {
                 "command": "EasyGit.resetLastCommit",
                 "title": "easy-git: reset --soft HEAD^ - 撤销上次commit"
+            },
+            {
+                "command": "EasyGit.restore",
+                "title": "easy-git: restore - 撤消对文件的修改"
+            },
+            {
+                "command": "EasyGit.restoreStaged",
+                "title": "easy-git: restore --staged - 撤销暂存"
             },
             {
                 "command": "EasyGit.pull",
