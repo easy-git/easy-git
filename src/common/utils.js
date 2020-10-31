@@ -535,36 +535,44 @@ async function gitStatus(workingDir) {
 
         // 合并更改（冲突）
         let conflicted = statusSummary.conflicted ? statusSummary.conflicted : [];
-        let conflicted_list = conflicted.map(function(v,i) {
-            return {'path':v, 'tag': 'C'}
-        });
+        let conflicted_list = [];
+        if (conflicted.length) {
+            for (let c of files) {
+                if (conflicted.includes(c.path)) {
+                    if (c.index != ' ' && c.working_dir == 'D') {
+                        conflicted_list.push({'path': c.path, 'tag': 'D'});
+                    } else {
+                        conflicted_list.push({'path': c.path, 'tag': 'C'});
+                    }
+                };
+            };
+        };
         result.FileResult.conflicted = conflicted_list;
 
-        // 更改(未暂存)
-        let not_add = statusSummary.not_added ? statusSummary.not_added : [];
-        let not_staged_list = [];
-        if (files.length && files != undefined) {
-            let tmp = [...not_add];
-            for (let s of files) {
-               if (!conflicted.includes(s.path) && ((s.index == ' ') || tmp.includes(s.path))) {
-                    not_staged_list.push({'path': s.path, 'tag': s.working_dir});
-               };
-           };
-        };
-        result.FileResult.notStaged = not_staged_list;
-
         // 暂存的变更
+        let staged = statusSummary.staged ? statusSummary.staged : [];
         let staged_list = [];
         if (files.length && files != undefined) {
-            let tmp2 = not_staged_list.map(function(v1,i1) { return v1.path });
-            let tmp3 = [...tmp2, ...conflicted];
+            let tmp3 = [...conflicted];
             for (let s1 of files) {
-                if (!tmp3.includes(s1.path)) {
+                if ((!tmp3.includes(s1.path) || staged.includes(s1.path)) && (s1.index != ' ' && s1.index != '?')) {
                     staged_list.push({'path': s1.path, 'tag': s1.index});
                 };
             };
         };
         result.FileResult.staged = staged_list;
+
+        // 更改(未暂存)
+        let not_staged_list = [];
+        if (files.length && files != undefined) {
+            let tmp = [...conflicted];
+            for (let s of files) {
+               if (!tmp.includes(s.path) && ((s.index == ' ' && s.working_dir == 'M') || (s.index == 'A' && s.working_dir == 'M') || (s.index == 'M' && s.working_dir == 'M') || s.working_dir == '?')) {
+                    not_staged_list.push({'path': s.path, 'tag': s.working_dir});
+               };
+           };
+        };
+        result.FileResult.notStaged = not_staged_list;
     } catch (e) {
         result.gitEnvironment = false;
         return result;
