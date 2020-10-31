@@ -174,19 +174,19 @@
             },
             {
                 "command": "EasyGit.gitBlameForLineChange",
-                "title": "easy-git: 显示当前行最后一次修改信息"
+                "title": "easy-git: blame - 显示当前行最后一次修改信息"
             },
             {
                 "command": "EasyGit.tagCreate",
-                "title": "easy-git: 标签创建"
+                "title": "easy-git: tag - 标签创建"
             },
             {
                 "command": "EasyGit.tagDetails",
-                "title": "easy-git: 标签查看详情"
+                "title": "easy-git: tag - 标签查看详情"
             },
             {
                 "command": "EasyGit.diffFile",
-                "title": "easy-git: 对比差异"
+                "title": "easy-git: diff 对比差异"
             },
             {
                 "command": "EasyGit.set",

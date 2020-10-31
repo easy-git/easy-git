@@ -1,5 +1,4 @@
 const hx = require('hbuilderx');
-const git = require('simple-git');
 
 const {
     gitStash,
