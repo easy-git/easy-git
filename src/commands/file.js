@@ -82,15 +82,15 @@ class gitRestore {
 
     // get option
     getRestoreOptions(projectPath, selectedFile) {
-      let options = selectedFile;
+        let options = selectedFile;
 
-      projectPath = path.normalize(projectPath);
-      selectedFile = path.normalize(selectedFile);
+        projectPath = path.normalize(projectPath);
+        selectedFile = path.normalize(selectedFile);
 
-      // 选择：整个项目
-      if (projectPath == selectedFile) {
+        // 选择：整个项目
+        if (projectPath == selectedFile) {
           options = '*';
-      } else {
+        } else {
           let state = fs.statSync(selectedFile);
           if (state.isFile()) {
               options = selectedFile;
@@ -99,8 +99,8 @@ class gitRestore {
               let dirName = selectedFile.replace(projectPath, '');
               options = path.join('.', path.sep, dirName.slice(1), path.sep, '*');
           };
-      };
-      return options;
+        };
+        return options;
     };
 
     async restore(SelectedInfo, actionName) {

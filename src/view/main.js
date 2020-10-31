@@ -10,9 +10,6 @@ const gitAction = require('../commands/index.js');
 const icon = require('./static/icon.js');
 const html = require('./mainHtml.js')
 
-const cmp_hx_version = require('../common/cmp.js');
-let cmp_git;
-
 /**
  * @description 获取图标、各种颜色
  * @return {Object} UIData
@@ -72,39 +69,6 @@ function getUIData() {
 
     let uiData = Object.assign(iconData,colorData);
     return uiData;
-};
-
-
-// 提示框
-function showGitVersionPrompt() {
-    hx.window.showErrorMessage('Git: 取消暂存，用到了restore命令。\n本机Git命令行版本太低, 没有restore命令。请升级电脑的Git命令行工具！', ['安装高版本Git工具', '关闭']).then( (res)=> {
-        if (res == '安装高版本Git工具') {
-            hx.env.openExternal('https://git-scm.com/downloads');
-        }
-    });
-};
-
-// Git: resotre git 2.23.0版本的命令
-async function JudgeGitRestore() {
-    try{
-        if (cmp_git == undefined) {
-            let version = await utils.getGitVersion();
-            cmp_git = cmp_hx_version(version, '2.23.0');
-            if (cmp_git > 0 ) {
-                showGitVersionPrompt();
-                return false;
-            };
-            return true;
-        } else {
-            if (cmp_git > 0 ) {
-                showGitVersionPrompt();
-                return false;
-            }
-            return true;
-        };
-    }catch(e){
-        return true;
-    };
 };
 
 
@@ -217,24 +181,26 @@ class GitFile {
 
     // Git: cancel add
     async cancelStash(fileUri) {
-        let isUseRestore = await JudgeGitRestore();
-        if (isUseRestore == false) { return; }
-
-        let cancelStatus = await utils.gitRaw(this.projectPath, ['restore', '--staged', fileUri], '取消暂存');
-        if (cancelStatus == 'success') {
-            this.refreshFileList();
+        if (!fileUri) {return;};
+        fileUri = path.join(this.projectPath, fileUri);
+        let data = {
+            'projectPath': this.projectPath,
+            'projectName': this.projectName,
+            'selectedFile': fileUri,
+            'easyGitInner': true
         };
+        hx.commands.executeCommand('EasyGit.restoreStaged', data);
     };
 
     // Git: cancel all add
     async cancelAllStash() {
-        let isUseRestore = await JudgeGitRestore();
-        if (isUseRestore == false) { return; }
-
-        let cancelStatus = await utils.gitRaw(this.projectPath, ['restore', '--staged', '*'], '取消所有暂存');
-        if (cancelStatus == 'success') {
-            this.refreshFileList();
+        let data = {
+            'projectPath': this.projectPath,
+            'projectName': this.projectName,
+            'selectedFile': this.projectPath,
+            'easyGitInner': true
         };
+        hx.commands.executeCommand('EasyGit.restoreStaged', data);
     };
 
     // Git: clean

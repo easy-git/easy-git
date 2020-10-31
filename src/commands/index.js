@@ -28,6 +28,7 @@ function action(param,action_name) {
         if (easyGitInner != undefined) {
             projectName = param.projectName;
             projectPath = param.projectPath;
+            selectedFile = param.selectedFile;
         } else {
             try {
                 projectName = param.workspaceFolder.name;
