@@ -26,6 +26,7 @@
         "onCommand:EasyGit.pull",
         "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
+        "onCommand:EasyGit.clean",
         "onCommand:EasyGit.stash",
         "onCommand:EasyGit.stashAll",
         "onCommand:EasyGit.stashPop",
@@ -166,6 +167,10 @@
             {
                 "command": "EasyGit.push",
                 "title": "easy-git: push - 推送"
+            },
+            {
+                "command": "EasyGit.clean",
+                "title": "easy-git: clean - 删除未跟踪的文件"
             },
             {
                 "command": "EasyGit.stash",

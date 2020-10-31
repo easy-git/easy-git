@@ -7,7 +7,7 @@ const utils = require('../common/utils.js');
 
 const { goStash, goStashPop, goStashClear } = require('./stash.js');
 const { gitInitProject } = require('./repository.js');
-const { gitAddFile, gitRestore } = require('./file.js');
+const { gitAddFile, gitRestore, goCleanFile } = require('./file.js');
 const { goSetConfig } = require('./base.js');
 
 const Tag = require('./tag.js');
@@ -84,6 +84,9 @@ function action(param,action_name) {
             break;
         case 'push':
             utils.gitPush(projectPath);
+            break;
+        case 'clean':
+            goCleanFile(ProjectInfo);
             break;
         case 'stash':
             goStash(ProjectInfo, '', 'Git: 储藏(stash)');

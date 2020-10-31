@@ -168,6 +168,12 @@ function activate(context) {
     });
     context.subscriptions.push(push);
 
+    // Git clean
+    let clean = hx.commands.registerCommand('EasyGit.clean', (param)=> {
+        git.action(param, 'clean');
+    });
+    context.subscriptions.push(clean);
+
     // Git Stash
     let stash = hx.commands.registerCommand('EasyGit.stash', (param)=> {
         git.action(param, 'stash');

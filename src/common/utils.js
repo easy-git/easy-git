@@ -1223,10 +1223,16 @@ async function gitTagCreate(workingDir,tagOptions, tagName) {
  * @description clean
  */
 async function gitClean(workingDir) {
-    // status bar show message
-    hx.window.setStatusBarMessage('Git: 开始删除本地未跟踪的文件', 2000, 'info');
+    let cleanMsg = 'Git: 确认删除当前所有未跟踪的文件，删除后无法恢复。';
+    let isDeleteBtn = await hx.window.showInformationMessage(cleanMsg, ['删除','关闭']).then((result) =>{
+        return result;
+    });
+    if (isDeleteBtn == '关闭') {
+        return;
+    };
 
     try {
+        hx.window.setStatusBarMessage('Git: 开始删除本地未跟踪的文件', 2000, 'info');
         let status = await git(workingDir).init()
             .clean('f',['-d'])
             .then(() => {
@@ -1241,7 +1247,7 @@ async function gitClean(workingDir) {
         return status;
     } catch (e) {
         return 'error';
-    }
+    };
 };
 
 /**

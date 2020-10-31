@@ -6,6 +6,7 @@ const path = require('path');
 const {
     gitAdd,
     getGitVersion,
+    gitClean,
     gitRaw
 } = require('../common/utils.js');
 
@@ -41,6 +42,17 @@ async function gitAddFile(ProjectInfo) {
     };
 };
 
+/**
+ * @description 清除本地未跟踪的文件
+ */
+async function goCleanFile(ProjectInfo) {
+    let { projectPath, projectName } = ProjectInfo;
+    let cleanResult = await gitClean(projectPath);
+    if (cleanResult == 'success') {
+        ProjectInfo.easyGitInner = true;
+        hx.commands.executeCommand('EasyGit.main', ProjectInfo);
+    };
+};
 
 
 class gitRestore {
@@ -151,5 +163,6 @@ class gitRestore {
 
 module.exports = {
     gitAddFile,
-    gitRestore
+    gitRestore,
+    goCleanFile
 }

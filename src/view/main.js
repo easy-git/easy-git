@@ -178,7 +178,6 @@ class GitFile {
         };
     };
 
-
     // Git: cancel add
     async cancelStash(fileUri) {
         if (!fileUri) {return;};
@@ -205,17 +204,12 @@ class GitFile {
 
     // Git: clean
     async clean() {
-        let cleanMsg = 'Git: 确认删除当前所有未跟踪的文件，删除后无法恢复。';
-        let isDeleteBtn = await hx.window.showInformationMessage(cleanMsg, ['删除','关闭']).then((result) =>{
-            return result;
-        });
-        if (isDeleteBtn == '关闭') {
-            return;
+        let data = {
+            'projectPath': this.projectPath,
+            'projectName': this.projectName,
+            'easyGitInner': true
         };
-        let cleanStatus = await utils.gitClean(this.projectPath);
-        if (cleanStatus == 'success') {
-            this.refreshFileList();
-        };
+        hx.commands.executeCommand('EasyGit.clean', data);
     };
 
     // Git: 撤销更改 git checkout -- filename
