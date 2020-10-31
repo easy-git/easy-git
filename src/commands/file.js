@@ -126,13 +126,14 @@ class gitRestore {
         if (this.isUseRestore == false) {
             let cmd, msg;
             if (actionName == 'restoreStaged') {
-                cmd = ['reset', 'HEAD', options];
+                cmd = ['reset', 'HEAD', '--', options];
                 msg = '取消暂存的文件，';
             };
             if (actionName == 'restoreChanged') {
                 cmd = ['checkout', '--', options];
                 msg = '撤消对文件的修改，';
             };
+            
             let cancelStatus = await gitRaw(projectPath, cmd, msg);
             if (cancelStatus == 'success') {
                 SelectedInfo.easyGitInner = true;
