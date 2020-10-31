@@ -138,6 +138,12 @@ function activate(context) {
     });
     context.subscriptions.push(pull);
 
+    // Git fetch
+    let fetch = hx.commands.registerCommand('EasyGit.fetch', (param)=> {
+        git.action(param, 'fetch');
+    });
+    context.subscriptions.push(fetch);
+
     // Git push
     let push = hx.commands.registerCommand('EasyGit.push', (param)=> {
         git.action(param, 'push');

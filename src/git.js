@@ -63,6 +63,9 @@ function action(param,action_name) {
         case 'pull':
             utils.gitPull(projectPath, {'rebase': true});
             break;
+        case 'fetch':
+            utils.gitFetch(projectPath);
+            break;
         case 'push':
             utils.gitPush(projectPath);
             break;
