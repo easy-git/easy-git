@@ -3,11 +3,11 @@ const path = require('path');
 
 const index = require("./index.js");
 const file = require('./common/file.js');
-const git = require('./git.js');
+const git = require('./commands/index.js');
 const cmp_hx_version = require('./common/cmp.js');
 
 const upgrade = require('./common/upgrade.js');
-let showCommandPanel = require('./commands/index.js');
+let showCommandPanel = require('./commands/commandPanel.js');
 
 // hbuilderx version
 let hxVersion = hx.env.appVersion;

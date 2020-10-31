@@ -6,7 +6,6 @@ const Diff2Html = require('diff2html');
 const hx = require('hbuilderx');
 
 let utils = require('../../common/utils.js');
-const gitAction = require('../../git.js');
 
 const icon = require('../static/icon.js');
 const {getWebviewDiffContent} = require('./html.js')
@@ -21,7 +20,7 @@ class Diff {
 
     async getDiffOptions(selectedFile) {
         let statusInfo = await utils.gitFileStatus(this.projectPath, ['-s', selectedFile]);
-        
+
         let gitIndex = statusInfo.index;
         let gitWorking_dir = (statusInfo.working_dir).trim();
 

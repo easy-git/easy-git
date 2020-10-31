@@ -5,7 +5,7 @@ const hx = require('hbuilderx');
 
 const file = require('../common/file.js');
 let utils = require('../common/utils.js');
-const gitAction = require('../git.js');
+const gitAction = require('../commands/index.js');
 
 const icon = require('./static/icon.js');
 const html = require('./mainHtml.js')
