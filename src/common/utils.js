@@ -568,7 +568,8 @@ async function gitStatus(workingDir) {
             let tmp = [...conflicted];
             for (let s of files) {
                if (!tmp.includes(s.path) && (([' ', 'M', 'A','R'].includes(s.index) && s.working_dir == 'M') || s.working_dir == '?')) {
-                    not_staged_list.push({'path': s.path, 'tag': s.working_dir});
+                    let tag = s.index != ' ' ? s.index : s.working_dir;
+                    not_staged_list.push({'path': s.path, 'tag': tag});
                };
            };
         };

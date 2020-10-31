@@ -341,12 +341,12 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 @mouseover="hoverConflictedFileID = 'conflicted_'+i1"
                                 @mouseleave="hoverConflictedFileID = false">
                                 <div class="flex-grow-1 text-hidden">
-                                    <span @click="gitDiff(v1.path, v1.tag);">{{ v1.path }}</span>
+                                    <span :class="[v1.tag == 'D' ? 'line-through' : '']" @click="gitDiff(v1.path, v1.tag);">{{ v1.path }}</span>
                                 </div>
                                 <div class="d-inline float-right" :id="'conflicted_'+i1">
                                     <div class="d-inline" v-if="hoverConflictedFileID == 'conflicted_'+i1">
                                         <span title="打开文件" @click="openFile(v1.path);">${OpenFileIconSvg}</span>
-                                        <span title="加入暂存 (git add)" @click="gitAdd(v1.path);">${AddIconSvg}</span>
+                                        <span title="加入暂存 (git add)" @click="gitAdd(v1.path, v1.tag);">${AddIconSvg}</span>
                                     </div>
                                     <div class="d-inline ml-1 pt-2">
                                         <span class="file-label fred"> {{ v1.tag }} </span>
@@ -396,7 +396,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         <p class="add-title" id="git_add_title">
                             <span class="a-icon" v-html="ChangeIcon" @click="isShowChangeList();"></span>更改:
                             <span class="gtag">{{ gitNotStagedileListLength }}</span>
-                            <span title="暂存所有文件" class="stash-all" @click="gitAdd('all');">
+                            <span title="暂存所有文件" class="stash-all" @click="gitAdd('all', '');">
                                 ${AddAllIcon}
                             </span>
                         </p>
@@ -411,7 +411,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 <div class="d-inline float-right" :id="'change_'+i">
                                     <div class="d-inline"  v-if="hoverChangeFileID == 'change_'+i">
                                         <span title="打开文件" @click="openFile(v.path);">${OpenFileIconSvg}</span>
-                                        <span title="加入暂存 (git add)" @click="gitAdd(v.path);">${AddIconSvg}</span>
+                                        <span title="加入暂存 (git add)" @click="gitAdd(v.path, v.tag);">${AddIconSvg}</span>
                                         <span title="撤销对文件的修改 (git checkout --)" @click="gitCheckout(v);">${checkoutIconSvg}</span>
                                     </div>
                                     <div class="d-inline ml-1 pt-2">
@@ -602,10 +602,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             command: 'cancelAllStash'
                         });
                     },
-                    gitAdd(fileUri) {
+                    gitAdd(fileUri, tag) {
                         hbuilderx.postMessage({
                             command: 'add',
-                            text: fileUri
+                            text: fileUri,
+                            tag: tag
                         });
                     },
                     gitCommit() {

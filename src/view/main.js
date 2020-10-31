@@ -115,9 +115,17 @@ class GitFile {
     };
 
     // Git: add
-    async add(filename) {
+    async add(info) {
+        let {text, tag} = info;
+        if (tag == 'C') {
+            let btnText = await hx.window.showErrorMessage(`确定要暂存含有合并冲突的 ${text} 文件吗? `, ['取消','确定']).then( (btnText) => {
+                return btnText
+            });
+            if (btnText == '取消') { return; }; 
+        };
+
         let files = [];
-        files.push(filename);
+        files.push(text);
         let addStatus = await utils.gitAdd(this.projectPath, files);
         if (addStatus == 'success') {
             this.refreshFileList();
@@ -352,7 +360,7 @@ function active(webviewPanel, userConfig, gitData) {
                 hx.workspace.openTextDocument(fileUri);
                 break;
             case 'add':
-                File.add(msg.text);
+                File.add(msg);
                 break;
             case 'commit':
                 let {isStaged,exist,comment} = msg;
