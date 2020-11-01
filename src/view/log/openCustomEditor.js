@@ -45,18 +45,21 @@ class CatCustomEditorProvider extends CustomEditorProvider {
     resolveCustomEditor(document, webViewPanel) {
         GitLogCustomEditorStatus = true;
         GitLogCustomWebViewPanal = webViewPanel;
-        
+
         // First Open: render html to customEditor
         if (isCustomFirstOpen == false) {
-            let isHtml = webViewPanel.webView._html;
             // 使用setTimeout主要是解决首次激活customEditor，重复渲染的问题
             setTimeout(function() {
                 hx.window.setStatusBarMessage('EasyGit: 正在加载Git日志，请耐心等待......', 3000, 'info');
                 if (isSelectedFile == undefined) {
                     setTimeout(function() {
-                        if (isHtml == '') {
-                            GitLogCustomEditorRenderHtml({},{});
-                        }
+                        let isHtml = '';
+                        try{
+                            let isHtml = GitLogCustomWebViewPanal.webView._html;
+                            if (isHtml == '') {
+                                GitLogCustomEditorRenderHtml({},{});
+                            };
+                        }catch(e){};
                     }, 2000);
                 };
             }, 3000);
