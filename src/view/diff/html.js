@@ -99,12 +99,6 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
             .diff-body {
                 margin-top: 40px !important;
             }
-            .d2h-file-header {
-                display: none !important;
-            }
-            .d2h-info {
-                background-color: ${background} !important;
-            }
             .d2h-file-wrapper {
                 border: none !important;
             }
@@ -114,27 +108,28 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
             .d2h-file-side-diff::-webkit-scrollbar {
                 height: 0 !important
             }
-            .d2h-code-line-ctn, .d2h-code-line-prefix {
-                white-space: normal !important;
+            .d2h-file-header {
+                display: none !important;
+            }
+            .d2h-code-side-linenumber {
+               background-color: ${background} !important;
+               border: 1px solid ${background} !important;
+               color: ${d2h_linenum_color} !important;
             }
             .d2h-code-side-linenumber::after {
                 background-color: ${background} !important;
             }
-            .d2h-code-side-linenumber {
-               background-color: ${background} !important;
-               border: none !important;
-               color: ${d2h_linenum_color} !important;
-            }
             .d2h-info {
-                border: none !important;
+                border-color: ${background} !important;
+                background-color: ${background} !important;
             }
             .d2h-ins {
                 background-color: ${d2h_ins_bg} !important;
-                border: none !important;
+                border-color: ${d2h_ins_bg} !important;
             }
             .d2h-del {
                 background-color: ${d2h_del_bg} !important;
-                border: none !important;
+                border-color: ${d2h_del_bg} !important;
             }
             .d2h-code-side-line ins {
                 background-color: ${d2h_code_side_line_ins_bg} !important;
@@ -143,7 +138,7 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
                 background-color: ${d2h_code_side_line_del_bg} !important;
             }
             .d2h-code-side-emptyplaceholder, .d2h-emptyplaceholder {
-                border: none !important;
+                border-color: ${d2h_emptyplaceholder_bg} !important;
                 background-color: ${d2h_emptyplaceholder_bg} !important;
             }
         </style>

@@ -32,6 +32,7 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 - `pull`, `push`
 - `push`
 - `分支查看`,`分支切换`, `打开log`等
+- `文件对比`
 
 ![](https://img-cdn-qiniu.dcloud.net.cn/uploads/article/20201024/aa12112946cab6fb3142b907e528b30b.png)
 
@@ -84,90 +85,68 @@ easy-git, 支持通过快捷键打开git视图。
 > 备注：目前只暴露了以下command。请逐条拷贝，设置快捷键时，请仔细检查。如需要更多commmand，请留言。
 
 ```json
+// 命令面板
+{"key":"","command": "EasyGit.CommandPanel"}
 
 // 打开Git文件视图
-{
-    "key":"",
-    "command": "EasyGit.main"
-}
+{"key":"","command": "EasyGit.main"}
  
 // 查看日志
-{
-    "key": "",
-    "command": "EasyGit.log"
-}
+{"key": "","command": "EasyGit.log"}
 
 // Git克隆
-{
-    "key": "",
-    "command": "EasyGit.clone"
-}
+{"key": "","command": "EasyGit.clone"}
+
+// Git 文件对比
+{"key": "","command": "EasyGit.diffFile"}
+
+// Git restore 取消更改
+{"key": "","command": "EasyGit.restore"}
+
+// Git restore staged 取消暂存
+{"key": "","command": "EasyGit.restoreStaged"}
+
+// Git 撤销上一次commit
+{"key": "","command": "EasyGit.resetLastCommit"}
 
 // Git pull --rebase
-{
-    "key": "",
-    "command": "EasyGit.pull"
-}
+{"key": "","command": "EasyGit.pull"}
 
 // Git stash 储藏
-{
-    "key": "",
-    "command": "EasyGit.stash"
-}
+{"key": "","command": "EasyGit.stash"}
 
 // Git stash 储藏全部(包含未跟踪的)
-{
-    "key": "",
-    "command": "EasyGit.stashAll"
-}
+{"key": "","command": "EasyGit.stashAll"}
 
 // Git stash 弹出储藏
-{
-    "key": "",
-    "command": "EasyGit.stashPop"
-}
+{"key": "","command": "EasyGit.stashPop"}
 
 // Git stash 弹出最新储藏
-{
-    "key": "",
-    "command": "EasyGit.stashPopNew"
-}
+{"key": "","command": "EasyGit.stashPopNew"}
 
 // Git stash 删除所有储藏
-{
-    "key": "",
-    "command": "EasyGit.stashClear"
-}
+{"key": "","command": "EasyGit.stashClear"}
 
 // Git Blame 显示git文件当前行最后一次修改信息
-{
-    "key": "",
-    "command": "EasyGit.gitBlameForLineChange"
-}
+{"key": "","command": "EasyGit.gitBlameForLineChange"}
 
 // Git tag 创建标签
-{
-    "key": "",
-    "command": "EasyGit.tagCreate"
-}
+{"key": "","command": "EasyGit.tagCreate"}
 
 // Git tag 查看标签详情
-{
-    "key": "",
-    "command": "EasyGit.tagDetails"
-}
+{"key": "","command": "EasyGit.tagDetails"}
 
 // Git init
-{
-    "key": "",
-    "command": "EasyGit.init"
-}
+{"key": "","command": "EasyGit.init"}
 
 // Git add Remote Origin
-{
-    "key": "",
-    "command": "EasyGit.addRemoteOrigin"
-}
+{"key": "","command": "EasyGit.addRemoteOrigin"}
+
+// Git merge
+{"key": "","command": "EasyGit.merge"}
+
+// Git merge --abort
+{"key": "","command": "EasyGit.mergeAbort"}
 ```
 
 ## 数据统计

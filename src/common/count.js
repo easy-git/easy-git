@@ -12,23 +12,33 @@ let mainFlags = false;
 let initFlags = false;
 let cloneFlags = false;
 
+let hxVersion = hx.env.appVersion;
+let pluginVersion = packageFile.version;
+let osName = os.platform() + ' ' + os.release();
 
 /**
  * @description 生成用户UID
  */
 function getEasyGitConfig() {
-    try{
+    let data = {
+        'uid': undefined,
+        'isShareUsageData': undefined
+    };
+    return new Promise((resolve, reject) => {
         let config = hx.workspace.getConfiguration();
-        let uid = config.get('EasyGit.id');
-        let isShareUsageData = config.get('EasyGit.isShareUsageData');
-        if (uid == undefined || !uid || uid == '') {
+        uid = config.get('EasyGit.id');
+        isShareUsageData = config.get('EasyGit.isShareUsageData');
+        if (uid == undefined || uid == '') {
             uid = (uuid.v1()).replace(/-/g, '');
             config.update("EasyGit.id", uid).then(() => {});
         };
-        return uid, isShareUsageData;
-    }catch(e){
-        return '', '';
-    };
+        if (isShareUsageData == undefined || isShareUsageData != false) {
+            isShareUsageData = true;
+        };
+        data.uid = uid;
+        data.isShareUsageData = isShareUsageData;
+        resolve(data);
+    });
 };
 
 /**
@@ -44,20 +54,23 @@ function getCurrentData() {
  * @description count
  * @param {Object} viewname
  */
-function count(viewname) {
+async function count(viewname) {
     let view_flags = eval(viewname+ "Flags");
     let view_flags_date = getCurrentData();
+
     // only count once
     if (view_flags && currentDate == view_flags_date) {
         return;
     };
 
-    let uid, isShareUsageData = getEasyGitConfig();
+    let uid;
+    let isShareUsageData = true;
+    if (uid == undefined || uid == '') {
+        let configInfo = await getEasyGitConfig()
+        uid = configInfo.uid;
+        isShareUsageData = configInfo.isShareUsageData;
+    };
 
-    const hxVersion = hx.env.appVersion;
-    const pluginVersion = packageFile.version;
-
-    let osName = os.platform() + ' ' + os.release();
     if (isShareUsageData == false) {
         osName = 'unKnow';
     };
@@ -69,7 +82,7 @@ function count(viewname) {
         'pluginVersion': pluginVersion,
         'osName': osName
     };
-
+    
     return new Promise((resolve, reject) => {
         try {
             const instance = axios.create({

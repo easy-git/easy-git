@@ -4,7 +4,6 @@ const path = require('path');
 const hx = require('hbuilderx');
 
 let utils = require('../../common/utils.js');
-const gitAction = require('../../git.js');
 
 const icon = require('../static/icon.js');
 const getWebviewBranchContent = require('./html.js')

@@ -5,13 +5,10 @@ const hx = require('hbuilderx');
 
 const file = require('../common/file.js');
 let utils = require('../common/utils.js');
-const gitAction = require('../git.js');
+const gitAction = require('../commands/index.js');
 
 const icon = require('./static/icon.js');
 const html = require('./mainHtml.js')
-
-const cmp_hx_version = require('../common/cmp.js');
-let cmp_git;
 
 /**
  * @description 获取图标、各种颜色
@@ -75,39 +72,6 @@ function getUIData() {
 };
 
 
-// 提示框
-function showGitVersionPrompt() {
-    hx.window.showErrorMessage('Git: 取消暂存，用到了restore命令。\n本机Git命令行版本太低, 没有restore命令。请升级电脑的Git命令行工具！', ['安装高版本Git工具', '关闭']).then( (res)=> {
-        if (res == '安装高版本Git工具') {
-            hx.env.openExternal('https://git-scm.com/downloads');
-        }
-    });
-};
-
-// Git: resotre git 2.23.0版本的命令
-async function JudgeGitRestore() {
-    try{
-        if (cmp_git == undefined) {
-            let version = await utils.getGitVersion();
-            cmp_git = cmp_hx_version(version, '2.23.0');
-            if (cmp_git > 0 ) {
-                showGitVersionPrompt();
-                return false;
-            };
-            return true;
-        } else {
-            if (cmp_git > 0 ) {
-                showGitVersionPrompt();
-                return false;
-            }
-            return true;
-        };
-    }catch(e){
-        return true;
-    };
-};
-
-
 /**
  * @description  set .gitignore and .gitattributes
  * @param {Object} filename
@@ -151,9 +115,17 @@ class GitFile {
     };
 
     // Git: add
-    async add(filename) {
+    async add(info) {
+        let {text, tag} = info;
+        if (tag == 'C') {
+            let btnText = await hx.window.showErrorMessage(`确定要暂存含有合并冲突的 ${text} 文件吗? `, ['取消','确定']).then( (btnText) => {
+                return btnText
+            });
+            if (btnText == '取消') { return; }; 
+        };
+
         let files = [];
-        files.push(filename);
+        files.push(text);
         let addStatus = await utils.gitAdd(this.projectPath, files);
         if (addStatus == 'success') {
             this.refreshFileList();
@@ -214,42 +186,38 @@ class GitFile {
         };
     };
 
-
     // Git: cancel add
     async cancelStash(fileUri) {
-        let isUseRestore = await JudgeGitRestore();
-        if (isUseRestore == false) { return; }
-
-        let cancelStatus = await utils.gitRaw(this.projectPath, ['restore', '--staged', fileUri], '取消暂存');
-        if (cancelStatus == 'success') {
-            this.refreshFileList();
+        if (!fileUri) {return;};
+        fileUri = path.join(this.projectPath, fileUri);
+        let data = {
+            'projectPath': this.projectPath,
+            'projectName': this.projectName,
+            'selectedFile': fileUri,
+            'easyGitInner': true
         };
+        hx.commands.executeCommand('EasyGit.restoreStaged', data);
     };
 
     // Git: cancel all add
     async cancelAllStash() {
-        let isUseRestore = await JudgeGitRestore();
-        if (isUseRestore == false) { return; }
-
-        let cancelStatus = await utils.gitRaw(this.projectPath, ['restore', '--staged', '*'], '取消所有暂存');
-        if (cancelStatus == 'success') {
-            this.refreshFileList();
+        let data = {
+            'projectPath': this.projectPath,
+            'projectName': this.projectName,
+            'selectedFile': this.projectPath,
+            'easyGitInner': true
         };
+        hx.commands.executeCommand('EasyGit.restoreStaged', data);
     };
 
     // Git: clean
     async clean() {
-        let cleanMsg = 'Git: 确认删除当前所有未跟踪的文件，删除后无法恢复。';
-        let isDeleteBtn = await hx.window.showInformationMessage(cleanMsg, ['删除','关闭']).then((result) =>{
-            return result;
-        });
-        if (isDeleteBtn == '关闭') {
-            return;
+        let data = {
+            'projectPath': this.projectPath,
+            'projectName': this.projectName,
+            'easyGitInner': true
         };
-        let cleanStatus = await utils.gitClean(this.projectPath);
-        if (cleanStatus == 'success') {
-            this.refreshFileList();
-        };
+        hx.commands.executeCommand('EasyGit.clean', data);
     };
 
     // Git: 撤销更改 git checkout -- filename
@@ -392,7 +360,7 @@ function active(webviewPanel, userConfig, gitData) {
                 hx.workspace.openTextDocument(fileUri);
                 break;
             case 'add':
-                File.add(msg.text);
+                File.add(msg);
                 break;
             case 'commit':
                 let {isStaged,exist,comment} = msg;
@@ -469,11 +437,20 @@ function active(webviewPanel, userConfig, gitData) {
             case 'openRemoteServer':
                 GitCfg.getUrl();
                 break;
+            case 'switchLastBranch':
+                switchLastBranch(projectPath);
+                break;
             default:
                 break;
         };
     });
 
+    async function switchLastBranch(projectPath) {
+        let switchResult = await utils.gitBranchSwitch(projectPath, '-');
+        if (switchResult == 'success') {
+            File.refreshFileList();
+        }
+    };
 
     // git push
     async function push(projectPath) {

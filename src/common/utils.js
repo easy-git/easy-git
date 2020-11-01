@@ -535,36 +535,45 @@ async function gitStatus(workingDir) {
 
         // 合并更改（冲突）
         let conflicted = statusSummary.conflicted ? statusSummary.conflicted : [];
-        let conflicted_list = conflicted.map(function(v,i) {
-            return {'path':v, 'tag': 'C'}
-        });
+        let conflicted_list = [];
+        if (conflicted.length) {
+            for (let c of files) {
+                if (conflicted.includes(c.path)) {
+                    if (c.index != ' ' && c.working_dir == 'D') {
+                        conflicted_list.push({'path': c.path, 'tag': 'D'});
+                    } else {
+                        conflicted_list.push({'path': c.path, 'tag': 'C'});
+                    }
+                };
+            };
+        };
         result.FileResult.conflicted = conflicted_list;
 
-        // 更改(未暂存)
-        let not_add = statusSummary.not_added ? statusSummary.not_added : [];
-        let not_staged_list = [];
-        if (files.length && files != undefined) {
-            let tmp = [...not_add];
-            for (let s of files) {
-               if (!conflicted.includes(s.path) && ((s.index == ' ') || tmp.includes(s.path))) {
-                    not_staged_list.push({'path': s.path, 'tag': s.working_dir});
-               };
-           };
-        };
-        result.FileResult.notStaged = not_staged_list;
-
         // 暂存的变更
+        let staged = statusSummary.staged ? statusSummary.staged : [];
         let staged_list = [];
         if (files.length && files != undefined) {
-            let tmp2 = not_staged_list.map(function(v1,i1) { return v1.path });
-            let tmp3 = [...tmp2, ...conflicted];
+            let tmp3 = [...conflicted];
             for (let s1 of files) {
-                if (!tmp3.includes(s1.path)) {
+                if ((!tmp3.includes(s1.path) || staged.includes(s1.path)) && (s1.index != ' ' && s1.index != '?')) {
                     staged_list.push({'path': s1.path, 'tag': s1.index});
                 };
             };
         };
         result.FileResult.staged = staged_list;
+
+        // 更改(未暂存)
+        let not_staged_list = [];
+        if (files.length && files != undefined) {
+            let tmp = [...conflicted];
+            for (let s of files) {
+               if (!tmp.includes(s.path) && (([' ', 'M', 'A','R'].includes(s.index) && s.working_dir == 'M') || s.working_dir == '?')) {
+                    let tag = s.index != ' ' ? s.index : s.working_dir;
+                    not_staged_list.push({'path': s.path, 'tag': tag});
+               };
+           };
+        };
+        result.FileResult.notStaged = not_staged_list;
     } catch (e) {
         result.gitEnvironment = false;
         return result;
@@ -955,7 +964,7 @@ async function gitBranchSwitch(workingDir,branchName) {
                 return 'success';
             })
             .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
+                let errMsg = (err).toString();
                 createOutputChannel(`Git: 分支${branchName}切换失败`, errMsg);
                 return 'fail';
             });
@@ -1223,10 +1232,16 @@ async function gitTagCreate(workingDir,tagOptions, tagName) {
  * @description clean
  */
 async function gitClean(workingDir) {
-    // status bar show message
-    hx.window.setStatusBarMessage('Git: 开始删除本地未跟踪的文件', 2000, 'info');
+    let cleanMsg = 'Git: 确认删除当前所有未跟踪的文件，删除后无法恢复。';
+    let isDeleteBtn = await hx.window.showInformationMessage(cleanMsg, ['删除','关闭']).then((result) =>{
+        return result;
+    });
+    if (isDeleteBtn == '关闭') {
+        return;
+    };
 
     try {
+        hx.window.setStatusBarMessage('Git: 开始删除本地未跟踪的文件', 2000, 'info');
         let status = await git(workingDir).init()
             .clean('f',['-d'])
             .then(() => {
@@ -1241,7 +1256,7 @@ async function gitClean(workingDir) {
         return status;
     } catch (e) {
         return 'error';
-    }
+    };
 };
 
 /**
@@ -1366,7 +1381,7 @@ async function gitStash(projectInfo, options, msg) {
         let status = await git(projectPath).init()
             .stash(options)
             .then((res) => {
-                if (res.includes('Saved') || res == '') {
+                if (res.includes('Saved') || res == '' || res.includes('Dropped')) {
                     hx.window.setStatusBarMessage(msg + '成功', 5000, 'info');
                     hx.commands.executeCommand('EasyGit.main', projectInfo);
                     return 'success';

@@ -3,10 +3,11 @@ const path = require('path');
 
 const index = require("./index.js");
 const file = require('./common/file.js');
-const git = require('./git.js');
+const git = require('./commands/index.js');
 const cmp_hx_version = require('./common/cmp.js');
 
 const upgrade = require('./common/upgrade.js');
+let showCommandPanel = require('./commands/commandPanel.js');
 
 // hbuilderx version
 let hxVersion = hx.env.appVersion;
@@ -42,6 +43,12 @@ function activate(context) {
         let providerForDiff = new CatDiffCustomEditorProvider({}, {}, {});
         hx.window.registerCustomEditorProvider("EasyGit - 对比差异", providerForDiff);
     };
+
+    // 命令面板
+    let CommandPanel = hx.commands.registerCommand('EasyGit.CommandPanel', (param) => {
+        showCommandPanel(param);
+    });
+    context.subscriptions.push(CommandPanel);
 
     // 菜单【源代码管理】，菜单【工具】、及项目管理器右键菜单
     let fv = hx.commands.registerCommand('EasyGit.main', (param) => {
@@ -125,17 +132,65 @@ function activate(context) {
     });
     context.subscriptions.push(add);
 
+    // git commit --amend
+    let commitAmend = hx.commands.registerCommand('EasyGit.commitAmend', (param)=> {
+        git.action(param, 'commitAmend');
+    });
+    context.subscriptions.push(commitAmend);
+
+    // Git reset last commit
+    let resetLastCommit = hx.commands.registerCommand('EasyGit.resetLastCommit', (param)=> {
+        git.action(param, 'resetLastCommit');
+    });
+    context.subscriptions.push(resetLastCommit);
+
+    // git restore --staged file
+    let restoreStaged = hx.commands.registerCommand('EasyGit.restoreStaged', (param)=> {
+        git.action(param, 'restoreStaged');
+    });
+    context.subscriptions.push(restoreStaged);
+
+    // git restore --staged file
+    let restoreChanged = hx.commands.registerCommand('EasyGit.restore', (param)=> {
+        git.action(param, 'restoreChanged');
+    });
+    context.subscriptions.push(restoreChanged);
+
     // Git pull
     let pull = hx.commands.registerCommand('EasyGit.pull', (param)=> {
         git.action(param, 'pull');
     });
     context.subscriptions.push(pull);
 
+    // Git fetch
+    let fetch = hx.commands.registerCommand('EasyGit.fetch', (param)=> {
+        git.action(param, 'fetch');
+    });
+    context.subscriptions.push(fetch);
+
     // Git push
     let push = hx.commands.registerCommand('EasyGit.push', (param)=> {
         git.action(param, 'push');
     });
     context.subscriptions.push(push);
+
+    // Git merge
+    let merge = hx.commands.registerCommand('EasyGit.merge', (param)=> {
+        git.action(param, 'merge');
+    });
+    context.subscriptions.push(merge);
+
+    // Git merge --abort
+    let mergeAbort = hx.commands.registerCommand('EasyGit.mergeAbort', (param)=> {
+        git.action(param, 'mergeAbort');
+    });
+    context.subscriptions.push(mergeAbort);
+
+    // Git clean
+    let clean = hx.commands.registerCommand('EasyGit.clean', (param)=> {
+        git.action(param, 'clean');
+    });
+    context.subscriptions.push(clean);
 
     // Git Stash
     let stash = hx.commands.registerCommand('EasyGit.stash', (param)=> {

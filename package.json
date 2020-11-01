@@ -12,6 +12,7 @@
     ],
     "main": "./src/extension",
     "activationEvents": [
+        "onCommand:EasyGit.CommandPanel",
         "onCommand:EasyGit.main",
         "onCommand:EasyGit.branch",
         "onCommand:EasyGit.log",
@@ -19,8 +20,16 @@
         "onCommand:EasyGit.init",
         "onCommand:EasyGit.addRemoteOrigin",
         "onCommand:EasyGit.add",
+        "onCommand:EasyGit.commitAmend",
+        "onCommand:EasyGit.resetLastCommit",
+        "onCommand:EasyGit.restore",
+        "onCommand:EasyGit.restoreStaged",
         "onCommand:EasyGit.pull",
+        "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
+        "onCommand:EasyGit.merge",
+        "onCommand:EasyGit.mergeAbort",
+        "onCommand:EasyGit.clean",
         "onCommand:EasyGit.stash",
         "onCommand:EasyGit.stashAll",
         "onCommand:EasyGit.stashPop",
@@ -112,23 +121,23 @@
             },
             {
                 "command": "EasyGit.main",
-                "title": "easy-git: 源代码管理"
+                "title": "easy-git: 视图 - 源代码管理"
             },
             {
                 "command": "EasyGit.branch",
-                "title": "easy-git: 分支管理"
-            },
-            {
-                "command": "EasyGit.addRemoteOrigin",
-                "title": "easy-git: 关联远程仓库"
-            },
-            {
-                "command": "EasyGit.init",
-                "title": "easy-git: 初始化仓库"
+                "title": "easy-git: 视图 - 分支/tag管理"
             },
             {
                 "command": "EasyGit.log",
-                "title": "easy-git: log - 查看日志"
+                "title": "easy-git: 视图 - 查看日志log"
+            },
+            {
+                "command": "EasyGit.init",
+                "title": "easy-git: init - 初始化仓库"
+            },
+            {
+                "command": "EasyGit.addRemoteOrigin",
+                "title": "easy-git: add remote origin - 关联远程仓库"
             },
             {
                 "command": "EasyGit.clone",
@@ -139,12 +148,44 @@
                 "title": "easy-git: add - 添加文件到暂存区"
             },
             {
+                "command": "EasyGit.commitAmend",
+                "title": "easy-git: commit --amend 修改最后提交的commit注释"
+            },
+            {
+                "command": "EasyGit.resetLastCommit",
+                "title": "easy-git: reset --soft HEAD^ - 撤销上次commit"
+            },
+            {
+                "command": "EasyGit.restore",
+                "title": "easy-git: restore - 撤消对文件的修改"
+            },
+            {
+                "command": "EasyGit.restoreStaged",
+                "title": "easy-git: restore --staged - 撤销暂存"
+            },
+            {
                 "command": "EasyGit.pull",
                 "title": "easy-git: pull - 拉取"
             },
             {
+                "command": "EasyGit.fetch",
+                "title": "easy-git: fetch - 获取"
+            },
+            {
                 "command": "EasyGit.push",
                 "title": "easy-git: push - 推送"
+            },
+            {
+                "command": "EasyGit.merge",
+                "title": "easy-git: merge - 分支合并"
+            },
+            {
+                "command": "EasyGit.mergeAbort",
+                "title": "easy-git: merge abort - 分支合并取消"
+            },
+            {
+                "command": "EasyGit.clean",
+                "title": "easy-git: clean - 删除未跟踪的文件"
             },
             {
                 "command": "EasyGit.stash",
@@ -168,49 +209,54 @@
             },
             {
                 "command": "EasyGit.gitBlameForLineChange",
-                "title": "easy-git: 显示当前行最后一次修改信息"
-            },
-            {
-                "command": "EasyGit.about",
-                "title": "关于easy-git"
-            },
-            {
-                "command": "EasyGit.set",
-                "title": "设置easy-git"
-            },
-            {
-                "command": "EasyGit.setGitingore",
-                "title": "设置.gitignore"
-            },
-            {
-                "command": "EasyGit.setUserName",
-                "title": "设置user.name"
-            },
-            {
-                "command": "EasyGit.setEmail",
-                "title": "设置user.email"
-            },
-            {
-                "command": "EasyGit.setGitattributes",
-                "title": "设置.gitattributes"
+                "title": "easy-git: blame - 显示当前行最后一次修改信息"
             },
             {
                 "command": "EasyGit.tagCreate",
-                "title": "标签创建"
+                "title": "easy-git: tag - 标签创建"
             },
             {
                 "command": "EasyGit.tagDetails",
-                "title": "标签查看详情"
+                "title": "easy-git: tag - 标签查看详情"
             },
             {
                 "command": "EasyGit.diffFile",
-                "title": "对比差异"
+                "title": "easy-git: diff 对比差异"
+            },
+            {
+                "command": "EasyGit.set",
+                "title": "easy-git: 设置easy-git"
+            },
+            {
+                "command": "EasyGit.setGitingore",
+                "title": "easy-git: 设置.gitignore"
+            },
+            {
+                "command": "EasyGit.setUserName",
+                "title": "easy-git: 设置user.name"
+            },
+            {
+                "command": "EasyGit.setEmail",
+                "title": "easy-git: 设置user.email"
+            },
+            {
+                "command": "EasyGit.setGitattributes",
+                "title": "easy-git: 设置.gitattributes"
+            },
+            {
+                "command": "EasyGit.about",
+                "title": "easy-git: 关于"
+            },
+            {
+                "command": "EasyGit.CommandPanel",
+                "title": "easy-git: 打开命令面板"
             }
         ],
         "menus": {
             "explorer/context": [
                 {
                     "command": "EasyGit.main",
+                    "title": "easy-git: 源代码管理",
                     "group": "z_commands"
                 },
                 {
@@ -257,6 +303,14 @@
                     "title": "easy-git",
                     "group": "ext_settings",
                     "id": "easygit"
+                },
+                {
+                    "command": "EasyGit.CommandPanel",
+                    "title": "打开命令面板",
+                    "group": "easygit@1"
+                },
+                {
+                    "group": "easygit@2"
                 },
                 {
                     "command": "EasyGit.setUserName",

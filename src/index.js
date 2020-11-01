@@ -21,6 +21,9 @@ const openLogWebView = require('./view/log/openWebView.js');
 let { GitLogCustomEditorRenderHtml, GitLogCustomWebViewPanal } = require('./view/log/openCustomEditor.js');
 let { GitDiffCustomEditorRenderHtml, GitDiffCustomWebViewPanal } = require('./view/diff/openCustomEditor.js');
 
+// 用户本地是否安装Git
+let isInstallGitForLocal;
+
 // get hbuilderx version
 let hxVersion = hx.env.appVersion;
 hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
@@ -317,10 +320,12 @@ async function main(viewType, param, webviewPanel, context) {
     let {source} = context;
 
     // 因为从扩展视图进入，会执行两遍，所以从扩展视图进入，不执行此处
-    if (source != "viewMenu") {
+    if (source != "viewMenu" && (isInstallGitForLocal == undefined || !isInstallGitForLocal)) {
         // 检查用户电脑Git环境是否正常
-        let isInstall = utils.isGitInstalled();
-        if (!isInstall) {
+        if (isInstallGitForLocal == undefined || !isInstallGitForLocal) {
+            isInstallGitForLocal = utils.isGitInstalled();
+        };
+        if (!isInstallGitForLocal) {
             hx.window.showErrorMessage('检测到您本机未安装Git环境! 如已安装，还提示此错误，请重启HBuilderX',['现在安装','关闭']).then((result) => {
                 if (result == '现在安装') {
                     hx.env.openExternal('https://git-scm.com/downloads');
