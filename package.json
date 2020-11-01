@@ -178,15 +178,15 @@
             },
             {
                 "command": "EasyGit.BranchSwitch",
-                "title": "easy-git: merge - 分支切换"
+                "title": "easy-git: branch switch - 分支切换"
             },
             {
                 "command": "EasyGit.merge",
-                "title": "easy-git: merge - 分支合并"
+                "title": "easy-git: branch merge - 分支合并"
             },
             {
                 "command": "EasyGit.mergeAbort",
-                "title": "easy-git: merge abort - 分支合并取消"
+                "title": "easy-git: branch merge abort - 分支合并取消"
             },
             {
                 "command": "EasyGit.clean",

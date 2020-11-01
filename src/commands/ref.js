@@ -81,12 +81,15 @@ class Branch {
         let { projectPath } = ProjectInfo;
         let branchs = await this.getAllBranch(projectPath);
 
-        let selected = await hx.window.showQuickPick(branchs, {
+        let data = [...[{"label": "切换到之前的分支"}], ...branchs];
+        let selected = await hx.window.showQuickPick(data, {
             'placeHolder': '请选择要切换的分支名称'
         }).then( (res)=> {
             return res.label;
         });
+
         if (selected == undefined && !selected) { return; };
+        if (selected == '切换到之前的分支') { selected = '-' };
 
         let switchResult = await gitBranchSwitch(projectPath, selected);
         if (switchResult) {
