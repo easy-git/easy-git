@@ -150,6 +150,9 @@ easy-git, 支持通过快捷键打开git视图。
 
 // Git Branch switch
 {"key": "","command": "EasyGit.BranchSwitch"}
+
+// Git Branch Delete
+{"key": "","command": "EasyGit.BranchDelete"}
 ```
 
 ## 数据统计

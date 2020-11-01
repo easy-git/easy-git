@@ -180,6 +180,12 @@ function activate(context) {
     });
     context.subscriptions.push(BranchSwitch);
 
+    // Git Branch delete
+    let BranchDelete = hx.commands.registerCommand('EasyGit.BranchDelete', (param)=> {
+        git.action(param, 'BranchDelete');
+    });
+    context.subscriptions.push(BranchDelete);
+
     // Git merge
     let merge = hx.commands.registerCommand('EasyGit.merge', (param)=> {
         git.action(param, 'BranchMerge');

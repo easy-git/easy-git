@@ -92,13 +92,17 @@ function action(param,action_name) {
             let bch1 = new Branch();
             bch1.switchBranch(ProjectInfo);
             break;
-        case 'BranchMerge':
+        case 'BranchDelete':
             let bch2 = new Branch();
-            bch2.merge(ProjectInfo);
+            bch2.del(ProjectInfo);
+            break;
+        case 'BranchMerge':
+            let bch3 = new Branch();
+            bch3.merge(ProjectInfo);
             break;
         case 'BranchMergeAbort':
-            let bch3 = new Branch();
-            bch3.mergeAbort(ProjectInfo);
+            let bch4 = new Branch();
+            bch4.mergeAbort(ProjectInfo);
             break;
         case 'clean':
             goCleanFile(ProjectInfo);

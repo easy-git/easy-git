@@ -7,7 +7,9 @@ const {
     gitPush,
     gitBranch,
     gitBranchMerge,
-    gitBranchSwitch
+    gitBranchSwitch,
+    gitDeleteRemoteBranch,
+    gitDeleteLocalBranch
 } = require('../common/utils.js');
 
 
@@ -64,22 +66,28 @@ class Branch {
         this.currentBranch = '';
     }
 
-    async getAllBranch(projectPath) {
-        let { localBranchList } = await gitBranch(projectPath, ['-vvv']);
+    async getAllBranch(projectPath, type) {
+        let { localBranchList, remoteBranchList } = await gitBranch(projectPath, ['-avvv']);
+
+        let branchs = [...localBranchList];
+        if (type == 'all') {
+            branchs = [...localBranchList, ...remoteBranchList];
+        };
+
         let data = [];
-        for (let s of localBranchList) {
+        for (let s of branchs) {
             if (s.current) {
                 this.currentBranch = s.name;
                 continue;
             } ;
-            data.push({'label': s.name});
+            data.push({'label': s.name, 'description': s.label});
         };
         return data;
     }
 
     async switchBranch(ProjectInfo) {
         let { projectPath } = ProjectInfo;
-        let branchs = await this.getAllBranch(projectPath);
+        let branchs = await this.getAllBranch(projectPath, 'local');
 
         let data = [...[{"label": "切换到之前的分支"}], ...branchs];
         let selected = await hx.window.showQuickPick(data, {
@@ -100,7 +108,7 @@ class Branch {
 
     async merge(ProjectInfo) {
         let { projectPath } = ProjectInfo;
-        let branchs = await this.getAllBranch(projectPath);
+        let branchs = await this.getAllBranch(projectPath, 'local');
 
         let selected = await hx.window.showQuickPick(branchs, {
             'placeHolder': '请选择要合并的分支名称'
@@ -132,8 +140,33 @@ class Branch {
         if (abortResult) {
             ProjectInfo.easyGitInner = true;
             hx.commands.executeCommand('EasyGit.main', ProjectInfo);
-        }
+        };
     }
+
+    async del(ProjectInfo){
+        let { projectPath } = ProjectInfo;
+        let branchs = await this.getAllBranch(projectPath, 'all');
+
+        let selected = await hx.window.showQuickPick(branchs, {
+            'placeHolder': '请选择要删除的分支名称'
+        }).then( (res)=> {
+            return res.label;
+        });
+
+        if (selected == undefined && !selected) { return; };
+
+        let delResult;
+        if (selected.startsWith('origin/')) {
+            delResult = await gitDeleteRemoteBranch(projectPath, selected);
+        } else {
+            delResult = await gitDeleteLocalBranch(projectPath, selected);
+        };
+        if (delResult) {
+            ProjectInfo.easyGitInner = true;
+            hx.commands.executeCommand('EasyGit.branch', ProjectInfo);
+        };
+    }
+
 }
 
 

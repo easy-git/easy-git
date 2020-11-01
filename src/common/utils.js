@@ -1018,7 +1018,7 @@ async function gitDeleteLocalBranch(workingDir,branchName) {
  */
 async function gitDeleteRemoteBranch(workingDir, branchName) {
     // status bar show message
-    hx.window.setStatusBarMessage(`Git: 正在对 ${branchName} 远程分支进行删除，请耐心等待!`, 5000, 'info');
+    hx.window.setStatusBarMessage(`Git: 正在对 ${branchName} 远程分支进行删除，请耐心等待!`, 60000, 'info');
 
     try {
         branchName = await branchName.replace('remotes/origin/','').replace('origin/','');

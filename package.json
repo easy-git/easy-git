@@ -28,6 +28,7 @@
         "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
         "onCommand:EasyGit.BranchSwitch",
+        "onCommand:EasyGit.BranchDelete",
         "onCommand:EasyGit.merge",
         "onCommand:EasyGit.mergeAbort",
         "onCommand:EasyGit.clean",
@@ -126,11 +127,11 @@
             },
             {
                 "command": "EasyGit.branch",
-                "title": "easy-git: 视图 - 分支/tag管理"
+                "title": "easy-git: 视图 - branch/tag 分支/标签管理"
             },
             {
                 "command": "EasyGit.log",
-                "title": "easy-git: 视图 - 查看日志log"
+                "title": "easy-git: 视图 - 日志log"
             },
             {
                 "command": "EasyGit.init",
@@ -179,6 +180,10 @@
             {
                 "command": "EasyGit.BranchSwitch",
                 "title": "easy-git: branch switch - 分支切换"
+            },
+            {
+                "command": "EasyGit.BranchDelete",
+                "title": "easy-git: branch delete - 分支删除"
             },
             {
                 "command": "EasyGit.merge",
