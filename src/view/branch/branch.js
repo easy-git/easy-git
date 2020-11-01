@@ -71,26 +71,26 @@ class GitBranch {
     }
 
     async LoadingBranchData() {
-        let BranchInfo = await utils.gitBranch(this.projectPath, ['-vvv']);
-        let OriginBranchList = await utils.gitBranch(this.projectPath, ['-rv']);
-        let StatusInfo = await utils.gitStatus(this.projectPath);
+        let {localBranchList, remoteBranchList} = await utils.gitBranch(this.projectPath, ['-avvv']);
         let TagsList = await utils.gitTagsList(this.projectPath);
 
-        let {GitAssignAction} = this.initData;
+        let {GitAssignAction, behind, ahead, tracking, originurl} = this.initData;
+        if (behind == undefined) { behind = 0 };
+        if (ahead == undefined) { ahead = 0 };
 
         const gitBranchData = Object.assign({
-            'BranchInfo': BranchInfo,
-            'OriginBranchList': OriginBranchList,
+            'localBranchList': localBranchList,
+            'remoteBranchList': remoteBranchList,
         }, {
             'TagsList': TagsList
         }, {
             'projectName': this.projectName,
             'projectPath': this.projectPath,
             'GitAssignAction': GitAssignAction,
-            'ahead': StatusInfo.ahead,
-            'behind': StatusInfo.behind,
-            'tracking': StatusInfo.tracking,
-            'originurl': StatusInfo.originurl
+            'ahead': ahead,
+            'behind': behind,
+            'tracking': tracking,
+            'originurl': originurl
         });
         const bhtml = getWebviewBranchContent(this.userConfig, this.uiData, gitBranchData);
         this.webviewPanel.webView.html = bhtml;
@@ -222,6 +222,7 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
 
     // get project info , and git info
     const { projectPath, projectName, currentBranch, originurl } = gitData;
+
     let currentProjectData = {
         'projectPath': projectPath,
         'projectName': projectName,

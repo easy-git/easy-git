@@ -877,25 +877,33 @@ async function gitCheckoutFile(workingDir, filename) {
 /**
  * @description 分支操作
  */
-async function gitBranch(workingDir, options='avvv') {
+async function gitBranch(workingDir, options='-avvv') {
+    let local = [];
+    let remote = [];
     try {
-        let args = options;
         let status = await git(workingDir).init()
-            .branch(args)
+            .branch(options)
             .then((info) => {
-                let branchs = [];
-                for (let s in info.branches) {
-                    branchs.push(info.branches[s]);
-                }
-                return branchs;
+                let branches = info.branches;
+                for (let s in branches) {
+                    let name = branches[s].name;
+                    if (name.startsWith('remotes/origin/')) {
+                        let tmp = info.branches[s];
+                        tmp.name = name.replace('remotes/', '');
+                        remote.push(tmp);
+                    } else {
+                        local.push(info.branches[s]);
+                    };
+                };
+                return { 'localBranchList':local, 'remoteBranchList': remote };
             })
             .catch((err) => {
                 hx.window.setStatusBarMessage('Git: 获取分支列表失败，请稍后再试', 3000, 'error');
-                return [];
+                return { 'localBranchList':local, 'remoteBranchList': remote };;
             });
         return status;
     } catch (e) {
-        return 'error';
+        return { 'localBranchList':local, 'remoteBranchList': remote };;
     }
 };
 

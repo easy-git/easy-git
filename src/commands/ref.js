@@ -64,9 +64,9 @@ class Branch {
     }
 
     async getAllBranch(projectPath) {
-        let result = await gitBranch(projectPath, ['-vvv']);
+        let { localBranchList } = await gitBranch(projectPath, ['-vvv']);
         let data = [];
-        for (let s of result) {
+        for (let s of localBranchList) {
             if (s.current) {
                 this.currentBranch = s.name;
                 continue;
