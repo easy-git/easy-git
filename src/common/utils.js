@@ -706,9 +706,16 @@ async function gitPush(workingDir, options=[]) {
     try {
         let status = await git(workingDir).init()
             .push(options)
-            .then(() => {
-                hx.window.setStatusBarMessage('Git: push操作成功', 3000, 'info');
-                return 'success';
+            .then((result) => {
+                let { remoteMessages } = result;
+                let res = JSON.stringify(remoteMessages);
+                if (res == undefined) {
+                    createOutputChannel('Git: push失败。\n1. 有可能是网络超时。2. \n或账号密码错误，请在终端手动提交, 并设置账号密码信息。', errMsg);
+                    return 'fail';
+                } else {
+                    hx.window.setStatusBarMessage('Git: push操作成功', 3000, 'info');
+                    return 'success';
+                };
             })
             .catch((err) => {
                 let errMsg = "\n" + (err).toString();
