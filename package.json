@@ -121,15 +121,15 @@
             },
             {
                 "command": "EasyGit.main",
-                "title": "easy-git: 源代码管理"
+                "title": "easy-git: 视图 - 源代码管理"
             },
             {
                 "command": "EasyGit.branch",
-                "title": "easy-git: 分支管理"
+                "title": "easy-git: 视图 - 分支/tag管理"
             },
             {
                 "command": "EasyGit.log",
-                "title": "easy-git: log - 查看日志"
+                "title": "easy-git: 视图 - 查看日志log"
             },
             {
                 "command": "EasyGit.init",
@@ -256,6 +256,7 @@
             "explorer/context": [
                 {
                     "command": "EasyGit.main",
+                    "title": "easy-git: 源代码管理",
                     "group": "z_commands"
                 },
                 {
