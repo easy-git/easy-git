@@ -4,7 +4,9 @@ const {
     gitRaw,
     createOutputChannel,
     gitTagCreate,
-    gitPush
+    gitPush,
+    gitBranch,
+    gitBranchMerge
 } = require('../common/utils.js');
 
 
@@ -54,7 +56,67 @@ class Tag {
             }
         }
     }
+};
+
+class Branch {
+    constructor() {
+        this.currentBranch = '';
+    }
+
+    async getAllBranch(projectPath) {
+        let result = await gitBranch(projectPath, ['-vvv']);
+        let data = [];
+        for (let s of result) {
+            if (s.current) {
+                this.currentBranch = s.name;
+                continue;
+            } ;
+            data.push({'label': s.name});
+        };
+        return data;
+    }
+
+    async merge(ProjectInfo) {
+        let { projectPath } = ProjectInfo;
+        let branchs = await this.getAllBranch(projectPath);
+
+        let selected = await hx.window.showQuickPick(branchs, {
+            'placeHolder': '请选择要合并的分支名称'
+        }).then( (res)=> {
+            return res.label;
+        });
+        if (selected == undefined && !selected) { return; };
+
+        let mergeResult = await gitBranchMerge(projectPath, selected, this.currentBranch);
+        if (mergeResult) {
+            ProjectInfo.easyGitInner = true;
+            hx.commands.executeCommand('EasyGit.main', ProjectInfo);
+        };
+        if (mergeResult == 'fail') {
+            let that = this;
+            setTimeout(function() {
+                hx.window.showErrorMessage('EasyGit: 分支合并存在冲突，是否取消本次合并？', ['取消合并', '关闭']).then( (btn)=> {
+                    if (btn == '取消合并') {
+                        that.mergeAbort(ProjectInfo);
+                    }
+                })
+            }, 2000);
+        };
+
+    }
+
+    async mergeAbort(ProjectInfo) {
+        let { projectPath } = ProjectInfo;
+        let abortResult = await gitRaw(projectPath, ['merge', '--abort'], '取消分支合并 ');
+        if (abortResult) {
+            ProjectInfo.easyGitInner = true;
+            hx.commands.executeCommand('EasyGit.main', ProjectInfo);
+        }
+    }
 }
 
 
-module.exports = Tag;
+module.exports = {
+    Tag,
+    Branch
+};

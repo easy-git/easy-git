@@ -174,6 +174,18 @@ function activate(context) {
     });
     context.subscriptions.push(push);
 
+    // Git merge
+    let merge = hx.commands.registerCommand('EasyGit.merge', (param)=> {
+        git.action(param, 'merge');
+    });
+    context.subscriptions.push(merge);
+
+    // Git merge --abort
+    let mergeAbort = hx.commands.registerCommand('EasyGit.mergeAbort', (param)=> {
+        git.action(param, 'mergeAbort');
+    });
+    context.subscriptions.push(mergeAbort);
+
     // Git clean
     let clean = hx.commands.registerCommand('EasyGit.clean', (param)=> {
         git.action(param, 'clean');

@@ -27,6 +27,8 @@
         "onCommand:EasyGit.pull",
         "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
+        "onCommand:EasyGit.merge",
+        "onCommand:EasyGit.mergeAbort",
         "onCommand:EasyGit.clean",
         "onCommand:EasyGit.stash",
         "onCommand:EasyGit.stashAll",
@@ -172,6 +174,14 @@
             {
                 "command": "EasyGit.push",
                 "title": "easy-git: push - 推送"
+            },
+            {
+                "command": "EasyGit.merge",
+                "title": "easy-git: merge - 分支合并"
+            },
+            {
+                "command": "EasyGit.mergeAbort",
+                "title": "easy-git: merge abort - 分支合并取消"
             },
             {
                 "command": "EasyGit.clean",

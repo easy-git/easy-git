@@ -10,7 +10,7 @@ const { gitInitProject } = require('./repository.js');
 const { gitAddFile, gitRestore, goCleanFile, goCommitAmend } = require('./file.js');
 const { goSetConfig } = require('./base.js');
 
-const Tag = require('./tag.js');
+const { Tag, Branch } = require('./ref.js');
 const gitBlameForLineChange = require('./blame.js');
 
 
@@ -87,6 +87,14 @@ function action(param,action_name) {
             break;
         case 'push':
             utils.gitPush(projectPath);
+            break;
+        case 'merge':
+            let bch = new Branch();
+            bch.merge(ProjectInfo);
+            break;
+        case 'mergeAbort':
+            let bch1 = new Branch();
+            bch1.mergeAbort(ProjectInfo);
             break;
         case 'clean':
             goCleanFile(ProjectInfo);
