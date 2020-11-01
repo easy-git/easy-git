@@ -24,7 +24,7 @@ function isJSON(str) {
  * @更新弹窗，点击【以后再说】，则本周内不再自动弹窗提示
  */
 function showUpgradeBox() {
-    let msg = '插件【easry-git】 发布了新版本！快去HBuilderX插件市场更新吧！\n';
+    let msg = '插件【easry-git】 发布了新版本！快去HBuilderX插件市场更新吧！<a href="https://ext.dcloud.net.cn/plugin?name=easy-git">更新日志</a>\n';
     let btn = ['立即更新','以后再说'];
 
     hx.window.showInformationMessage(msg, btn).then(result => {
