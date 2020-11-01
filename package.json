@@ -27,6 +27,7 @@
         "onCommand:EasyGit.pull",
         "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
+        "onCommand:EasyGit.BranchSwitch",
         "onCommand:EasyGit.merge",
         "onCommand:EasyGit.mergeAbort",
         "onCommand:EasyGit.clean",
@@ -174,6 +175,10 @@
             {
                 "command": "EasyGit.push",
                 "title": "easy-git: push - 推送"
+            },
+            {
+                "command": "EasyGit.BranchSwitch",
+                "title": "easy-git: merge - 分支切换"
             },
             {
                 "command": "EasyGit.merge",

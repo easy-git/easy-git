@@ -6,7 +6,8 @@ const {
     gitTagCreate,
     gitPush,
     gitBranch,
-    gitBranchMerge
+    gitBranchMerge,
+    gitBranchSwitch
 } = require('../common/utils.js');
 
 
@@ -76,6 +77,24 @@ class Branch {
         return data;
     }
 
+    async switchBranch(ProjectInfo) {
+        let { projectPath } = ProjectInfo;
+        let branchs = await this.getAllBranch(projectPath);
+
+        let selected = await hx.window.showQuickPick(branchs, {
+            'placeHolder': '请选择要切换的分支名称'
+        }).then( (res)=> {
+            return res.label;
+        });
+        if (selected == undefined && !selected) { return; };
+
+        let switchResult = await gitBranchSwitch(projectPath, selected);
+        if (switchResult) {
+            ProjectInfo.easyGitInner = true;
+            hx.commands.executeCommand('EasyGit.main', ProjectInfo);
+        };
+    }
+
     async merge(ProjectInfo) {
         let { projectPath } = ProjectInfo;
         let branchs = await this.getAllBranch(projectPath);
@@ -102,7 +121,6 @@ class Branch {
                 })
             }, 2000);
         };
-
     }
 
     async mergeAbort(ProjectInfo) {
