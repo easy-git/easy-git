@@ -375,7 +375,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
             <div class="container-fluid" v-if="!isShowModel">
                 <div class="row m-0 fixedBottom" id="git_branch">
                     <div class="col-auto mr-auto" title="点击跳转到源代码管理器">
-                        <span @click.once="showBranchWindow();" @click.middle="switchBranch('-');" class="branch">
+                        <span @click.once="showBranchWindow();" @click.middle="switchBranch({'name':'-', 'current':false});" class="branch">
                             ${BranchIcon} {{currentBranch}}
                         </span>
                     </div>
