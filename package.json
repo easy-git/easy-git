@@ -1,8 +1,8 @@
 {
     "name": "easy-git",
     "description": "vscode源代码管理工具风格。HBuilderX内唯一的图形化Git工具, 支持克隆、提交/更新/拉取、分支/tag管理、日志、文件对比、储藏等操作。",
-    "displayName": "重大更新:【easy-git】Git源代码管理工具",
-    "version": "0.4.0",
+    "displayName": "重大更新:【easy-git】Git源代码管理工具，新增命令面板、文件对比。",
+    "version": "0.4.1",
     "publisher": "oneone",
     "engines": {
         "HBuilderX": "^2.8.3"
@@ -27,6 +27,8 @@
         "onCommand:EasyGit.pull",
         "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
+        "onCommand:EasyGit.BranchSwitch",
+        "onCommand:EasyGit.BranchDelete",
         "onCommand:EasyGit.merge",
         "onCommand:EasyGit.mergeAbort",
         "onCommand:EasyGit.clean",
@@ -125,11 +127,11 @@
             },
             {
                 "command": "EasyGit.branch",
-                "title": "easy-git: 视图 - 分支/tag管理"
+                "title": "easy-git: 视图 - branch/tag 分支/标签管理"
             },
             {
                 "command": "EasyGit.log",
-                "title": "easy-git: 视图 - 查看日志log"
+                "title": "easy-git: 视图 - 日志log"
             },
             {
                 "command": "EasyGit.init",
@@ -176,12 +178,20 @@
                 "title": "easy-git: push - 推送"
             },
             {
+                "command": "EasyGit.BranchSwitch",
+                "title": "easy-git: branch switch - 分支切换"
+            },
+            {
+                "command": "EasyGit.BranchDelete",
+                "title": "easy-git: branch delete - 分支删除"
+            },
+            {
                 "command": "EasyGit.merge",
-                "title": "easy-git: merge - 分支合并"
+                "title": "easy-git: branch merge - 分支合并"
             },
             {
                 "command": "EasyGit.mergeAbort",
-                "title": "easy-git: merge abort - 分支合并取消"
+                "title": "easy-git: branch merge abort - 分支合并取消"
             },
             {
                 "command": "EasyGit.clean",

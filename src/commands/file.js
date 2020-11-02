@@ -90,7 +90,7 @@ class gitRestore {
 
     // 提示框
     showGitVersionPrompt() {
-        hx.window.showErrorMessage('Git: 此操作，用到了restore命令。\n本机Git命令行版本太低, 没有restore命令，将使用旧版命令。建议升级电脑的Git命令行工具！', ['安装高版本Git工具', '关闭']).then( (res)=> {
+        hx.window.showInformationMessage('Git提醒:  此操作，用到了restore命令。\n本机Git命令行版本太低, 没有restore命令，将使用旧版命令。建议升级电脑的Git命令行工具！', ['安装高版本Git工具', '关闭']).then( (res)=> {
             if (res == '安装高版本Git工具') {
                 hx.env.openExternal('https://git-scm.com/downloads');
             };

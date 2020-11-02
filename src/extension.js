@@ -174,15 +174,27 @@ function activate(context) {
     });
     context.subscriptions.push(push);
 
+    // Git Branch Switch
+    let BranchSwitch = hx.commands.registerCommand('EasyGit.BranchSwitch', (param)=> {
+        git.action(param, 'BranchSwitch');
+    });
+    context.subscriptions.push(BranchSwitch);
+
+    // Git Branch delete
+    let BranchDelete = hx.commands.registerCommand('EasyGit.BranchDelete', (param)=> {
+        git.action(param, 'BranchDelete');
+    });
+    context.subscriptions.push(BranchDelete);
+
     // Git merge
     let merge = hx.commands.registerCommand('EasyGit.merge', (param)=> {
-        git.action(param, 'merge');
+        git.action(param, 'BranchMerge');
     });
     context.subscriptions.push(merge);
 
     // Git merge --abort
     let mergeAbort = hx.commands.registerCommand('EasyGit.mergeAbort', (param)=> {
-        git.action(param, 'mergeAbort');
+        git.action(param, 'BranchMergeAbort');
     });
     context.subscriptions.push(mergeAbort);
 

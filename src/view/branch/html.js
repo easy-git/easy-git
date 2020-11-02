@@ -1,8 +1,6 @@
 const hx = require('hbuilderx');
 
-const os = require('os');
 const path = require('path');
-const osName = os.platform();
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
@@ -45,8 +43,8 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
         projectPath,
         projectName,
         GitAssignAction,
-        BranchInfo,
-        OriginBranchList,
+        localBranchList,
+        remoteBranchList,
         TagsList,
         ahead,
         behind,
@@ -55,16 +53,16 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
     } = gitBranchData;
 
     let currentBranch = '';
-    for (let s of BranchInfo) {
+    for (let s of localBranchList) {
         if (s.current) {
             currentBranch = s.name;
             break;
         };
     };
 
-    let branchs = JSON.stringify(BranchInfo);
+    let branchs = JSON.stringify(localBranchList);
+    remoteBranchList = JSON.stringify(remoteBranchList);
 
-    OriginBranchList = JSON.stringify(OriginBranchList);
     TagsList = JSON.stringify(TagsList.data);
     GitAssignAction = JSON.stringify(GitAssignAction);
 
@@ -377,7 +375,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
             <div class="container-fluid" v-if="!isShowModel">
                 <div class="row m-0 fixedBottom" id="git_branch">
                     <div class="col-auto mr-auto" title="点击跳转到源代码管理器">
-                        <span @click.once="showBranchWindow();" @click.middle="switchBranch('-');" class="branch">
+                        <span @click.once="showBranchWindow();" @click.middle="switchBranch({'name':'-', 'current':false});" class="branch">
                             ${BranchIcon} {{currentBranch}}
                         </span>
                     </div>
@@ -386,6 +384,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             ${SyncIcon}
                         </div>
                         <div @click="gitPull('rebase');" title="git pull --rebase">
+                            <span class="cactive num">${behind}</span>
                             ${DownArrowIcon}
                         </div>
                         <div @click="gitPush();" title="git push">
@@ -445,6 +444,8 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                 data: {
                     projectName: '',
                     currentBranch: '',
+                    ahead: '',
+                    behind: '',
                     tracking: '',
                     originurl: '',
                     originurlBoolean: '',
@@ -503,6 +504,8 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     }
                 },
                 created() {
+                    this.ahead = '${ahead}';
+                    this.behind = '${behind}';
                     this.projectName = '${projectName}';
                     this.currentBranch = '${currentBranch}';
                     this.AssignAction = ${GitAssignAction};
@@ -513,8 +516,8 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     this.rawBranchList = ${branchs};
                     this.BranchList = ${branchs};
 
-                    this.rawOriginBranchList = ${OriginBranchList};
-                    this.OriginBranchList = ${OriginBranchList};
+                    this.rawOriginBranchList = ${remoteBranchList};
+                    this.OriginBranchList = ${remoteBranchList};
 
                     this.rawTagsList = ${TagsList};
                     this.TagsList = ${TagsList};

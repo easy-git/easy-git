@@ -118,10 +118,10 @@ class GitFile {
     async add(info) {
         let {text, tag} = info;
         if (tag == 'C') {
-            let btnText = await hx.window.showErrorMessage(`确定要暂存含有合并冲突的 ${text} 文件吗? `, ['取消','确定']).then( (btnText) => {
+            let btnText = await hx.window.showErrorMessage(`确定要暂存含有合并冲突的 ${text} 文件吗? `, ['我已解决冲突','关闭']).then( (btnText) => {
                 return btnText
             });
-            if (btnText == '取消') { return; }; 
+            if (btnText == '关闭') { return; };
         };
 
         let files = [];
@@ -454,7 +454,14 @@ function active(webviewPanel, userConfig, gitData) {
 
     // git push
     async function push(projectPath) {
-        let pushStatus = await utils.gitPush(projectPath);
+        let pushStatus;
+        setTimeout(function() {
+            if (pushStatus == undefined && pushStatus != 'success') {
+                utils.createOutputChannel('Git: 未获取到push操作结果。', '1. 有可能是网络超时，请检查网络。\n2. 或Git凭证（账号密码/ssh公钥）错误，请修正Git凭证后再试。\n3. 如需了解GitHub/Gitee，添加/删除/配置SSH公钥，请访问：https://docs.github.com/cn/free-pro-team@latest/github/authenticating-to-github/connecting-to-github-with-ssh');
+            };
+        }, 60000)
+
+        pushStatus = await utils.gitPush(projectPath);
         if (pushStatus == 'success') {
             File.refreshFileList();
         };

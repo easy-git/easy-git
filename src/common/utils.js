@@ -702,16 +702,16 @@ async function gitAddCommit(workingDir,commitComment) {
  */
 async function gitPush(workingDir, options=[]) {
     // status bar show message
-    hx.window.setStatusBarMessage(`Git: 正在向远端推送......`, 2000, 'info');
+    hx.window.setStatusBarMessage(`Git: 正在向远端推送......`, 60000, 'info');
     try {
         let status = await git(workingDir).init()
             .push(options)
-            .then(() => {
+            .then((result) => {
                 hx.window.setStatusBarMessage('Git: push操作成功', 3000, 'info');
                 return 'success';
             })
             .catch((err) => {
-                let errMsg = "\n" + (err).toString();
+                let errMsg = (err).toString();
                 createOutputChannel('Git: push操作失败', errMsg);
                 return 'fail';
             });
@@ -747,7 +747,7 @@ async function gitPull(workingDir,options) {
                 return 'success';
             })
             .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
+                let errMsg = (err).toString();
                 createOutputChannel('Git: pull失败', errMsg);
                 return 'fail';
             });
@@ -870,25 +870,33 @@ async function gitCheckoutFile(workingDir, filename) {
 /**
  * @description 分支操作
  */
-async function gitBranch(workingDir, options='avvv') {
+async function gitBranch(workingDir, options='-avvv') {
+    let local = [];
+    let remote = [];
     try {
-        let args = options;
         let status = await git(workingDir).init()
-            .branch(args)
+            .branch(options)
             .then((info) => {
-                let branchs = [];
-                for (let s in info.branches) {
-                    branchs.push(info.branches[s]);
-                }
-                return branchs;
+                let branches = info.branches;
+                for (let s in branches) {
+                    let name = branches[s].name;
+                    if (name.startsWith('remotes/origin/')) {
+                        let tmp = info.branches[s];
+                        tmp.name = name.replace('remotes/', '');
+                        remote.push(tmp);
+                    } else {
+                        local.push(info.branches[s]);
+                    };
+                };
+                return { 'localBranchList':local, 'remoteBranchList': remote };
             })
             .catch((err) => {
                 hx.window.setStatusBarMessage('Git: 获取分支列表失败，请稍后再试', 3000, 'error');
-                return [];
+                return { 'localBranchList':local, 'remoteBranchList': remote };;
             });
         return status;
     } catch (e) {
-        return 'error';
+        return { 'localBranchList':local, 'remoteBranchList': remote };;
     }
 };
 
@@ -1003,7 +1011,7 @@ async function gitDeleteLocalBranch(workingDir,branchName) {
  */
 async function gitDeleteRemoteBranch(workingDir, branchName) {
     // status bar show message
-    hx.window.setStatusBarMessage(`Git: 正在对 ${branchName} 远程分支进行删除，请耐心等待!`, 5000, 'info');
+    hx.window.setStatusBarMessage(`Git: 正在对 ${branchName} 远程分支进行删除，请耐心等待!`, 60000, 'info');
 
     try {
         branchName = await branchName.replace('remotes/origin/','').replace('origin/','');
@@ -1133,7 +1141,7 @@ async function gitBranchCreatePush(workingDir,branchName) {
                 return 'success';
             })
             .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
+                let errMsg = (err).toString();
                 createOutputChannel(`Git: 分支${branchName} 创建、推送分支失败`, errMsg);
                 return 'fail';
             });
@@ -1155,13 +1163,11 @@ async function gitBranchMerge(workingDir,fromBranch,toBranch) {
         let status = await git(workingDir).init()
             .mergeFromTo(fromBranch,toBranch)
             .then((res) => {
-                console.log(res)
-                let Msg = "\n\n" + (res).toString();
-                createOutputChannel(`Git: 分支合并`, Msg);
+                hx.window.setStatusBarMessage(`Git: 分支${toBranch}，合并${fromBranch}的代码，合并成功！`, 10000, 'info');
                 return 'success';
             })
             .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
+                let errMsg = (err).toString();
                 createOutputChannel(`Git: 分支合并失败, 请根据控制台提示手动处理。`, errMsg);
                 return 'fail';
             });
@@ -1190,7 +1196,7 @@ async function gitTagsList(workingDir) {
             })
             .catch((err) => {
                 tagsList.error = true;
-                let errMsg = "\n\n" + (err).toString();
+                let errMsg = (err).toString();
                 createOutputChannel(`Git: tag获取失败`, errMsg);
             });
     } catch (e) {
@@ -1216,7 +1222,7 @@ async function gitTagCreate(workingDir,tagOptions, tagName) {
                 return 'success';
             })
             .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
+                let errMsg = "\n" + (err).toString();
                 createOutputChannel(`Git: 标签 ${tagName} 创建失败!`, errMsg);
                 return 'fail';
             });
@@ -1249,7 +1255,7 @@ async function gitClean(workingDir) {
                 return 'success';
             })
             .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
+                let errMsg = "\n" + (err).toString();
                 createOutputChannel(`Git: 删除未跟踪的文件失败`, errMsg);
                 return 'fail';
             });
