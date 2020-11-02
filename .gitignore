@@ -13,3 +13,6 @@ unpackage/dist/dev/
 
 # python
 *.pyc
+
+todo.md
+docs/test.js
