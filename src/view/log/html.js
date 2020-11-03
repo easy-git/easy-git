@@ -590,6 +590,8 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         <div class="dropdown-divider"></div>
                         <li @click="copyLogMsg(rightClickItem, 'msg')">复制</li>
                         <li @click="copyLogMsg(rightClickItem, 'commit_id')">复制commit id到剪贴板</li>
+                        <div class="dropdown-divider"></div>
+                        <li @click="openCommandPanel(rightClickItem)">Git 命令面板</li>
                     </ul>
                 </div>
             </div>
@@ -878,6 +880,11 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                 if (msg.command != 'showCommitFileChange') {return};
                                 this.CommitFileChangeDetails = msg.result.data;
                             });
+                        },
+                        openCommandPanel() {
+                            hbuilderx.postMessage({
+                                command: 'openCommandPanel'
+                            })
                         }
                     }
                 })

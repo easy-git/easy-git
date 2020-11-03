@@ -323,6 +323,12 @@ function active(webviewPanel, userConfig, gitData) {
     // set html
     view.html = viewContent;
 
+    let EasyGitInnerParams = {
+        'projectPath': projectPath,
+        'projectName': projectName,
+        'easyGitInner': true
+    };
+
     view.onDidReceiveMessage((msg) => {
         let action = msg.command;
         switch (action) {
@@ -348,12 +354,7 @@ function active(webviewPanel, userConfig, gitData) {
                 hx.commands.executeCommand('EasyGit.diffFile',diff_parms);
                 break;
             case 'log':
-                let data = {
-                    'projectPath': projectPath,
-                    'projectName': projectName,
-                    'easyGitInner': true
-                };
-                hx.commands.executeCommand('EasyGit.log',data);
+                hx.commands.executeCommand('EasyGit.log',EasyGitInnerParams);
                 break;
             case 'open':
                 let fileUri = path.join(projectPath, msg.text);
@@ -387,12 +388,7 @@ function active(webviewPanel, userConfig, gitData) {
                 File.checkoutFile(msg.text);
                 break;
             case 'stash':
-                let param = {
-                    'projectPath': projectPath,
-                    'projectName': projectName,
-                    'easyGitInner': true
-                };
-                gitAction.action(param,msg.option);
+                gitAction.action(EasyGitInnerParams,msg.option);
                 break;
             case 'cancelStash':
                 File.cancelStash(msg.text);
@@ -411,12 +407,7 @@ function active(webviewPanel, userConfig, gitData) {
                     if (originurl == undefined) {
                         hx.window.showErrorMessage('请发布此项目到远程到后再进行操作。', ['我知道了']);
                     } else {
-                        let currentProjectData = {
-                            'projectPath': projectPath,
-                            'projectName': projectName,
-                            'easyGitInner': true
-                        };
-                        hx.commands.executeCommand('EasyGit.branch',currentProjectData);
+                        hx.commands.executeCommand('EasyGit.branch',EasyGitInnerParams);
                     };
                 } else {
                     File.refreshFileList();
@@ -439,6 +430,9 @@ function active(webviewPanel, userConfig, gitData) {
                 break;
             case 'switchLastBranch':
                 switchLastBranch(projectPath);
+                break;
+            case 'openCommandPanel':
+                hx.commands.executeCommand('EasyGit.CommandPanel', EasyGitInnerParams);
                 break;
             default:
                 break;
