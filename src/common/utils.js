@@ -556,7 +556,8 @@ async function gitStatus(workingDir) {
             let tmp3 = [...conflicted];
             for (let s1 of files) {
                 if ((!tmp3.includes(s1.path) || staged.includes(s1.path)) && (s1.index != ' ' && s1.index != '?')) {
-                    staged_list.push({'path': s1.path, 'tag': s1.index});
+                    let tag = s1.index != ' ' && s1.working_dir != ' ' ? s1.working_dir : s1.index;
+                    staged_list.push({'path': s1.path, 'tag': tag});
                 };
             };
         };
@@ -567,11 +568,8 @@ async function gitStatus(workingDir) {
         if (files.length && files != undefined) {
             let tmp = [...conflicted];
             for (let s of files) {
-               if ( !tmp.includes(s.path) &&
-                    ( ( [' ', 'M', 'A','R'].includes(s.index) && s.working_dir == 'M') ||
-                      ( [' ', '?'].includes(s.index) && ([' ', '?', 'D'].includes(s.working_dir)) ) )) {
-                    let tag = s.index != ' ' ? s.index : s.working_dir;
-                    not_staged_list.push({'path': s.path, 'tag': tag});
+               if ( !tmp.includes(s.path) && (['M', 'A', 'R', 'D','?', '!'].includes(s.working_dir) && s.working_dir != ' ')) {
+                    not_staged_list.push({'path': s.path, 'tag': s.working_dir});
                };
            };
         };
