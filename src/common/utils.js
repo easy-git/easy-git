@@ -1524,11 +1524,11 @@ async function gitCherryPick(workingDir, commands) {
                 return 'success';
             })
             .catch((err) => {
-                createOutputChannel(`Git: ${commands} 操作失败。`, err);
                 let errMsg = err.toString();
                 if (errMsg.includes('resolving the conflicts')) {
                     return 'conflicts';
                 };
+                createOutputChannel(`Git: ${commands} 操作失败。`, err);
                 return 'fail';
             });
         return status;

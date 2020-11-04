@@ -213,9 +213,10 @@ class Branch {
                 hx.commands.executeCommand('EasyGit.main',ProjectInfo);
             }, 1000);
 
-            let btn = await hx.window.showInformationMessage('Git: cherry-pick操作过程中发生代码冲突', ['退出CheryPick','放弃合并']).then((result) => {
+            let btn = await hx.window.showInformationMessage('Git: cherry-pick操作过程中发生代码冲突', ['继续','退出CheryPick','放弃合并']).then((result) => {
                 return result
             });
+            if (btn == '继续') { reutrn; };
             if (btn == '退出CheryPick') {
                 await gitCherryPick(projectPath, ['cherry-pick', '--quit']);
             } else if (btn == '放弃合并') {
