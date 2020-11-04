@@ -198,6 +198,12 @@ function activate(context) {
     });
     context.subscriptions.push(mergeAbort);
 
+    // Git cherry-pick
+    let cherryPick = hx.commands.registerCommand('EasyGit.cherryPick', (param)=> {
+        git.action(param, 'cherryPick');
+    });
+    context.subscriptions.push(cherryPick);
+
     // Git clean
     let clean = hx.commands.registerCommand('EasyGit.clean', (param)=> {
         git.action(param, 'clean');

@@ -9,7 +9,9 @@ const {
     gitBranchMerge,
     gitBranchSwitch,
     gitDeleteRemoteBranch,
-    gitDeleteLocalBranch
+    gitDeleteLocalBranch,
+    gitLog,
+    gitCherryPick
 } = require('../common/utils.js');
 
 
@@ -81,6 +83,24 @@ class Branch {
                 continue;
             } ;
             data.push({'label': s.name, 'description': s.label});
+        };
+        return data;
+    }
+
+    async getProjectLogs(projectPath) {
+        let Logs = await gitLog(projectPath, 'all', 'default');
+        let {success} = Logs;
+
+        let data = [];
+        if (success && success != undefined) {
+            for (let s of Logs.data) {
+                let shortHash = s.hash.slice(0,12);
+                data.push({
+                    "label": shortHash,
+                    "description": s.date + s.message,
+                    "hash": s.hash
+                });
+            };
         };
         return data;
     }
@@ -167,6 +187,53 @@ class Branch {
         };
     }
 
+    async cherryPick(ProjectInfo) {
+        let { projectPath, hash } = ProjectInfo;
+
+        if (hash == undefined || hash == '') {
+            let data = await this.getProjectLogs(projectPath);
+            let selected = await hx.window.showQuickPick(data, {
+                'placeHolder': '请选择要应用的commit......'
+            }).then( (res)=> {
+                return res;
+            });
+
+            hash = selected.hash;
+            if (hash == undefined) { return; };
+        };
+
+        let cmd = ['cherry-pick', '-x', hash];
+        let cherryPickResult = await gitCherryPick(projectPath, cmd);
+        if (cherryPickResult == 'fail' || cherryPickResult == 'error') {
+            return;
+        } else if ( cherryPickResult == 'conflicts') {
+            // 刷新源代码管理器
+            setTimeout(function() {
+                ProjectInfo.easyGitInner = true;
+                hx.commands.executeCommand('EasyGit.main',ProjectInfo);
+            }, 1000);
+
+            let btn = await hx.window.showInformationMessage('Git: cherry-pick操作过程中发生代码冲突', ['退出CheryPick','放弃合并']).then((result) => {
+                return result
+            });
+            if (btn == '退出CheryPick') {
+                await gitCherryPick(projectPath, ['cherry-pick', '--quit']);
+            } else if (btn == '放弃合并') {
+                await gitCherryPick(projectPath, ['cherry-pick', '--abort']);
+            };
+            // 刷新源代码管理器
+            hx.commands.executeCommand('EasyGit.main',ProjectInfo);
+        } else {
+            hx.window.showInformationMessage('Git: cherry-pick 操作成功！', ['现在push','以后push' ,'关闭']).then((result) => {
+                if (result == '现在push') {
+                    hx.commands.executeCommand('EasyGit.push', ProjectInfo);
+                };
+                setTimeout(function() {
+                    hx.commands.executeCommand('EasyGit.main',ProjectInfo);
+                }, 1500);
+            });
+        };
+    }
 }
 
 

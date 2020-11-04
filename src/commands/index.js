@@ -55,6 +55,9 @@ function action(param,action_name) {
     // git tag: 标签相关操作
     let tag = new Tag(projectPath);
 
+    // git branch: 分支相关操作
+    let bch = new Branch();
+
     switch (action_name){
         case 'init':
             gitInitProject(ProjectInfo);
@@ -89,20 +92,21 @@ function action(param,action_name) {
             utils.gitPush(projectPath);
             break;
         case 'BranchSwitch':
-            let bch1 = new Branch();
-            bch1.switchBranch(ProjectInfo);
+            bch.switchBranch(ProjectInfo);
             break;
         case 'BranchDelete':
-            let bch2 = new Branch();
-            bch2.del(ProjectInfo);
+            bch.del(ProjectInfo);
             break;
         case 'BranchMerge':
-            let bch3 = new Branch();
-            bch3.merge(ProjectInfo);
+            bch.merge(ProjectInfo);
             break;
         case 'BranchMergeAbort':
-            let bch4 = new Branch();
-            bch4.mergeAbort(ProjectInfo);
+            bch.mergeAbort(ProjectInfo);
+            break;
+        case 'cherryPick':
+            let hashValue = param.hash;
+            let info = Object.assign( {'hash': hashValue}, ProjectInfo);
+            bch.cherryPick(info);
             break;
         case 'clean':
             goCleanFile(ProjectInfo);

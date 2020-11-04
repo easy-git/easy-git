@@ -31,6 +31,7 @@
         "onCommand:EasyGit.BranchDelete",
         "onCommand:EasyGit.merge",
         "onCommand:EasyGit.mergeAbort",
+        "onCommand:EasyGit.cherryPick",
         "onCommand:EasyGit.clean",
         "onCommand:EasyGit.stash",
         "onCommand:EasyGit.stashAll",
@@ -146,6 +147,18 @@
                 "title": "easy-git: clone - 克隆"
             },
             {
+                "command": "EasyGit.pull",
+                "title": "easy-git: pull - 拉取"
+            },
+            {
+                "command": "EasyGit.fetch",
+                "title": "easy-git: fetch - 抓取"
+            },
+            {
+                "command": "EasyGit.push",
+                "title": "easy-git: push - 推送"
+            },
+            {
                 "command": "EasyGit.add",
                 "title": "easy-git: add - 添加文件到暂存区"
             },
@@ -166,16 +179,8 @@
                 "title": "easy-git: restore --staged - 撤销暂存"
             },
             {
-                "command": "EasyGit.pull",
-                "title": "easy-git: pull - 拉取"
-            },
-            {
-                "command": "EasyGit.fetch",
-                "title": "easy-git: fetch - 获取"
-            },
-            {
-                "command": "EasyGit.push",
-                "title": "easy-git: push - 推送"
+                "command": "EasyGit.clean",
+                "title": "easy-git: clean - 删除未跟踪的文件"
             },
             {
                 "command": "EasyGit.BranchSwitch",
@@ -194,8 +199,8 @@
                 "title": "easy-git: branch merge abort - 分支合并取消"
             },
             {
-                "command": "EasyGit.clean",
-                "title": "easy-git: clean - 删除未跟踪的文件"
+                "command": "EasyGit.cherryPick",
+                "title": "easy-git: cherry-pick"
             },
             {
                 "command": "EasyGit.stash",

@@ -1497,15 +1497,43 @@ async function gitRaw(workingDir, commands, msg, resultType='statusCode') {
             })
             .catch((err) => {
                 if (msg != undefined) {
-                    createOutputChannel('Git: ${msg} 操作失败', err);
+                    createOutputChannel(`Git: ${msg} 操作失败。`, err);
                 }
                 return 'fail';
             });
         return status;
     } catch (e) {
         if (msg != undefined) {
-            createOutputChannel('Git: ${msg} 操作失败，插件运行异常。', e);
+            createOutputChannel(`Git: ${msg} 操作失败，插件运行异常。`, e);
         }
+        return 'error';
+    };
+};
+
+
+/**
+ * @description raw
+ * @param {String} workingDir Git工作目录
+ * @param {Array} commands []
+ * @param {String} msg 消息
+ */
+async function gitCherryPick(workingDir, commands) {
+    try {
+        let status = await git(workingDir).raw(commands)
+            .then((res) => {
+                return 'success';
+            })
+            .catch((err) => {
+                createOutputChannel(`Git: ${commands} 操作失败。`, err);
+                let errMsg = err.toString();
+                if (errMsg.includes('resolving the conflicts')) {
+                    return 'conflicts';
+                };
+                return 'fail';
+            });
+        return status;
+    } catch (e) {
+        createOutputChannel(`Git: ${commands} 操作失败，插件运行异常。`, e);
         return 'error';
     };
 };
@@ -1609,5 +1637,6 @@ module.exports = {
     gitStash,
     gitStashList,
     gitAddRemote,
-    gitRaw
+    gitRaw,
+    gitCherryPick
 }
