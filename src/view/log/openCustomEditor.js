@@ -165,6 +165,9 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
             case 'reset-hard-commit':
                 Log.resetHardCommit(msg.hash);
                 break;
+            case 'revert':
+                Log.revert(msg.hash);
+                break;
             case 'checkout-commit':
                 Log.checkoutCommit(msg.hash);
                 break;

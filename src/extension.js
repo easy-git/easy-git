@@ -156,6 +156,12 @@ function activate(context) {
     });
     context.subscriptions.push(restoreChanged);
 
+    // git revert
+    let revert = hx.commands.registerCommand('EasyGit.revert', (param)=> {
+        git.action(param, 'revert');
+    });
+    context.subscriptions.push(revert);
+
     // Git pull
     let pull = hx.commands.registerCommand('EasyGit.pull', (param)=> {
         git.action(param, 'pull');

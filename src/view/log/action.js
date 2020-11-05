@@ -244,6 +244,16 @@ class GitLogAction {
         hx.commands.executeCommand('EasyGit.cherryPick', cherryPickInfo);
     }
 
+    async revert(hash) {
+        let revertInfo = {
+            'hash': hash,
+            'projectName': this.projectName,
+            'projectPath': this.projectPath,
+            'easyGitInner': true
+        };
+        hx.commands.executeCommand('EasyGit.revert', revertInfo);
+    }
+
     // 重置回退代码到某次提交
     async resetHardCommit(hash) {
         let shortHashValue = hash.slice(0,12);

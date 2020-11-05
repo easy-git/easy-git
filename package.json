@@ -24,6 +24,7 @@
         "onCommand:EasyGit.resetLastCommit",
         "onCommand:EasyGit.restore",
         "onCommand:EasyGit.restoreStaged",
+        "onCommand:EasyGit.revert",
         "onCommand:EasyGit.pull",
         "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
@@ -179,6 +180,10 @@
                 "title": "easy-git: restore --staged - 撤销暂存"
             },
             {
+                "command": "EasyGit.revert",
+                "title": "easy-git: revert - 撤销指定commit"
+            },
+            {
                 "command": "EasyGit.clean",
                 "title": "easy-git: clean - 删除未跟踪的文件"
             },
@@ -287,11 +292,6 @@
                 {
                     "command": "EasyGit.log",
                     "title": "easy-git: 查看日志",
-                    "group": "z_commands"
-                },
-                {
-                    "command": "EasyGit.diffFile",
-                    "title": "easy-git: 比较差异",
                     "group": "z_commands"
                 },
                 {

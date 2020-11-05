@@ -1512,7 +1512,7 @@ async function gitRaw(workingDir, commands, msg, resultType='statusCode') {
 
 
 /**
- * @description raw
+ * @description git Cherry-pick
  * @param {String} workingDir Git工作目录
  * @param {Array} commands []
  * @param {String} msg 消息
@@ -1627,8 +1627,34 @@ class FillCommitMessage {
             return undefined;
         }
     }
-
 }
+
+/**
+ * @description git revert <commit-id>
+ * @param {String} workingDir Git工作目录
+ * @param {Array} commands []
+ * @param {String} msg 消息
+ */
+async function gitRevert(workingDir, commands) {
+    try {
+        let status = await git(workingDir).raw(commands)
+            .then((res) => {
+                return 'success';
+            })
+            .catch((err) => {
+                let errMsg = err.toString();
+                if (errMsg.includes('Reverting is not possible') || errMsg.includes('resolving the conflicts')) {
+                    return 'conflicts';
+                };
+                createOutputChannel(`Git: ${commands} 操作失败。`, err);
+                return 'fail';
+            });
+        return status;
+    } catch (e) {
+        createOutputChannel(`Git: ${commands} 操作失败，插件运行异常。`, e);
+        return 'error';
+    };
+};
 
 
 module.exports = {
@@ -1680,5 +1706,6 @@ module.exports = {
     gitAddRemote,
     gitRaw,
     gitCherryPick,
-    FillCommitMessage
+    FillCommitMessage,
+    gitRevert
 }
