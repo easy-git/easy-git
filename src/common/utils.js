@@ -1590,6 +1590,47 @@ async function gitAddRemoteOrigin(projectPath) {
 };
 
 
+/**
+ * Git Commit Message Fill
+ * @constructor
+ * @param {String} repositoryRoot
+ */
+class FillCommitMessage {
+    constructor(repositoryRoot) {
+        this.repositoryRoot = repositoryRoot
+    }
+
+    handleMsgComments(message) {
+        return message.replace(/^\s*#.*$\n?/gm, '').trim();
+    }
+
+    async readFile(mergeMsgPath) {
+        return new Promise((resolve,reject) => {
+            fs.readFile(mergeMsgPath, 'utf8', (err, data) => {
+                if (err) {
+                    reject(undefined)
+                }
+                resolve(data);
+            });
+        })
+    }
+
+    async getMergeMsg() {
+        const mergeMsgPath = path.join(this.repositoryRoot, '.git', 'MERGE_MSG');
+        try {
+            const raw = await this.readFile(mergeMsgPath);
+            if (raw != undefined) {
+                return this.handleMsgComments(raw);
+            };
+            return undefined;
+        } catch (e) {
+            return undefined;
+        }
+    }
+
+}
+
+
 module.exports = {
     createOutputChannel,
     isGitInstalled,
@@ -1638,5 +1679,6 @@ module.exports = {
     gitStashList,
     gitAddRemote,
     gitRaw,
-    gitCherryPick
+    gitCherryPick,
+    FillCommitMessage
 }

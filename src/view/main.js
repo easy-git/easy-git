@@ -132,6 +132,17 @@ class GitFile {
         };
     };
 
+    async getCommitMessage() {
+        let cm = new utils.FillCommitMessage(this.projectPath);
+        let cmText = await cm.getMergeMsg();
+
+        if (cmText == undefined) {return;};
+        this.webviewPanel.webView.postMessage({
+            command: "CommitMessage",
+            commitMessage: cmText
+        });
+    };
+
     // Git: commit
     async commit(isStaged, exist, comment) {
         if (exist == 0){
@@ -362,6 +373,9 @@ function active(webviewPanel, userConfig, gitData) {
                 break;
             case 'add':
                 File.add(msg);
+                break;
+            case 'CommitMessage':
+                File.getCommitMessage();
                 break;
             case 'commit':
                 let {isStaged,exist,comment} = msg;
