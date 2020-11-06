@@ -11,7 +11,8 @@ const {
     gitDeleteRemoteBranch,
     gitDeleteLocalBranch,
     gitLog,
-    gitCherryPick
+    gitCherryPick,
+    gitRevert
 } = require('../common/utils.js');
 
 
@@ -62,6 +63,7 @@ class Tag {
         }
     }
 };
+
 
 class Branch {
     constructor() {
@@ -199,8 +201,9 @@ class Branch {
             });
 
             hash = selected.hash;
-            if (hash == undefined) { return; };
         };
+
+        if (hash == undefined) { return; };
 
         let cmd = ['cherry-pick', '-x', hash];
         let cherryPickResult = await gitCherryPick(projectPath, cmd);
@@ -213,7 +216,7 @@ class Branch {
                 hx.commands.executeCommand('EasyGit.main',ProjectInfo);
             }, 1000);
 
-            let btn = await hx.window.showInformationMessage('Git: cherry-pick操作过程中，出现代码冲突，如需继续，请手动解决冲突。', ['放弃合并', '退出CheryPick', '我知道了']).then((result) => {
+            let btn = await hx.window.showInformationMessage('Git: cherry-pick操作过程中，出现代码冲突。 请选择要进行的操作。\n', ['放弃合并', '退出CheryPick', '我知道了']).then((result) => {
                 return result;
             });
             if (btn == '我知道了') { return; };
@@ -238,7 +241,72 @@ class Branch {
 }
 
 
+class Revert {
+    constructor(arg) {
+
+    }
+
+    async getProjectLogs(projectPath) {
+        let Logs = await gitLog(projectPath, 'branch', 'default');
+        let {success} = Logs;
+
+        let data = [];
+        if (success && success != undefined) {
+            for (let s of Logs.data) {
+                let shortHash = s.hash.slice(0,12);
+                data.push({
+                    "label": shortHash,
+                    "description": s.date + s.message,
+                    "hash": s.hash
+                });
+            };
+        };
+        return data;
+    }
+
+    async run(ProjectInfo) {
+        let { projectPath, hash } = ProjectInfo;
+
+        if (hash == undefined || hash == '') {
+            let data = await this.getProjectLogs(projectPath);
+            let selected = await hx.window.showQuickPick(data, {
+                'placeHolder': '请选择要还原撤销的commit......'
+            }).then( (res)=> {
+                return res;
+            });
+            hash = selected.hash;
+        };
+        if (hash == undefined) { return; };
+
+        let revertResult = await gitRevert(projectPath, ['revert', hash])
+        if ( revertResult == 'conflicts') {
+            // 刷新源代码管理器
+            setTimeout(function() {
+                ProjectInfo.easyGitInner = true;
+                hx.commands.executeCommand('EasyGit.main',ProjectInfo);
+            }, 1000);
+
+            let btn = await hx.window.showInformationMessage('Git: revert操作过程中，出现代码冲突。 请选择要进行的操作。\n', ['放弃revert', 'skip', 'continue']).then((result) => {
+                return result;
+            });
+            if (btn == 'skip') {
+                await gitRevert(projectPath, ['revert', '--skip']);
+            } else if (btn == '放弃revert') {
+                await gitRevert(projectPath, ['revert', '--abort']);
+            } else if (btn == 'continue') {
+                await gitRevert(projectPath, ['revert', '--continue']);
+            }
+            // 刷新源代码管理器
+            hx.commands.executeCommand('EasyGit.main',ProjectInfo);
+        };
+        ProjectInfo.easyGitInner = true;
+        hx.commands.executeCommand('EasyGit.main',ProjectInfo);
+    }
+}
+
+
 module.exports = {
     Tag,
-    Branch
+    Branch,
+    Revert
 };

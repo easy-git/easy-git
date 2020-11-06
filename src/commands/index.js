@@ -10,7 +10,7 @@ const { gitInitProject } = require('./repository.js');
 const { gitAddFile, gitRestore, goCleanFile, goCommitAmend } = require('./file.js');
 const { goSetConfig } = require('./base.js');
 
-const { Tag, Branch } = require('./ref.js');
+const { Tag, Branch, Revert } = require('./ref.js');
 const gitBlameForLineChange = require('./blame.js');
 
 
@@ -77,6 +77,12 @@ function action(param,action_name) {
         case 'restoreStaged':
             let t1 = new gitRestore();
             t1.restore(ProjectInfo, 'restoreStaged');
+            break;
+        case 'revert':
+            let rhash = param.hash;
+            let rinfo = Object.assign( {'hash': rhash}, ProjectInfo);
+            let r = new Revert();
+            r.run(rinfo);
             break;
         case 'restoreChanged':
             let t2 = new gitRestore();
