@@ -260,7 +260,7 @@ function getDefaultContent(userConfig) {
                 <div id="diff-head" class="row">
                     <div class="col text-center pt-5">
                         <p>没有要对比的文件内容</p>
-                        <p>打开要对比的文件，右键菜单，点击【比较差异】</p>
+                        <p>注意：目前仅支持对比本地有更改的文件</p>
                     </div>
                 </div>
             </div>

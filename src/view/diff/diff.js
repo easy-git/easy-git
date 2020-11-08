@@ -8,7 +8,7 @@ const hx = require('hbuilderx');
 let utils = require('../../common/utils.js');
 
 const icon = require('../static/icon.js');
-const {getWebviewDiffContent} = require('./html.js')
+const {getWebviewDiffContent, getDefaultContent} = require('./html.js')
 
 
 class Diff {
@@ -20,6 +20,11 @@ class Diff {
 
     async getDiffOptions(selectedFile) {
         let statusInfo = await utils.gitFileStatus(this.projectPath, ['-s', selectedFile]);
+
+        // 目前仅支持对比本地有更改的文件
+        if (statusInfo == undefined) {
+            return 'error';
+        };
 
         let gitIndex = statusInfo.index;
         let gitWorking_dir = (statusInfo.working_dir).trim();
@@ -59,6 +64,11 @@ class Diff {
 
     async SetView(selectedFile) {
         let init = await this.getDiffOptions(selectedFile);
+
+        if (init == 'error') {
+            this.webviewPanel.webView.htm = getDefaultContent();
+            return;
+        };
         let {diff_options, titleLeft, titleRight} = init;
 
         let result = await utils.gitRaw(this.projectPath, diff_options, '获取Git差异', 'result');

@@ -439,7 +439,7 @@ async function gitClone(info) {
     };
 
     try{
-        let options = []
+        let options = ['--progress', '-v']
 
         if (branch) {
             let t = '-b ' + branch;
@@ -1519,8 +1519,10 @@ async function gitRaw(workingDir, commands, msg, resultType='statusCode') {
  */
 async function gitCherryPick(workingDir, commands) {
     try {
+        hx.window.setStatusBarMessage('Git: cherry-pick 操作进行中......', 2000, 'info');
         let status = await git(workingDir).raw(commands)
             .then((res) => {
+                hx.window.setStatusBarMessage('Git: cherry-pick 操作成功！', 10000, 'info');
                 return 'success';
             })
             .catch((err) => {
@@ -1637,13 +1639,16 @@ class FillCommitMessage {
  */
 async function gitRevert(workingDir, commands) {
     try {
+        hx.window.setStatusBarMessage('Git: revert 操作进行中......', 3000, 'info');
         let status = await git(workingDir).raw(commands)
             .then((res) => {
+                hx.window.setStatusBarMessage('Git: revert 操作成功。', 5000, 'info');
                 return 'success';
             })
             .catch((err) => {
                 let errMsg = err.toString();
                 if (errMsg.includes('Reverting is not possible') || errMsg.includes('resolving the conflicts')) {
+                    hx.window.setStatusBarMessage('Git: revert 操作出现冲突！', 10000, 'info');
                     return 'conflicts';
                 };
                 createOutputChannel(`Git: ${commands} 操作失败。`, err);
