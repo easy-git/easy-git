@@ -414,6 +414,63 @@ async function gitInit(projectPath,projectName) {
     }
 };
 
+
+/**
+ * @param {Object} info
+ */
+function runGitClone(options) {
+    let totalProgress = 0;
+    let previousProgress = 0;
+    let match;
+    let isPrint = [];
+    return new Promise((resolve, reject) => {
+        let default_options = ['clone', '-v', '--progress']
+        let cmd = [...default_options, ...options]
+        const run = spawn('git', cmd);
+        run.stdout.on('data', (data) => {
+            console.log(`stdout: ${data}`);
+        });
+
+        run.stderr.on('data', (data) => {
+            if (!data.includes("remote: Compressing objects") && !data.includes('remote: Counting objects') && !data.includes('remote: Total')) {
+                if (data.includes('Receiving objects') || data.includes('Resolving deltas')) {
+                    if (totalProgress == 0) {
+                        createOutputChannelForClone('Git clone进度: 0%', false);
+                    };
+                    if (match = /Counting objects:\s*(\d+)%/i.exec(data)) {
+                        totalProgress = Math.floor(parseInt(match[1]) * 0.1);
+                    } else if (match = /Compressing objects:\s*(\d+)%/i.exec(data)) {
+                        totalProgress = 10 + Math.floor(parseInt(match[1]) * 0.1);
+                    } else if (match = /Receiving objects:\s*(\d+)%/i.exec(data)) {
+                        totalProgress = 20 + Math.floor(parseInt(match[1]) * 0.4);
+                    } else if (match = /Resolving deltas:\s*(\d+)%/i.exec(data)) {
+                        totalProgress = 60 + Math.floor(parseInt(match[1]) * 0.4);
+                    };
+                    if ([0,1,2,3,5,7,10,20,25,30,37,45,50,60,70,80,90,91,95,99,100].includes(totalProgress) && !isPrint.includes(totalProgress)) {
+                        createOutputChannelForClone(`Git clone进度: ${totalProgress}%`, false);
+                        isPrint.push(totalProgress);
+                    };
+                    if (data.includes("Resolving deltas: 100%") && data.includes("done.")) {
+                        createOutputChannelForClone('Git clone完成！', false);
+                        createOutputChannelForClone(data, false);
+                    };
+                } else {
+                    createOutputChannelForClone(data, false);
+                };
+            };
+        });
+
+        run.on('close', (code) => {
+            if (code == 0) {
+                resolve('success');
+            } else {
+                reject('fail');
+            };
+        });
+    });
+}
+
+
 /**
  * @description clone
  */
@@ -439,30 +496,27 @@ async function gitClone(info) {
     };
 
     try{
-        let options = ['--progress', '-v']
-
+        let options = [];
         if (branch) {
             let t = '-b ' + branch;
             options.push(t);
         };
+        options.push(repo);
+        options.push(localPath);
 
-        createOutputChannelForClone(`开始克隆 ${projectName}！受网络影响，需要一定时间，请耐心等待。请不要重复点击【克隆】按钮。`, false);
+        createOutputChannelForClone(`开始克隆 ${projectName}！\n`, false);
+        createOutputChannelForClone(`备注1：克隆进度跟项目大小、网络有关，需要一定时间，请不要重复点击【克隆】按钮。`, false);
+        createOutputChannelForClone(`备注2：克隆成功后，会自动将克隆项目，加入到HBuilderX项目管理器。\n`, false);
 
-        let status = await git()
-            .clone(repo, localPath, options)
-            .then((res) => {
-                createOutputChannelForClone(`克隆成功。本地路径: ${localPath}`, false);
-                return 'success'
-            })
-            .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
-                createOutputChannelForClone('Git: 克隆仓库失败！' + errMsg);
-                createOutputChannelForClone('Git: 克隆失败，请参考: https://ext.dcloud.net.cn/plugin?id=2475', false);
-                return 'fail';
-            });
+        let status = await runGitClone(options)
+        if (status == 'success') {
+            createOutputChannelForClone(`克隆成功。本地路径: ${localPath}`, false);
+        } else {
+            createOutputChannelForClone('Git: 克隆失败，请参考: https://ext.dcloud.net.cn/plugin?id=2475', false);
+        };
         return status
     } catch(e) {
-        createOutputChannelForClone('克隆仓库异常' + e);
+        createOutputChannelForClone('克隆仓库异常' + e, false);
         return 'error';
     };
 };
