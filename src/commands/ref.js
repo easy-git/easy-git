@@ -210,15 +210,15 @@ class Branch {
 
         ProjectInfo.easyGitInner = true;
 
-        if (cherryPickResult == 'fail' || cherryPickResult == 'error') {
+        if (cherryPickResult == 'error') {
             return;
-        } else if ( cherryPickResult == 'conflicts') {
+        } else if ( ['conflicts', 'fail'].includes(cherryPickResult)) {
             // 刷新源代码管理器
             setTimeout(function() {
                 hx.commands.executeCommand('EasyGit.main',ProjectInfo);
             }, 1000);
 
-            let btn = await hx.window.showInformationMessage('Git: cherry-pick操作过程中，出现代码冲突。 请选择要进行的操作。\n', ['放弃合并', '退出CheryPick', '我知道了']).then((result) => {
+            let btn = await hx.window.showInformationMessage('Git: cherry-pick操作过程中，出现异常或代码冲突。 请选择要进行的操作。\n', ['放弃合并', '退出CheryPick', '我知道了']).then((result) => {
                 return result;
             });
             if (btn == '我知道了') { return; };
