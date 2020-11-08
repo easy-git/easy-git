@@ -252,6 +252,11 @@ class GitLogAction {
             'easyGitInner': true
         };
         hx.commands.executeCommand('EasyGit.revert', revertInfo);
+
+        let that = this;
+        setTimeout(function() {
+            that.setView('branch', 'default');
+        }, 2000);
     }
 
     // 重置回退代码到某次提交

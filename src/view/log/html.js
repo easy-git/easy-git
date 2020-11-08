@@ -587,7 +587,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         <li @click="cherryPick(rightClickItem)" title="cherry pick，如置灰无法点击，请点击顶部：所有分支，查看所有log" :class="{ 'click-disable': searchType != 'all' }">
                             将当前提交应用于 {{currentBranch}} 分支
                         </li>
-                        <li @click="revert(rightClickItem)">还原revert到这次提交...</li>
+                        <li @click="revert(rightClickItem)">revert到这次提交...</li>
                         <div class="dropdown-divider"></div>
                         <li @click="copyLogMsg(rightClickItem, 'msg')">复制</li>
                         <li @click="copyLogMsg(rightClickItem, 'commit_id')">复制commit id到剪贴板</li>
