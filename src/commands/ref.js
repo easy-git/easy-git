@@ -230,6 +230,7 @@ class Branch {
         } else {
             hx.window.showInformationMessage('Git: cherry-pick 操作成功！', ['现在push','以后push' ,'关闭']).then((result) => {
                 if (result == '现在push') {
+                    ProjectInfo.easyGitInner = true;
                     hx.commands.executeCommand('EasyGit.push', ProjectInfo);
                 };
                 setTimeout(function() {
