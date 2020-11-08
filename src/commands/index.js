@@ -111,7 +111,8 @@ function action(param,action_name) {
             break;
         case 'cherryPick':
             let hashValue = param.hash;
-            let info = Object.assign( {'hash': hashValue}, ProjectInfo);
+            let actionSource = param.actionSource;
+            let info = Object.assign( {'hash': hashValue, 'actionSource': actionSource}, ProjectInfo);
             bch.cherryPick(info);
             break;
         case 'clean':

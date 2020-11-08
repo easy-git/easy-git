@@ -190,7 +190,7 @@ class Branch {
     }
 
     async cherryPick(ProjectInfo) {
-        let { projectPath, hash } = ProjectInfo;
+        let { projectPath, hash, actionSource } = ProjectInfo;
 
         if (hash == undefined || hash == '') {
             let data = await this.getProjectLogs(projectPath);
@@ -207,12 +207,14 @@ class Branch {
 
         let cmd = ['cherry-pick', '-x', hash];
         let cherryPickResult = await gitCherryPick(projectPath, cmd);
+
+        ProjectInfo.easyGitInner = true;
+
         if (cherryPickResult == 'fail' || cherryPickResult == 'error') {
             return;
         } else if ( cherryPickResult == 'conflicts') {
             // 刷新源代码管理器
             setTimeout(function() {
-                ProjectInfo.easyGitInner = true;
                 hx.commands.executeCommand('EasyGit.main',ProjectInfo);
             }, 1000);
 
@@ -225,19 +227,21 @@ class Branch {
             } else if (btn == '放弃合并') {
                 await gitCherryPick(projectPath, ['cherry-pick', '--abort']);
             };
-            // 刷新源代码管理器
-            hx.commands.executeCommand('EasyGit.main',ProjectInfo);
+            // 刷新视图
+            hx.commands.executeCommand('EasyGit.main', ProjectInfo);
         } else {
-            hx.window.showInformationMessage('Git: cherry-pick 操作成功！', ['现在push','以后push' ,'关闭']).then((result) => {
-                if (result == '现在push') {
-                    hx.commands.executeCommand('EasyGit.push', ProjectInfo);
-                };
-                setTimeout(function() {
-                    hx.commands.executeCommand('EasyGit.main',ProjectInfo);
-                }, 1500);
+            hx.commands.executeCommand('EasyGit.main', ProjectInfo);
+            let bResult = await hx.window.showInformationMessage('Git: cherry-pick 操作成功！', ['现在push','以后push' ,'关闭']).then((result) => {
+                return result
             });
+            if (bResult == '现在push') {
+                hx.commands.executeCommand('EasyGit.push', ProjectInfo);
+                setTimeout(function() {
+                    hx.commands.executeCommand('EasyGit.main', ProjectInfo);
+                }, 1200);
+            };
         };
-    }
+    };
 }
 
 

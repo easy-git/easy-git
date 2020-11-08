@@ -181,6 +181,15 @@ class GitLogAction {
         };
     }
 
+
+    // refresh
+    async refreshView() {
+        let that = this;
+        setTimeout(function() {
+            that.setView('branch', 'default');
+        }, 1500);
+    }
+
     // 显示commit 文件具体修改
     async showCommitFileChange(msg) {
         let {commitId, filePath} = msg;
@@ -239,9 +248,11 @@ class GitLogAction {
             'hash': hash,
             'projectName': this.projectName,
             'projectPath': this.projectPath,
-            'easyGitInner': true
+            'easyGitInner': true,
+            'actionSource': 'LogView'
         };
         hx.commands.executeCommand('EasyGit.cherryPick', cherryPickInfo);
+        this.refreshView();
     }
 
     async revert(hash) {
@@ -252,6 +263,7 @@ class GitLogAction {
             'easyGitInner': true
         };
         hx.commands.executeCommand('EasyGit.revert', revertInfo);
+        this.refreshView();
     }
 
     // 重置回退代码到某次提交
