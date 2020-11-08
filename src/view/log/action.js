@@ -235,26 +235,23 @@ class GitLogAction {
     }
 
     async cherryPick(hash) {
-        let cmd = ['cherry-pick', '-x', hash];
-        let status = await utils.gitRaw(this.projectPath, cmd, 'cherry-pick');
-        if (status == 'fail' || status == 'error') {
-            hx.window.showErrorMessage(`Git: ${cmd}操作失败`);
-            return;
-        } else {
-            let data = {
-                'projectPath': this.projectPath,
-                'projectName': this.projectName,
-                'easyGitInner': true
-            };
-            hx.window.showInformationMessage('Git: cherry-pick 操作成功！', ['现在push','以后push' ,'关闭']).then((result) => {
-                if (result == '现在push') {
-                    hx.commands.executeCommand('EasyGit.push', data);
-                } else {
-                    hx.commands.executeCommand('EasyGit.main',data);
-                };
-            });
-            return;
-        }
+        let cherryPickInfo = {
+            'hash': hash,
+            'projectName': this.projectName,
+            'projectPath': this.projectPath,
+            'easyGitInner': true
+        };
+        hx.commands.executeCommand('EasyGit.cherryPick', cherryPickInfo);
+    }
+
+    async revert(hash) {
+        let revertInfo = {
+            'hash': hash,
+            'projectName': this.projectName,
+            'projectPath': this.projectPath,
+            'easyGitInner': true
+        };
+        hx.commands.executeCommand('EasyGit.revert', revertInfo);
     }
 
     // 重置回退代码到某次提交

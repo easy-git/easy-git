@@ -1,8 +1,8 @@
 {
     "name": "easy-git",
     "description": "vscode源代码管理工具风格。HBuilderX内唯一的图形化Git工具, 支持克隆、提交/更新/拉取、分支/tag管理、日志、文件对比、储藏等操作。",
-    "displayName": "重大更新:【easy-git】Git源代码管理工具，新增命令面板、文件对比。",
-    "version": "0.4.1",
+    "displayName": "【easy-git】Git源代码管理工具，新增命令面板、文件对比。",
+    "version": "0.4.2",
     "publisher": "oneone",
     "engines": {
         "HBuilderX": "^2.8.3"
@@ -24,6 +24,7 @@
         "onCommand:EasyGit.resetLastCommit",
         "onCommand:EasyGit.restore",
         "onCommand:EasyGit.restoreStaged",
+        "onCommand:EasyGit.revert",
         "onCommand:EasyGit.pull",
         "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
@@ -31,6 +32,7 @@
         "onCommand:EasyGit.BranchDelete",
         "onCommand:EasyGit.merge",
         "onCommand:EasyGit.mergeAbort",
+        "onCommand:EasyGit.cherryPick",
         "onCommand:EasyGit.clean",
         "onCommand:EasyGit.stash",
         "onCommand:EasyGit.stashAll",
@@ -146,6 +148,18 @@
                 "title": "easy-git: clone - 克隆"
             },
             {
+                "command": "EasyGit.pull",
+                "title": "easy-git: pull - 拉取"
+            },
+            {
+                "command": "EasyGit.fetch",
+                "title": "easy-git: fetch - 抓取"
+            },
+            {
+                "command": "EasyGit.push",
+                "title": "easy-git: push - 推送"
+            },
+            {
                 "command": "EasyGit.add",
                 "title": "easy-git: add - 添加文件到暂存区"
             },
@@ -166,16 +180,12 @@
                 "title": "easy-git: restore --staged - 撤销暂存"
             },
             {
-                "command": "EasyGit.pull",
-                "title": "easy-git: pull - 拉取"
+                "command": "EasyGit.revert",
+                "title": "easy-git: revert - 撤销指定commit"
             },
             {
-                "command": "EasyGit.fetch",
-                "title": "easy-git: fetch - 获取"
-            },
-            {
-                "command": "EasyGit.push",
-                "title": "easy-git: push - 推送"
+                "command": "EasyGit.clean",
+                "title": "easy-git: clean - 删除未跟踪的文件"
             },
             {
                 "command": "EasyGit.BranchSwitch",
@@ -194,8 +204,8 @@
                 "title": "easy-git: branch merge abort - 分支合并取消"
             },
             {
-                "command": "EasyGit.clean",
-                "title": "easy-git: clean - 删除未跟踪的文件"
+                "command": "EasyGit.cherryPick",
+                "title": "easy-git: cherry-pick"
             },
             {
                 "command": "EasyGit.stash",
@@ -282,11 +292,6 @@
                 {
                     "command": "EasyGit.log",
                     "title": "easy-git: 查看日志",
-                    "group": "z_commands"
-                },
-                {
-                    "command": "EasyGit.diffFile",
-                    "title": "easy-git: 比较差异",
                     "group": "z_commands"
                 },
                 {

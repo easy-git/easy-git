@@ -303,13 +303,14 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                         <li title="stash pop stash@{0}" @click="gitStash('stashPopNew');">弹出最新储藏</li>
                                         <li title="stash clear" @click="gitStash('stashClear');">删除所有储藏</li>
                                         <li class="divider"></li>
-                                        <li title="git show remote origin" @click="showRemoteOrigin();">查看远程仓库信息</li>
                                         <li title="git config -l" @click="showConfig();">查看配置文件</li>
+                                        <li title="git show remote origin" @click="showRemoteOrigin();">查看远程仓库信息</li>
+                                        <li @click="openRemoteServerInBrowser();">浏览器里查看远程仓库</li>
                                         <li class="divider"></li>
                                         <li @click="gitConfigFile('.gitignore');">设置.gitignore</li>
                                         <li @click="gitConfigFile('.gitattributes');">设置.gitattributes</li>
                                         <li class="divider"></li>
-                                        <li @click="openRemoteServerInBrowser();">浏览器里查看远程仓库</li>
+                                        <li @click="openCommandPanel();">Git 命令面板</li>
                                     </ul>
                                 </div>
                             </span>
@@ -320,9 +321,9 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     <div class="col mt-2">
                         <div>
                             <textarea rows=1
-                                v-model="codeComment"
+                                v-model="commitMessage"
                                 class="form-control outline-none textarea"
-                                :placeholder="commitMessage"
+                                :placeholder="commitMessagePlaceholder"
                                 @keyup.${ctrl}.enter="gitCommit();"
                                 onfocus="window.activeobj=this;this.clock=setInterval(function(){activeobj.style.height=(activeobj.scrollHeight + 2)+'px';},100);">
                             </textarea>
@@ -460,9 +461,9 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     tracking: "",
                     originurl: "",
                     originurlBoolean: "",
-                    commitMessage: "",
+                    commitMessage: '',
+                    commitMessagePlaceholder: "",
                     gitFileResult: {},
-                    codeComment: '',
                     isShowMenu: false,
                     bodyWidth: 0,
                     hoverConflictedFileID: false,
@@ -491,7 +492,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     if (ctrl == 'meta') {
                         ctrl = '⌘';
                     };
-                    this.commitMessage = '消息（' + ctrl + '+Enter 提交）'
+                    this.commitMessagePlaceholder = '消息（' + ctrl + '+Enter 提交）'
                     this.gitFileResult = ${gitFileResult};
                     this.projectName = '${projectName}';
                     this.tracking = '${tracking}';
@@ -504,6 +505,14 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 },
                 mounted() {
                     this.getGitFileList();
+
+                    that = this;
+                    window.onload = function() {
+                        setTimeout(function() {
+                            that.getCommitMessage();
+                            that.forUpdateCommitMessage();
+                        }, 1000)
+                    };
                 },
                 methods: {
                     isShowConflictedList() {
@@ -609,6 +618,21 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             tag: tag
                         });
                     },
+                    forUpdateCommitMessage() {
+                        hbuilderx.onDidReceiveMessage((msg) => {
+                            if (msg.command != 'CommitMessage') {
+                                return;
+                            };
+                            if (msg.commitMessage) {
+                                this.commitMessage = msg.commitMessage;
+                            }
+                        });
+                    },
+                    getCommitMessage() {
+                        hbuilderx.postMessage({
+                            command: 'CommitMessage'
+                        });
+                    },
                     gitCommit() {
                         let ChangeList = this.gitNotStagedileList;
                         let stagedList = this.gitStagedFileList;
@@ -619,7 +643,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
 
                         hbuilderx.postMessage({
                             command: 'commit',
-                            comment: this.codeComment,
+                            comment: this.commitMessage,
                             isStaged: isStaged,
                             exist: exist
                         });
@@ -655,7 +679,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     gitACP() {
                         hbuilderx.postMessage({
                             command: 'commit',
-                            text: this.codeComment
+                            text: this.commitMessage
                         });
                     },
                     gitCheckout(file) {
@@ -694,6 +718,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     openRemoteServerInBrowser() {
                         hbuilderx.postMessage({
                             command: 'openRemoteServer'
+                        });
+                    },
+                    openCommandPanel() {
+                        hbuilderx.postMessage({
+                            command: 'openCommandPanel'
                         });
                     }
                 }

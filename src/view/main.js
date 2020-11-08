@@ -132,6 +132,17 @@ class GitFile {
         };
     };
 
+    async getCommitMessage() {
+        let cm = new utils.FillCommitMessage(this.projectPath);
+        let cmText = await cm.getMergeMsg();
+
+        if (cmText == undefined) {return;};
+        this.webviewPanel.webView.postMessage({
+            command: "CommitMessage",
+            commitMessage: cmText
+        });
+    };
+
     // Git: commit
     async commit(isStaged, exist, comment) {
         if (exist == 0){
@@ -323,6 +334,12 @@ function active(webviewPanel, userConfig, gitData) {
     // set html
     view.html = viewContent;
 
+    let EasyGitInnerParams = {
+        'projectPath': projectPath,
+        'projectName': projectName,
+        'easyGitInner': true
+    };
+
     view.onDidReceiveMessage((msg) => {
         let action = msg.command;
         switch (action) {
@@ -348,12 +365,7 @@ function active(webviewPanel, userConfig, gitData) {
                 hx.commands.executeCommand('EasyGit.diffFile',diff_parms);
                 break;
             case 'log':
-                let data = {
-                    'projectPath': projectPath,
-                    'projectName': projectName,
-                    'easyGitInner': true
-                };
-                hx.commands.executeCommand('EasyGit.log',data);
+                hx.commands.executeCommand('EasyGit.log',EasyGitInnerParams);
                 break;
             case 'open':
                 let fileUri = path.join(projectPath, msg.text);
@@ -361,6 +373,9 @@ function active(webviewPanel, userConfig, gitData) {
                 break;
             case 'add':
                 File.add(msg);
+                break;
+            case 'CommitMessage':
+                File.getCommitMessage();
                 break;
             case 'commit':
                 let {isStaged,exist,comment} = msg;
@@ -387,12 +402,7 @@ function active(webviewPanel, userConfig, gitData) {
                 File.checkoutFile(msg.text);
                 break;
             case 'stash':
-                let param = {
-                    'projectPath': projectPath,
-                    'projectName': projectName,
-                    'easyGitInner': true
-                };
-                gitAction.action(param,msg.option);
+                gitAction.action(EasyGitInnerParams,msg.option);
                 break;
             case 'cancelStash':
                 File.cancelStash(msg.text);
@@ -411,12 +421,7 @@ function active(webviewPanel, userConfig, gitData) {
                     if (originurl == undefined) {
                         hx.window.showErrorMessage('请发布此项目到远程到后再进行操作。', ['我知道了']);
                     } else {
-                        let currentProjectData = {
-                            'projectPath': projectPath,
-                            'projectName': projectName,
-                            'easyGitInner': true
-                        };
-                        hx.commands.executeCommand('EasyGit.branch',currentProjectData);
+                        hx.commands.executeCommand('EasyGit.branch',EasyGitInnerParams);
                     };
                 } else {
                     File.refreshFileList();
@@ -440,6 +445,9 @@ function active(webviewPanel, userConfig, gitData) {
             case 'switchLastBranch':
                 switchLastBranch(projectPath);
                 break;
+            case 'openCommandPanel':
+                hx.commands.executeCommand('EasyGit.CommandPanel', EasyGitInnerParams);
+                break;
             default:
                 break;
         };
@@ -457,9 +465,9 @@ function active(webviewPanel, userConfig, gitData) {
         let pushStatus;
         setTimeout(function() {
             if (pushStatus == undefined && pushStatus != 'success') {
-                utils.createOutputChannel('Git: 未获取到push操作结果。', '1. 有可能是网络超时，请检查网络。\n2. 或Git凭证（账号密码/ssh公钥）错误，请修正Git凭证后再试。\n3. 如需了解GitHub/Gitee，添加/删除/配置SSH公钥，请访问：https://docs.github.com/cn/free-pro-team@latest/github/authenticating-to-github/connecting-to-github-with-ssh');
+                utils.createOutputChannel('Git: 未获取到push操作结果。', '1. 有可能是网络超时，请检查网络。\n2. 或Git凭证（账号密码/ssh公钥）错误，请修正Git凭证后再试。\n3. 如需了解GitHub/Gitee添加/删除/配置SSH公钥，请访问：https://docs.github.com/cn/free-pro-team@latest/github/authenticating-to-github/connecting-to-github-with-ssh');
             };
-        }, 60000)
+        }, 30000)
 
         pushStatus = await utils.gitPush(projectPath);
         if (pushStatus == 'success') {

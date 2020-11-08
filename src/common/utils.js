@@ -439,7 +439,7 @@ async function gitClone(info) {
     };
 
     try{
-        let options = []
+        let options = ['--progress', '-v']
 
         if (branch) {
             let t = '-b ' + branch;
@@ -556,7 +556,8 @@ async function gitStatus(workingDir) {
             let tmp3 = [...conflicted];
             for (let s1 of files) {
                 if ((!tmp3.includes(s1.path) || staged.includes(s1.path)) && (s1.index != ' ' && s1.index != '?')) {
-                    staged_list.push({'path': s1.path, 'tag': s1.index});
+                    let tag = s1.index != ' ' && s1.working_dir != ' ' ? s1.working_dir : s1.index;
+                    staged_list.push({'path': s1.path, 'tag': tag});
                 };
             };
         };
@@ -567,9 +568,8 @@ async function gitStatus(workingDir) {
         if (files.length && files != undefined) {
             let tmp = [...conflicted];
             for (let s of files) {
-               if (!tmp.includes(s.path) && (([' ', 'M', 'A','R'].includes(s.index) && s.working_dir == 'M') || s.working_dir == '?')) {
-                    let tag = s.index != ' ' ? s.index : s.working_dir;
-                    not_staged_list.push({'path': s.path, 'tag': tag});
+               if ( !tmp.includes(s.path) && (['M', 'A', 'R', 'D','?', '!'].includes(s.working_dir) && s.working_dir != ' ')) {
+                    not_staged_list.push({'path': s.path, 'tag': s.working_dir});
                };
            };
         };
@@ -1497,15 +1497,45 @@ async function gitRaw(workingDir, commands, msg, resultType='statusCode') {
             })
             .catch((err) => {
                 if (msg != undefined) {
-                    createOutputChannel('Git: ${msg} 操作失败', err);
+                    createOutputChannel(`Git: ${msg} 操作失败。`, err);
                 }
                 return 'fail';
             });
         return status;
     } catch (e) {
         if (msg != undefined) {
-            createOutputChannel('Git: ${msg} 操作失败，插件运行异常。', e);
+            createOutputChannel(`Git: ${msg} 操作失败，插件运行异常。`, e);
         }
+        return 'error';
+    };
+};
+
+
+/**
+ * @description git Cherry-pick
+ * @param {String} workingDir Git工作目录
+ * @param {Array} commands []
+ * @param {String} msg 消息
+ */
+async function gitCherryPick(workingDir, commands) {
+    try {
+        hx.window.setStatusBarMessage('Git: cherry-pick 操作进行中......', 2000, 'info');
+        let status = await git(workingDir).raw(commands)
+            .then((res) => {
+                hx.window.setStatusBarMessage('Git: cherry-pick 操作成功！', 10000, 'info');
+                return 'success';
+            })
+            .catch((err) => {
+                let errMsg = err.toString();
+                if (errMsg.includes('resolving the conflicts')) {
+                    return 'conflicts';
+                };
+                createOutputChannel(`Git: ${commands} 操作失败。`, err);
+                return 'fail';
+            });
+        return status;
+    } catch (e) {
+        createOutputChannel(`Git: ${commands} 操作失败，插件运行异常。`, e);
         return 'error';
     };
 };
@@ -1562,6 +1592,76 @@ async function gitAddRemoteOrigin(projectPath) {
 };
 
 
+/**
+ * Git Commit Message Fill
+ * @constructor
+ * @param {String} repositoryRoot
+ */
+class FillCommitMessage {
+    constructor(repositoryRoot) {
+        this.repositoryRoot = repositoryRoot
+    }
+
+    handleMsgComments(message) {
+        return message.replace(/^\s*#.*$\n?/gm, '').trim();
+    }
+
+    async readFile(mergeMsgPath) {
+        return new Promise((resolve,reject) => {
+            fs.readFile(mergeMsgPath, 'utf8', (err, data) => {
+                if (err) {
+                    reject(undefined)
+                }
+                resolve(data);
+            });
+        })
+    }
+
+    async getMergeMsg() {
+        const mergeMsgPath = path.join(this.repositoryRoot, '.git', 'MERGE_MSG');
+        try {
+            const raw = await this.readFile(mergeMsgPath);
+            if (raw != undefined) {
+                return this.handleMsgComments(raw);
+            };
+            return undefined;
+        } catch (e) {
+            return undefined;
+        }
+    }
+}
+
+/**
+ * @description git revert <commit-id>
+ * @param {String} workingDir Git工作目录
+ * @param {Array} commands []
+ * @param {String} msg 消息
+ */
+async function gitRevert(workingDir, commands) {
+    try {
+        hx.window.setStatusBarMessage('Git: revert 操作进行中......', 3000, 'info');
+        let status = await git(workingDir).raw(commands)
+            .then((res) => {
+                hx.window.setStatusBarMessage('Git: revert 操作成功。', 5000, 'info');
+                return 'success';
+            })
+            .catch((err) => {
+                let errMsg = err.toString();
+                if (errMsg.includes('Reverting is not possible') || errMsg.includes('resolving the conflicts')) {
+                    hx.window.setStatusBarMessage('Git: revert 操作出现冲突！', 10000, 'info');
+                    return 'conflicts';
+                };
+                createOutputChannel(`Git: ${commands} 操作失败。`, err);
+                return 'fail';
+            });
+        return status;
+    } catch (e) {
+        createOutputChannel(`Git: ${commands} 操作失败，插件运行异常。`, e);
+        return 'error';
+    };
+};
+
+
 module.exports = {
     createOutputChannel,
     isGitInstalled,
@@ -1609,5 +1709,8 @@ module.exports = {
     gitStash,
     gitStashList,
     gitAddRemote,
-    gitRaw
+    gitRaw,
+    gitCherryPick,
+    FillCommitMessage,
+    gitRevert
 }

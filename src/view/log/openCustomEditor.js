@@ -147,7 +147,7 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
                 hx.workspace.openTextDocument(furi).then((res) => {
                     if (res == null) {
                         hx.window.showErrorMessage('Git: 打开文件失败，文件不存在，可能被删除！', ['我知道了']);
-                    }
+                    };
                 });
                 break;
             case 'copy':
@@ -165,6 +165,9 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
             case 'reset-hard-commit':
                 Log.resetHardCommit(msg.hash);
                 break;
+            case 'revert':
+                Log.revert(msg.hash);
+                break;
             case 'checkout-commit':
                 Log.checkoutCommit(msg.hash);
                 break;
@@ -176,6 +179,14 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
                 break;
             case 'showCommitFileChange':
                 Log.showCommitFileChange(msg.data);
+                break;
+            case 'openCommandPanel':
+                let params = {
+                    'projectPath': projectPath,
+                    'projectName': projectName,
+                    'easyGitInner': true
+                };
+                hx.commands.executeCommand('EasyGit.CommandPanel', params);
                 break;
             default:
                 break;

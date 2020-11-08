@@ -156,6 +156,12 @@ function activate(context) {
     });
     context.subscriptions.push(restoreChanged);
 
+    // git revert
+    let revert = hx.commands.registerCommand('EasyGit.revert', (param)=> {
+        git.action(param, 'revert');
+    });
+    context.subscriptions.push(revert);
+
     // Git pull
     let pull = hx.commands.registerCommand('EasyGit.pull', (param)=> {
         git.action(param, 'pull');
@@ -197,6 +203,12 @@ function activate(context) {
         git.action(param, 'BranchMergeAbort');
     });
     context.subscriptions.push(mergeAbort);
+
+    // Git cherry-pick
+    let cherryPick = hx.commands.registerCommand('EasyGit.cherryPick', (param)=> {
+        git.action(param, 'cherryPick');
+    });
+    context.subscriptions.push(cherryPick);
 
     // Git clean
     let clean = hx.commands.registerCommand('EasyGit.clean', (param)=> {
