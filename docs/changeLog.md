@@ -1,7 +1,7 @@
 # Change Log
 
 ## 0.4.2
-* 新增 新增 日志视图、源代码管理器，增加命令面板入口
+* 新增 日志视图、源代码管理器，增加命令面板入口
 * 新增 command: EasyGit.revert，日志视图同时增加revert菜单
 * 新增 command: EasyGit.cherryPick
 * 优化 Git克隆 优化控制台日志，并增加clone进度
