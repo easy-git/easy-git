@@ -2,7 +2,12 @@
 
 ## 0.4.2
 * 新增 新增 日志视图、源代码管理器，增加命令面板入口
+* 新增 command: EasyGit.revert，日志视图同时增加revert菜单
+* 新增 command: EasyGit.cherryPick
+* 优化 Git克隆 优化控制台日志，并增加clone进度
+* 优化 merge\cherryPick操作 自动填充commit message
 * 修复 文件视图 暂存区的文件，在本地修改后，工作区文件状态计算错误的Bug
+* 修复 日志视图 cherrPick后，push操作失败的Bug
 
 ## 0.4.1
 * `修复` 因解压问题，在MacOSX上中文乱码导致日志视图、文件对比视图无法显示的Bug
