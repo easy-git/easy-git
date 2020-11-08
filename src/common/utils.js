@@ -434,18 +434,25 @@ function runGitClone(options) {
         run.stderr.on('data', (data) => {
             if (!data.includes("remote: Compressing objects") && !data.includes('remote: Counting objects') && !data.includes('remote: Total')) {
                 if (data.includes('Receiving objects') || data.includes('Resolving deltas')) {
+                    if (totalProgress == 0) {
+                        createOutputChannelForClone('Git clone进度: 0%', false);
+                    };
                     if (match = /Counting objects:\s*(\d+)%/i.exec(data)) {
-                    	totalProgress = Math.floor(parseInt(match[1]) * 0.1);
+                        totalProgress = Math.floor(parseInt(match[1]) * 0.1);
                     } else if (match = /Compressing objects:\s*(\d+)%/i.exec(data)) {
-                    	totalProgress = 10 + Math.floor(parseInt(match[1]) * 0.1);
+                        totalProgress = 10 + Math.floor(parseInt(match[1]) * 0.1);
                     } else if (match = /Receiving objects:\s*(\d+)%/i.exec(data)) {
-                    	totalProgress = 20 + Math.floor(parseInt(match[1]) * 0.4);
+                        totalProgress = 20 + Math.floor(parseInt(match[1]) * 0.4);
                     } else if (match = /Resolving deltas:\s*(\d+)%/i.exec(data)) {
-                    	totalProgress = 60 + Math.floor(parseInt(match[1]) * 0.4);
+                        totalProgress = 60 + Math.floor(parseInt(match[1]) * 0.4);
                     };
                     if ([0,1,2,3,5,7,10,20,25,30,37,45,50,60,70,80,90,91,95,99,100].includes(totalProgress) && !isPrint.includes(totalProgress)) {
                         createOutputChannelForClone(`Git clone进度: ${totalProgress}%`, false);
                         isPrint.push(totalProgress);
+                    };
+                    if (data.includes("Resolving deltas: 100%") && data.includes("done.")) {
+                        createOutputChannelForClone('Git clone完成！', false);
+                        createOutputChannelForClone(data, false);
                     };
                 } else {
                     createOutputChannelForClone(data, false);
@@ -497,8 +504,9 @@ async function gitClone(info) {
         options.push(repo);
         options.push(localPath);
 
-        createOutputChannelForClone(`开始克隆 ${projectName}！受网络影响，需要一定时间，请不要重复点击【克隆】按钮。`, false);
-        createOutputChannelForClone(`克隆进度跟项目大小、网络有关，请耐心等待。`, false);
+        createOutputChannelForClone(`开始克隆 ${projectName}！\n`, false);
+        createOutputChannelForClone(`备注1：克隆进度跟项目大小、网络有关，需要一定时间，请不要重复点击【克隆】按钮。`, false);
+        createOutputChannelForClone(`备注2：克隆成功后，会自动将克隆项目，加入到HBuilderX项目管理器。\n`, false);
 
         let status = await runGitClone(options)
         if (status == 'success') {
