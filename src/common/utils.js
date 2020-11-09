@@ -346,19 +346,23 @@ async function checkGitUsernameEmail(projectPath, projectName, userConfig) {
  * @description 检查用户凭证
  */
 async function checkGitCredentials(projectPath, unset=false) {
-    if (osName != 'win32') {return;};
     if (unset == true) {
-        await gitRaw(projectPath, ['config', '--local', '--unset', 'credential.helper']);
+        await gitRaw(projectPath, ['config', '--system', '--unset-all', 'credential.helper']);
         return;
     };
     let configData = await gitConfigShow(projectPath, false);
     let credential = configData['credential.helper'];
-    if (credential == undefined) {
-        let credentialResult = await gitRaw(projectPath, ['config', '--local', 'credential.helper', 'manager']);
-        return credentialResult
-    } else {
-        return true
-    }
+
+    if (osName == 'win32' && credential != 'wincred') {
+        await gitRaw(projectPath, ['config', '--unset-all', 'credential.helper']);
+        let winCredentialResult = await gitRaw(projectPath, ['config', '--local', 'credential.helper', 'wincred']);
+        return wincredentialResult;
+    };
+    if (osName == 'darwin' && credential != 'osxkeychain') {
+        await gitRaw(projectPath, ['config', '--unset-all', 'credential.helper']);
+        let macCredentialResult = await gitRaw(projectPath, ['config', '--local', 'credential.helper', 'osxkeychain']);
+        return macCredentialResult;
+    };
 }
 
 /**
@@ -779,9 +783,7 @@ async function gitPush(workingDir, options=[]) {
     // status bar show message
     hx.window.setStatusBarMessage(`Git: 正在向远端推送......`, 60000, 'info');
     try {
-        if (osName == 'win32') {
-            let checkResult = await checkGitCredentials(workingDir);
-        };
+        let checkResult = await checkGitCredentials(workingDir);
         let status = await git(workingDir).init()
             .push(options)
             .then((result) => {
@@ -789,12 +791,18 @@ async function gitPush(workingDir, options=[]) {
                 return 'success';
             })
             .catch((err) => {
+                hx.window.clearStatusBarMessage();
                 let errMsg = (err).toString();
-                let title = "Git: push操作失败。\n";
-                if (errMsg.includes('Authentication failed') && osName == 'win32') {
-                    title = title + "\n" + "原因：账号密码错误，如是使用账号密码方式（非SSH KEY）登录Git，可通过以下方法解决。\n方法1：windows, 打开控制面板 -> 用户账户 -> 管理windows凭据，在【普通凭据】列表中，删除此Git仓库的账号密码信息。\n方法2：打开终端，进入此项目，执行git push，此时输入正确的账号密码。\n"
+                let title = "Git: push操作失败。";
+                if (errMsg.includes('Authentication failed') || errMsg.includes('could not read Username')) {
                     checkGitCredentials(workingDir, true);
                 };
+                let osErrorMsg = osName == 'darwin'
+                    ? "方法2：Mac, 打开钥匙串，清除此Git仓库的账号密码信息。"
+                    : "方法2：windows, 打开控制面板 -> 用户账户 -> 管理windows凭据，在【普通凭据】列表中，删除此Git仓库的账号密码信息。";
+                errMsg = errMsg + "\n" + "原因：账号密码错误，如是使用账号密码方式（非SSH KEY）登录Git，可通过以下方法解决。\n"
+                    + "方法1：打开终端，进入此项目，执行git push，此时输入正确的账号密码。\n"
+                    + osErrorMsg;
                 createOutputChannel(title, errMsg);
                 return 'fail';
             });
