@@ -20,6 +20,13 @@ function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
     const view = webviewPanel.webView;
     const viewId = webviewPanel.webView._id;
 
+    let projectPath, projectName;
+    let {currentSelectedProject} = FilesExplorerProjectInfo;
+    if (currentSelectedProject != undefined) {
+        projectPath = currentSelectedProject.FolderPath;
+        projectName = currentSelectedProject.FolderName;
+    };
+
     // 根据主题适配颜色
     let colorData = utils.getThemeColor('siderBar');
     let {fontColor} = colorData;

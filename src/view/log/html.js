@@ -509,7 +509,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             <div class="mt-3 text-center load-more-log">
                                 <!-- 此处存在问题，50不应该写死。 +1也存在问题。先这样 -->
                                 <div v-if="logNum + 1 < CommitTotal && logNum >= 50" @click="moreLog();">加载更多</div>
-                                <div v-if="logNum + 1 >= CommitTotal">我是有底线的</div>
+                                <div v-if="logNum + 1 >= CommitTotal && logNum >= 15">我是有底线的</div>
                             </div>
                         </div>
                     </div>
