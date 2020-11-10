@@ -347,19 +347,20 @@ async function checkGitUsernameEmail(projectPath, projectName, userConfig) {
  */
 async function checkGitCredentials(projectPath, unset=false) {
     if (unset == true) {
-        await gitRaw(projectPath, ['config', '--system', '--unset-all', 'credential.helper']);
+        await gitRaw(projectPath, ['config', '--global', '--unset', 'credential.helper']);
+        await gitRaw(projectPath, ['config', '--local', '--unset', 'credential.helper']);
+        await gitRaw(projectPath, ['config', '--system', '--unset', 'credential.helper']);
         return;
     };
     let configData = await gitConfigShow(projectPath, false);
     let credential = configData['credential.helper'];
-
-    if (osName == 'win32' && credential != 'wincred') {
-        await gitRaw(projectPath, ['config', '--unset-all', 'credential.helper']);
-        let winCredentialResult = await gitRaw(projectPath, ['config', '--local', 'credential.helper', 'wincred']);
+    if (osName == 'win32' && credential != 'manager') {
+        await gitRaw(projectPath, ['config', '--local', '--unset', 'credential.helper']);
+        let winCredentialResult = await gitRaw(projectPath, ['config', '--local', 'credential.helper', 'manager']);
         return wincredentialResult;
     };
     if (osName == 'darwin' && credential != 'osxkeychain') {
-        await gitRaw(projectPath, ['config', '--unset-all', 'credential.helper']);
+        await gitRaw(projectPath, ['config', '--local', '--unset', 'credential.helper']);
         let macCredentialResult = await gitRaw(projectPath, ['config', '--local', 'credential.helper', 'osxkeychain']);
         return macCredentialResult;
     };
@@ -781,7 +782,7 @@ async function gitAddCommit(workingDir,commitComment) {
  */
 async function gitPush(workingDir, options=[]) {
     // status bar show message
-    hx.window.setStatusBarMessage(`Git: 正在向远端推送......`, 60000, 'info');
+    hx.window.setStatusBarMessage(`Git: 正在向远端推送..... 如弹出授权，请输入凭证信息！`, 40000, 'info');
     try {
         let checkResult = await checkGitCredentials(workingDir);
         let status = await git(workingDir).init()
