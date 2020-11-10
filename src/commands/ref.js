@@ -8,6 +8,8 @@ const {
     gitBranch,
     gitBranchMerge,
     gitBranchSwitch,
+    gitCurrentBranchName,
+    gitLocalBranchToRemote,
     gitDeleteRemoteBranch,
     gitDeleteLocalBranch,
     gitLog,
@@ -21,6 +23,7 @@ class Tag {
         this.projectPath = projectPath;
     }
 
+    // Git: git show <tag-name>
     async showDetails(tagName) {
         if (tagName.length == 0) {
             return hx.window.showErrorMessage('tag名称无效。',['关闭']);
@@ -32,6 +35,7 @@ class Tag {
         };
     }
 
+    // Git: git tag <tag-name>
     async create(hash=null, param=null) {
         let titleLabel = '当前代码';
         if (hash != null && hash != undefined) {
@@ -70,6 +74,7 @@ class Branch {
         this.currentBranch = '';
     }
 
+    // Git: get project all branchs
     async getAllBranch(projectPath, type) {
         let { localBranchList, remoteBranchList } = await gitBranch(projectPath, ['-avvv']);
 
@@ -89,6 +94,7 @@ class Branch {
         return data;
     }
 
+    // Git: get logs
     async getProjectLogs(projectPath) {
         let Logs = await gitLog(projectPath, 'all', 'default');
         let {success} = Logs;
@@ -107,6 +113,7 @@ class Branch {
         return data;
     }
 
+    // Git: git checkout <branch-name>
     async switchBranch(ProjectInfo) {
         let { projectPath } = ProjectInfo;
         let branchs = await this.getAllBranch(projectPath, 'local');
@@ -128,6 +135,7 @@ class Branch {
         };
     }
 
+    // Git: git merge <branch-name>
     async merge(ProjectInfo) {
         let { projectPath } = ProjectInfo;
         let branchs = await this.getAllBranch(projectPath, 'local');
@@ -156,6 +164,7 @@ class Branch {
         };
     }
 
+    // Git: git merge --abort
     async mergeAbort(ProjectInfo) {
         let { projectPath } = ProjectInfo;
         let abortResult = await gitRaw(projectPath, ['merge', '--abort'], '取消分支合并 ');
@@ -165,6 +174,7 @@ class Branch {
         };
     }
 
+    // Git: git branch -D <branch-name>
     async del(ProjectInfo){
         let { projectPath } = ProjectInfo;
         let branchs = await this.getAllBranch(projectPath, 'all');
@@ -187,8 +197,24 @@ class Branch {
             ProjectInfo.easyGitInner = true;
             hx.commands.executeCommand('EasyGit.branch', ProjectInfo);
         };
+    };
+
+    // Git: git push --set-upstream origin master
+    async LocalBranchToRemote(ProjectInfo) {
+        let { projectPath } = ProjectInfo;
+        let currentBranch = await gitCurrentBranchName(projectPath);
+        if (currentBranch.length == 0) {
+            currentBranch = 'master';
+        };
+        let btn = await hx.window.showInformationMessage(`Git: 将设置本地分支追踪远程分支 ${currentBranch} \n`, ['确定', '取消']).then((result) => {
+            return result;
+        });
+        if (btn == '确定') {
+            gitLocalBranchToRemote(this.projectPath, currentBranch);
+        };
     }
 
+    // Git: git cherry-pick <commit-id>
     async cherryPick(ProjectInfo) {
         let { projectPath, hash, actionSource } = ProjectInfo;
 

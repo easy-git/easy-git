@@ -180,6 +180,12 @@ function activate(context) {
     });
     context.subscriptions.push(push);
 
+    // Git push --set-upstream origin master
+    let pushSetUpstream = hx.commands.registerCommand('EasyGit.pushSetUpstream', (param)=> {
+        git.action(param, 'push --set-upstream');
+    });
+    context.subscriptions.push(pushSetUpstream);
+
     // Git Branch Switch
     let BranchSwitch = hx.commands.registerCommand('EasyGit.BranchSwitch', (param)=> {
         git.action(param, 'BranchSwitch');

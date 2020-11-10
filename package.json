@@ -28,6 +28,7 @@
         "onCommand:EasyGit.pull",
         "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
+        "onCommand:EasyGit.pushSetUpstream",
         "onCommand:EasyGit.BranchSwitch",
         "onCommand:EasyGit.BranchDelete",
         "onCommand:EasyGit.merge",
@@ -186,6 +187,10 @@
             {
                 "command": "EasyGit.clean",
                 "title": "easy-git: clean - 删除未跟踪的文件"
+            },
+            {
+                "command": "EasyGit.pushSetUpstream",
+                "title": "easy-git: push --set-upstream - 本地分支追踪远程分支"
             },
             {
                 "command": "EasyGit.BranchSwitch",

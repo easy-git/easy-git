@@ -97,6 +97,9 @@ function action(param,action_name) {
         case 'push':
             utils.gitPush(projectPath);
             break;
+        case 'push --set-upstream':
+            bch.LocalBranchToRemote(ProjectInfo)
+            break;
         case 'BranchSwitch':
             bch.switchBranch(ProjectInfo);
             break;
