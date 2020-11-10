@@ -90,6 +90,44 @@ function gitConfigFileSetting(projectPath, filename) {
 
 
 /**
+ * @description  Git Cofing
+ * @return {String} projectPath 项目路径
+ */
+class GitConfig {
+    constructor(projectPath) {
+        this.projectPath = projectPath;
+    };
+
+    async showOrigin() {
+        await utils.gitRemoteshowOrigin(this.projectPath);
+    };
+
+    async ConfigShow() {
+        return await utils.gitConfigShow(this.projectPath);
+    };
+
+    async getUrl() {
+        let result = await utils.gitRaw(this.projectPath, ['ls-remote', '--get-url', 'origin'], '获取仓库URL', 'result')
+        if (typeof(result) == 'string') {
+            let url = result;
+            if (result.includes('.git')) {
+                if (result.includes('git@') == true) {
+                    url = result.replace('git@', '').replace(':','/').replace('.git','');
+                    url = 'http://' + url;
+                };
+                url = url.replace(/\r\n/g,"").replace(/\n/g,"");
+                setTimeout(function() {
+                    hx.env.openExternal(url);
+                }, 1000);
+            };
+        } else {
+            hx.window.showErrorMessage('获取仓库地址失败');
+        }
+    };
+};
+
+
+/**
  * @description Git文件
  */
 class GitFile {
@@ -114,6 +152,15 @@ class GitFile {
         }catch(e){};
     };
 
+    // 当编辑器打开日志视图时，文件视图内的操作，要刷新日志视图
+    async refreshLogView() {
+        // await hx.request('internaltest.executeCommand', 'workbench.action.focusEditor');
+        let activeEditorName = await hx.window.getActiveTextEditor().then(function(editor){
+            return editor.document.fileName;
+        });
+        console.log(activeEditorName)
+    };
+
     // Git: add
     async add(info) {
         let {text, tag} = info;
@@ -132,6 +179,7 @@ class GitFile {
         };
     };
 
+    // Git: from local get commit message
     async getCommitMessage() {
         let cm = new utils.FillCommitMessage(this.projectPath);
         let cmText = await cm.getMergeMsg();
@@ -266,44 +314,58 @@ class GitFile {
         };
     };
 
-};
-
-
-/**
- * @description  Git Cofing
- * @return {String} projectPath 项目路径
- */
-class GitConfig {
-    constructor(projectPath) {
-        this.projectPath = projectPath;
+    // Git: push
+    async push() {
+        let pushStatus = await utils.gitPush(this.projectPath);
+        if (pushStatus == 'success') {
+            this.refreshFileList();
+        };
     };
 
-    async showOrigin() {
-        await utils.gitRemoteshowOrigin(this.projectPath);
+    // Git: switch last Branch
+    async switchLastBranch() {
+        let switchResult = await utils.gitBranchSwitch(this.projectPath, '-');
+        if (switchResult == 'success') {
+            this.refreshFileList();
+        };
     };
 
-    async ConfigShow() {
-        return await utils.gitConfigShow(this.projectPath);
-    };
 
-    async getUrl() {
-        let result = await utils.gitRaw(this.projectPath, ['ls-remote', '--get-url', 'origin'], '获取仓库URL', 'result')
-        if (typeof(result) == 'string') {
-            let url = result;
-            if (result.includes('.git')) {
-                if (result.includes('git@') == true) {
-                    url = result.replace('git@', '').replace(':','/').replace('.git','');
-                    url = 'http://' + url;
-                };
-                url = url.replace(/\r\n/g,"").replace(/\n/g,"");
-                setTimeout(function() {
-                    hx.env.openExternal(url);
-                }, 1000);
+    // Git: pull
+    async pull(msg) {
+        let {text,rebase} = msg;
+        let options = Object.assign(msg);
+        let pullStatus = await utils.gitPull(this.projectPath,options);
+        if (pullStatus == 'success') {
+            if (text == 'file') {
+                this.refreshFileList();
+            } else {
+                Branch.LoadingBranchData();
             };
-        } else {
-            hx.window.showErrorMessage('获取仓库地址失败');
-        }
+        };
     };
+
+    // Git: fetch
+    async fetch(source) {
+        let fetchStatus = await utils.gitFetch(this.projectPath);
+        if (fetchStatus == 'success') {
+            if (source == 'file') {
+                this.refreshFileList();
+            } else {
+                Branch.LoadingBranchData();
+            };
+        };
+    };
+
+    // Git: publish
+    async goPublish(msg) {
+        let branchName = msg.text;
+        let pushStatus = await utils.gitAddRemoteOrigin(this.projectPath);
+        if (pushStatus == 'success') {
+            this.refreshFileList();
+        };
+    };
+
 };
 
 
@@ -385,10 +447,10 @@ function active(webviewPanel, userConfig, gitData) {
                 File.resetLastCommit();
                 break;
             case 'push':
-                push(projectPath);
+                File.push();
                 break;
             case 'publish':
-                goPublish(projectPath, msg);
+                File.goPublish(msg);
                 break;
             case 'acp':
                 let commitComment = msg.text;
@@ -411,10 +473,10 @@ function active(webviewPanel, userConfig, gitData) {
                 File.cancelAllStash();
                 break;
             case 'pull':
-                pull(projectPath,msg);
+                File.pull(msg);
                 break;
             case 'fetch':
-                fetch(projectPath,msg.text);
+                File.fetch(msg.text);
                 break;
             case 'BranchInfo':
                 if (msg.text == 'branch') {
@@ -443,7 +505,7 @@ function active(webviewPanel, userConfig, gitData) {
                 GitCfg.getUrl();
                 break;
             case 'switchLastBranch':
-                switchLastBranch(projectPath);
+                File.switchLastBranch();
                 break;
             case 'openCommandPanel':
                 hx.commands.executeCommand('EasyGit.CommandPanel', EasyGitInnerParams);
@@ -452,56 +514,6 @@ function active(webviewPanel, userConfig, gitData) {
                 break;
         };
     });
-
-    async function switchLastBranch(projectPath) {
-        let switchResult = await utils.gitBranchSwitch(projectPath, '-');
-        if (switchResult == 'success') {
-            File.refreshFileList();
-        }
-    };
-
-    // git push
-    async function push(projectPath) {
-        pushStatus = await utils.gitPush(projectPath);
-        if (pushStatus == 'success') {
-            File.refreshFileList();
-        };
-    };
-
-    // git publish
-    async function goPublish(projectName, msg) {
-        let branchName = msg.text;
-        let pushStatus = await utils.gitAddRemoteOrigin(projectPath);
-        if (pushStatus == 'success') {
-            File.refreshFileList();
-        };
-    };
-
-    // git pull
-    async function pull(projectPath, msg) {
-        let {text,rebase} = msg;
-        let options = Object.assign(msg);
-        let pullStatus = await utils.gitPull(projectPath,options);
-        if (pullStatus == 'success') {
-            if (text == 'file') {
-                File.refreshFileList();
-            } else {
-                Branch.LoadingBranchData();
-            };
-        };
-    };
-
-    // git fetch
-    async function fetch(projectPath, source) {
-        let fetchStatus = await utils.gitFetch(projectPath);
-        if (fetchStatus == 'success') {
-            if (source == 'file') {
-                File.refreshFileList();
-            } else {
-                Branch.LoadingBranchData();
-            };
-        };
-    };
 
 };
 
