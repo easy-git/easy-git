@@ -362,7 +362,10 @@ class GitFile {
         let branchName = msg.text;
         let pushStatus = await utils.gitAddRemoteOrigin(this.projectPath);
         if (pushStatus == 'success') {
-            this.refreshFileList();
+            let AssociationResult = await utils.gitLocalBranchToRemote(this.projectPath, branchName);
+            if (AssociationResult) {
+                this.refreshFileList();
+            };
         };
     };
 
