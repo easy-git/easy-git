@@ -797,13 +797,13 @@ async function gitPush(workingDir, options=[]) {
                 let title = "Git: push操作失败。";
                 if (errMsg.includes('Authentication failed') || errMsg.includes('could not read Username')) {
                     checkGitCredentials(workingDir, true);
+                    let osErrorMsg = osName == 'darwin'
+                        ? "方法2：Mac, 打开钥匙串，清除此Git仓库的账号密码信息。"
+                        : "方法2：windows, 打开控制面板 -> 用户账户 -> 管理windows凭据，在【普通凭据】列表中，删除此Git仓库的账号密码信息。";
+                    errMsg = errMsg + "\n" + "原因：账号密码错误，如是使用账号密码方式（非SSH KEY）登录Git，可通过以下方法解决。\n"
+                        + "方法1：打开终端，进入此项目，执行git push，此时输入正确的账号密码。\n"
+                        + osErrorMsg;
                 };
-                let osErrorMsg = osName == 'darwin'
-                    ? "方法2：Mac, 打开钥匙串，清除此Git仓库的账号密码信息。"
-                    : "方法2：windows, 打开控制面板 -> 用户账户 -> 管理windows凭据，在【普通凭据】列表中，删除此Git仓库的账号密码信息。";
-                errMsg = errMsg + "\n" + "原因：账号密码错误，如是使用账号密码方式（非SSH KEY）登录Git，可通过以下方法解决。\n"
-                    + "方法1：打开终端，进入此项目，执行git push，此时输入正确的账号密码。\n"
-                    + osErrorMsg;
                 createOutputChannel(title, errMsg);
                 return 'fail';
             });
