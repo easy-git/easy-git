@@ -676,12 +676,6 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         }
                         hbuilderx.postMessage(req);
                     },
-                    gitACP() {
-                        hbuilderx.postMessage({
-                            command: 'commit',
-                            text: this.commitMessage
-                        });
-                    },
                     gitCheckout(file) {
                         hbuilderx.postMessage({
                             command: 'checkoutFile',

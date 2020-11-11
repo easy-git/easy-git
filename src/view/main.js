@@ -199,14 +199,24 @@ class GitFile {
         if (comment == '') {
             return hx.window.showErrorMessage('Git: 请填写commit message后再提交。', ['我知道了']);
         };
+
+        let config = hx.workspace.getConfiguration();
+
         if (isStaged) {
-            let ciStatus = await utils.gitCommit(this.projectPath, comment);
-            if (ciStatus == 'success') {
-                this.refreshFileList();
+            let AlwaysAutoCommitPush = config.get('EasyGit.AlwaysAutoCommitPush');
+            if (AlwaysAutoCommitPush) {
+                let cpStatus = await utils.gitCommitPush(this.projectPath, comment);
+                if (cpStatus == 'success') {
+                    this.refreshFileList();
+                };
+            } else {
+                let ciStatus = await utils.gitCommit(this.projectPath, comment);
+                if (ciStatus == 'success') {
+                    this.refreshFileList();
+                };
             };
         } else {
             // 需要判断用户是否开启了：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。
-            let config = hx.workspace.getConfiguration();
             let AlwaysAutoAddCommit = config.get('EasyGit.AlwaysAutoAddCommit');
 
             if (AlwaysAutoAddCommit) {
@@ -300,17 +310,6 @@ class GitFile {
             if (status) {
                 this.refreshFileList();
             };
-        };
-    };
-
-    // Git: add -> commit -> push
-    async acp(commitComment) {
-        if (commitComment.trim() == '') {
-            return hx.window.showErrorMessage('请输入注释后再提交', ['我知道了']);
-        };
-        let acpStatus = await utils.gitAddCommitPush(this.projectPath, commitComment);
-        if (acpStatus == 'success') {
-            this.refreshFileList();
         };
     };
 
@@ -454,10 +453,6 @@ function active(webviewPanel, userConfig, gitData) {
                 break;
             case 'publish':
                 File.goPublish(msg);
-                break;
-            case 'acp':
-                let commitComment = msg.text;
-                File.acp(commitComment);
                 break;
             case 'diff':
                 let fileAbsPath = path.join(projectPath, msg.text);

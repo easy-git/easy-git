@@ -65,6 +65,11 @@
                     "default": false,
                     "description": "当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。"
                 },
+                "EasyGit.AlwaysAutoCommitPush": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "源代码管理器，点击commit图标，执行commit时，并执行push。"
+                },
                 "EasyGit.DisableDevTools": {
                     "type": "boolean",
                     "default": true,

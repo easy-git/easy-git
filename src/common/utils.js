@@ -667,23 +667,22 @@ async function gitStatus(workingDir) {
  * @param {String} projectPath 项目路径
  * @param {String} commitComment 注释
  */
-async function gitAddCommitPush(workingDir, commitComment) {
+async function gitCommitPush(workingDir, commitComment) {
     let dir = path.join(workingDir, '*');
 
     // status bar show message
-    hx.window.setStatusBarMessage('Git: 正在提交...');
+    hx.window.setStatusBarMessage('Git: 正在执行 commit 和 push操作...');
     try {
         let status = await git(workingDir).init()
-            .add(dir)
             .commit(commitComment)
             .push()
             .then(() => {
-                hx.window.setStatusBarMessage('Git: 提交成功', 3000, 'info');
+                hx.window.setStatusBarMessage('Git: commit 和 push操作执行成功！', 10000, 'info');
                 return 'success'
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel('Git: add -> commit -> push 失败', errMsg);
+                createOutputChannel('Git: add -> commit -> push 失败'！, errMsg);
                 return 'fail';
             });
         return status
@@ -1771,7 +1770,7 @@ module.exports = {
     gitFileStatus,
     gitAdd,
     gitAddCommit,
-    gitAddCommitPush,
+    gitCommitPush,
     gitCancelAdd,
     gitCommit,
     gitReset,
