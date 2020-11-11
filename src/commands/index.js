@@ -10,7 +10,7 @@ const { gitInitProject } = require('./repository.js');
 const { gitAddFile, gitRestore, goCleanFile, goCommitAmend } = require('./file.js');
 const { goSetConfig } = require('./base.js');
 
-const { Tag, Branch, Revert } = require('./ref.js');
+const { Tag, Branch, Revert, Reset } = require('./ref.js');
 const gitBlameForLineChange = require('./blame.js');
 
 
@@ -83,6 +83,10 @@ function action(param,action_name) {
             let rinfo = Object.assign( {'hash': rhash}, ProjectInfo);
             let r = new Revert();
             r.run(rinfo);
+            break;
+        case 'reset':
+            let rt = new Reset();
+            rt.run(ProjectInfo);
             break;
         case 'restoreChanged':
             let t2 = new gitRestore();

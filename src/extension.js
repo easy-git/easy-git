@@ -162,6 +162,12 @@ function activate(context) {
     });
     context.subscriptions.push(revert);
 
+    // git reset
+    let resetCmd = hx.commands.registerCommand('EasyGit.reset', (param)=> {
+        git.action(param, 'reset');
+    });
+    context.subscriptions.push(resetCmd);
+
     // Git pull
     let pull = hx.commands.registerCommand('EasyGit.pull', (param)=> {
         git.action(param, 'pull');

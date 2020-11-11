@@ -25,6 +25,7 @@
         "onCommand:EasyGit.restore",
         "onCommand:EasyGit.restoreStaged",
         "onCommand:EasyGit.revert",
+        "onCommand:EasyGit.reset",
         "onCommand:EasyGit.pull",
         "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
@@ -187,7 +188,11 @@
             },
             {
                 "command": "EasyGit.revert",
-                "title": "easy-git: revert - 撤销指定commit"
+                "title": "easy-git: revert - 撤销还原指定commit"
+            },
+            {
+                "command": "EasyGit.reset",
+                "title": "easy-git: reset"
             },
             {
                 "command": "EasyGit.clean",

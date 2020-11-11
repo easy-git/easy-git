@@ -18,6 +18,24 @@ const {
 } = require('../common/utils.js');
 
 
+async function getProjectLogs(projectPath) {
+    let Logs = await gitLog(projectPath, 'branch', 'default');
+    let {success} = Logs;
+
+    let data = [];
+    if (success && success != undefined) {
+        for (let s of Logs.data) {
+            let shortHash = s.hash.slice(0,12);
+            data.push({
+                "label": shortHash,
+                "description": s.date + s.message,
+                "hash": s.hash
+            });
+        };
+    };
+    return data;
+}
+
 class Tag {
     constructor(projectPath) {
         this.projectPath = projectPath;
@@ -270,35 +288,19 @@ class Branch {
     };
 }
 
-
+/**
+ * @description Git Revert
+ */
 class Revert {
     constructor(arg) {
 
-    }
-
-    async getProjectLogs(projectPath) {
-        let Logs = await gitLog(projectPath, 'branch', 'default');
-        let {success} = Logs;
-
-        let data = [];
-        if (success && success != undefined) {
-            for (let s of Logs.data) {
-                let shortHash = s.hash.slice(0,12);
-                data.push({
-                    "label": shortHash,
-                    "description": s.date + s.message,
-                    "hash": s.hash
-                });
-            };
-        };
-        return data;
     }
 
     async run(ProjectInfo) {
         let { projectPath, hash } = ProjectInfo;
 
         if (hash == undefined || hash == '') {
-            let data = await this.getProjectLogs(projectPath);
+            let data = await getProjectLogs(projectPath);
             let selected = await hx.window.showQuickPick(data, {
                 'placeHolder': '请选择要还原撤销的commit......'
             }).then( (res)=> {
@@ -335,8 +337,63 @@ class Revert {
 }
 
 
+/**
+ * @description Git Reset
+ */
+class Reset {
+    constructor(arg) {
+        this.PickerData = [{
+            "label": "重置代码到上一次提交",
+            "description": "git reset --hard HEAD^",
+            "options": ["reset", "--hard", "HEAD^"]
+        },{
+            "label": "重置代码到指定commitID",
+            "description": "git reset --hard commitID"
+        }]
+    }
+
+    async resetCommitID(projectPath) {
+        let data = await getProjectLogs(projectPath);
+        let selected = await hx.window.showQuickPick(data, {
+            'placeHolder': '请选择要重置的commitID...'
+        }).then( (res)=> {
+            return res;
+        });
+        if (selected == undefined) { return; };
+        let hash = selected.hash;
+        if (hash == undefined) { return; };
+
+        let cmd = ["reset", "--hard", hash]
+        let runResult = await gitRaw(projectPath, cmd, `重置到 ${hash}`);
+    }
+
+    async run(ProjectInfo) {
+        let { projectPath } = ProjectInfo;
+
+        let selected = await hx.window.showQuickPick(this.PickerData, {
+            'placeHolder': '请选择要操作的 reset 命令...'
+        }).then( (result)=> {
+            return result;
+        });
+        let label = selected.label;
+
+        if (label == '重置代码到上一次提交') {
+            let cmd = selected.options;
+            let runResult = await gitRaw(projectPath, cmd, label);
+        };
+
+        if (label == '重置代码到指定commitID') {
+            this.resetCommitID(projectPath);
+        }
+
+    }
+
+}
+
+
 module.exports = {
     Tag,
     Branch,
-    Revert
+    Revert,
+    Reset
 };

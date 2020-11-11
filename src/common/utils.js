@@ -682,7 +682,7 @@ async function gitCommitPush(workingDir, commitComment) {
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel('Git: add -> commit -> push 失败'！, errMsg);
+                createOutputChannel('Git: add -> commit -> push 失败!', errMsg);
                 return 'fail';
             });
         return status
