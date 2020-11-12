@@ -14,10 +14,14 @@ const {
     gitDeleteLocalBranch,
     gitLog,
     gitCherryPick,
-    gitRevert
+    gitRevert,
+    gitReset
 } = require('../common/utils.js');
 
-
+/**
+ * @description get log
+ * @param {Object} projectPath
+ */
 async function getProjectLogs(projectPath) {
     let Logs = await gitLog(projectPath, 'branch', 'default');
     let {success} = Logs;
@@ -34,7 +38,7 @@ async function getProjectLogs(projectPath) {
         };
     };
     return data;
-}
+};
 
 class Tag {
     constructor(projectPath) {
@@ -293,7 +297,6 @@ class Branch {
  */
 class Revert {
     constructor(arg) {
-
     }
 
     async run(ProjectInfo) {
@@ -342,20 +345,39 @@ class Revert {
  */
 class Reset {
     constructor(arg) {
-        this.PickerData = [{
-            "label": "重置代码到上一次提交",
-            "description": "git reset --hard HEAD^",
-            "options": ["reset", "--hard", "HEAD^"]
-        },{
-            "label": "重置代码到指定commitID",
-            "description": "git reset --hard commitID"
-        }]
     }
 
-    async resetCommitID(projectPath) {
+    // Git: git reset --soft HEAD^
+    async resetSoftLastCommit(ProjectInfo) {
+        let { projectPath } = ProjectInfo;
+
+        let git_options = ['--soft', 'HEAD^'];
+        let runResult = await gitReset(projectPath, git_options, 'Git: 插销上次commit');
+        if (runResult == 'success') {
+            ProjectInfo.easyGitInner = true;
+            hx.commands.executeCommand('EasyGit.main',ProjectInfo);
+        };
+    }
+
+    // Git: git reset --hard HEAD^
+    async resetHardLastCommit(ProjectInfo) {
+        let { projectPath } = ProjectInfo;
+
+        let options = ['--hard', 'HEAD^'];
+        let runResult = await gitReset(projectPath, options, 'Git: 重置代码到上次提交');
+        if (runResult == 'success') {
+            ProjectInfo.easyGitInner = true;
+            hx.commands.executeCommand('EasyGit.main',ProjectInfo);
+        };
+    }
+
+    // Git: git reset --hard <commit-id>
+    async resetHardCommitID(ProjectInfo) {
+        let { projectPath } = ProjectInfo;
+
         let data = await getProjectLogs(projectPath);
         let selected = await hx.window.showQuickPick(data, {
-            'placeHolder': '请选择要重置的commitID...'
+            'placeHolder': '请选择要重置的 commit_id '
         }).then( (res)=> {
             return res;
         });
@@ -364,28 +386,11 @@ class Reset {
         if (hash == undefined) { return; };
 
         let cmd = ["reset", "--hard", hash]
-        let runResult = await gitRaw(projectPath, cmd, `重置到 ${hash}`);
-    }
-
-    async run(ProjectInfo) {
-        let { projectPath } = ProjectInfo;
-
-        let selected = await hx.window.showQuickPick(this.PickerData, {
-            'placeHolder': '请选择要操作的 reset 命令...'
-        }).then( (result)=> {
-            return result;
-        });
-        let label = selected.label;
-
-        if (label == '重置代码到上一次提交') {
-            let cmd = selected.options;
-            let runResult = await gitRaw(projectPath, cmd, label);
+        let runResult = await gitReset(projectPath, cmd, `重置到代码 ${hash}`);
+        if (runResult == 'success') {
+            ProjectInfo.easyGitInner = true;
+            hx.commands.executeCommand('EasyGit.main',ProjectInfo);
         };
-
-        if (label == '重置代码到指定commitID') {
-            this.resetCommitID(projectPath);
-        }
-
     }
 
 }

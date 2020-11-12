@@ -21,11 +21,12 @@
         "onCommand:EasyGit.addRemoteOrigin",
         "onCommand:EasyGit.add",
         "onCommand:EasyGit.commitAmend",
-        "onCommand:EasyGit.resetLastCommit",
+        "onCommand:EasyGit.resetSoftLastCommit",
+        "onCommand:EasyGit.resetHardLastCommit",
+        "onCommand:EasyGit.resetHardCommitID",
         "onCommand:EasyGit.restore",
         "onCommand:EasyGit.restoreStaged",
         "onCommand:EasyGit.revert",
-        "onCommand:EasyGit.reset",
         "onCommand:EasyGit.pull",
         "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
@@ -175,8 +176,16 @@
                 "title": "easy-git: commit --amend 修改最后提交的commit注释"
             },
             {
-                "command": "EasyGit.resetLastCommit",
-                "title": "easy-git: reset --soft HEAD^ - 撤销上次commit"
+                "command": "EasyGit.resetSoftLastCommit",
+                "title": "easy-git: reset --soft HEAD^ - 撤销上次commit，即重置代码到工作区"
+            },
+            {
+                "command": "EasyGit.resetHardLastCommit",
+                "title": "easy-git: reset --hard HEAD^ - 重置代码到上次提交"
+            },
+            {
+                "command": "EasyGit.resetHardCommitID",
+                "title": "easy-git: reset --hard commitID - 重置代码到指定提交"
             },
             {
                 "command": "EasyGit.restore",
@@ -189,10 +198,6 @@
             {
                 "command": "EasyGit.revert",
                 "title": "easy-git: revert - 撤销还原指定commit"
-            },
-            {
-                "command": "EasyGit.reset",
-                "title": "easy-git: reset"
             },
             {
                 "command": "EasyGit.clean",

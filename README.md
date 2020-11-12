@@ -107,7 +107,13 @@ easy-git, 支持通过快捷键打开git视图。
 {"key": "","command": "EasyGit.restoreStaged"}
 
 // Git 撤销上一次commit
-{"key": "","command": "EasyGit.resetLastCommit"}
+{"key": "","command": "EasyGit.resetSoftLastCommit"}
+
+// Git 重置代码到上次提交
+{"key": "","command": "EasyGit.resetHardLastCommit"}
+
+// Git 重置代码到指定提交
+{"key": "","command": "EasyGit.resetHardCommitID"}
 
 // Git pull --rebase
 {"key": "","command": "EasyGit.pull"}

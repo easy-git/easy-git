@@ -71,8 +71,17 @@ function action(param,action_name) {
         case 'commitAmend':
             goCommitAmend(ProjectInfo);
             break;
-        case 'resetLastCommit':
-            utils.gitReset(projectPath, ['--soft', 'HEAD^'], 'Git: 插销上次commit');
+        case 'resetSoftLastCommit':
+            let rt = new Reset();
+            rt.resetSoftLastCommit(ProjectInfo);
+            break;
+        case 'resetHardLastCommit':
+            let rt1 = new Reset();
+            rt1.resetHardLastCommit(ProjectInfo);
+            break;
+        case 'resetHardCommitID':
+            let rt2 = new Reset();
+            rt2.resetHardCommitID(ProjectInfo);
             break;
         case 'restoreStaged':
             let t1 = new gitRestore();
@@ -83,10 +92,6 @@ function action(param,action_name) {
             let rinfo = Object.assign( {'hash': rhash}, ProjectInfo);
             let r = new Revert();
             r.run(rinfo);
-            break;
-        case 'reset':
-            let rt = new Reset();
-            rt.run(ProjectInfo);
             break;
         case 'restoreChanged':
             let t2 = new gitRestore();

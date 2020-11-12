@@ -139,10 +139,22 @@ function activate(context) {
     context.subscriptions.push(commitAmend);
 
     // Git reset last commit
-    let resetLastCommit = hx.commands.registerCommand('EasyGit.resetLastCommit', (param)=> {
-        git.action(param, 'resetLastCommit');
+    let resetSoftLastCommit = hx.commands.registerCommand('EasyGit.resetSoftLastCommit', (param)=> {
+        git.action(param, 'resetSoftLastCommit');
     });
-    context.subscriptions.push(resetLastCommit);
+    context.subscriptions.push(resetSoftLastCommit);
+
+    // git reset --hard HEAD^
+    let resetHardLastCommit = hx.commands.registerCommand('EasyGit.resetHardLastCommit', (param)=> {
+        git.action(param, 'resetHardLastCommit');
+    });
+    context.subscriptions.push(resetHardLastCommit);
+
+    // git reset
+    let resetHardCommitID = hx.commands.registerCommand('EasyGit.resetHardCommitID', (param)=> {
+        git.action(param, 'resetHardCommitID');
+    });
+    context.subscriptions.push(resetHardCommitID);
 
     // git restore --staged file
     let restoreStaged = hx.commands.registerCommand('EasyGit.restoreStaged', (param)=> {
@@ -161,12 +173,6 @@ function activate(context) {
         git.action(param, 'revert');
     });
     context.subscriptions.push(revert);
-
-    // git reset
-    let resetCmd = hx.commands.registerCommand('EasyGit.reset', (param)=> {
-        git.action(param, 'reset');
-    });
-    context.subscriptions.push(resetCmd);
 
     // Git pull
     let pull = hx.commands.registerCommand('EasyGit.pull', (param)=> {
