@@ -15,7 +15,7 @@ const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
  */
 function getWebviewContent(userConfig, uiData, gitData) {
     // 是否启用开发者工具
-    let {DisableDevTools} = userConfig;
+    let { DisableDevTools, GitAlwaysAutoCommitPush } = userConfig;
 
     // icon
     let {
@@ -284,7 +284,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         </div>
                         <div class="col-auto p-0">
                             <span class="top" @click="refresh();" title="刷新">${iconRefresh}</span>
-                            <span class="top" @click="gitCommit();" title="commit">${CheckMarkIcon}</span>
+                            <span class="top" @click="gitCommit();" :title="GitAlwaysAutoCommitPush ? 'commit & push' : 'commit'">${CheckMarkIcon}</span>
                             <span class="top" @click="gitLog();" title="查看日志">${HistoryIcon}</span>
                             <span class="top" @click.stop="clickMenu();">
                                 <i title="更多操作">${MenuIcon}</i>
@@ -325,6 +325,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 class="form-control outline-none textarea"
                                 :placeholder="commitMessagePlaceholder"
                                 @keyup.${ctrl}.enter="gitCommit();"
+                                :title="GitAlwaysAutoCommitPush ? 'commit & push' : 'commit'"
                                 onfocus="window.activeobj=this;this.clock=setInterval(function(){activeobj.style.height=(activeobj.scrollHeight + 2)+'px';},100);">
                             </textarea>
                         </div>
@@ -480,7 +481,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     StagedIcon: '',
                     isShowStaged: true,
                     gitStagedFileList: [],
-                    gitStagedFileListLength: 0
+                    gitStagedFileListLength: 0,
+                    GitAlwaysAutoCommitPush: false
                 },
                 computed: {
                     GitAssociationRemote() {
@@ -502,6 +504,12 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     this.ConflictedIcon = '${ChevronDownIcon}';
                     this.StagedIcon = '${ChevronDownIcon}';
                     this.ChangeIcon = '${ChevronDownIcon}';
+
+                    // 用户是否设置自动commit -> push
+                    let GitAlwaysAutoCommitPush =  ${GitAlwaysAutoCommitPush};
+                    if (GitAlwaysAutoCommitPush != undefined) {
+                        this.GitAlwaysAutoCommitPush = GitAlwaysAutoCommitPush;
+                    };
                 },
                 mounted() {
                     this.getGitFileList();

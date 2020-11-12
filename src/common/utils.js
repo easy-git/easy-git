@@ -353,10 +353,12 @@ async function checkGitCredentials(projectPath, unset=false) {
         return;
     };
     let configData = await gitConfigShow(projectPath, false);
+    let remoteOriginUrl = configData['remote.origin.url'];
+    if (remoteOriginUrl.slice(0,4) == 'git@') { return 'ssh'; };
+
     let credential = configData['credential.helper'];
     if (osName == 'win32' && credential != 'manager') {
-        await gitRaw(projectPath, ['config', '--local', '--unset', 'credential.helper']);
-        let winCredentialResult = await gitRaw(projectPath, ['config', '--local', 'credential.helper', 'manager']);
+        let winCredentialResult = await gitRaw(projectPath, ['config', '--global', 'credential.helper', 'manager']);
         return wincredentialResult;
     };
     if (osName == 'darwin' && credential != 'osxkeychain') {
@@ -673,6 +675,7 @@ async function gitCommitPush(workingDir, commitComment) {
     // status bar show message
     hx.window.setStatusBarMessage('Git: 正在执行 commit 和 push操作...');
     try {
+        let checkCert = await checkGitCredentials(workingDir);
         let status = await git(workingDir).init()
             .commit(commitComment)
             .push()
@@ -681,8 +684,19 @@ async function gitCommitPush(workingDir, commitComment) {
                 return 'success'
             })
             .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
-                createOutputChannel('Git: add -> commit -> push 失败!', errMsg);
+                hx.window.clearStatusBarMessage();
+                let errMsg = (err).toString();
+                let title = "Git: commit -> push 失败!";
+                if (errMsg.includes('Authentication failed') || errMsg.includes('could not read Username')) {
+                    checkGitCredentials(workingDir, true);
+                    let osErrorMsg = osName == 'darwin'
+                        ? "方法2：Mac, 打开钥匙串，清除此Git仓库的账号密码信息。"
+                        : "方法2：windows, 打开控制面板 -> 用户账户 -> 管理windows凭据，在【普通凭据】列表中，删除此Git仓库的账号密码信息。";
+                    errMsg = errMsg + "\n" + "原因：账号密码错误，如是使用账号密码方式（非SSH KEY）登录Git，可通过以下方法解决。\n"
+                        + "方法1：打开终端，进入此项目，执行git push，此时输入正确的账号密码。\n"
+                        + osErrorMsg;
+                };
+                createOutputChannel(title, errMsg);
                 return 'fail';
             });
         return status

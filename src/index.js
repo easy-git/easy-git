@@ -340,9 +340,11 @@ async function main(viewType, param, webviewPanel, context) {
     let DisableDevTools = config.get('EasyGit.DisableDevTools');
     let GitConfigUserPrompt = config.get('EasyGit.GitConfigUserPrompt');
     let isShareUsageData = config.get('EasyGit.isShareUsageData');
+    let GitAlwaysAutoCommitPush = config.get('EasyGit.AlwaysAutoCommitPush');
     let userConfig = {
         'DisableDevTools': DisableDevTools,
-        'GitConfigUserPrompt': GitConfigUserPrompt
+        'GitConfigUserPrompt': GitConfigUserPrompt,
+        'GitAlwaysAutoCommitPush': GitAlwaysAutoCommitPush
     };
 
     // 项目管理器所有项目信息

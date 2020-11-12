@@ -200,7 +200,7 @@ class GitFile {
             return hx.window.showErrorMessage('Git: 请填写commit message后再提交。', ['我知道了']);
         };
 
-        let config = hx.workspace.getConfiguration();
+        let config = await hx.workspace.getConfiguration();
 
         if (isStaged) {
             let AlwaysAutoCommitPush = config.get('EasyGit.AlwaysAutoCommitPush');
