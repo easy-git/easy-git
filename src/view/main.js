@@ -255,6 +255,14 @@ class GitFile {
         };
     };
 
+    // Git: 重置代码到上次提交
+    async resetHardLastCommit() {
+        let resetStatus = await utils.gitReset(this.projectPath, ['--hard', 'HEAD^'], 'Git: 重置代码到上次提交');
+        if (resetStatus == 'success') {
+            this.refreshFileList();
+        };
+    };
+
     // Git: cancel add
     async cancelStash(fileUri) {
         if (!fileUri) {return;};
@@ -447,6 +455,9 @@ function active(webviewPanel, userConfig, gitData) {
                 break;
             case 'ResetSoftHEAD':
                 File.resetLastCommit();
+                break;
+            case 'ResetHardHEAD':
+                File.resetHardLastCommit();
                 break;
             case 'push':
                 File.push();

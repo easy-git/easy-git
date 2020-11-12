@@ -146,7 +146,7 @@ function activate(context) {
 
     // git reset --hard HEAD^
     let resetHardLastCommit = hx.commands.registerCommand('EasyGit.resetHardLastCommit', (param)=> {
-        git.action(param, 'resetHardLastCommit');
+        return git.action(param, 'resetHardLastCommit');
     });
     context.subscriptions.push(resetHardLastCommit);
 
