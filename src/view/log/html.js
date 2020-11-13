@@ -168,6 +168,10 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     line-height: 1.4rem;
                 }
                 .li-log:hover {
+                    cursor: pointer;
+                    /* background-color: ${liHoverBackground} !important; */
+                }
+                .li-log-selected {
                     background-color: ${liHoverBackground} !important;
                 }
                 .htext {
@@ -478,6 +482,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                 <li class="li-log gitfile"
                                     v-for="(item,idx) of gitLogInfoList" :key="idx"
                                     :id="'msg_'+idx"
+                                    :class="{  'li-log-selected' : selectedLogID == item.hash }"
                                     @contextmenu.prevent.stop="openMenu($event,item)"
                                     @mouseover="hoverLogID = 'msg_'+idx"
                                     @mouseleave="mouseleaveLogItem()">
@@ -612,6 +617,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         logNum: 0,
                         gitLogInfoList: [],
                         hoverLogID: '',
+                        selectedLogID: '',
                         isShowViewDetails: false,
                         logDetails: {},
                         logDetailsFiles: [],
@@ -662,6 +668,8 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     },
                     methods: {
                         openMenu(e, item) {
+                            this.selectedLogID = item.hash;
+                            console.log(this.selectedLogID)
                             this.rightClickItem = item;
                             var x = e.pageX;
                             var y = e.pageY;
@@ -781,6 +789,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             document.body.style.overflow = 'auto';
                         },
                         viewDetails(data) {
+                            this.selectedLogID = data.hash;
                             this.CommitFileChangeDetails = '';
                             this.isShowViewDetails = true;
                             this.logDetails = data;
@@ -808,6 +817,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             };
                         },
                         closeViewDetails() {
+                            this.selectedLogID = '';
                             this.isShowViewDetails = false;
                             document.body.style.overflow = 'auto !important';
                         },
