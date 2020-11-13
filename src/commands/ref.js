@@ -300,7 +300,8 @@ class Revert {
     }
 
     async run(ProjectInfo) {
-        let { projectPath, hash } = ProjectInfo;
+        let { projectPath, hash, isFromGitView } = ProjectInfo;
+        ProjectInfo.easyGitInner = true;
 
         if (hash == undefined || hash == '') {
             let data = await getProjectLogs(projectPath);
@@ -313,11 +314,10 @@ class Revert {
         };
         if (hash == undefined) { return; };
 
-        let revertResult = await gitRevert(projectPath, ['revert', hash])
+        let revertResult = await gitRevert(projectPath, ['revert', hash]);
         if ( revertResult == 'conflicts') {
             // 刷新源代码管理器
             setTimeout(function() {
-                ProjectInfo.easyGitInner = true;
                 hx.commands.executeCommand('EasyGit.main',ProjectInfo);
             }, 1000);
 
@@ -333,9 +333,10 @@ class Revert {
             }
             // 刷新源代码管理器
             hx.commands.executeCommand('EasyGit.main',ProjectInfo);
+        } else {
+            hx.commands.executeCommand('EasyGit.main',ProjectInfo);
         };
-        ProjectInfo.easyGitInner = true;
-        hx.commands.executeCommand('EasyGit.main',ProjectInfo);
+        return revertResult;
     }
 }
 

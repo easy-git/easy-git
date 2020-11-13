@@ -22,13 +22,14 @@ function action(param,action_name) {
         return hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试。', ['我知道了']);
     };
 
-    let projectName, projectPath, selectedFile, easyGitInner;
+    let projectName, projectPath, selectedFile, easyGitInner, isFromGitView;
     try{
         let {easyGitInner} = param;
         if (easyGitInner != undefined) {
             projectName = param.projectName;
             projectPath = param.projectPath;
             selectedFile = param.selectedFile;
+            isFromGitView = param.isFromGitView;
         } else {
             try {
                 projectName = param.workspaceFolder.name;
@@ -49,7 +50,8 @@ function action(param,action_name) {
         'projectName': projectName,
         'projectPath': projectPath,
         'selectedFile': selectedFile,
-        'easyGitInner': easyGitInner
+        'easyGitInner': easyGitInner,
+        'isFromGitView': isFromGitView
     };
 
     // git tag: 标签相关操作
@@ -88,8 +90,7 @@ function action(param,action_name) {
             t1.restore(ProjectInfo, 'restoreStaged');
             break;
         case 'revert':
-            let rhash = param.hash;
-            let rinfo = Object.assign( {'hash': rhash}, ProjectInfo);
+            let rinfo = Object.assign({ 'hash': param.hash }, ProjectInfo);
             let r = new Revert();
             r.run(rinfo);
             break;

@@ -260,9 +260,10 @@ class GitLogAction {
             'hash': hash,
             'projectName': this.projectName,
             'projectPath': this.projectPath,
-            'easyGitInner': true
+            'easyGitInner': true,
+            'isFromGitView': true
         };
-        hx.commands.executeCommand('EasyGit.revert', revertInfo);
+        let runResult = await hx.commands.executeCommand('EasyGit.revert', revertInfo);
         this.refreshView();
     }
 
