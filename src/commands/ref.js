@@ -1,4 +1,5 @@
 const hx = require('hbuilderx');
+const dayjs = require('dayjs');
 
 const {
     gitRaw,
@@ -22,17 +23,18 @@ const {
  * @description get log
  * @param {Object} projectPath
  */
-async function getProjectLogs(projectPath) {
-    let Logs = await gitLog(projectPath, 'branch', 'default');
+async function getProjectLogs(projectPath, isAll='branch') {
+    let Logs = await gitLog(projectPath, isAll, 'default');
     let {success} = Logs;
 
     let data = [];
     if (success && success != undefined) {
         for (let s of Logs.data) {
             let shortHash = s.hash.slice(0,12);
+            let date = dayjs(s.date).format('YY/MM/DD HH:mm');
             data.push({
-                "label": shortHash,
-                "description": s.date + s.message,
+                "label": date + ': ' + shortHash,
+                "description": s.message,
                 "hash": s.hash
             });
         };
@@ -112,25 +114,6 @@ class Branch {
                 continue;
             } ;
             data.push({'label': s.name, 'description': s.label});
-        };
-        return data;
-    }
-
-    // Git: get logs
-    async getProjectLogs(projectPath) {
-        let Logs = await gitLog(projectPath, 'all', 'default');
-        let {success} = Logs;
-
-        let data = [];
-        if (success && success != undefined) {
-            for (let s of Logs.data) {
-                let shortHash = s.hash.slice(0,12);
-                data.push({
-                    "label": shortHash,
-                    "description": s.date + s.message,
-                    "hash": s.hash
-                });
-            };
         };
         return data;
     }
@@ -241,9 +224,9 @@ class Branch {
         let { projectPath, hash, actionSource } = ProjectInfo;
 
         if (hash == undefined || hash == '') {
-            let data = await this.getProjectLogs(projectPath);
+            let data = await getProjectLogs(projectPath, 'all');
             let selected = await hx.window.showQuickPick(data, {
-                'placeHolder': '请选择要应用的commit......'
+                'placeHolder': '请选择要cherry-Pick的commit......'
             }).then( (res)=> {
                 return res;
             });
