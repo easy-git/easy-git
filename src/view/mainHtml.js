@@ -428,7 +428,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
             </div>
             <div class="container-fluid">
                 <div class="row m-0 fixedBottom" id="git_branch">
-                    <div class="col-auto mr-auto" title="点击：切换/管理分支">
+                    <div class="col-auto mr-auto" title="鼠标左键，进入分支管理视图; 鼠标中键，可直接切换到上一次分支。">
                         <span class="cactive" @click.once="showBranchWindow();" @click.middle="switchLastBranch();">
                             ${BranchIcon} {{ currentBranch }}
                         </span>
