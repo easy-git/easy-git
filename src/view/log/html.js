@@ -429,16 +429,24 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     <div id="page-top" class="fixed-top">
                         <div class="row px-3 pt-3">
                             <div class="col">
-                                <h6 class="project-info">
-                                    <span>{{ projectName }} / </span>
-                                    <span title="显示当前分支log" class="branch"
-                                        :class="{ active: searchType == 'branch'}"
-                                        @click="switchSearchType('branch');">{{ currentBranch }} </span>
-                                    <span v-if="branchNum > 1"> | </span>
-                                    <span title="显示所有分支log" class="branch"
-                                        :class="{ active: searchType == 'all'}"
-                                        @click="switchSearchType('all');" v-if="branchNum > 1">所有分支</span>
-                                </h6>
+                                <div class="d-flex">
+                                    <div class="mr-auto">
+                                        <h6 class="project-info">
+                                            <span>{{ projectName }} / </span>
+                                            <span title="仅显示当前分支log" class="branch"
+                                                :class="{ active: searchType == 'branch'}"
+                                                @click="switchSearchType('branch');">{{ currentBranch }} </span>
+                                            <span v-if="branchNum > 1"> | </span>
+                                            <span title="显示所有分支log" class="branch"
+                                                :class="{ active: searchType == 'all'}"
+                                                @click="switchSearchType('all');" v-if="branchNum > 1">所有分支</span>
+                                        </h6>
+                                    </div>
+                                    <div>
+                                        <span @click="showRefList();" title="可查看指定分支或标签的log">跳转到: {{ viewRefName }} </span>
+                                    </div>
+                                </div>
+
                                 <div class="d-flex">
                                     <div class="flex-grow-1">
                                         <input
@@ -471,10 +479,15 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     </div>
                     <div id="git-log-body" class="row mb-5"  style="margin-top:80px;" v-else :class="{ 'tmp-log-body' :isShowViewDetails }">
                         <div class="col mt-2 px-0" v-if="gitLogInfoList.length == 0">
-                            <div class="text-center" style="margin-top: 20%;">
+                            <div class="text-center" style="margin-top: 12%;">
                                 <span>${noIcon}</span>
-                                <p class="no-result">没有结果...</p>
-                                <p class="no-result" v-if="searchText">请检查查询条件，如存在多个查询条件，请以逗号分隔</p>
+                                <p class="no-result">没有结果, 请检查查询条件...</p>
+                                <p class="no-result"><a href="https://ext.dcloud.net.cn/plugin?id=2475">搜索帮助</a></p>
+                                <p class="no-result" v-if="searchText">
+                                    存在多个查询条件，请以逗号分隔。例: -n 10,--auther=小糊涂 <br/>
+                                    按提交信息来过滤提交，你可以使用 --grep 标记。 例: --grep=删除
+                                </p>
+                                <p class="no-result">{{ LogErrorMsg }}</p>
                             </div>
                         </div>
                         <div class="col mt-2 px-0" v-else>
@@ -584,15 +597,15 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         <li @click="refresh()">刷新</li>
                         <li @click="switchBranch()">切换分支</li>
                         <div class="dropdown-divider"></div>
-                        <li @click="checkoutCommit(rightClickItem)" :class="{ 'click-disable': searchType == 'all' }">检出...</li>
-                        <li @click="checkoutCommitForCreateBranch(rightClickItem)" :class="{ 'click-disable': searchType == 'all' }">检出并创建新分支</li>
-                        <li @click="createTag(rightClickItem)" :class="{ 'click-disable': searchType == 'all' }" title="git tag">创建标签</li>
+                        <li @click="checkoutCommit(rightClickItem);">检出...</li>
+                        <li @click="checkoutCommitForCreateBranch(rightClickItem);">检出并创建新分支</li>
+                        <li @click="createTag(rightClickItem)" title="git tag">创建标签</li>
                         <div class="dropdown-divider"></div>
-                        <li @click="resetCommit(rightClickItem)" :class="{ 'click-disable': searchType == 'all' }">将 {{currentBranch}} 重置到这次提交</li>
-                        <li @click="cherryPick(rightClickItem)" title="cherry pick，如置灰无法点击，请点击顶部：所有分支，查看所有log" :class="{ 'click-disable': searchType != 'all' }">
+                        <li @click="resetCommit(rightClickItem)" :class="[searchType == 'all' || viewRefName != '' ? 'click-disable' : '']">将 {{currentBranch}} 重置到这次提交</li>
+                        <li @click="cherryPick(rightClickItem)" title="cherry pick，如置灰无法点击，请点击顶部：所有分支，查看所有log" :class="[searchType == 'all' || viewRefName != '' ? '' : 'click-disable']">
                             将当前提交应用于 {{currentBranch}} 分支
                         </li>
-                        <li @click="revert(rightClickItem)">revert到这次提交...</li>
+                        <li @click="revert(rightClickItem)" :class="[searchType == 'all' || viewRefName != '' ? 'click-disable' : '']">revert到这次提交...</li>
                         <div class="dropdown-divider"></div>
                         <li @click="copyLogMsg(rightClickItem, 'msg')">复制</li>
                         <li @click="copyLogMsg(rightClickItem, 'commit_id')">复制commit id到剪贴板</li>
@@ -623,7 +636,9 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         logDetailsFiles: [],
                         loading: false,
                         CommitFileChangeDetails: '',
-                        renderType: 'webView'
+                        renderType: 'webView',
+                        viewRefName: '',
+                        LogErrorMsg: ''
                     },
                     watch: {
                         visibleRightMenu(value) {
@@ -689,7 +704,8 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             hbuilderx.postMessage({
                                 command: 'refresh',
                                 searchType: this.searchType,
-                                condition: this.searchText
+                                condition: this.searchText,
+                                refname: this.viewRefName
                             });
                         },
                         moreLog() {
@@ -716,19 +732,22 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         forUpdate() {
                             hbuilderx.onDidReceiveMessage((msg) => {
                                 if (msg.command != 'search') {return};
+                                console.log(msg)
                                 this.loading = false;
                                 if (this.isShowViewDetails) {
                                     this.isShowViewDetails = false;
                                 };
                                 if (msg.gitData) {
                                     let gitData = msg.gitData;
-                                    this.searchType = msg.searchType;
                                     this.gitLogInfoList = gitData.logData;
-                                    this.searchText = msg.searchText;
                                     this.currentBranch = gitData.currentBranch;
-                                    this.projectName = msg.projectName;
+                                    this.LogErrorMsg = gitData.LogErrorMsg;
+                                    this.CommitTotal = gitData.CommitTotal;
                                     this.logNum = (gitData.logData).length;
-                                    this.CommitTotal = msg.CommitTotal;
+                                    this.searchType = msg.searchType;
+                                    this.searchText = msg.searchText;
+                                    this.projectName = msg.projectName;
+                                    this.viewRefName = msg.refname;
                                 }
                             });
                         },
@@ -748,7 +767,8 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             hbuilderx.postMessage({
                                 command: 'search',
                                 searchType: this.searchType,
-                                condition: this.searchText
+                                condition: this.searchText,
+                                refname: this.viewRefName
                             });
                         },
                         goSearchAuthor(searchType,keyword) {
@@ -903,6 +923,11 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         openCommandPanel() {
                             hbuilderx.postMessage({
                                 command: 'openCommandPanel'
+                            })
+                        },
+                        showRefList() {
+                            hbuilderx.postMessage({
+                                command: 'showRefList'
                             })
                         }
                     }

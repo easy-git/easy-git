@@ -130,17 +130,17 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
         if (selectedFile != projectPath) {
             Log.setView(searchType, sfile);
         } else {
-            Log.setView(searchType, 'default');
+            Log.setView(searchType, '');
         }
     } else {
-        Log.setView(searchType, 'default');
+        Log.setView(searchType, '');
     };
 
     GitLogCustomWebViewPanal.webView.onDidReceiveMessage(function(msg) {
         let action = msg.command;
         switch (action) {
             case 'refresh':
-                Log.setView(searchType, 'default');
+                Log.setView(searchType, '', msg.refname);
                 break;
             case 'openFile':
                 let furi = path.join(projectPath,msg.filename);
@@ -154,7 +154,7 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
                 hx.env.clipboard.writeText(msg.text);
                 break;
             case 'search':
-                Log.setView(msg.searchType, msg.condition);
+                Log.setView(msg.searchType, msg.condition, msg.refname);
                 break;
             case 'branch':
                 Log.switchBranch();
@@ -187,6 +187,9 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
                     'easyGitInner': true
                 };
                 hx.commands.executeCommand('EasyGit.CommandPanel', params);
+                break;
+            case 'showRefList':
+                Log.goRefs();
                 break;
             default:
                 break;

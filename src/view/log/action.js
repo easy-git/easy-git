@@ -60,7 +60,7 @@ class GitLogAction {
 
     // 验证Email
     validateEmail(condition) {
-        if (condition!='default' &&
+        if (condition !='' &&
             !condition.includes(',') &&
             !condition.includes('--author=') &&
             (/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(condition))
@@ -74,7 +74,7 @@ class GitLogAction {
     // set --group
     setGroupSearch(condition) {
         if (!this.validateData(condition) &&
-            condition!='default' &&
+            condition!='' &&
             !(fs.existsSync(path.join(this.projectPath, condition)))&&
             !(condition.includes('.')) &&
             !condition.includes(',') &&
@@ -91,8 +91,9 @@ class GitLogAction {
     };
 
     // get webview html content, set html
-    async setView(searchType, condition) {
-        if (condition != 'default' && condition == undefined) {
+    // searchType: ['branch', 'all']
+    async setView(searchType, condition, refname) {
+        if (condition != '' && condition == undefined) {
             // 引导用户正确的使用日期查询
             if(this.validateData(condition)){
                 return hx.window.showErrorMessage(
@@ -113,39 +114,30 @@ class GitLogAction {
         };
 
         // 搜索，并获取搜索结果
-        let gitLogInfo = await utils.gitLog(this.projectPath, searchType, condition);
-        // let gitLogInfo = await utils.gitLog(this.projectPath, searchType, "-n 2");
-
-        if (!gitLogInfo.success && gitLogInfo.errorMsg == '') {
-            return hx.window.showErrorMessage('获取日志失败，未知错误。请重新尝试操作，或通过运行日志查看错误。',['关闭']);
-        };
-        if (!gitLogInfo.success && gitLogInfo.errorMsg != '') {
-            let emsg = `日志搜索失败，原因：<span>${gitLogInfo.errorMsg}。</span>请查看: <a href="https://ext.dcloud.net.cn/plugin?id=2475">git log搜索方法</a>`
-            return hx.window.showErrorMessage(emsg,['关闭']);
-        };
+        let gitLogInfo = await utils.gitLog(this.projectPath, searchType, condition, refname);
 
         // 获取提交数量
         // todo: 当查询具体文件的log时，CommitTotal计算错误
         let CommitTotal = 0;
-        try{
-            let query = ["rev-list", "--branches", "--count"];
-            if (condition.includes("all")) {
-                query = ["rev-list", "--all", "--count"];
-            };
-            CommitTotal = await utils.gitRaw(this.projectPath, query, undefined, "result");
-            CommitTotal = parseInt(CommitTotal);
-        }catch(e){
-            console.log(e)
-        }
+        if (gitLogInfo.success) {
+            try{
+                let query = ["rev-list", "--branches", "--count"];
+                if (condition.includes("all")) {
+                    query = ["rev-list", "--all", "--count"];
+                };
+                CommitTotal = await utils.gitRaw(this.projectPath, query, undefined, "result");
+                CommitTotal = parseInt(CommitTotal);
+            }catch(e){}
+        };
 
         // 设置git log数据
         this.gitData = Object.assign(
             this.gitData,
             { "branchNum": 1, "CommitTotal": CommitTotal },
-            { "logData": gitLogInfo.data },
+            { "logData": gitLogInfo.data, 'LogErrorMsg': gitLogInfo.errorMsg },
         );
 
-        if (condition != 'default') {
+        if (condition != '' && condition != undefined) {
             this.gitData.searchText = condition;
         } else {
             delete this.gitData.searchText;
@@ -162,31 +154,30 @@ class GitLogAction {
         }catch(e){};
 
         // set webview
-        if (condition != 'default') {
+        try{
             let isHtml = this.webviewPanel.webView._html;
             if (isHtml == '') {
                 this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData, this.renderType);
             } else {
                 this.webviewPanel.webView.postMessage({
+                    projectName: this.projectName,
+                    refname: refname,
                     command: "search",
                     searchType: searchType,
-                    projectName: this.projectName,
-                    gitData: this.gitData,
-                    CommitTotal: CommitTotal,
-                    searchText: condition
+                    searchText: condition,
+                    gitData: this.gitData
                 });
             };
-        } else {
+        }catch(e){
             this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData, this.renderType);
-        };
+        }
     }
-
 
     // refresh
     async refreshView() {
         let that = this;
         setTimeout(function() {
-            that.setView('branch', 'default');
+            that.setView('branch', '');
         }, 1500);
     }
 
@@ -238,7 +229,7 @@ class GitLogAction {
         if (branchID) {
             let status = await utils.gitBranchSwitch(this.projectPath, branchID);
             if (status == 'success') {
-                this.setView('branch', 'default')
+                this.setView('branch', '')
             }
         };
     }
@@ -277,7 +268,7 @@ class GitLogAction {
             return;
         } else {
             hx.window.showInformationMessage(`Git: 回退${shortHashValue} 操作成功！\n 后期可在[源代码管理器]视图中进行后续操作。`, ['我知道了']);
-            this.setView('branch', 'default');
+            this.setView('branch', '');
             let that = this;
             setTimeout(function() {
                 hx.commands.executeCommand('EasyGit.main', that.currentProjectInfoForFlush);
@@ -298,7 +289,7 @@ class GitLogAction {
                 hx.window.showErrorMessage(`Git: 检出${shortHashValue}操作失败`);
                 return;
             } else {
-                this.setView('branch', 'default');
+                this.setView('branch', '');
                 let that = this;
                 setTimeout(function() {
                     hx.commands.executeCommand('EasyGit.main', that.currentProjectInfoForFlush);
@@ -329,6 +320,43 @@ class GitLogAction {
             "easyGitInner": true
         };
         hx.commands.executeCommand('EasyGit.tagCreate', data);
+    }
+
+    // 显示所有的分支、tags
+    async goRefs() {
+        let pickerData = [];
+        let info = await utils.gitRefs(this.projectPath);
+        let { localBranchList, remoteBranchList, tags } = info;
+
+        if (localBranchList != undefined) {
+            for (let s of localBranchList) {
+                pickerData.push({"label": s.name});
+            };
+        };
+        if (remoteBranchList != undefined) {
+            for (let s of remoteBranchList) {
+                pickerData.push({"label": s.name});
+            };
+        };
+        if (tags != undefined) {
+            for (let s of tags) {
+                pickerData.push({"label": s});
+            };
+        };
+
+        let refs = [];
+        for (let s of pickerData) {
+            refs.push(s.label);
+        };
+
+        let selected = await hx.window.showQuickPick(pickerData, {
+            placeHolder: "请选择您查看的分支或tag.."
+        }).then( (selected) => {
+            return selected;
+        });
+
+        if (selected == undefined) { return; };
+        this.setView('branch', '', selected.label);
     }
 };
 

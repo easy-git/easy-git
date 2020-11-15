@@ -1297,7 +1297,6 @@ async function gitTagsList(workingDir) {
             .tags()
             .then((res) => {
                 tagsList.data = res.all;
-                return 'success';
             })
             .catch((err) => {
                 tagsList.error = true;
@@ -1409,8 +1408,9 @@ async function gitConfigShow(workingDir, isPrint=true) {
  * @param {Object} workingDir
  * @param {String} searchType 搜索类型 (all|branch)
  * @param {String} filterCondition 过滤条件，逗号分割
+ * @param {String} refname 特定的本地分支、远程分支、tag名称
  */
-async function gitLog(workingDir, searchType, filterCondition) {
+async function gitLog(workingDir, searchType, filterCondition, refname) {
     filter = ['-n 50']
     if (filterCondition != 'default') {
         if (filterCondition.includes('-n')) {
@@ -1431,7 +1431,12 @@ async function gitLog(workingDir, searchType, filterCondition) {
     for (let s of filter) {
         tmpFilter.push(s.trim())
     };
-    filter = [...tmpFilter];
+
+    if (refname != undefined && refname != '') {
+        filter = [refname, ...tmpFilter]
+    } else {
+        filter = [...tmpFilter];
+    };
 
     try {
         let result = {
@@ -1439,7 +1444,7 @@ async function gitLog(workingDir, searchType, filterCondition) {
             "errorMsg": '',
             "data": []
         };
-
+        console.log('--->filter', filter)
         if (workingDir == undefined || workingDir == '') {
             result.errorMsg = '无法获取项目路径，git log执行失败。请关闭当前Git日志视图后重试。';
             result.success = false;
@@ -1460,6 +1465,7 @@ async function gitLog(workingDir, searchType, filterCondition) {
             });
         return result;
     } catch (e) {
+        result.errorMsg = e;
         result.success = false;
         return result;
     };
@@ -1767,6 +1773,31 @@ async function gitRevert(workingDir, commands) {
 };
 
 
+/**
+ * @description 获取所有分支、tags
+ * @param {Object} workingDir
+ */
+async function gitRefs(workingDir) {
+    if (workingDir == undefined) {
+        return {};
+    };
+    try{
+        let refs = {};
+        let branches = await gitBranch(workingDir);
+        refs = Object.assign(branches);
+
+        let tags = await gitTagsList(workingDir);
+        let {error} = tags;
+        if (!error) {
+            refs.tags = tags.data;
+        };
+        return refs;
+    }catch(e){
+        return {}
+    }
+}
+
+
 module.exports = {
     createOutputChannel,
     isGitInstalled,
@@ -1817,5 +1848,6 @@ module.exports = {
     gitRaw,
     gitCherryPick,
     FillCommitMessage,
-    gitRevert
+    gitRevert,
+    gitRefs
 }
