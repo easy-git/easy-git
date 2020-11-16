@@ -32,13 +32,12 @@ class Diff {
         let options = ['diff', selectedFile];
 
         let fileName = selectedFile.replace(this.projectPath, '').replace(/\\/g, '\/');
-        let titleLeft = fileName;
-        let titleRight = fileName;
+        let titleLeft, titleRight;
 
         switch (gitIndex){
             case 'M':
                 options = ['diff','--staged', selectedFile];
-                titleRight = 'Working Tree : ' + titleRight;
+                titleRight = 'Working Tree';
                 break;
             case 'A':
                 options = ['diff','--cached', selectedFile];
@@ -49,7 +48,7 @@ class Diff {
                 } else {
                     options = ['diff','HEAD', selectedFile];
                 }
-                titleRight = 'HEAD : ' + titleRight;
+                titleRight = 'HEAD';
                 break;
             default:
                 break;
@@ -91,8 +90,10 @@ class Diff {
             "titleLeft": titleLeft,
             "titleRight": titleRight
         }
+
+        let selectedFilePath = path.normalize(path.join(this.projectPath, selectedFile));
         this.webviewPanel.webView.html = getWebviewDiffContent(
-            this.selectedFile,
+            selectedFilePath,
             this.userConfig,
             diffData
         );
