@@ -19,20 +19,23 @@ function getUIData() {
 
     // 根据主题适配颜色
     let colorData = utils.getThemeColor('right');
+    let {fontColor} = colorData;
 
-    // let {fontColor} = colorData;
+    let OpenFileIconSvg = icon.getOpenFileIcon(fontColor);
+    let HistoryIcon = icon.getHistoryIcon(fontColor);
 
-    // let uiData = Object.assign(iconData,colorData);
-    return colorData;
+    let iconData = {OpenFileIconSvg, HistoryIcon};
+    let uiData = Object.assign(iconData, colorData);
+    return uiData;
 };
 
 /**
  * @description 获取webview Branch内容
- * @param {String} selectedFile
+ * @param {String} selectedFilePath
  * @param {Object} userConfig
  * @param {Object} gitBranchData
  */
-function getWebviewDiffContent(selectedFile, userConfig, diffData) {
+function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
     // 是否启用开发者工具
     let { DisableDevTools } = userConfig;
 
@@ -47,6 +50,8 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
         cursorColor,
         fontColor,
         lineColor,
+        OpenFileIconSvg,
+        HistoryIcon,
         d2h_ins_bg,
         d2h_ins_border,
         d2h_del_bg,
@@ -80,24 +85,30 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
                 display: none;
             }
             .diff-head {
-                height: 40px;
-                line-height: 40px;
+                height: 50px;
                 background-color: ${background} !important;
                 z-index: 100;
             }
             .diff-head .file-title {
-                display: inline;
+                display: inline-block;
+                font-size: 16px;
+                font-weight: 500;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+            .diff-head .file-label {
+                display: inline-block;
                 padding-left: 1.5rem;
                 font-size: 15px;
                 font-style: oblique;
                 color: ${fontColor} !important;
-                display: block;
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
             }
             .diff-body {
-                margin-top: 40px !important;
+                margin-top: 50px !important;
             }
             .d2h-file-wrapper {
                 border: none !important;
@@ -146,12 +157,27 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
     <body>
         <div id="app" v-cloak>
             <div class="container-fluid">
-                <div id="diff-head" class="row diff-head fixed-top">
-                    <div class="col-6">
-                        <span class="file-title">{{ titleLeft }}</span>
+                <div id="diff-head" class="diff-head fixed-top">
+                    <div class="row">
+                        <div class="col px-5">
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <span class="file-title">${selectedFilePath}</span>
+                                </div>
+                                <div>
+                                    <span title="打开文件" @click="openFile();">${OpenFileIconSvg}</span>
+                                    <span title="查看日志" @click="openLog();">${HistoryIcon}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <span class="file-title">{{ titleRight }}</span>
+                    <div class="row">
+                        <div class="col-6">
+                            <span class="file-label" v-show="titleLeft != 'undefined' ">{{ titleLeft }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="file-label" v-show="titleRight != 'undefined' ">{{ titleRight }}</span>
+                        </div>
                     </div>
                 </div>
                 <div id="diff-body" class="row diff-body">
@@ -167,13 +193,13 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
                 data: {
                     titleLeft: '',
                     titleRight: '',
-                    selectedFile: '',
+                    selectedFilePath: '',
                     gitDiffResult: ''
                 },
                 created() {
                     this.titleLeft = '${titleLeft}';
                     this.titleRight = '${titleRight}';
-                    this.selectedFile = '${selectedFile}'
+                    this.selectedFilePath = '${selectedFilePath}'
                 },
                 mounted() {
                     that = this;
@@ -195,6 +221,16 @@ function getWebviewDiffContent(selectedFile, userConfig, diffData) {
                             this.gitDiffResult = msg.result;
                             this.titleLeft = '';
                             this.titleRight = '';
+                        });
+                    },
+                    openFile() {
+                        hbuilderx.postMessage({
+                            command: 'openFile'
+                        });
+                    },
+                    openLog() {
+                        hbuilderx.postMessage({
+                            command: 'openLog'
                         });
                     }
                 }

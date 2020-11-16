@@ -85,7 +85,7 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
     try{
         GitDiffCustomWebViewPanal.webView._html = '';
     }catch(e){};
-    
+
     try{
         projectPath = path.normalize(projectPath);
         ProjectData.projectPath = projectPath;
@@ -105,6 +105,19 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
         switch (action) {
             case 'update':
                 GitDiff.SetView(msg.selectedFile);
+                break;
+            case 'openFile':
+                let fPath = path.join(projectPath, selectedFile);
+                hx.workspace.openTextDocument(fPath);
+                break;
+            case 'openLog':
+                let data = {
+                    'projectPath': projectPath,
+                    'projectName': projectName,
+                    'selectedFile': selectedFile,
+                    'easyGitInner': true
+                };
+                hx.commands.executeCommand('EasyGit.log', data);
                 break;
             default:
                 break;
