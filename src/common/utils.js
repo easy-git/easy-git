@@ -358,10 +358,12 @@ async function checkGitCredentials(projectPath, unset=false) {
 
     let credential = configData['credential.helper'];
     if (osName == 'win32' && credential != 'manager') {
+        hx.window.setStatusBarMessage(`Git: 正在校验身份，如弹出授权，请同意或输入凭证信息！`, 30000, 'info');
         let winCredentialResult = await gitRaw(projectPath, ['config', '--global', 'credential.helper', 'manager']);
         return wincredentialResult;
     };
     if (osName == 'darwin' && credential != 'osxkeychain') {
+        hx.window.setStatusBarMessage(`Git: 正在校验身份，如弹出授权，请同意或输入凭证信息！`, 30000, 'info');
         await gitRaw(projectPath, ['config', '--local', '--unset', 'credential.helper']);
         let macCredentialResult = await gitRaw(projectPath, ['config', '--local', 'credential.helper', 'osxkeychain']);
         return macCredentialResult;
@@ -795,13 +797,13 @@ async function gitAddCommit(workingDir,commitComment) {
  */
 async function gitPush(workingDir, options=[]) {
     // status bar show message
-    hx.window.setStatusBarMessage(`Git: 正在向远端推送..... 如弹出授权，请输入凭证信息！`, 40000, 'info');
+    hx.window.setStatusBarMessage(`Git: 正在向远端推送.....`, 30000, 'info');
     try {
         let checkResult = await checkGitCredentials(workingDir);
         let status = await git(workingDir).init()
             .push(options)
             .then((result) => {
-                hx.window.setStatusBarMessage('Git: push操作成功', 3000, 'info');
+                hx.window.setStatusBarMessage('Git: push操作成功', 30000, 'info');
                 return 'success';
             })
             .catch((err) => {
