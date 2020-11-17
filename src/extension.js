@@ -264,6 +264,12 @@ function activate(context) {
     });
     context.subscriptions.push(stashClear);
 
+    // git archive
+    let archive = hx.commands.registerCommand('EasyGit.archive', (param)=> {
+        git.action(param, 'archive')
+    });
+    context.subscriptions.push(archive);
+
     // check update
     let checkUpdate = hx.commands.registerCommand('EasyGit.checkUpdate', ()=> {
         upgrade.checkUpdate('manual');

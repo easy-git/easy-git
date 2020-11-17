@@ -10,7 +10,7 @@ const { gitInitProject } = require('./repository.js');
 const { gitAddFile, gitRestore, goCleanFile, goCommitAmend } = require('./file.js');
 const { goSetConfig } = require('./base.js');
 
-const { Tag, Branch, Revert, Reset } = require('./ref.js');
+const { Tag, Branch, Revert, Reset, Archive } = require('./ref.js');
 const gitBlameForLineChange = require('./blame.js');
 
 
@@ -162,6 +162,10 @@ function action(param,action_name) {
         case 'tagDetails':
             let { tagName } = param;
             tag.showDetails(tagName);
+            break;
+        case 'archive':
+            let ae = new Archive();
+            ae.set(ProjectInfo);
             break;
         default:
             break;

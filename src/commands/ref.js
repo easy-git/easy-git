@@ -1,4 +1,5 @@
 const hx = require('hbuilderx');
+const path = require('path');
 const dayjs = require('dayjs');
 
 const {
@@ -42,6 +43,10 @@ async function getProjectLogs(projectPath, isAll='branch') {
     return data;
 };
 
+
+/**
+ * @description Tag操作
+ */
 class Tag {
     constructor(projectPath) {
         this.projectPath = projectPath;
@@ -93,6 +98,9 @@ class Tag {
 };
 
 
+/**
+ * @description 分支操作
+ */
 class Branch {
     constructor() {
         this.currentBranch = '';
@@ -275,6 +283,7 @@ class Branch {
     };
 }
 
+
 /**
  * @description Git Revert
  */
@@ -380,9 +389,39 @@ class Reset {
 }
 
 
+/**
+ * @description Git archive
+ */
+class Archive {
+    constructor(arg) {
+    }
+
+    async set(ProjectInfo) {
+        let { projectPath, projectName, hash, isFromGitView } = ProjectInfo;
+
+        let currentBranch = await gitCurrentBranchName(projectPath);
+        if (currentBranch.length == 0) {
+            currentBranch = 'master';
+        };
+
+        let ArchiveDir = path.join(projectPath, projectName + '_' + currentBranch + '.zip');
+        let options = ['archive', '--format=zip', '--output', ArchiveDir, currentBranch];
+
+        let ArchiveResult = await gitRaw(projectPath, options, 'Git: 归档');
+        if (ArchiveResult == 'success') {
+            let success_msg = `Git: ${projectName} ${currentBranch} 归档成功。`
+            createOutputChannel(success_msg, '路径:' + ArchiveDir);
+        } else {
+            let fail_msg = `Git: ${projectName} ${currentBranch} 归档失败。`
+            createOutputChannel(fail_msg, '路径:' + ArchiveDir);
+        };
+    }
+}
+
 module.exports = {
     Tag,
     Branch,
     Revert,
-    Reset
+    Reset,
+    Archive
 };

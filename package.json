@@ -53,6 +53,7 @@
         "onCommand:EasyGit.tagCreate",
         "onCommand:EasyGit.tagDetails",
         "onCommand:EasyGit.diffFile",
+        "onCommand:EasyGit.archive",
         "onView:EasyGitSourceCodeView",
         "onView:EasyGitCommonView",
         "onCustomEditor:EasyGit - 日志",
@@ -262,6 +263,10 @@
             {
                 "command": "EasyGit.diffFile",
                 "title": "easy-git: diff 对比差异"
+            },
+            {
+                "command": "EasyGit.archive",
+                "title": "easy-git: archive - 归档"
             },
             {
                 "command": "EasyGit.set",
