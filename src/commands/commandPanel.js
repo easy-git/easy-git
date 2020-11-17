@@ -1,5 +1,7 @@
 const hx = require('hbuilderx');
 
+const count = require('../common/count.js');
+
 let packageFile = require('../../package.json');
 let commands = packageFile.contributes.commands;
 
@@ -8,6 +10,10 @@ let commands = packageFile.contributes.commands;
  * @datetime 2020-10-30 10:16:00
  */
 function showCommandPanel(param) {
+    try{
+        count('CommandPanel').catch( error=> {});
+    }catch(e){};
+
     let tmp = [];
     for (let s of commands) {
         if (s.command != 'EasyGit.CommandPanel') {
