@@ -1,9 +1,18 @@
 # Change Log
 
+## 0.5.0
+* `重要` 修复 当本地没有设置账号密码时，git push失败且没有任何提示的Bug
+* `重要` 新增 commit&push配置项: 源代码管理器，点击commit图标，对已暂存的文件，支持commit & push一键提交 （菜单【设置】【插件配置】）
+* `重要` 新增 源代码管理器 右上角菜单列表，增加`重置代码到上次提交`
+* 新增 文件对比视图，增加打开文件、打开日志功能
+* 优化 日志视图 选中并点击log，改变背景色
+* 优化 命令面板 cherry-Pick、reset、revert等操作，优化数据展示格式
+* 修复 选中项目，执行初始化存储库失败的Bug
+
 ## 0.4.2
+* `重要` 新增 command: EasyGit.revert，支持通过面板触发，日志视图同时增加revert菜单
+* `重要` 新增 command: EasyGit.cherryPick，支持通过面板触发
 * 新增 日志视图、源代码管理器，增加命令面板入口
-* 新增 command: EasyGit.revert，日志视图同时增加revert菜单
-* 新增 command: EasyGit.cherryPick
 * 优化 Git克隆 优化控制台日志，并增加clone进度
 * 优化 merge\cherryPick操作 自动填充commit message
 * 修复 文件视图 暂存区的文件，在本地修改后，工作区文件状态计算错误的Bug
