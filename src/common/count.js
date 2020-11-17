@@ -11,6 +11,7 @@ let logFlags = false;
 let mainFlags = false;
 let initFlags = false;
 let cloneFlags = false;
+let diffFlags = false;
 
 let hxVersion = hx.env.appVersion;
 let pluginVersion = packageFile.version;
@@ -82,7 +83,7 @@ async function count(viewname) {
         'pluginVersion': pluginVersion,
         'osName': osName
     };
-    
+
     return new Promise((resolve, reject) => {
         try {
             const instance = axios.create({
@@ -96,6 +97,7 @@ async function count(viewname) {
                     if (viewname == 'main') { mainFlags = true};
                     if (viewname == 'init') { initFlags = true};
                     if (viewname == 'clone') { cloneFlags = true};
+                    if (viewname == 'diff') { diffFlags = true};
                     resolve('Y');
                 })
                 .catch(function(error) {
