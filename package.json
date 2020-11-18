@@ -302,11 +302,19 @@
                 {
                     "command": "EasyGit.main",
                     "title": "easy-git: 源代码管理",
+                    "when": "isGit",
                     "group": "z_commands"
                 },
                 {
                     "command": "EasyGit.log",
                     "title": "easy-git: 查看日志",
+                    "when": "isGit",
+                    "group": "z_commands"
+                },
+                {
+                    "command": "EasyGit.init",
+                    "title": "easy-git: 初始化存储库",
+                    "when": "!isGit",
                     "group": "z_commands"
                 },
                 {
@@ -317,11 +325,13 @@
                 {
                     "command": "EasyGit.log",
                     "title": "easy-git: 查看日志",
+                    "when": "isGit",
                     "group": "z_commands"
                 },
                 {
                     "command": "EasyGit.gitBlameForLineChange",
                     "title": "easy-git: 显示当前行最后一次修改信息",
+                    "when": "isGit",
                     "group": "z_commands"
                 },
                 {
@@ -340,14 +350,14 @@
                     "group": "ext_settings"
                 },
                 {
+                    "command": "EasyGit.CommandPanel",
+                    "title": "Git: 命令面板",
+                    "group": "ext_settings"
+                },
+                {
                     "title": "easy-git",
                     "group": "ext_settings",
                     "id": "easygit"
-                },
-                {
-                    "command": "EasyGit.CommandPanel",
-                    "title": "打开命令面板",
-                    "group": "easygit@1"
                 },
                 {
                     "group": "easygit@2"
