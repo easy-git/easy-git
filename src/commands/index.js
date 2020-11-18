@@ -164,8 +164,8 @@ function action(param,action_name) {
             tag.showDetails(tagName);
             break;
         case 'archive':
-            let ae = new Archive();
-            ae.set(ProjectInfo);
+            let ae = new Archive(ProjectInfo);
+            ae.set();
             break;
         default:
             break;

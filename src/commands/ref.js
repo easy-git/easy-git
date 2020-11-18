@@ -17,7 +17,8 @@ const {
     gitLog,
     gitCherryPick,
     gitRevert,
-    gitReset
+    gitReset,
+    gitRefs
 } = require('../common/utils.js');
 
 /**
@@ -32,9 +33,9 @@ async function getProjectLogs(projectPath, isAll='branch') {
     if (success && success != undefined) {
         for (let s of Logs.data) {
             let shortHash = s.hash.slice(0,12);
-            let date = dayjs(s.date).format('YY/MM/DD HH:mm');
+            let date = dayjs(s.date).format('YY/MM/DD HH:mm:ss');
             data.push({
-                "label": date + ': ' + shortHash,
+                "label": date + ' - ' + shortHash,
                 "description": s.message,
                 "hash": s.hash
             });
@@ -384,8 +385,7 @@ class Reset {
             ProjectInfo.easyGitInner = true;
             hx.commands.executeCommand('EasyGit.main',ProjectInfo);
         };
-    }
-
+    };
 }
 
 
@@ -393,27 +393,124 @@ class Reset {
  * @description Git archive
  */
 class Archive {
-    constructor(arg) {
+    constructor(ProjectInfo) {
+        this.ProjectInfo = ProjectInfo;
+        this.initPickerData = [
+            {
+                "label": "打包当前分支",
+                "name": "currentBranch"
+            }, {
+                "label": "打包某个分支或tag",
+                "name": "refs"
+            }, {
+                "label": "打包某个commit",
+                "name": "commitID"
+            }
+        ]
     }
 
-    async set(ProjectInfo) {
-        let { projectPath, projectName, hash, isFromGitView } = ProjectInfo;
+    // 打包本地分支、远程分支、tags
+    async ArchiveRefs(projectPath) {
+        let refs = [];
+        let info = await gitRefs(projectPath);
+        let { localBranchList, remoteBranchList, tags } = info;
 
-        let currentBranch = await gitCurrentBranchName(projectPath);
-        if (currentBranch.length == 0) {
-            currentBranch = 'master';
+        if (localBranchList != undefined) {
+            for (let s of localBranchList) {
+                refs.push({"label": s.name});
+            };
+        };
+        if (remoteBranchList != undefined) {
+            for (let s of remoteBranchList) {
+                refs.push({"label": s.name});
+            };
+        };
+        if (tags != undefined) {
+            for (let s of tags) {
+                refs.push({"label": s});
+            };
         };
 
-        let ArchiveDir = path.join(projectPath, projectName + '_' + currentBranch + '.zip');
-        let options = ['archive', '--format=zip', '--output', ArchiveDir, currentBranch];
+        let pickerData = [{"label": "回到上一步操作"}, ...refs];
+        return await hx.window.showQuickPick(pickerData, {
+            placeHolder: "请选择您要打包的分支或tag, 默认打包为zip"
+        }).then( (selected) => {
+            if (selected.label == '回到上一步操作') {
+                this.set();
+            } else {
+                return selected.label;
+            };
+        });
+    }
+
+    // 打包指定commit id
+    async ArchiveCommitID(projectPath){
+        let data = await getProjectLogs(projectPath, 'all');
+        let pickerData = [
+            {"label": "回到上一步操作", "hash": ""}, ...data
+        ]
+        return await hx.window.showQuickPick(pickerData, {
+            'placeHolder': '请选择commit id...'
+        }).then( (res)=> {
+            if (res.hash == '') {
+                this.set();
+            } else {
+                return res.hash;
+            };
+        });
+    }
+
+    // 运行打包命令
+    async Run(projectPath, projectName, refName) {
+
+        let fname = refName;
+        if (fname.startsWith('origin/')) {
+            fname = fname.replace(/\//g, '-');
+        };
+        let ArchiveDir = path.join(projectPath, projectName + '_' + fname + '.zip');
+        let options = ['archive', '--format=zip', '--output', ArchiveDir, refName];
 
         let ArchiveResult = await gitRaw(projectPath, options, 'Git: 归档');
         if (ArchiveResult == 'success') {
-            let success_msg = `Git: ${projectName} ${currentBranch} 归档成功。`
+            let success_msg = `Git: ${projectName} ${refName} 归档成功。`
             createOutputChannel(success_msg, '路径:' + ArchiveDir);
         } else {
-            let fail_msg = `Git: ${projectName} ${currentBranch} 归档失败。`
+            let fail_msg = `Git: ${projectName} ${refName} 归档失败。`
             createOutputChannel(fail_msg, '路径:' + ArchiveDir);
+        };
+    }
+
+    async set() {
+        let { projectPath, projectName, hash, isFromGitView } = this.ProjectInfo;
+
+        let selected = await hx.window.showQuickPick(this.initPickerData, {
+            'placeHolder': '请选择要打包的内容...'
+        }).then( (res)=> {
+            return res.name;
+        });
+
+        switch (selected){
+            case 'currentBranch':
+                let currentBranch = await gitCurrentBranchName(projectPath);
+                if (currentBranch.length == 0) {
+                    currentBranch = 'master';
+                };
+                this.Run(projectPath, projectName, currentBranch);
+                break;
+            case 'commitID':
+                let hash = await this.ArchiveCommitID(projectPath);
+                if (hash != '' && hash != undefined) {
+                    this.Run(projectPath, projectName, hash);
+                };
+                break;
+            case 'refs':
+                let refName = await this.ArchiveRefs(projectPath);
+                if (refName != '' && refName != undefined) {
+                    this.Run(projectPath, projectName, refName);
+                };
+                break;
+            default:
+                break;
         };
     }
 }
