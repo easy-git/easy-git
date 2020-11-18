@@ -230,7 +230,7 @@ class Branch {
 
     // Git: git cherry-pick <commit-id>
     async cherryPick(ProjectInfo) {
-        let { projectPath, hash, actionSource } = ProjectInfo;
+        let { projectPath, hash } = ProjectInfo;
 
         if (hash == undefined || hash == '') {
             let data = await getProjectLogs(projectPath, 'all');
@@ -481,13 +481,25 @@ class Archive {
     }
 
     async set() {
-        let { projectPath, projectName, hash, isFromGitView } = this.ProjectInfo;
+        let { projectPath, projectName, hash } = this.ProjectInfo;
 
-        let selected = await hx.window.showQuickPick(this.initPickerData, {
+        let PickerData = this.initPickerData;
+        
+        // 日志视图：选中记录，右键菜单，点击【归档】
+        if (hash != '' && hash != undefined) {
+            let tmp = [{"label": `打包已选择的${hash}`, "name": hash}];
+            PickerData = [...tmp, ...this.initPickerData];
+        };
+
+        let selected = await hx.window.showQuickPick(PickerData, {
             'placeHolder': '请选择要打包的内容...'
         }).then( (res)=> {
             return res.name;
         });
+
+        if (selected == hash) {
+            this.Run(projectPath, projectName, hash);
+        };
 
         switch (selected){
             case 'currentBranch':

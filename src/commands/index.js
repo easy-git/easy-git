@@ -124,8 +124,7 @@ function action(param,action_name) {
             break;
         case 'cherryPick':
             let hashValue = param.hash;
-            let actionSource = param.actionSource;
-            let info = Object.assign( {'hash': hashValue, 'actionSource': actionSource}, ProjectInfo);
+            let info = Object.assign({'hash': hashValue}, ProjectInfo);
             bch.cherryPick(info);
             break;
         case 'clean':
@@ -164,7 +163,9 @@ function action(param,action_name) {
             tag.showDetails(tagName);
             break;
         case 'archive':
-            let ae = new Archive(ProjectInfo);
+            let archiveValue = param.hash;
+            let archiveInfo = Object.assign( {'hash': archiveValue}, ProjectInfo);
+            let ae = new Archive(archiveInfo);
             ae.set();
             break;
         default:

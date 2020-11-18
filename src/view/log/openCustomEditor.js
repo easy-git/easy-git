@@ -136,6 +136,12 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
         Log.setView(searchType, '');
     };
 
+    let easyGitInnerParams = {
+        'projectPath': projectPath,
+        'projectName': projectName,
+        'easyGitInner': true
+    };
+
     GitLogCustomWebViewPanal.webView.onDidReceiveMessage(function(msg) {
         let action = msg.command;
         switch (action) {
@@ -181,15 +187,14 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
                 Log.showCommitFileChange(msg.data);
                 break;
             case 'openCommandPanel':
-                let params = {
-                    'projectPath': projectPath,
-                    'projectName': projectName,
-                    'easyGitInner': true
-                };
-                hx.commands.executeCommand('EasyGit.CommandPanel', params);
+                hx.commands.executeCommand('EasyGit.CommandPanel', easyGitInnerParams);
                 break;
             case 'showRefList':
                 Log.goRefs();
+                break;
+            case 'archive':
+                let archvieParams = Object.assign({'hash': msg.hash}, easyGitInnerParams);
+                hx.commands.executeCommand('EasyGit.archive', archvieParams);
                 break;
             default:
                 break;

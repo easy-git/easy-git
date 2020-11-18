@@ -610,6 +610,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         <li @click="copyLogMsg(rightClickItem, 'msg')">复制</li>
                         <li @click="copyLogMsg(rightClickItem, 'commit_id')">复制commit id到剪贴板</li>
                         <div class="dropdown-divider"></div>
+                        <li @click="archive(rightClickItem)">归档</li>
                         <li @click="openCommandPanel(rightClickItem)">Git 命令面板</li>
                     </ul>
                 </div>
@@ -928,6 +929,14 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         showRefList() {
                             hbuilderx.postMessage({
                                 command: 'showRefList'
+                            })
+                        },
+                        archive(item) {
+                            let hash = item.hash;
+                            if (!hash) {return};
+                            hbuilderx.postMessage({
+                                command: 'archive',
+                                hash: hash
                             })
                         }
                     }

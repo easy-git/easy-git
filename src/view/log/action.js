@@ -239,8 +239,7 @@ class GitLogAction {
             'hash': hash,
             'projectName': this.projectName,
             'projectPath': this.projectPath,
-            'easyGitInner': true,
-            'actionSource': 'LogView'
+            'easyGitInner': true
         };
         hx.commands.executeCommand('EasyGit.cherryPick', cherryPickInfo);
         this.refreshView();
