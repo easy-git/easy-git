@@ -270,6 +270,12 @@ function activate(context) {
     });
     context.subscriptions.push(archive);
 
+    // git reflog
+    let reflog = hx.commands.registerCommand('EasyGit.reflog', (param)=> {
+        git.action(param, 'reflog')
+    });
+    context.subscriptions.push(reflog);
+
     // check update
     let checkUpdate = hx.commands.registerCommand('EasyGit.checkUpdate', ()=> {
         upgrade.checkUpdate('manual');

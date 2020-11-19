@@ -282,7 +282,7 @@ class Branch {
             };
         };
     };
-}
+};
 
 
 /**
@@ -331,7 +331,7 @@ class Revert {
         };
         return revertResult;
     }
-}
+};
 
 
 /**
@@ -386,7 +386,7 @@ class Reset {
             hx.commands.executeCommand('EasyGit.main',ProjectInfo);
         };
     };
-}
+};
 
 
 /**
@@ -484,7 +484,7 @@ class Archive {
         let { projectPath, projectName, hash } = this.ProjectInfo;
 
         let PickerData = this.initPickerData;
-        
+
         // 日志视图：选中记录，右键菜单，点击【归档】
         if (hash != '' && hash != undefined) {
             let tmp = [{"label": `打包已选择的${hash}`, "name": hash}];
@@ -525,12 +525,30 @@ class Archive {
                 break;
         };
     }
-}
+};
+
+/**
+ * @description git reflog
+ */
+async function reflog(ProjectInfo) {
+    let { projectPath } = ProjectInfo;
+    let result = await gitRaw(projectPath, ['reflog'], 'reflog', 'result');
+    if (result != undefined && result != '') {
+        await hx.env.clipboard.writeText(result);
+        await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
+        setTimeout(function() {
+            hx.commands.executeCommand('editor.action.clipboardPasteAction');
+        }, 100);
+    } else {
+        hx.window.showErrorMessage("Git: reflog没有获取到信息。", ['我知道了']);
+    };
+};
 
 module.exports = {
     Tag,
     Branch,
     Revert,
     Reset,
-    Archive
+    Archive,
+    reflog
 };

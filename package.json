@@ -54,6 +54,7 @@
         "onCommand:EasyGit.tagDetails",
         "onCommand:EasyGit.diffFile",
         "onCommand:EasyGit.archive",
+        "onCommand:EasyGit.reflog",
         "onView:EasyGitSourceCodeView",
         "onView:EasyGitCommonView",
         "onCustomEditor:EasyGit - 日志",
@@ -267,6 +268,10 @@
             {
                 "command": "EasyGit.archive",
                 "title": "easy-git: archive - 归档"
+            },
+            {
+                "command": "EasyGit.reflog",
+                "title": "easy-git: reflog - 救命神器"
             },
             {
                 "command": "EasyGit.set",

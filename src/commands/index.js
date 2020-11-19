@@ -10,7 +10,7 @@ const { gitInitProject } = require('./repository.js');
 const { gitAddFile, gitRestore, goCleanFile, goCommitAmend } = require('./file.js');
 const { goSetConfig } = require('./base.js');
 
-const { Tag, Branch, Revert, Reset, Archive } = require('./ref.js');
+const { Tag, Branch, Revert, Reset, Archive, reflog } = require('./ref.js');
 const gitBlameForLineChange = require('./blame.js');
 
 
@@ -167,6 +167,9 @@ function action(param,action_name) {
             let archiveInfo = Object.assign( {'hash': archiveValue}, ProjectInfo);
             let ae = new Archive(archiveInfo);
             ae.set();
+            break;
+        case 'reflog':
+            reflog(ProjectInfo);
             break;
         default:
             break;
