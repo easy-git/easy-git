@@ -290,8 +290,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 <i title="更多操作">${MenuIcon}</i>
                                 <div id="menu" :class="[ isShowMenu ? 'menu' : 'd-none' ]" @mouseleave="isShowMenu=false">
                                     <ul>
-                                        <li title="git pull" @click="gitPull('');">拉取</li>
-                                        <li title="git pull" @click="gitPush();">推送</li>
+                                        <li title="git pull" @click="gitPull('');">拉取 - pull</li>
+                                        <li title="git pull" @click="gitPush();">推送 - push</li>
                                         <li class="divider"></li>
                                         <li title="git reset --soft HEAD^" @click="gitResetSoftHEAD();">撤销上次commit</li>
                                         <li title="git reset --hard HEAD^" @click="gitResetHardHEAD();">重置代码到上次提交</li>
