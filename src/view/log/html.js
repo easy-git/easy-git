@@ -685,12 +685,14 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     methods: {
                         openMenu(e, item) {
                             this.selectedLogID = item.hash;
-                            console.log(this.selectedLogID)
                             this.rightClickItem = item;
-                            var x = e.pageX;
-                            var y = e.pageY;
-                            this.top = y;
-                            this.left = x;
+                            this.left = e.pageX;
+                            let t = window.innerHeight - e.clientY;
+                            if (t < 420) {
+                                this.top =  e.clientY - 420;
+                            } else {
+                                this.top = e.pageY;
+                            };
                             this.visibleRightMenu = true;
                         },
                         closeMenu() {
@@ -733,7 +735,6 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         forUpdate() {
                             hbuilderx.onDidReceiveMessage((msg) => {
                                 if (msg.command != 'search') {return};
-                                console.log(msg)
                                 this.loading = false;
                                 if (this.isShowViewDetails) {
                                     this.isShowViewDetails = false;
