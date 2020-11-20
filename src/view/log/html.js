@@ -687,15 +687,17 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             this.selectedLogID = item.hash;
                             this.rightClickItem = item;
                             this.left = e.pageX;
-                            let t = window.innerHeight - e.clientY;
+                            let t = window.innerHeight - e.pageY;
                             if (t < 420) {
-                                this.top =  e.clientY - 420;
+                                this.top =  e.pageY - 420;
                             } else {
                                 this.top = e.pageY;
                             };
                             this.visibleRightMenu = true;
                         },
                         closeMenu() {
+                            this.top = 0;
+                            this.left = 0;
                             this.visibleRightMenu = false;
                         },
                         mouseleaveLogItem() {
