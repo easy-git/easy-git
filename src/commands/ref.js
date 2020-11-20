@@ -534,11 +534,15 @@ async function reflog(ProjectInfo) {
     let { projectPath } = ProjectInfo;
     let result = await gitRaw(projectPath, ['reflog'], 'reflog', 'result');
     if (result != undefined && result != '') {
+        let old = await hx.env.clipboard.readText().then(function(text) {
+            return text;
+        });
         await hx.env.clipboard.writeText(result);
         await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
-        setTimeout(function() {
-            hx.commands.executeCommand('editor.action.clipboardPasteAction');
-        }, 100);
+        await hx.commands.executeCommand('editor.action.clipboardPasteAction');
+        if (old != undefined) {
+            hx.env.clipboard.writeText(old);
+        };
     } else {
         hx.window.showErrorMessage("Git: reflog没有获取到信息。", ['我知道了']);
     };
