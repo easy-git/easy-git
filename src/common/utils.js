@@ -9,7 +9,6 @@ const ini = require('ini');
 
 const gitRemoteOriginUrl = require('git-remote-origin-url');
 const git = require('simple-git');
-// const git = simpleGit();
 
 const osName = os.platform();
 
@@ -803,7 +802,11 @@ async function gitPush(workingDir, options=[]) {
         let status = await git(workingDir).init()
             .push(options)
             .then((result) => {
-                hx.window.setStatusBarMessage('Git: push操作成功', 30000, 'info');
+                hx.window.clearStatusBarMessage();
+                let pushResult = result.pushed;
+                if (JSON.stringify(pushResult) === '[]') {
+                    hx.window.setStatusBarMessage('Git: push操作成功', 30000, 'info');
+                };
                 return 'success';
             })
             .catch((err) => {
@@ -1075,12 +1078,12 @@ async function gitBranchSwitch(workingDir,branchName) {
         let status = await git(workingDir).init()
             .checkout([branchName])
             .then(() => {
-                hx.window.setStatusBarMessage('Git: 分支切换成功', 3000, 'info');
+                hx.window.setStatusBarMessage(`Git: 分支切换成功, 当前分支是 ${branchName}`, 3000, 'info');
                 return 'success';
             })
             .catch((err) => {
                 let errMsg = (err).toString();
-                createOutputChannel(`Git: 分支${branchName}切换失败`, errMsg);
+                createOutputChannel(`Git: 分支${branchName}切换失败!`, errMsg);
                 return 'fail';
             });
         return status;
@@ -1098,12 +1101,12 @@ async function gitDeleteLocalBranch(workingDir,branchName) {
         let status = await git(workingDir).init()
             .branch(['-D',branchName])
             .then(() => {
-                hx.window.setStatusBarMessage('Git: 本地分支强制删除成功 !', 3000, 'info');
+                hx.window.setStatusBarMessage('Git: 本地分支强制删除成功!', 3000, 'info');
                 return 'success';
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: 本地分支${branchName}强制删除失败`, errMsg);
+                createOutputChannel(`Git: 本地分支${branchName}强制删除失败!`, errMsg);
                 return 'fail';
             });
         return status
