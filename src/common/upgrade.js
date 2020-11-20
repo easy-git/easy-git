@@ -1,6 +1,6 @@
 const hx = require('hbuilderx');
 
-var isPopUpWindow = false
+var isPopUpWindow = false;
 
 
 function isJSON(str) {
@@ -48,9 +48,17 @@ function showUpgradeBox() {
  */
 function noUpgrade() {
     let msg = 'EasyGit: 当前是最新版本，没有可用的更新。';
-    hx.window.showInformationMessage(msg, ['有更新时提醒我', '关闭']).then(result => {
+    let btns = ['关闭']
+    
+    let config = hx.workspace.getConfiguration();
+    let updatePrompt = config.get('EasyGit.updatePrompt');
+    let updatePromptTime = config.get('EasyGit.updatePromptTime');
+    if (updatePromptTime != undefined || updatePrompt != undefined) {
+        btns = ['有更新时提醒我', '关闭'];
+    };
+    
+    hx.window.showInformationMessage(msg, btns).then(result => {
         if (result === '有更新时提醒我') {
-            let config = hx.workspace.getConfiguration();
             config.update('EasyGit.updatePrompt', true).then( () => {
                 config.update('EasyGit.updatePromptTime', '1577808001');
             });
@@ -99,11 +107,13 @@ async function checkUpdate(mode) {
                             if (s.version != version) {
                                 showUpgradeBox();
                             } else {
-                                noUpgrade();
-                            }
-                        }
+                                if (mode != 'auto') {
+                                    noUpgrade();
+                                };
+                            };
+                        };
                     };
-                }
+                };
             }catch(e){};
         });
         res.on("error", (e) => {

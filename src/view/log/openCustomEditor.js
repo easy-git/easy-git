@@ -158,6 +158,7 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
                 break;
             case 'copy':
                 hx.env.clipboard.writeText(msg.text);
+                hx.window.setStatusBarMessage("EasyGit: 已成功复制到剪切板。", 5000, 'info');
                 break;
             case 'search':
                 Log.setView(msg.searchType, msg.condition, msg.refname);
