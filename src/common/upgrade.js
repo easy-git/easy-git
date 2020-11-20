@@ -44,6 +44,22 @@ function showUpgradeBox() {
 
 
 /**
+ * @description
+ */
+function noUpgrade() {
+    let msg = 'EasyGit: 当前是最新版本，没有可用的更新。';
+    hx.window.showInformationMessage(msg, ['有更新时提醒我', '关闭']).then(result => {
+        if (result === '有更新时提醒我') {
+            let config = hx.workspace.getConfiguration();
+            config.update('EasyGit.updatePrompt', true).then( () => {
+                config.update('EasyGit.updatePromptTime', '1577808001');
+            });
+        };
+    });
+};
+
+
+/**
  * @description check plugin update
  * @param {String} mode (manual|auto) 手动检查、自动检查
  */
@@ -82,6 +98,8 @@ async function checkUpdate(mode) {
                         if (s.name == 'easy-git') {
                             if (s.version != version) {
                                 showUpgradeBox();
+                            } else {
+                                noUpgrade();
                             }
                         }
                     };
