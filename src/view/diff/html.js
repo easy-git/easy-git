@@ -92,7 +92,6 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
             .diff-head .file-title {
                 display: inline-block;
                 font-size: 16px;
-                font-weight: 500;
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;

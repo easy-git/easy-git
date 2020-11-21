@@ -1,7 +1,7 @@
 const hx = require('hbuilderx');
 const path = require('path');
 
-const {GitLogAction} = require('./action.js');
+const { GitLogAction } = require('./log.js');
 
 // 解决hx启动后，已打开的自定义编辑器空白的问题
 let HistoryProjectPath;

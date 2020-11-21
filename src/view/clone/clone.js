@@ -6,16 +6,16 @@ const process = require('process');
 const ini = require('ini');
 const hx = require('hbuilderx');
 
-const icon = require('./static/icon.js');
+const icon = require('../static/icon.js');
 
-const MainView = require('./main.js');
-const utils = require('../common/utils.js');
-const file = require('../common/file.js');
+const MainView = require('../main.js');
+const utils = require('../../common/utils.js');
+const file = require('../../common/file.js');
 
 const osName = os.platform();
 
-const vueFile = path.join(__dirname, 'static', '','vue.min.js');
-const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
+const vueFile = path.join(path.resolve(__dirname, '..'), 'static', '','vue.min.js');
+const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
 
 /**
  * @description 读取HBuilderX.ini, 获取ProjectWizard

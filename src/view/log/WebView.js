@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const hx = require('hbuilderx');
-const {GitLogAction} = require('./action.js');
+const { GitLogAction } = require('./log.js');
 
 /**
  * @description log view

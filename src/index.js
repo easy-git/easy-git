@@ -11,84 +11,14 @@ const upgrade = require('./common/upgrade.js');
 
 const MainView = require('./view/main.js');
 const GitBranchView = require('./view/branch/branch.js');
-const initView = require('./view/init.js');
-const cloneView = require('./view/clone.js');
-
-// Easy-Git log view, hbuilderx 2.9.2-, use webview
-const openLogWebView = require('./view/log/openWebView.js');
-
-// Easy-Git log view, hbuilderx 2.9.2+, use customEditor
-let { GitLogCustomEditorRenderHtml, GitLogCustomWebViewPanal } = require('./view/log/openCustomEditor.js');
-let { GitDiffCustomEditorRenderHtml, GitDiffCustomWebViewPanal } = require('./view/diff/openCustomEditor.js');
+const initView = require('./view/init/init.js');
+const cloneView = require('./view/clone/clone.js');
+const openLogView = require('./view/log/index.js');
+const openDiffFileView = require('./view/diff/index.js');
 
 // 用户本地是否安装Git
 let isInstallGitForLocal;
 
-// get hbuilderx version
-let hxVersion = hx.env.appVersion;
-hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
-let cmp = cmp_hx_version(hxVersion, '2.9.2');
-
-// CustomEditor 首次启动缓慢，因此在状态栏增加提示
-let isShowLogMessage = false;
-let isShowDiffMessage = false;
-
-
-/**
- * @description 打开日志视图
- * @param {Object} userConfig
- * @param {Object} gitData
- * @param {Object} webviewPanel. hbuilderx 2.9.2-, use webview; hbuilderx 2.9.2+, use customEditor
- */
-async function openGitLog(userConfig, gitData, webviewPanel) {
-    if (cmp <= 0) {
-        if (isShowLogMessage == false) {
-            hx.window.setStatusBarMessage('EasyGit: 正在加载Git日志，首次加载较慢，请耐心等待......', 5000, 'info');
-            isShowLogMessage = true;
-            setTimeout(function() {
-                GitLogCustomEditorRenderHtml(gitData, userConfig);
-            }, 800);
-        } else {
-            setTimeout(function() {
-                GitLogCustomEditorRenderHtml(gitData, userConfig);
-            }, 300);
-        };
-    } else {
-        openLogWebView(webviewPanel, userConfig, gitData);
-        hx.window.showView({
-            viewid: "EasyGitCommonView",
-            containerid: "EasyGitCommonView"
-        });
-    };
-};
-
-
-
-/**
- * @param {Object} ProjectData
- * @param {Object} userConfig
- */
-async function openDiffFile(ProjectData, userConfig) {
-    if (cmp <= 0) {
-        if (isShowDiffMessage == false) {
-            hx.window.setStatusBarMessage('EasyGit: 正在加载Diff自定义编辑器，首次加载较慢，请耐心等待......', 5000, 'info');
-            isShowDiffMessage = true;
-            setTimeout(function() {
-                GitDiffCustomEditorRenderHtml(ProjectData, userConfig);
-            }, 1500);
-        } else {
-            setTimeout(function() {
-                GitDiffCustomEditorRenderHtml(ProjectData, userConfig);
-            }, 300);
-        };
-    } else {
-        hx.window.showErrorMessage('Git: 此功能适用于HBuilderX 2.9.2+版本。', ['升级HBuilderX', '关闭']).then( (res) => {
-            if (res == '升级HBuilderX') {
-                hx.commands.executeCommand('update.checkForUpdate');
-            };
-        });
-    };
-};
 
 /**
  * @description 当焦点不在编辑器、项目管理器上
@@ -116,7 +46,7 @@ async function FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExpl
                 GitBranchView(webviewPanel, userConfig, gitData);
             };
             if (viewType == 'log') {
-                openGitLog(userConfig, gitData, webviewPanel);
+                openLogView(userConfig, gitData, webviewPanel);
                 return;
             };
         } else {
@@ -173,8 +103,16 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
                 selectedFile = param.document.uri.fsPath;
             };
         } catch(e){
-            return hx.window.showErrorMessage('easy-git: 无法获取到项目，请在项目管理器选中后再试。', ['我知道了']);
-        }
+            return hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试，或克隆一个项目', ['克隆','我知道了']).then( res=> {
+                if (res == '克隆') {
+                    cloneView.show(webviewPanel, userConfig);
+                    hx.window.showView({
+                        viewid: "EasyGitSourceCodeView",
+                        containerid: "EasyGitSourceCodeView"
+                    });
+                };
+            });
+        };
     };
 
     let ProjectData = {
@@ -214,7 +152,7 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
 
     // git diff
     if (viewType == 'diff') {
-        openDiffFile(ProjectData, userConfig);
+        openDiffFileView(ProjectData, userConfig);
         return;
     };
 
@@ -258,7 +196,7 @@ async function FromFilesFocus(viewType, param, webviewPanel, userConfig, FilesEx
 
     // show git log view
     if (viewType == 'log') {
-        openGitLog(userConfig, gitData, webviewPanel);
+        openLogView(userConfig, gitData, webviewPanel);
         return;
     };
 };
@@ -295,7 +233,7 @@ async function FromViewMenu(viewType, webviewPanel, userConfig, FilesExplorerPro
                 GitBranchView(webviewPanel, userConfig, gitData);
             };
             if (viewType == 'log') {
-                openGitLog(userConfig, gitData, webviewPanel);
+                openLogView(userConfig, gitData, webviewPanel);
             };
         };
     };
@@ -395,7 +333,7 @@ async function main(viewType, param, webviewPanel, context) {
     };
 
     // 没有获取到焦点
-    if (source == "filesExplorer" && param == null && param != undefined) {
+    if (source == "filesExplorer" && param == null) {
         param = param;
         FromNotFocus(viewType, param, webviewPanel, userConfig, FilesExplorerProjectInfo);
         return;

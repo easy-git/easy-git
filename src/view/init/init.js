@@ -3,11 +3,11 @@ const path = require('path');
 
 const hx = require('hbuilderx');
 
-const utils = require('../common/utils.js');
-const icon = require('./static/icon.js');
+const utils = require('../../common/utils.js');
+const icon = require('../static/icon.js');
 
-const vueFile = path.join(__dirname, 'static', '','vue.min.js');
-const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
+const vueFile = path.join(path.resolve(__dirname, '..'), 'static', '','vue.min.js');
+const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
 
 
 /**

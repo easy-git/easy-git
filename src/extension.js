@@ -24,9 +24,6 @@ let CommonView = hx.window.createWebView("EasyGitCommonView", {
 });
 
 
-/**
- * @todo 多个视图一起执行的问题
- */
 function activate(context) {
     context.source = 'viewMenu';
 
@@ -34,12 +31,12 @@ function activate(context) {
     const cmp = cmp_hx_version(hxVersion, '2.9.2');
     if (cmp <= 0) {
         // git log customEditor view
-        var { CatCustomEditorProvider, GitLogCustomWebViewPanal } = require('./view/log/openCustomEditor.js');
+        var { CatCustomEditorProvider, GitLogCustomWebViewPanal } = require('./view/log/CustomEditor.js');
         let provider = new CatCustomEditorProvider({}, {}, {});
         hx.window.registerCustomEditorProvider("EasyGit - 日志", provider);
 
         // git file diff cusomtEditor view
-        var { CatDiffCustomEditorProvider, GitDiffCustomWebViewPanal } = require('./view/diff/openCustomEditor.js');
+        var { CatDiffCustomEditorProvider, GitDiffCustomWebViewPanal } = require('./view/diff/CustomEditor.js');
         let providerForDiff = new CatDiffCustomEditorProvider({}, {}, {});
         hx.window.registerCustomEditorProvider("EasyGit - 对比差异", providerForDiff);
     };
