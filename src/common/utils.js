@@ -10,6 +10,8 @@ const ini = require('ini');
 const gitRemoteOriginUrl = require('git-remote-origin-url');
 const git = require('simple-git');
 
+const voiceSay = require('./voice.js');
+
 const osName = os.platform();
 
 
@@ -806,6 +808,7 @@ async function gitPush(workingDir, options=[]) {
                 let pushResult = result.pushed;
                 if (JSON.stringify(pushResult) === '[]') {
                     hx.window.setStatusBarMessage('Git: push操作成功', 30000, 'info');
+                    voiceSay('push.success')
                 };
                 return 'success';
             })
@@ -1079,6 +1082,7 @@ async function gitBranchSwitch(workingDir,branchName) {
             .checkout([branchName])
             .then(() => {
                 hx.window.setStatusBarMessage(`Git: 分支切换成功, 当前分支是 ${branchName}`, 3000, 'info');
+                voiceSay(`branch.switch.success`, `当前分支是 ${branchName}`);
                 return 'success';
             })
             .catch((err) => {
@@ -1279,6 +1283,7 @@ async function gitBranchMerge(workingDir,fromBranch,toBranch) {
             .catch((err) => {
                 let errMsg = (err).toString();
                 createOutputChannel(`Git: 分支合并失败, 请根据控制台提示手动处理。`, errMsg);
+                voiceSay('merge.conflict');
                 return 'fail';
             });
         return status
@@ -1643,6 +1648,7 @@ async function gitCherryPick(workingDir, commands) {
             .catch((err) => {
                 let errMsg = err.toString();
                 if (errMsg.includes('resolving the conflicts')) {
+                    voiceSay("merge.conflict");
                     return 'conflicts';
                 };
                 createOutputChannel(`Git: ${commands} 操作失败。`, err);

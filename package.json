@@ -77,7 +77,18 @@
                 "EasyGit.DisableDevTools": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Git视图页面, 禁用右键菜单开发者工具(非必要时，请勿开启开发者工具)"
+                    "description": "Git视图页面，禁用右键菜单开发者工具 (非必要时，请勿开启开发者工具)。"
+                },
+                "EasyGit.VoiceBroadcast": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Git某些操作，语音播报执行结果（仅限MacOSX操作系统），修改后重启生效。"
+                },
+                "EasyGit.VoiceBroadcastLanguage": {
+                    "type": "string",
+                    "default": "普通话",
+                    "description": "Git操作，语音播报语言（默认女声普通话），修改后重启生效。",
+                    "enum": ["普通话", "粤语"]
                 }
             }
         },
