@@ -159,6 +159,12 @@ easy-git, 支持通过快捷键打开git视图。
 
 // Git Branch Delete
 {"key": "","command": "EasyGit.BranchDelete"}
+
+// Git reflog
+{"key": "","command": "EasyGit.reflog"}
+
+// Git 归档
+{"key": "","command": "EasyGit.archive"}
 ```
 
 ## 数据统计

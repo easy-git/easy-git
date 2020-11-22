@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.6.0
+* `重要` 新增 command: EasyGit.reflog，支持通过命令面板触发
+* `重要` 新增 command: EasyGit.archive， 支持通过命令面板触发
+* 新增 日志视图，选中记录，右键菜单，增加【归档】操作
+* 新增 Git某些操作 运行结果语音播报 可手动关闭 (仅支持MacOSX)
+* 修复 某些情况下，日志视图，右键菜单显示不全的Bug
+* 修复 当没有新版本时，点击检查更新，没有任何提示的Bug
+* 新增 根据用户反馈，源代码管理器 更多，增加【推送】
+* 优化 项目管理器 菜单显示方式；非Git项目，显示初始化存储库菜单
+* 优化 Git用户身份校验提示信息
+
 ## 0.5.0
 * `重要` 修复 当本地没有设置账号密码时，git push失败且没有任何提示的Bug
 * `重要` 新增 commit&push配置项: 源代码管理器，点击commit图标，对已暂存的文件，支持commit & push一键提交 （菜单【设置】【插件配置】）
@@ -10,8 +21,8 @@
 * 修复 选中项目，执行初始化存储库失败的Bug
 
 ## 0.4.2
-* `重要` 新增 command: EasyGit.revert，支持通过面板触发，日志视图同时增加revert菜单
-* `重要` 新增 command: EasyGit.cherryPick，支持通过面板触发
+* `重要` 新增 command: EasyGit.revert，支持通过命令面板触发，日志视图同时增加revert菜单
+* `重要` 新增 command: EasyGit.cherryPick，支持通过命令面板触发
 * 新增 日志视图、源代码管理器，增加命令面板入口
 * 优化 Git克隆 优化控制台日志，并增加clone进度
 * 优化 merge\cherryPick操作 自动填充commit message
