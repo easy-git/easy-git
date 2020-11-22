@@ -166,7 +166,7 @@ class Branch {
             ProjectInfo.easyGitInner = true;
             hx.commands.executeCommand('EasyGit.main', ProjectInfo);
         };
-        if (mergeResult == 'fail') {
+        if (mergeResult == 'fail' || mergeResult == 'conflicts') {
             let that = this;
             setTimeout(function() {
                 hx.window.showErrorMessage('EasyGit: 分支合并存在冲突，是否取消本次合并？', ['取消合并', '关闭']).then( (btn)=> {

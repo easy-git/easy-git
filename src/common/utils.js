@@ -1277,13 +1277,16 @@ async function gitBranchMerge(workingDir,fromBranch,toBranch) {
         let status = await git(workingDir).init()
             .mergeFromTo(fromBranch,toBranch)
             .then((res) => {
-                hx.window.setStatusBarMessage(`Git: 分支${toBranch}，合并${fromBranch}的代码，合并成功！`, 10000, 'info');
+                hx.window.setStatusBarMessage(`Git: 分支${toBranch}，合并${fromBranch}的代码，合并成功！在命令面板中，可取消合并。`, 10000, 'info');
                 return 'success';
             })
             .catch((err) => {
                 let errMsg = (err).toString();
                 createOutputChannel(`Git: 分支合并失败, 请根据控制台提示手动处理。`, errMsg);
                 voiceSay('merge.conflict');
+                if (errMsg.includes('CONFLICTS')) {
+                    return 'conflicts';
+                };
                 return 'fail';
             });
         return status

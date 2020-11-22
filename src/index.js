@@ -188,8 +188,6 @@ class Main extends Common {
     };
 
     /**
-     * @description
-     *
      * 项目管理器，选中项目，右键菜单入口:
      *  - 是Git项目，则直接打开
      *  - 不是Git项目，显示【初始化存储库】按钮
@@ -233,43 +231,34 @@ class Main extends Common {
             this.ExplorerInfo, {'currentSelectedProject': currentSelectedProject}
         );
 
-        // git diff
-        if (this.viewType == 'diff') {
-            openDiffFileView(this.ProjectData, this.userConfig);
+        if (!isGitProject) {
+            initView.show(this.webviewPanel, this.userConfig, FilesExplorerProjectInfo);
             return;
         };
 
-        // 清空webview html
-        let isActive = this.webviewPanel._webView._html;
-        if (isActive != '') {
-            this.webviewPanel._webView._html = '';
-            this.webviewPanel._webView._msgListeners = [];
-        };
+        try{
+            let isActive = this.webviewPanel._webView._html;
+            if (isActive != '') {
+                this.webviewPanel._webView._html = '';
+                this.webviewPanel._webView._msgListeners = [];
+            };
+        }catch(e){};
 
-        // show git Main view
-        if (this.viewType == 'main') {
-            if (isGitProject) {
+        switch (this.viewType){
+            case 'diff':
+                openDiffFileView(this.ProjectData, this.userConfig);
+                break;
+            case 'main':
                 MainView.active(this.webviewPanel, this.userConfig, gitData);
-            } else {
-                initView.show(this.webviewPanel, this.userConfig, FilesExplorerProjectInfo);
-            };
-            return;
-        };
-
-        // show git Main view
-        if (this.viewType == 'branch') {
-            if (isGitProject) {
+                break;
+            case 'branch':
                 GitBranchView(this.webviewPanel, this.userConfig, gitData);
-            } else {
-                initView.show(this.webviewPanel, this.userConfig, FilesExplorerProjectInfo);
-            };
-            return;
-        };
-
-        // show git log view
-        if (this.viewType == 'log') {
-            openLogView(this.userConfig, gitData, this.webviewPanel);
-            return;
+                break;
+            case 'log':
+                openLogView(this.userConfig, gitData, this.webviewPanel);
+                break;
+            default:
+                break;
         };
     };
 

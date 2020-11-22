@@ -4,6 +4,7 @@ const path = require('path');
 const hx = require('hbuilderx');
 
 let utils = require('../../common/utils.js');
+const { Branch } = require('../../commands/ref.js');
 
 const icon = require('../static/icon.js');
 const getWebviewBranchContent = require('./html.js')
@@ -154,14 +155,19 @@ class GitBranch {
 
     // Git branch: merge
     async merge(fromBranch,toBranch) {
-        let mergeStatus = await utils.gitBranchMerge(this.projectPath,fromBranch,toBranch);
-        if (mergeStatus == 'success' || mergeStatus == 'fail') {
-            let param = {
-                'projectPath': this.projectPath,
-                'projectName': this.projectName,
-                'easyGitInner': true
-            };
-            hx.commands.executeCommand('EasyGit.main', param);
+        let param = {
+            'projectPath': this.projectPath,
+            'projectName': this.projectName,
+            'easyGitInner': true
+        };
+        let mergeStatus = await utils.gitBranchMerge(this.projectPath, fromBranch, toBranch);
+        hx.commands.executeCommand('EasyGit.main', param);
+        if (mergeStatus == 'fail' || mergeStatus == 'conflicts') {
+            hx.window.showErrorMessage('EasyGit: 分支合并存在冲突，是否取消本次合并？', ['取消合并', '关闭']).then( (btn)=> {
+                if (btn == '取消合并') {
+                    hx.commands.executeCommand('EasyGit.mergeAbort', param);
+                };
+            });
         };
     };
 
@@ -223,7 +229,7 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
         viewid: 'EasyGitSourceCodeView',
         containerid: 'EasyGitSourceCodeView'
     });
-    
+
     // get project info , and git info
     const { projectPath, projectName, currentBranch, originurl } = gitData;
 
