@@ -19,6 +19,10 @@ const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'boo
 function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
     const view = webviewPanel.webView;
     const viewId = webviewPanel.webView._id;
+    hx.window.showView({
+        viewid: 'EasyGitSourceCodeView',
+        containerid: 'EasyGitSourceCodeView'
+    });
 
     let projectPath, projectName;
     let {currentSelectedProject} = FilesExplorerProjectInfo;

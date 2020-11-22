@@ -43,7 +43,11 @@ function getProjectWizard() {
 function show(webviewPanel, userConfig) {
     const view = webviewPanel.webView;
     const viewId = webviewPanel.webView._id;
-
+    hx.window.showView({
+        viewid: "EasyGitSourceCodeView",
+        containerid: "EasyGitSourceCodeView"
+    });
+    
     // 根据主题适配颜色
     let colorData = utils.getThemeColor('left');
     let {fontColor} = colorData;

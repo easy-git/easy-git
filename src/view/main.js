@@ -387,6 +387,10 @@ class GitFile {
  */
 function active(webviewPanel, userConfig, gitData) {
     const view = webviewPanel.webView;
+    hx.window.showView({
+        viewid: 'EasyGitSourceCodeView',
+        containerid: 'EasyGitSourceCodeView'
+    });
 
     // get project info , and git info
     const { projectPath, projectName, currentBranch, originurl } = gitData;

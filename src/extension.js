@@ -1,7 +1,7 @@
 const hx = require("hbuilderx");
 const path = require('path');
 
-const index = require("./index.js");
+const Main = require("./index.js");
 const file = require('./common/file.js');
 const git = require('./commands/index.js');
 const cmp_hx_version = require('./common/cmp.js');
@@ -50,14 +50,16 @@ function activate(context) {
     // 菜单【源代码管理】，菜单【工具】、及项目管理器右键菜单
     let fv = hx.commands.registerCommand('EasyGit.main', (param) => {
         context.source = 'filesExplorer';
-        index.main('main',param, FileView, context);
+        let main_view = new Main('main',param, FileView, context);
+        main_view.run();
     });
     context.subscriptions.push(fv);
 
     // 菜单【分支管理】，菜单【工具】、及项目管理器右键菜单
     let branch = hx.commands.registerCommand('EasyGit.branch', (param) => {
         context.source = 'filesExplorer';
-        index.main('branch',param, FileView, context);
+        let view_branch = new Main('branch',param, FileView, context);
+        view_branch.run();
     });
     context.subscriptions.push(branch);
 
@@ -69,14 +71,16 @@ function activate(context) {
             hx.workspace.openTextDocument(LogCscratFile);
         };
         context.source = 'filesExplorer';
-        index.main('log',param, CommonView, context);
+        let view_log = new Main('log',param, CommonView, context);
+        view_log.run();
     });
     context.subscriptions.push(log);
 
     // 菜单【工具】【克隆存储库】
     let clone = hx.commands.registerCommand('EasyGit.clone',(param) => {
         context.source = 'clone';
-        index.main('clone',param, FileView, context);
+        let view_clone = new Main('clone',param, FileView, context);
+        view_clone.run();
     });
     context.subscriptions.push(clone);
 
@@ -314,7 +318,8 @@ function activate(context) {
             hx.workspace.openTextDocument(DiffCscratFile);
         };
         context.source = 'filesExplorer';
-        index.main('diff', param, {}, context);
+        let view_diff = new Main('diff', param, {}, context);
+        view_diff.run();
     });
     context.subscriptions.push(diffFile);
 };
