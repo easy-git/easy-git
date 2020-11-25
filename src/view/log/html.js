@@ -817,27 +817,32 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             this.CommitFileChangeDetails = '';
                             this.isShowViewDetails = true;
                             this.logDetails = data;
-                            let files = data.diff.files;
-                            let tmp = [];
-                            for (let f of files) {
-                                f.add_str = '';
-                                f.del_str = '';
-                                let addNum = f.insertions ? Math.round((f.insertions / (f.insertions + f.deletions))*10) : 0;
-                                let delNum = f.deletions ? Math.round((f.deletions / (f.insertions + f.deletions))*10) : 0;
-                                if (addNum > 0) {
-                                    f.add_str = this.symbolRepeat('+',addNum);
+                            try{
+                                let files = data.diff.files;
+                                let tmp = [];
+                                for (let f of files) {
+                                    f.add_str = '';
+                                    f.del_str = '';
+                                    let addNum = f.insertions ? Math.round((f.insertions / (f.insertions + f.deletions))*10) : 0;
+                                    let delNum = f.deletions ? Math.round((f.deletions / (f.insertions + f.deletions))*10) : 0;
+                                    if (addNum > 0) {
+                                        f.add_str = this.symbolRepeat('+',addNum);
+                                    };
+                                    if (delNum > 0) {
+                                        f.del_str = this.symbolRepeat('-',delNum);
+                                    };
+                                    tmp.push(f);
                                 };
-                                if (delNum > 0) {
-                                    f.del_str = this.symbolRepeat('-',delNum);
-                                };
-                                tmp.push(f);
-                            };
-                            this.logDetailsFiles = tmp;
+                                this.logDetailsFiles = tmp;
 
-                            let firstFile = files.length ? files[0] : {};
-                            if (JSON.stringify(firstFile) != '{}') {
-                                let {file} = firstFile;
-                                this.showCommitFileChange(file);
+                                let firstFile = files.length ? files[0] : {};
+                                if (JSON.stringify(firstFile) != '{}') {
+                                    let {file} = firstFile;
+                                    this.showCommitFileChange(file);
+                                };
+                            }catch(e){
+                                this.showCommitFileChange('');
+                                this.closeViewDetails();
                             };
                         },
                         closeViewDetails() {
@@ -908,14 +913,20 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         // 显示commit 文件具体修改
                         showCommitFileChange(filePath) {
                             this.CommitFileChangeDetails = '';
+                            let {message, diff, hash} = this.logDetails;
+                            let isMergeMessage = false;
+                            if (message.includes('Merge') && diff == undefined) {
+                                isMergeMessage = true;
+                            };
                             let data = {
-                                "commitId": this.logDetails.hash,
-                                "filePath": filePath
+                                "commitId": hash,
+                                "filePath": filePath,
+                                "isMergeMessage": isMergeMessage
                             };
                             hbuilderx.postMessage({
                                 command: 'showCommitFileChange',
                                 data: data
-                            })
+                            });
                         },
                         forShowCommitFileChange() {
                             hbuilderx.onDidReceiveMessage((msg) => {

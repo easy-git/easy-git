@@ -183,10 +183,12 @@ class GitLogAction {
 
     // 显示commit 文件具体修改
     async showCommitFileChange(msg) {
-        let {commitId, filePath} = msg;
+        let {commitId, filePath, isMergeMessage} = msg;
+        if (filePath == '' && isMergeMessage) {
+            return hx.window.showErrorMessage("Git: 操作失败。备注：Merge消息暂不支持获取文件修改列表、及修改详情。", ["我知道了"]);
+        };
         let options = [commitId, filePath];
         let result = await utils.gitShowCommitFileChange(this.projectPath, options);
-
         result.filePath = filePath;
         if ((result.data).length) {
             let diffHtml = Diff2Html.html(result.data, {
