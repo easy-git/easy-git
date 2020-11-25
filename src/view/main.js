@@ -240,7 +240,7 @@ class GitFile {
                     if (userSelect == '总是') {
                         config.update("EasyGit.AlwaysAutoAddCommit", true).then(() => {
                             hx.window.setStatusBarMessage("Git已开启：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。", 5000,'info');
-                        })
+                        });
                     };
                 };
             };
@@ -337,7 +337,6 @@ class GitFile {
         };
     };
 
-
     // Git: pull
     async pull(msg) {
         let {text,rebase} = msg;
@@ -372,6 +371,21 @@ class GitFile {
             let AssociationResult = await utils.gitLocalBranchToRemote(this.projectPath, branchName);
             if (AssociationResult) {
                 this.refreshFileList();
+            };
+        };
+    };
+
+    // Git: sync
+    async sync() {
+        let fetchStatus = await utils.gitFetch(this.projectPath, false);
+        if (fetchStatus == 'success') {
+            let gitInfo = await utils.gitStatus(this.projectPath);
+            let { behind } = gitInfo;
+            if (behind != 0 && behind != undefined) {
+                this.webviewPanel.webView.postMessage({
+                    command: "sync",
+                    behind: behind
+                });
             };
         };
     };
@@ -522,6 +536,9 @@ function active(webviewPanel, userConfig, gitData) {
                 break;
             case 'openCommandPanel':
                 hx.commands.executeCommand('EasyGit.CommandPanel', EasyGitInnerParams);
+                break;
+            case 'sync':
+                File.sync();
                 break;
             default:
                 break;

@@ -10,7 +10,8 @@ const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
 
 /**
  * @description 获取webview内容
- * @param {Object} uiData
+ * @param {Object} userConfig 
+ * @param {Object} uiData 
  * @param {Object} gitData
  */
 function getWebviewContent(userConfig, uiData, gitData) {
@@ -59,7 +60,9 @@ function getWebviewContent(userConfig, uiData, gitData) {
     let gitFileResult = JSON.stringify(FileResult);
     let originurlBoolean = originurl != undefined ? true : false;
     ahead = ahead == 0 ? '' : ahead;
-    behind = behind == 0 ? '': behind;
+
+    // 2020-11-25 behind值修改为从fetch操作后再获取
+    // behind = behind == 0 ? '': behind;
 
     let ctrl = 'ctrl';
     if (osName == 'darwin') {
@@ -439,11 +442,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             ${SyncIcon}
                         </div>
                         <div @click="gitPull('rebase');" title="git pull --rebase">
-                            <span class="cactive num">${behind}</span>
+                            <span class="cactive num">{{ behind }}</span>
                             <span>${DownArrowIcon}</span>
                         </div>
                         <div @click="gitPush();" title="git push">
-                            <span class="cactive num">${ahead}</span>
+                            <span class="cactive num">{{ ahead }}</span>
                             <span>${UpArrowIcon}</span>
                         </div>
                     </div>
@@ -459,11 +462,13 @@ function getWebviewContent(userConfig, uiData, gitData) {
             var app = new Vue({
                 el: '#app',
                 data: {
-                    projectName: "",
-                    currentBranch: "",
-                    tracking: "",
-                    originurl: "",
-                    originurlBoolean: "",
+                    projectName: "${projectName}",
+                    currentBranch: "${currentBranch}",
+                    behind: " ",
+                    ahead: "${ahead}",
+                    tracking: "${tracking}",
+                    originurl: "${originurl}",
+                    originurlBoolean: ${originurlBoolean},
                     commitMessage: '',
                     commitMessagePlaceholder: "",
                     gitFileResult: {},
@@ -472,15 +477,15 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     hoverConflictedFileID: false,
                     hoverChangeFileID: false,
                     hoverStashFileID: false,
-                    ConflictedIcon: '',
+                    ConflictedIcon: '${ChevronDownIcon}',
                     isShowConflicted: true,
                     gitConflictedFileList: [],
                     gitConflictedFileListLength:0,
-                    ChangeIcon: '',
+                    ChangeIcon: '${ChevronDownIcon}',
                     isShowChange: true,
                     gitNotStagedileList: [],
                     gitNotStagedileListLength: 0,
-                    StagedIcon: '',
+                    StagedIcon: '${ChevronDownIcon}',
                     isShowStaged: true,
                     gitStagedFileList: [],
                     gitStagedFileListLength: 0,
@@ -488,7 +493,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 },
                 computed: {
                     GitAssociationRemote() {
-                        return this.originurlBoolean
+                        return this.originurlBoolean;
                     }
                 },
                 created() {
@@ -497,15 +502,9 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         ctrl = '⌘';
                     };
                     this.commitMessagePlaceholder = '消息（' + ctrl + '+Enter 提交）'
+
                     this.gitFileResult = ${gitFileResult};
-                    this.projectName = '${projectName}';
-                    this.tracking = '${tracking}';
-                    this.originurl = '${originurl}';
-                    this.originurlBoolean = ${originurlBoolean};
-                    this.currentBranch = '${currentBranch}';
-                    this.ConflictedIcon = '${ChevronDownIcon}';
-                    this.StagedIcon = '${ChevronDownIcon}';
-                    this.ChangeIcon = '${ChevronDownIcon}';
+                    this.getGitFileList();
 
                     // 用户是否设置自动commit -> push
                     let GitAlwaysAutoCommitPush =  ${GitAlwaysAutoCommitPush};
@@ -514,17 +513,33 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     };
                 },
                 mounted() {
-                    this.getGitFileList();
-
                     that = this;
                     window.onload = function() {
                         setTimeout(function() {
+                            that.runSync();
+                            that.updateFetchResult();
+                        }, 500);
+                        setTimeout(function() {
                             that.getCommitMessage();
                             that.forUpdateCommitMessage();
-                        }, 1000)
+                        }, 1000);
                     };
                 },
                 methods: {
+                    runSync() {
+                        hbuilderx.postMessage({
+                            command: 'sync'
+                        });
+                    },
+                    updateFetchResult() {
+                        hbuilderx.onDidReceiveMessage((msg) => {
+                            console.log(msg);
+                            if (msg.command != 'sync') {
+                                return;
+                            };
+                            this.behind = msg.behind;
+                        });
+                    },
                     isShowConflictedList() {
                         if (this.ConflictedIcon == '${ChevronDownIcon}') {
                             this.isShowConflicted = false;

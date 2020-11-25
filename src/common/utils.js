@@ -875,16 +875,21 @@ async function gitPull(workingDir,options) {
 /**
  * @description git: fetch
  * @param {String} projectPath 项目路径
+ * @param {String} isShowMsg 是否在底部状态栏显示消息，默认ture
  */
-async function gitFetch(workingDir) {
+async function gitFetch(workingDir, isShowMsg=true) {
     // status bar show message
-    hx.window.setStatusBarMessage(`Git: 正在同步信息 ......`);
-
+    if (isShowMsg) {
+        hx.window.setStatusBarMessage(`Git: 正在同步信息 (fetch) ......`);
+    };
     try {
+        // '--all','--prune'
         let status = await git(workingDir).init()
-            .fetch(['--all','--prune'])
+            .fetch(['--all'])
             .then((res) => {
-                hx.window.setStatusBarMessage('Git: Fetch success', 3000, 'info');
+                if (isShowMsg) {
+                    hx.window.setStatusBarMessage('Git: Fetch success', 3000, 'info');
+                };
                 return 'success';
             })
             .catch((err) => {
