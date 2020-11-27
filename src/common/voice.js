@@ -14,7 +14,7 @@ let VoiceBroadcastLanguage = config.get('EasyGit.VoiceBroadcastLanguage');
 
 const voiceData = {
     "pull": "代码拉取成功",
-    "push.success": "代码推送成功 恭喜 你是最棒的",
+    "push.success": "代码推送成功 你是最棒的",
     "merge.conflict": "我的天啊 合并代码出现了冲突 同志快醒醒吧",
     "branch.switch.success": "分支切换成功"
 };
