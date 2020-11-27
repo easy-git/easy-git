@@ -6,6 +6,7 @@ const file = require('./common/file.js');
 const git = require('./commands/index.js');
 const cmp_hx_version = require('./common/cmp.js');
 
+const {getThemeColor} = require('./common/utils.js');
 const upgrade = require('./common/upgrade.js');
 let showCommandPanel = require('./commands/commandPanel.js');
 
@@ -18,6 +19,10 @@ let source = 'viewMenu';
 let FileView = hx.window.createWebView("EasyGitSourceCodeView", {
     enableScritps: true
 });
+
+// 解决从扩展视图打开空白的问题
+let {background} = getThemeColor('siderBar');
+FileView.webView.html = `<body style="background-color: ${background};"><p style='margin-top: 2rem;font-size: 13px;'>请从项目管理器，选中项目，通过右键菜单打开源代码管理器。</p></body>`;
 
 let CommonView = hx.window.createWebView("EasyGitCommonView", {
     enableScritps: true
