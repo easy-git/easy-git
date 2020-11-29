@@ -119,6 +119,10 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
                 };
                 hx.commands.executeCommand('EasyGit.log', data);
                 break;
+            // case 'handleConflict':
+            //     let options = ['checkout', msg.options, selectedFile];
+            //     GitDiff.handleConflict(selectedFile, options);
+            //     break;
             default:
                 break;
         };

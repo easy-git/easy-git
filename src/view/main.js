@@ -437,12 +437,16 @@ function active(webviewPanel, userConfig, gitData) {
                 File.refreshFileList();
                 break;
             case 'diff':
-                let { filename, tag } = msg;
+                let { filename, tag, isConflicted } = msg;
                 let fpath = path.join(projectPath, filename);
                 if ( tag == 'D') {
                     return hx.window.showErrorMessage(`EasyGit: ${filename} 已被删除，无法查看信息。`, ['我知道了']);
                 };
-                if ( tag == '?') {
+                if ( tag == '?' || isConflicted) {
+                    hx.workspace.openTextDocument(fpath);
+                    return;
+                };
+                if (isConflicted) {
                     hx.workspace.openTextDocument(fpath);
                     return;
                 };

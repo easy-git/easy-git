@@ -19,13 +19,14 @@ class Diff {
     }
 
     async getDiffOptions(selectedFile) {
-        let statusInfo = await utils.gitFileStatus(this.projectPath, ['-s', selectedFile]);
+        let resut = await utils.gitFileStatus(this.projectPath, selectedFile, ['-s', selectedFile]);
 
         // 目前仅支持对比本地有更改的文件
-        if (statusInfo == undefined) {
+        if (resut == undefined || resut == 'error') {
             return 'error';
         };
 
+        let {statusInfo, isConflicted} = resut;
         let gitIndex = statusInfo.index;
         let gitWorking_dir = (statusInfo.working_dir).trim();
 
@@ -56,7 +57,8 @@ class Diff {
         let data = {
             "diff_options": options,
             "titleLeft": titleLeft,
-            "titleRight": titleRight
+            "titleRight": titleRight,
+            "isConflicted": isConflicted
         }
         return data;
     }
@@ -68,7 +70,8 @@ class Diff {
             this.webviewPanel.webView.htm = getDefaultContent();
             return;
         };
-        let {diff_options, titleLeft, titleRight} = init;
+
+        let {diff_options, titleLeft, titleRight, isConflicted} = init;
 
         let result = await utils.gitRaw(this.projectPath, diff_options, '获取Git差异', 'result');
         if (result == 'success' || result == 'fail' || result == 'error') {
@@ -76,7 +79,9 @@ class Diff {
         };
 
         let diffJson = Diff2Html.parse(result);;
-        let diffResult = Diff2Html.html(diffJson, {
+        let diffResult;
+
+        diffResult = Diff2Html.html(diffJson, {
             drawFileList: false,
             matching: 'lines',
             outputFormat: 'side-by-side',
@@ -88,8 +93,9 @@ class Diff {
         let diffData = {
             "diffResult": diffResult,
             "titleLeft": titleLeft,
-            "titleRight": titleRight
-        }
+            "titleRight": titleRight,
+            "isConflicted": isConflicted
+        };
 
         let selectedFilePath = path.normalize(path.join(this.projectPath, selectedFile));
         this.webviewPanel.webView.html = getWebviewDiffContent(
@@ -97,6 +103,13 @@ class Diff {
             this.userConfig,
             diffData
         );
+    };
+
+    async handleConflict(selectedFile, options) {
+        let result = await utils.gitRaw(this.projectPath, options, '处理冲突');
+        if (result == 'success') {
+            this.SetView(selectedFile);
+        };
     }
 }
 

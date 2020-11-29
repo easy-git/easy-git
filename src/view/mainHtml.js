@@ -10,8 +10,8 @@ const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
 
 /**
  * @description 获取webview内容
- * @param {Object} userConfig 
- * @param {Object} uiData 
+ * @param {Object} userConfig
+ * @param {Object} uiData
  * @param {Object} gitData
  */
 function getWebviewContent(userConfig, uiData, gitData) {
@@ -348,7 +348,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 @mouseover="hoverConflictedFileID = 'conflicted_'+i1"
                                 @mouseleave="hoverConflictedFileID = false">
                                 <div class="flex-grow-1 text-hidden">
-                                    <span :class="[v1.tag == 'D' ? 'line-through' : '']" @click="gitDiff(v1.path, v1.tag);">{{ v1.path }}</span>
+                                    <span :class="[v1.tag == 'D' ? 'line-through' : '']" @click="gitDiff(v1.path, v1.tag, true);">{{ v1.path }}</span>
                                 </div>
                                 <div class="d-inline float-right" :id="'conflicted_'+i1">
                                     <div class="d-inline" v-if="hoverConflictedFileID == 'conflicted_'+i1">
@@ -612,11 +612,12 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             text: filename
                         });
                     },
-                    gitDiff(fileUri, tag) {
+                    gitDiff(fileUri, tag, isConflicted=false) {
                         hbuilderx.postMessage({
                             command: 'diff',
                             filename: fileUri,
-                            tag: tag
+                            tag: tag,
+                            isConflicted: isConflicted
                         });
                     },
                     openFile(fileUri) {

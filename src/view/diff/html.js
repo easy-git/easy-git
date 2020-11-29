@@ -63,7 +63,15 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
         d2h_linenum_color
     } = uiData;
 
-    let { titleLeft, titleRight, diffResult } = diffData;
+    let { titleLeft, titleRight, diffResult, isConflicted } = diffData;
+
+    // .d2h-code-linenumber .d2h-code-line .d2h-cntx
+    // let d2hCodeLinenumber = "width: 7.5em !important;";
+    // let d2hCodeLine = "padding: 0 8em;";
+    // if (isConflicted) {
+    //     d2hCodeLinenumber = "width: 3.75em !important;";
+    //     d2hCodeLine = "padding: 0 4em;";
+    // };
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -170,7 +178,13 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row" v-if="isConflicted">
+                        <div class="col px-5">
+                            <span title="checkout --ours" @click="gitHandleConflict('--ours')">保留当前版本 | </span>
+                            <span title="checkout --theirs" @click="gitHandleConflict('--theirs')">保留传入的版本</span>
+                        </div>
+                    </div>
+                    <div class="row" v-else>
                         <div class="col-6">
                             <span class="file-label" v-show="titleLeft != 'undefined' ">{{ titleLeft }}</span>
                         </div>
@@ -190,22 +204,18 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
             var app = new Vue({
                 el: '#app',
                 data: {
-                    titleLeft: '',
-                    titleRight: '',
-                    selectedFilePath: '',
+                    titleLeft: '${titleLeft}',
+                    titleRight: '${titleRight}',
+                    selectedFilePath: '${selectedFilePath}',
+                    isConflicted: ${isConflicted},
                     gitDiffResult: ''
-                },
-                created() {
-                    this.titleLeft = '${titleLeft}';
-                    this.titleRight = '${titleRight}';
-                    this.selectedFilePath = '${selectedFilePath}'
                 },
                 mounted() {
                     that = this;
                     window.onload = function() {
                         setTimeout(function() {
                             that.forUpdate();
-                        }, 1000)
+                        }, 800)
                     };
                     this.forInit();
                 },
@@ -230,6 +240,12 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                     openLog() {
                         hbuilderx.postMessage({
                             command: 'openLog'
+                        });
+                    },
+                    gitHandleConflict(options) {
+                        hbuilderx.postMessage({
+                            command: 'handleConflict',
+                            options: options
                         });
                     }
                 }

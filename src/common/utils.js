@@ -553,16 +553,27 @@ async function gitClone(info) {
 };
 
 /**
- * @description 获取文件状态
+ * @description 获取具体文件状态
  * @param {Object} workingDir
  * @param {Object} options
  */
-async function gitFileStatus(workingDir, options) {
+async function gitFileStatus(workingDir, selectedFile, options) {
     try {
+        let result = {
+            "isConflicted": false,
+            "statusInfo": {}
+        };
         let statusSummary = await git(workingDir)
             .status(options)
             .then( (res) => {
-                return res['files'][0];
+                result.statusInfo = res['files'][0];
+                let conflicted = res.conflicted;
+                if (conflicted.length != 0) {
+                    if (conflicted[0] == selectedFile) {
+                        result.isConflicted = true;
+                    };
+                };
+                return result;
             })
             .catch( (error)=> {
                 return 'error';
@@ -624,7 +635,7 @@ async function gitStatus(workingDir) {
         if (conflicted.length) {
             for (let c of files) {
                 if (conflicted.includes(c.path)) {
-                    if (c.index != ' ' && c.working_dir == 'D') {
+                    if ((c.index != ' ' && c.working_dir == 'D') || (c.index == 'D' && c.working_dir == 'U')) {
                         conflicted_list.push({'path': c.path, 'tag': 'D'});
                     } else {
                         conflicted_list.push({'path': c.path, 'tag': 'C'});
