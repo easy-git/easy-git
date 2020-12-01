@@ -14,6 +14,11 @@ const voiceSay = require('./voice.js');
 
 const osName = os.platform();
 
+// hbuilderx version
+const cmp_hx_version = require('./cmp.js');
+let hxVersion = hx.env.appVersion;
+hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
+const cmpVersionResult = cmp_hx_version(hxVersion, '2.9.12');
 
 /**
  * @description 背景颜色、输入框颜色、字体颜色、线条颜色
@@ -1824,10 +1829,62 @@ async function gitRefs(workingDir) {
     }catch(e){
         return {}
     }
-}
+};
+
+/**
+ * @description 对话框
+ * @param {String} title
+ * @param {String} text
+ * @param {String} buttons 按钮，必须大于1个
+ */
+function hxShowMessageBox(title, text, buttons = ['关闭']) {
+    return new Promise((resolve, reject) => {
+        try {
+            if (cmpVersionResult <= 0) {
+                hx.window.showMessageBox({
+                    type: 'info',
+                    title: title,
+                    text: text,
+                    buttons: buttons,
+                    defaultButton: 0,
+                    escapeButton: -10
+                }).then(button => {
+                    resolve(button);
+                })
+            } else {
+                hx.window.showInformationMessage(text, buttons).then((result) => {
+                    resolve(result);
+                });
+            };
+        } catch (e) {
+            hx.window.showInformationMessage(text, buttons).then((result) => {
+                resolve(result);
+            });
+        }
+    });
+};
+
+/**
+ * @description Git文件删除
+ */
+async function gitRemoveFile(filepath,filename) {
+    let desc = `确定要删除${filename}吗？删除后无法恢复!`;
+    let status = await hxShowMessageBox('Git 文件删除', desc, ['确定','取消']).then(btnText => {
+        if (btnText == '确定') {
+            fs.unlinkSync(filepath)
+            hx.window.setStatusBarMessage(`${filename}删除成功!`);
+            return true;
+        } else {
+            hx.window.setStatusBarMessage(`${filename}删除操作被取消!`);
+            return false;
+        }
+    });
+    return status;
+};
 
 
 module.exports = {
+    hxShowMessageBox,
     createOutputChannel,
     isGitInstalled,
     getGitVersion,
@@ -1878,5 +1935,6 @@ module.exports = {
     gitCherryPick,
     FillCommitMessage,
     gitRevert,
-    gitRefs
+    gitRefs,
+    gitRemoveFile
 }

@@ -314,7 +314,7 @@ class GitFile {
         };
         if (fpath != 'all' && ftag.includes('?')) {
             let absPath = path.join(this.projectPath, fpath);
-            let status = await file.remove(absPath, fpath);
+            let status = await utils.gitRemoveFile(absPath, fpath);
             if (status) {
                 this.refreshFileList();
             };

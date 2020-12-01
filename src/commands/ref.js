@@ -4,7 +4,6 @@ const dayjs = require('dayjs');
 
 const {
     gitRaw,
-    createOutputChannel,
     gitTagCreate,
     gitPush,
     gitBranch,
@@ -18,7 +17,9 @@ const {
     gitCherryPick,
     gitRevert,
     gitReset,
-    gitRefs
+    gitRefs,
+    hxShowMessageBox,
+    createOutputChannel
 } = require('../common/utils.js');
 
 /**
@@ -165,16 +166,26 @@ class Branch {
         if (mergeResult) {
             ProjectInfo.easyGitInner = true;
             hx.commands.executeCommand('EasyGit.main', ProjectInfo);
-        };
-        if (mergeResult == 'fail' || mergeResult == 'conflicts') {
+
             let that = this;
             setTimeout(function() {
-                hx.window.showErrorMessage('EasyGit: 分支合并存在冲突，是否取消本次合并？', ['取消合并', '关闭']).then( (btn)=> {
-                    if (btn == '取消合并') {
+                let msg = mergeResult == 'success'
+                    ? `${that.currentBranch} 合并 ${selected} 分支成功，请选择接下来的操作？`
+                    : `${that.currentBranch} 合并 ${selected} 分支，部分文件存在冲突，请选择接下来的操作？`;
+                let btns = mergeResult == 'success'
+                    ? ['稍后推送', '立即推送'] : ['关闭', '取消合并', '去解决冲突'];
+                hxShowMessageBox('Git 分支合并', msg, btns).then(btnText => {
+                    if (btnText == '取消合并') {
                         that.mergeAbort(ProjectInfo);
-                    }
-                })
-            }, 2000);
+                    };
+                    if (btnText == '立即推送') {
+                        hx.commands.executeCommand('EasyGit.push', ProjectInfo);
+                        setTimeout(function() {
+                            hx.commands.executeCommand('EasyGit.main', ProjectInfo);
+                        }, 1200);
+                    };
+                });
+            }, 1000);
         };
     }
 
@@ -201,15 +212,21 @@ class Branch {
 
         if (selected == undefined && !selected) { return; };
 
-        let delResult;
-        if (selected.startsWith('origin/')) {
-            delResult = await gitDeleteRemoteBranch(projectPath, selected);
-        } else {
-            delResult = await gitDeleteLocalBranch(projectPath, selected);
-        };
-        if (delResult) {
-            ProjectInfo.easyGitInner = true;
-            hx.commands.executeCommand('EasyGit.branch', ProjectInfo);
+        let delMsg = `确定要删除 ${selected} 分支?`;
+        let btn = await hxShowMessageBox('Git: 分支删除', delMsg, ['删除','关闭']).then((result) =>{
+            return result;
+        });
+        if (btn == '删除') {
+            let delResult;
+            if (selected.startsWith('origin/')) {
+                delResult = await gitDeleteRemoteBranch(projectPath, selected);
+            } else {
+                delResult = await gitDeleteLocalBranch(projectPath, selected);
+            };
+            if (delResult) {
+                ProjectInfo.easyGitInner = true;
+                hx.commands.executeCommand('EasyGit.branch', ProjectInfo);
+            };
         };
     };
 
@@ -251,6 +268,7 @@ class Branch {
         ProjectInfo.easyGitInner = true;
 
         if (cherryPickResult == 'error') {
+            hx.window.showErrorMessage('Git: cherry-pick 操作异常，请手动排查错误！', ['我知道了'])
             return;
         } else if ( ['conflicts', 'fail'].includes(cherryPickResult)) {
             // 刷新源代码管理器

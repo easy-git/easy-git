@@ -162,19 +162,34 @@ class GitBranch {
         };
         let mergeStatus = await utils.gitBranchMerge(this.projectPath, fromBranch, toBranch);
         hx.commands.executeCommand('EasyGit.main', param);
-        if (mergeStatus == 'fail' || mergeStatus == 'conflicts') {
-            hx.window.showErrorMessage('EasyGit: 分支合并存在冲突，是否取消本次合并？', ['取消合并', '关闭']).then( (btn)=> {
-                if (btn == '取消合并') {
-                    hx.commands.executeCommand('EasyGit.mergeAbort', param);
-                };
-            });
+        if (mergeStatus != undefined) {
+            let that = this;
+            setTimeout(function() {
+                let msg = mergeStatus == 'success'
+                    ? `${toBranch} 合并 ${fromBranch} 分支成功，请选择接下来的操作？`
+                    : `${toBranch} 合并 ${fromBranch} 分支，部分文件存在冲突，请选择接下来的操作？`;
+                let btns = mergeStatus == 'success'
+                    ? ['稍后推送', '立即推送'] : ['关闭', '取消合并', '去解决冲突'];
+                utils.hxShowMessageBox('Git 分支合并', msg, btns).then(btnText => {
+                    console.log(btnText);
+                    if (btnText == '取消合并') {
+                        hx.commands.executeCommand('EasyGit.mergeAbort', param);
+                    };
+                    if (btnText == '立即推送') {
+                        hx.commands.executeCommand('EasyGit.push', param);
+                        setTimeout(function() {
+                            hx.commands.executeCommand('EasyGit.main', param);
+                        }, 1200);
+                    };
+                });
+            }, 1000);
         };
     };
 
     // Git branch: delete
     async delete(branchName) {
-        let delMsg = `Git: 确认删除 ${branchName} 分支?`;
-        let btn = await hx.window.showInformationMessage(delMsg, ['删除','关闭']).then((result) =>{
+        let delMsg = `确定要删除 ${branchName} 分支?`;
+        let btn = await utils.hxShowMessageBox('Git: 分支删除', delMsg, ['删除','关闭']).then((result) =>{
             return result;
         });
         if (btn == '关闭') {
