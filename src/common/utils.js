@@ -695,7 +695,7 @@ async function gitCommitPush(workingDir, commitComment) {
     hx.window.setStatusBarMessage('Git: 正在执行 commit 和 push操作...');
     try {
         let checkCert = await checkGitCredentials(workingDir);
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .commit(commitComment)
             .push()
             .then(() => {
@@ -737,7 +737,7 @@ async function gitAdd(workingDir, files) {
         files = './*'
     };
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .add(files)
             .then(() => {
                 hx.window.setStatusBarMessage('Git: 成功添加文件到暂存区。', 3000, 'info');
@@ -762,7 +762,7 @@ async function gitAdd(workingDir, files) {
  */
 async function gitCommit(workingDir, comment) {
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .commit(comment)
             .then(() => {
                 hx.window.setStatusBarMessage('Git: commit success', 3000, 'info');
@@ -789,7 +789,7 @@ async function gitAddCommit(workingDir,commitComment) {
     // status bar show message
     hx.window.setStatusBarMessage('Git: commit...');
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .add('*')
             .commit(commitComment)
             .then((res) => {
@@ -817,12 +817,12 @@ async function gitPush(workingDir, options=[]) {
     hx.window.setStatusBarMessage(`Git: 正在向远端推送.....`, 30000, 'info');
     try {
         let checkResult = await checkGitCredentials(workingDir);
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .push(options)
             .then((result) => {
                 hx.window.clearStatusBarMessage();
                 let pushResult = result.pushed;
-                if (JSON.stringify(pushResult) === '[]') {
+                if (JSON.stringify(pushResult) === '[]' || JSON.stringify(pushResult)) {
                     hx.window.setStatusBarMessage('Git: push操作成功', 30000, 'info');
                     voiceSay('push.success')
                 };
@@ -869,7 +869,7 @@ async function gitPull(workingDir,options) {
     hx.window.setStatusBarMessage(msg, 10000,'info');
 
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .pull(args)
             .then(() => {
                 hx.window.setStatusBarMessage('Git: pull success', 3000, 'info');
@@ -900,7 +900,7 @@ async function gitFetch(workingDir, isShowMsg=true) {
     };
     try {
         // '--all','--prune'
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .fetch(['--all'])
             .then((res) => {
                 if (isShowMsg) {
@@ -929,7 +929,7 @@ async function gitCancelAdd(workingDir, filename) {
     hx.window.setStatusBarMessage(`Git: ${filename} 正在取消暂存`);
 
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .reset(['HEAD', '--' ,filename])
             .then(() => {
                 hx.window.setStatusBarMessage('Git: 取消暂存成功', 3000, 'info');
@@ -953,7 +953,7 @@ async function gitCancelAdd(workingDir, filename) {
  */
 async function gitReset(workingDir, options, msg) {
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .reset(options)
             .then(() => {
                 hx.window.setStatusBarMessage(msg + '成功', 5000, 'info');
@@ -983,7 +983,7 @@ async function gitCheckoutFile(workingDir, filename) {
         args = ['.']
     };
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .checkout(args)
             .then(() => {
                 hx.window.setStatusBarMessage(`Git: ${filename} 成功撤销修改!`, 3000, 'info');
@@ -1008,7 +1008,7 @@ async function gitBranch(workingDir, options='-avvv') {
     let local = [];
     let remote = [];
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .branch(options)
             .then((info) => {
                 let branches = info.branches;
@@ -1072,26 +1072,20 @@ async function gitRawGetBranch(workingDir, commands) {
  */
 async function gitCurrentBranchName(workingDir) {
     try {
-        let status = await git(workingDir).init()
-            .branch()
+        let name = await git(workingDir)
+            .raw(['symbolic-ref', '--short', 'HEAD'])
             .then((info) => {
-                let currentbranchName = '';
-                for (let s in info.branches) {
-                    if ((info.branches[s]).current) {
-                        currentbranchName = (info.branches[s]).name;
-                        break;
-                    };
-                }
-                return currentbranchName;
+                info = info.trim();
+                return info == undefined || info == '' ? false : info;
             })
             .catch((err) => {
-                hx.window.setStatusBarMessage('Git: 获取当前分支信息失败', 3000, 'error');
+                hx.window.setStatusBarMessage('Git: 获取当前分支信息失败', 30000, 'error');
                 return false;
             });
-        return status;
+        return name;
     } catch (e) {
         return false;
-    }
+    };
 };
 
 /**
@@ -1099,7 +1093,7 @@ async function gitCurrentBranchName(workingDir) {
  */
 async function gitBranchSwitch(workingDir,branchName) {
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .checkout([branchName])
             .then(() => {
                 hx.window.setStatusBarMessage(`Git: 分支切换成功, 当前分支是 ${branchName}`, 3000, 'info');
@@ -1123,7 +1117,7 @@ async function gitBranchSwitch(workingDir,branchName) {
  */
 async function gitDeleteLocalBranch(workingDir,branchName) {
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .branch(['-D',branchName])
             .then(() => {
                 hx.window.setStatusBarMessage('Git: 本地分支强制删除成功!', 3000, 'info');
@@ -1150,7 +1144,7 @@ async function gitDeleteRemoteBranch(workingDir, branchName) {
 
     try {
         branchName = await branchName.replace('remotes/origin/','').replace('origin/','');
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .push(['origin', '--delete', branchName])
             .then(() => {
                 setTimeout(function() {
@@ -1192,7 +1186,7 @@ async function gitBranchCreate(data) {
     if (isPush) {
         try {
             let HEAD = "HEAD:" + newBranchName;
-            let status = await git(projectPath).init()
+            let status = await git(projectPath)
                 .checkout(args)
                 .push(["--set-upstream","origin",newBranchName])
                 .then(() => {
@@ -1210,7 +1204,7 @@ async function gitBranchCreate(data) {
         }
     } else {
         try {
-            let status = await git(projectPath).init()
+            let status = await git(projectPath)
                 .checkout(args)
                 .then(() => {
                     hx.window.setStatusBarMessage(`Git: ${newBranchName} 新分支创建成功`, 30000, 'info');
@@ -1237,7 +1231,7 @@ async function gitLocalBranchToRemote(workingDir,branchName) {
     hx.window.setStatusBarMessage(`Git: 正在把 ${branchName} 推送到远端，请耐心等待!`, 10000, 'info');
 
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .push(['--set-upstream', 'origin', branchName])
             .then(() => {
                 setTimeout(function() {
@@ -1266,7 +1260,7 @@ async function gitBranchCreatePush(workingDir,branchName) {
     // status bar show message
     hx.window.setStatusBarMessage('Git: create and push, in progress....!', 10000, 'info');
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .checkout(['-b',branchName])
             .push(['--set-upstream', 'origin', branchName])
             .then(() => {
@@ -1295,7 +1289,7 @@ async function gitBranchMerge(workingDir,fromBranch,toBranch) {
     hx.window.setStatusBarMessage(`'Git: 正在将 ${fromBranch} 合并到 ${toBranch}...`, 2000, 'info');
 
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .mergeFromTo(fromBranch,toBranch)
             .then((res) => {
                 hx.window.setStatusBarMessage(`Git: 分支${toBranch}，合并${fromBranch}的代码，合并成功！在命令面板中，可取消合并。`, 10000, 'info');
@@ -1327,7 +1321,7 @@ async function gitTagsList(workingDir) {
         "data": []
     }
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .tags()
             .then((res) => {
                 tagsList.data = res.all;
@@ -1354,7 +1348,7 @@ async function gitTagCreate(workingDir,tagOptions, tagName) {
     hx.window.setStatusBarMessage(`Git: 正在创建标签 ${tagName} ....`, 2000, 'info');
 
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .tag(tagOptions)
             .then(() => {
                 return 'success';
@@ -1386,7 +1380,7 @@ async function gitClean(workingDir) {
 
     try {
         hx.window.setStatusBarMessage('Git: 开始删除本地未跟踪的文件', 2000, 'info');
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .clean('f',['-d'])
             .then(() => {
                 hx.window.setStatusBarMessage(`Git: 成功删除未跟踪的文件`, 5000, 'info');
@@ -1409,7 +1403,7 @@ async function gitClean(workingDir) {
  */
 async function gitConfigShow(workingDir, isPrint=true) {
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .listConfig()
             .then((res) => {
                 res = Object.values(res.values);
@@ -1484,7 +1478,7 @@ async function gitLog(workingDir, searchType, filterCondition, refname) {
             return result;
         };
 
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .log(filter)
             .then((res) => {
                 let data = res.all;
@@ -1528,7 +1522,7 @@ async function gitDiffFile(workingDir,filename) {
 async function gitStash(projectInfo, options, msg) {
     try {
         let {projectPath} = projectInfo;
-        let status = await git(projectPath).init()
+        let status = await git(projectPath)
             .stash(options)
             .then((res) => {
                 if (res.includes('Saved') || res == '' || res.includes('Dropped')) {
@@ -1558,7 +1552,7 @@ async function gitStash(projectInfo, options, msg) {
  */
 async function gitStashList(workingDir) {
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .stashList()
             .then((res) => {
                 return res;
@@ -1580,7 +1574,7 @@ async function gitStashList(workingDir) {
 async function gitConfigSet(workingDir, data) {
     try {
         let {key, value} = data;
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .addConfig(key, value)
             .then((res) => {
                 hx.window.setStatusBarMessage(`Git: 设置${key}成功。`, 5000, 'info');
@@ -1603,7 +1597,7 @@ async function gitConfigSet(workingDir, data) {
  */
 async function gitAddRemote(workingDir, url) {
     try {
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .addRemote('origin', url)
             .then((res) => {
                 hx.window.setStatusBarMessage(`Git: 操作成功。`, 5000, 'info');
@@ -1696,7 +1690,7 @@ async function gitShowCommitFileChange(workingDir, options) {
             "errorMsg": '',
             "data": []
         }
-        let status = await git(workingDir).init()
+        let status = await git(workingDir)
             .show(options)
             .then((res) => {
                 result.data = res
