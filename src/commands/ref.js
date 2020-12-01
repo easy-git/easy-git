@@ -86,10 +86,11 @@ class Tag {
             let options = hash == null ? [tagName] : [tagName, hash];
             let status = await gitTagCreate(this.projectPath, options, tagName);
             if (status == 'success') {
-                hx.window.showInformationMessage(`Git: 在${titleLabel}上创建标签成功！`, ['立即推送到远端','以后再说']).then( (result)=> {
+                let desc = `标签 ${tagName} 创建成功！是否推送到远端？`;
+                hxShowMessageBox('Git 标签', desc, ['立即推送到远端','以后再说']).then( (result)=> {
                     if (result == '立即推送到远端') {
                         gitPush(this.projectPath, ['origin', tagName]);
-                    }
+                    };
                 });
                 if (param != null && JSON.stringify(param) != '{}') {
                     hx.commands.executeCommand('EasyGit.branch', param);
