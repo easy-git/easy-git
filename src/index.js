@@ -153,7 +153,6 @@ class Main extends Common {
     async notFocus() {
         let isGitProject = false;
         let { FoldersNum, Folders } = this.ExplorerInfo;
-
         if (FoldersNum != 1) {
             initView.show(this.webviewPanel, this.userConfig, this.ExplorerInfo);
             return;
@@ -183,6 +182,9 @@ class Main extends Common {
                     default:
                         break;
                 };
+            } else {
+                initView.show(this.webviewPanel, this.userConfig, this.ExplorerInfo);
+                return;
             };
         };
     };

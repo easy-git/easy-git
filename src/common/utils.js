@@ -1,6 +1,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const process = require('process');
 const {exec} = require('child_process');
 
 const hx = require('hbuilderx');
@@ -203,6 +204,29 @@ function importProjectToExplorer(projectPaht) {
     }
 };
 
+/**
+ * @description 检查项目是否Git项目
+ */
+function checkIsGitProject(projectPath) {
+    return new Promise((resolve, reject) => {
+        try{
+            process.chdir(projectPath);
+            exec('git rev-parse --git-dir', function(error, stdout, stderr) {
+                if (error) {
+                    reject(false)
+                };
+                if (stderr.includes('not a git repository')) {
+                    reject(false);
+                };
+                let tmp = stdout.trim();
+                let result = tmp.length >= 4 ? tmp : false;
+                resolve(result);
+            });
+        }catch(e){
+            reject(false);
+        };
+    });
+}
 
 /**
  * @description 获取项目管理器的项目数量
@@ -214,30 +238,42 @@ async function getFilesExplorerProjectInfo() {
         "FoldersNum": 0,
         "Folders": []
     };
-    let result = hx.workspace.getWorkspaceFolders().then(function(wsFolders) {
-        try{
-            let Folders = []
-            for (let item of wsFolders) {
-                let tmp = {
-                    'FolderPath': item.uri.fsPath,
-                    'FolderName': item.name,
-                    'isGit': false
-                };
-                let gitfsPath = path.join(item.uri.fsPath, '.git', 'config');
-                if (fs.existsSync(gitfsPath)) {
-                    tmp.isGit = true;
-                };
-                Folders.push(tmp);
-            };
-            data.FoldersNum = wsFolders.length;
-            data.Folders = Folders;
-        } catch (e) {
-            data.msg = "获取项目管理器项目信息失败";
-            data.success = false;
-        };
-        return data;
+
+    let wsFolders = await hx.workspace.getWorkspaceFolders().then(function(wsFolders) {
+        return wsFolders;
     });
-    return result;
+
+    try{
+        let Folders = []
+        for (let item of wsFolders) {
+            let tmp = {
+                'FolderPath': item.uri.fsPath,
+                'FolderName': item.name,
+                'isGit': false
+            };
+            // 判断是否是Git项目
+            let gitfsPath = path.join(item.uri.fsPath, '.git', 'config');
+            if (!fs.existsSync(gitfsPath)) {
+                try{
+                    let checkResult = await checkIsGitProject(item.uri.fsPath);
+                    if (checkResult) {
+                        tmp.isGit = true;
+                    };
+                }catch(e){
+                    tmp.isGit = false;
+                };
+            } else {
+                tmp.isGit = true;
+            };
+            Folders.push(tmp);
+        };
+        data.FoldersNum = wsFolders.length;
+        data.Folders = Folders;
+    } catch (e) {
+        data.msg = "获取项目管理器项目信息失败";
+        data.success = false;
+    };
+    return data;
 };
 
 
@@ -288,13 +324,13 @@ async function runCmd(cmd) {
  * @description 检查是否安装了Git
  */
 function isGitInstalled() {
-  const command = spawn.sync('git', ['--version'], {
-    stdio: 'ignore'
-  });
-  if (command.error) {
-    return false;
-  };
-  return true;
+    const command = spawn.sync('git', ['--version'], {
+        stdio: 'ignore'
+    });
+    if (command.error) {
+        return false;
+    };
+    return true;
 };
 
 /**
