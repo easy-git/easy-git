@@ -30,24 +30,24 @@ class Diff {
         let gitIndex = statusInfo.index;
         let gitWorking_dir = (statusInfo.working_dir).trim();
 
-        let options = ['diff', selectedFile];
+        let options = ['diff', '-U1000', selectedFile];
 
         let fileName = selectedFile.replace(this.projectPath, '').replace(/\\/g, '\/');
         let titleLeft, titleRight;
 
         switch (gitIndex){
             case 'M':
-                options = ['diff','--staged', selectedFile];
+                options = ['diff', '-U1000', '--staged', selectedFile];
                 titleRight = 'Working Tree';
                 break;
             case 'A':
-                options = ['diff','--cached', selectedFile];
+                options = ['diff', '-U1000', '--cached', selectedFile];
                 break;
             case 'U':
                 if (gitWorking_dir == 'U') {
-                    options = ['diff', selectedFile];
+                    options = ['diff',  '-U1000', selectedFile];
                 } else {
-                    options = ['diff','HEAD', selectedFile];
+                    options = ['diff', '-U1000', 'HEAD', selectedFile];
                 }
                 titleRight = 'HEAD';
                 break;
