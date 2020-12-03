@@ -219,8 +219,14 @@ function checkIsGitProject(projectPath) {
                     reject(false);
                 };
                 let tmp = stdout.trim();
-                let result = tmp.length >= 4 ? tmp : false;
-                resolve(result);
+                if (tmp.length == '.git') {
+                    resolve(projectPath);
+                } else if (tmp.length > 5) {
+                    let ppath = path.dirname(tmp);
+                    resolve(ppath);
+                } else {
+                    resolve(false);
+                };
             });
         }catch(e){
             reject(false);
@@ -244,25 +250,29 @@ async function getFilesExplorerProjectInfo() {
     });
 
     try{
-        let Folders = []
+        let Folders = [];
         for (let item of wsFolders) {
+            let selectPath = item.uri.fsPath;
             let tmp = {
-                'FolderPath': item.uri.fsPath,
+                'FolderPath': selectPath,
                 'FolderName': item.name,
-                'isGit': false
+                'isGit': false,
+                'GitRepository': undefined
             };
             // 判断是否是Git项目
-            let gitfsPath = path.join(item.uri.fsPath, '.git', 'config');
+            let gitfsPath = path.join(selectPath, '.git', 'config');
             if (!fs.existsSync(gitfsPath)) {
                 try{
-                    let checkResult = await checkIsGitProject(item.uri.fsPath);
+                    let checkResult = await checkIsGitProject(selectPath);
                     if (checkResult) {
+                        tmp.GitRepository = checkResult;
                         tmp.isGit = true;
                     };
                 }catch(e){
                     tmp.isGit = false;
                 };
             } else {
+                tmp.GitRepository = selectPath;
                 tmp.isGit = true;
             };
             Folders.push(tmp);
@@ -625,6 +635,47 @@ async function gitFileStatus(workingDir, selectedFile, options) {
     };
 };
 
+/**
+ * @description 获取git文件列表
+ * @param {String} workingDir Git工作目录
+ */
+async function gitFileList(workingDir) {
+    try {
+        let data = {
+            'msg': 'success',
+            'conflicted': [],
+            'staged': [],
+            'notStaged': []
+        };
+        await git(workingDir).raw(['status', '-s', '-u'])
+            .then((res) => {
+                let files = res.split('\n');
+                for (let s of files) {
+                    if (s != '') {
+                        let tag = s.slice(0,2);
+                        let fpath = s.slice(3);
+                        if (tag == 'UU' || tag == 'AA') {
+                            data.conflicted.push({'tag': 'C', 'path': fpath})
+                        }else if (tag.slice(0,1) == ' ' || tag == '??') {
+                            data.notStaged.push({'tag': tag.trim(), 'path': fpath})
+                        } else if (tag.slice(1,2) == ' ') {
+                            data.staged.push({'tag': tag.trim(), 'path': fpath})
+                        };
+                    };
+                };
+            })
+            .catch((err) => {
+                hx.window.showInformationMessage('EasyGit: 获取文件列表失败, 请重试或联系作者反馈问题。', ['我知道了']);
+                data.msg = 'error';
+            });
+        return data;
+    } catch (e) {
+        hx.window.showInformationMessage('EasyGit: 获取文件列表失败，请重试或联系作者反馈问题', ['我知道了']);
+        data.msg = 'error';
+    };
+    return data;
+};
+
 
 /**
  * @description 获取git信息
@@ -634,6 +685,7 @@ async function gitStatus(workingDir) {
     let result = {
         'gitEnvironment': true,
         'isGit': false,
+        'GitRepository': undefined,
         'tracking': '',
         'gitStatusResult': {},
         'FileResult': {
@@ -653,6 +705,14 @@ async function gitStatus(workingDir) {
         return undefined
     });
 
+    // 仓库地址
+    // checkResult = await checkIsGitProject(workingDir);
+    // if (checkResult) {
+    //     result.GitRepository = checkResult;
+    // } else {
+    //     result.GitRepository = workingDir;
+    // };
+
     try {
         let statusSummary = await git(workingDir).status();
         result.gitStatusResult = JSON.stringify(statusSummary);
@@ -669,48 +729,9 @@ async function gitStatus(workingDir) {
 
         // 所有文件列表
         let files = statusSummary.files;
-
-        // 合并更改（冲突）
-        let conflicted = statusSummary.conflicted ? statusSummary.conflicted : [];
-        let conflicted_list = [];
-        if (conflicted.length) {
-            for (let c of files) {
-                if (conflicted.includes(c.path)) {
-                    if ((c.index != ' ' && c.working_dir == 'D') || (c.index == 'D' && c.working_dir == 'U')) {
-                        conflicted_list.push({'path': c.path, 'tag': 'D'});
-                    } else {
-                        conflicted_list.push({'path': c.path, 'tag': 'C'});
-                    }
-                };
-            };
+        if (files.length) {
+            result.FileResult = await gitFileList(workingDir);
         };
-        result.FileResult.conflicted = conflicted_list;
-
-        // 暂存的变更
-        let staged = statusSummary.staged ? statusSummary.staged : [];
-        let staged_list = [];
-        if (files.length && files != undefined) {
-            let tmp3 = [...conflicted];
-            for (let s1 of files) {
-                if ((!tmp3.includes(s1.path) || staged.includes(s1.path)) && (s1.index != ' ' && s1.index != '?')) {
-                    let tag = s1.index != ' ' && s1.working_dir != ' ' ? s1.working_dir : s1.index;
-                    staged_list.push({'path': s1.path, 'tag': tag});
-                };
-            };
-        };
-        result.FileResult.staged = staged_list;
-
-        // 更改(未暂存)
-        let not_staged_list = [];
-        if (files.length && files != undefined) {
-            let tmp = [...conflicted];
-            for (let s of files) {
-               if ( !tmp.includes(s.path) && (['M', 'A', 'R', 'D','?', '!'].includes(s.working_dir) && s.working_dir != ' ')) {
-                    not_staged_list.push({'path': s.path, 'tag': s.working_dir});
-               };
-           };
-        };
-        result.FileResult.notStaged = not_staged_list;
     } catch (e) {
         result.gitEnvironment = false;
         return result;

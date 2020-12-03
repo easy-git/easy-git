@@ -171,7 +171,6 @@ class GitBranch {
                 let btns = mergeStatus == 'success'
                     ? ['稍后推送', '立即推送'] : ['关闭', '取消合并', '去解决冲突'];
                 utils.hxShowMessageBox('Git 分支合并', msg, btns).then(btnText => {
-                    console.log(btnText);
                     if (btnText == '取消合并') {
                         hx.commands.executeCommand('EasyGit.mergeAbort', param);
                     };
