@@ -155,7 +155,7 @@ class gitRestore {
             let cmd, msg;
             if (actionName == 'restoreStaged') {
                 cmd = ['reset', 'HEAD', '--', options];
-                msg = '取消暂存的文件，';
+                msg = '文件取消暂存，';
             };
             if (actionName == 'restoreChanged') {
                 cmd = ['checkout', '--', options];

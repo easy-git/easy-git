@@ -264,9 +264,14 @@ class GitFile {
     };
 
     // Git: cancel add
-    async cancelStash(fileUri) {
+    async cancelStash(fileUri, tag) {
         if (!fileUri) {return;};
-        fileUri = path.join(this.projectPath, fileUri);
+        if (tag == 'R') {
+            let tmp = (fileUri.split('->')[1]).trim();
+            fileUri = path.join(this.projectPath, tmp);
+        } else {
+            fileUri = path.join(this.projectPath, fileUri);
+        }
         let data = {
             'projectPath': this.projectPath,
             'projectName': this.projectName,
@@ -498,7 +503,7 @@ function active(webviewPanel, userConfig, gitData) {
                 gitAction.action(EasyGitInnerParams,msg.option);
                 break;
             case 'cancelStash':
-                File.cancelStash(msg.text);
+                File.cancelStash(msg.text, msg.tag);
                 break;
             case 'cancelAllStash':
                 File.cancelAllStash();

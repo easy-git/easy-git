@@ -386,7 +386,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                         <span title="打开文件" @click="openFile(vv.path);">${OpenFileIconSvg}</span>
                                         <span
                                             title="取消暂存 git restore --staged <file>"
-                                            @click="cancelStash(vv.path);">
+                                            @click="cancelStash(vv.path, vv.tag);">
                                             ${CancelIconSvg}
                                         </span>
                                     </div>
@@ -626,10 +626,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             text: fileUri
                         });
                     },
-                    cancelStash(fileUri) {
+                    cancelStash(fileUri, tag) {
                         hbuilderx.postMessage({
                             command: 'cancelStash',
-                            text: fileUri
+                            text: fileUri,
+                            tag: tag
                         });
                     },
                     cancelAllStash() {
