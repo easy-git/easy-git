@@ -318,19 +318,19 @@
                 {
                     "command": "EasyGit.main",
                     "title": "easy-git: 源代码管理",
-                    "when": "isGit",
+                    "when": "isGit && explorerResourceCount == 1",
                     "group": "z_commands"
                 },
                 {
                     "command": "EasyGit.log",
                     "title": "easy-git: 查看日志",
-                    "when": "isGit",
+                    "when": "isGit && explorerResourceCount == 1",
                     "group": "z_commands"
                 },
                 {
                     "command": "EasyGit.init",
                     "title": "easy-git: 初始化存储库",
-                    "when": "!isGit",
+                    "when": "!isGit && explorerResourceCount == 1 && explorerResourceIsFolder",
                     "group": "z_commands"
                 },
                 {
