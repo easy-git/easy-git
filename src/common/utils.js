@@ -639,7 +639,7 @@ async function gitFileStatus(workingDir, selectedFile, options) {
  * @description 获取git文件列表
  * @param {String} workingDir Git工作目录
  */
-async function gitFileList(workingDir) {
+async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
     try {
         let data = {
             'msg': 'success',
@@ -647,7 +647,7 @@ async function gitFileList(workingDir) {
             'staged': [],
             'notStaged': []
         };
-        await git(workingDir).raw(['status', '-s', '-u'])
+        await git(workingDir).raw(options)
             .then((res) => {
                 let files = res.split('\n');
                 for (let s of files) {
@@ -730,7 +730,7 @@ async function gitStatus(workingDir) {
         // 所有文件列表
         let files = statusSummary.files;
         if (files.length) {
-            result.FileResult = await gitFileList(workingDir);
+            result.FileResult = await gitFileListStatus(workingDir);
         };
     } catch (e) {
         result.gitEnvironment = false;
