@@ -85,6 +85,15 @@ function getWebviewContent(userConfig, uiData, gitData) {
             [v-cloak] {
                 display: none;
             }
+            * {
+                moz-user-select: -moz-none;
+                -moz-user-select: none;
+                -o-user-select:none;
+                -khtml-user-select:none;
+                -webkit-user-select:none;
+                -ms-user-select:none;
+                user-select:none;
+            }
             body::-webkit-scrollbar {
                 display: none;
             }

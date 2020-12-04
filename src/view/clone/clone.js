@@ -47,7 +47,7 @@ function show(webviewPanel, userConfig) {
         viewid: "EasyGitSourceCodeView",
         containerid: "EasyGitSourceCodeView"
     });
-    
+
     // 根据主题适配颜色
     let colorData = utils.getThemeColor('left');
     let {fontColor} = colorData;
@@ -149,6 +149,13 @@ function generateLogHtml(userConfig, uiData, hxData) {
                 }
                 * {
                     outline: none;
+                    moz-user-select: -moz-none;
+                    -moz-user-select: none;
+                    -o-user-select:none;
+                    -khtml-user-select:none;
+                    -webkit-user-select:none;
+                    -ms-user-select:none;
+                    user-select:none;
                 }
                 [v-cloak] {
                     display: none;
