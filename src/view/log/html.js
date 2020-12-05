@@ -696,9 +696,13 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             this.selectedLogID = item.hash;
                             this.rightClickItem = item;
                             this.left = e.pageX;
+                            let pageYOffset = window.pageYOffset;
                             let t = window.innerHeight - e.pageY;
-                            if (t < 420) {
-                                this.top =  e.pageY - 420;
+                            if (pageYOffset > 0) {
+                                t = window.innerHeight - e.pageY + pageYOffset;
+                            };
+                            if (t < 425 && e.pageY > 425) {
+                                this.top =  e.pageY - 425;
                             } else {
                                 this.top = e.pageY;
                             };
