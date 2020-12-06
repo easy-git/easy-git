@@ -16,9 +16,49 @@ class Diff {
         this.webviewPanel = webviewPanel;
         this.projectPath = ProjectData.projectPath;
         this.userConfig = userConfig;
+        this.isFullTextDiffFile = 3;
+    }
+
+    async getFileDiffConfig() {
+        let config = await hx.workspace.getConfiguration();
+        let isFullTextDiffFile = config.get('EasyGit.isFullTextDiffFile');
+        if (isFullTextDiffFile != 'full' && isFullTextDiffFile) {
+            try{
+                let result = parseInt(isFullTextDiffFile);
+                if (typeof result === 'number' && !isNaN(result)) {
+                    this.isFullTextDiffFile = result;
+                } else {
+                    this.isFullTextDiffFile = 3;
+                };
+            }catch(e){
+                this.isFullTextDiffFile = 3;
+            };
+        };
+        if (isFullTextDiffFile == 'full' || isFullTextDiffFile == true) {
+            this.isFullTextDiffFile = 100000;
+        };
+
+        let msg = `EasyGit: 目前文件对比使用 ${this.isFullTextDiffFile} 行上下文生成差异, 是否修改？修改后，下次生效。`;
+        setTimeout(function() {
+            if (isFullTextDiffFile == undefined) {
+                hx.window.showInformationMessage(msg, ['使用全文对比', '保持默认']).then( (res)=> {
+                    if (res == '保持默认') {
+                        config.update("EasyGit.isFullTextDiffFile", "3").then(() => {});
+                    };
+                    if (res == '使用全文对比') {
+                        this.isFullTextDiffFile = 100000;
+                        config.update("EasyGit.isFullTextDiffFile", "full").then(() => {});
+                    };
+                });
+            };
+        }, 3500);
     }
 
     async getDiffOptions(selectedFile) {
+
+        // 是否全文显示对比
+        await this.getFileDiffConfig();
+
         let resut = await utils.gitFileStatus(this.projectPath, selectedFile, ['-s', selectedFile]);
 
         // 目前仅支持对比本地有更改的文件
@@ -30,36 +70,37 @@ class Diff {
         let gitIndex = statusInfo.index;
         let gitWorking_dir = (statusInfo.working_dir).trim();
 
-        let options = ['diff', '-U1000', selectedFile];
+        let lineOption = `-U${this.isFullTextDiffFile}`;
+        let options = ['diff', lineOption, selectedFile];
 
         let fileName = selectedFile.replace(this.projectPath, '').replace(/\\/g, '\/');
         let titleLeft, titleRight;
 
         switch (gitIndex){
             case 'M':
-                options = ['diff', '-U1000', '--staged', selectedFile];
+                options = ['diff', lineOption, '--staged', selectedFile];
                 titleRight = 'Working Tree';
                 break;
             case 'A':
-                options = ['diff', '-U1000', '--cached', selectedFile];
+                options = ['diff', lineOption, '--cached', selectedFile];
                 break;
             case 'U':
                 if (gitWorking_dir == 'U') {
-                    options = ['diff',  '-U1000', selectedFile];
+                    options = ['diff',  lineOption, selectedFile];
                 } else {
-                    options = ['diff', '-U1000', 'HEAD', selectedFile];
+                    options = ['diff', lineOption, 'HEAD', selectedFile];
                 }
                 titleRight = 'HEAD';
                 break;
             default:
                 break;
-        }
+        };
         let data = {
             "diff_options": options,
             "titleLeft": titleLeft,
             "titleRight": titleRight,
             "isConflicted": isConflicted
-        }
+        };
         return data;
     }
 
