@@ -165,11 +165,17 @@ class GitBranch {
         if (mergeStatus != undefined) {
             let that = this;
             setTimeout(function() {
-                let msg = mergeStatus == 'success'
-                    ? `${toBranch} 合并 ${fromBranch} 分支成功，请选择接下来的操作？`
-                    : `${toBranch} 合并 ${fromBranch} 分支，部分文件存在冲突，请选择接下来的操作？`;
-                let btns = mergeStatus == 'success'
-                    ? ['稍后推送', '立即推送'] : ['关闭', '取消合并', '去解决冲突'];
+                let msg = `${toBranch} 合并 ${fromBranch} 分支成功，请选择接下来的操作？`;
+                let btns = ['稍后推送', '立即推送'];
+                if (mergeStatus == 'conflicts') {
+                    msg = `${toBranch} 合并 ${fromBranch} 分支，部分文件存在冲突，请选择接下来的操作？`;
+                    btns = ['关闭', '取消合并', '去解决冲突']
+                };
+                if (mergeStatus == 'fail') {
+                    msg = `${toBranch} 合并 ${fromBranch} 分支，合并失败，请解决错误后，再次进行合并。\n 错误信息，请查看控制台。`;
+                    btns = ['好的', '关闭']
+                };
+
                 utils.hxShowMessageBox('Git 分支合并', msg, btns).then(btnText => {
                     if (btnText == '取消合并') {
                         hx.commands.executeCommand('EasyGit.mergeAbort', param);

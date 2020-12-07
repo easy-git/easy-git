@@ -170,11 +170,17 @@ class Branch {
 
             let that = this;
             setTimeout(function() {
-                let msg = mergeResult == 'success'
-                    ? `${that.currentBranch} 合并 ${selected} 分支成功，请选择接下来的操作？`
-                    : `${that.currentBranch} 合并 ${selected} 分支，部分文件存在冲突，请选择接下来的操作？`;
-                let btns = mergeResult == 'success'
-                    ? ['稍后推送', '立即推送'] : ['关闭', '取消合并', '去解决冲突'];
+                let msg = `${that.currentBranch} 合并 ${selected} 分支成功，请选择接下来的操作？`;
+                let btns = ['稍后推送', '立即推送'];
+                if (mergeResult == 'conflicts') {
+                    msg = `${that.currentBranch} 合并 ${selected} 分支，部分文件存在冲突，请选择接下来的操作？`;
+                    btns = ['关闭', '取消合并', '去解决冲突']
+                };
+                if (mergeResult == 'fail') {
+                    msg = `${that.currentBranch} 合并 ${selected} 分支，合并失败，请解决错误后，再进行合并。\n 错误信息，请查看控制台。`;
+                    btns = ['好的', '关闭']
+                };
+
                 hxShowMessageBox('Git 分支合并', msg, btns).then(btnText => {
                     if (btnText == '取消合并') {
                         that.mergeAbort(ProjectInfo);
