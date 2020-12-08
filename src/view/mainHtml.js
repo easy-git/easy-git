@@ -45,7 +45,6 @@ function getWebviewContent(userConfig, uiData, gitData) {
         ChevronDownIcon,
         ChevronRightIcon
     } = uiData;
-
     let {
         projectPath,
         projectName,
@@ -54,8 +53,13 @@ function getWebviewContent(userConfig, uiData, gitData) {
         tracking,
         ahead,
         behind,
-        originurl
+        originurl,
+        BranchTracking
     } = gitData;
+
+    if (BranchTracking == null) {
+        GitAlwaysAutoCommitPush = false;
+    };
 
     let gitFileResult = JSON.stringify(FileResult);
     let originurlBoolean = originurl != undefined ? true : false;
@@ -517,7 +521,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
 
                     // 用户是否设置自动commit -> push
                     let GitAlwaysAutoCommitPush =  ${GitAlwaysAutoCommitPush};
-                    if (GitAlwaysAutoCommitPush != undefined) {
+                    if (GitAlwaysAutoCommitPush != undefined && GitAlwaysAutoCommitPush) {
                         this.GitAlwaysAutoCommitPush = GitAlwaysAutoCommitPush;
                     };
                 },

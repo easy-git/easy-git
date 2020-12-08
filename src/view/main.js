@@ -137,12 +137,14 @@ class GitFile {
         this.projectName = projectName;
         this.uiData = uiData;
         this.userConfig = userConfig;
+        this.BranchTracking = false;
     }
 
     // refresh webview git filelist
     async refreshFileList() {
         try{
             let gitInfo = await utils.gitStatus(this.projectPath);
+            let { BranchTracking } = gitInfo;
             const gitData = Object.assign(gitInfo, {
                 'projectName': this.projectName,
                 'projectPath': this.projectPath
@@ -204,6 +206,18 @@ class GitFile {
 
         if (isStaged) {
             let AlwaysAutoCommitPush = config.get('EasyGit.AlwaysAutoCommitPush');
+
+            // commit & push的前提：本地分支必须关联到远端
+            if (this.BranchTracking == null || this.BranchTracking == false) {
+                let gitInfo = await utils.gitStatus(this.projectPath);
+                let { BranchTracking } = gitInfo;
+                if (BranchTracking != null) {
+                    this.BranchTracking = true;
+                } else {
+                    AlwaysAutoCommitPush = false;
+                };
+            };
+
             if (AlwaysAutoCommitPush) {
                 let cpStatus = await utils.gitCommitPush(this.projectPath, comment);
                 if (cpStatus == 'success') {
@@ -328,7 +342,20 @@ class GitFile {
 
     // Git: push
     async push() {
-        let pushStatus = await utils.gitPush(this.projectPath);
+        let options = [];
+
+        // push的前提：本地分支必须关联到远端
+        if (this.BranchTracking == null || this.BranchTracking == false) {
+            let gitInfo = await utils.gitStatus(this.projectPath);
+            let { BranchTracking,currentBranch } = gitInfo;
+            if (BranchTracking != null) {
+                this.BranchTracking = true;
+            } else {
+                options = ['--set-upstream', 'origin', currentBranch];
+            };
+        };
+
+        let pushStatus = await utils.gitPush(this.projectPath, options);
         if (pushStatus == 'success') {
             this.refreshFileList();
         };
@@ -373,10 +400,11 @@ class GitFile {
         let branchName = msg.text;
         let pushStatus = await utils.gitAddRemoteOrigin(this.projectPath);
         if (pushStatus == 'success') {
-            let AssociationResult = await utils.gitLocalBranchToRemote(this.projectPath, branchName);
-            if (AssociationResult) {
-                this.refreshFileList();
-            };
+            // let AssociationResult = await utils.gitLocalBranchToRemote(this.projectPath, branchName);
+            // if (AssociationResult) {
+            //     this.refreshFileList();
+            // };
+            this.refreshFileList();
         };
     };
 
