@@ -21,15 +21,14 @@ const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'boo
  * @description 读取HBuilderX.ini, 获取ProjectWizard
  */
 function getProjectWizard() {
-    let iniFile = '';
     try{
-        const appData = hx.env.appData;
-        const iniFile = path.join(appData,'HBuilder X.ini')
-        const fileinfo = ini.parse(fs.readFileSync(iniFile, 'utf-8'));
-        const ProjectWizard = path.join(fileinfo.ProjectWizard.location,'/');
-        return ProjectWizard;
-    } catch(e){
-        return '';
+        if (osName == 'darwin') {
+            return path.join(process.env.HOME, 'Documents')
+        } else {
+            return path.join(process.env.HOMEPATH, 'Documents')
+        }
+    }catch(e){
+        return ''
     };
 };
 
@@ -187,6 +186,7 @@ function generateLogHtml(userConfig, uiData, hxData) {
                     background-color:${background} !important;
                     font-size: 0.9rem !important;
                     border: 1px solid ${lineColor} !important;
+                    color: ${fontColor} !important;
                 }
                 .form-control:focus {
                     border: 1px solid ${inputLineColor} !important;
