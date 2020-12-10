@@ -344,15 +344,21 @@ class GitFile {
     async push() {
         let options = [];
 
+        let gitInfo = await utils.gitStatus(this.projectPath);
+        let { BranchTracking,currentBranch, ahead } = gitInfo;
+
         // push的前提：本地分支必须关联到远端
         if (this.BranchTracking == null || this.BranchTracking == false) {
-            let gitInfo = await utils.gitStatus(this.projectPath);
-            let { BranchTracking,currentBranch } = gitInfo;
             if (BranchTracking != null) {
                 this.BranchTracking = true;
             } else {
                 options = ['--set-upstream', 'origin', currentBranch];
             };
+        };
+        
+        if (ahead == 0 || ahead == undefined ) {
+            hx.window.showInformationMessage("EasyGit: 当前没有要提交的内容。", ["我知道了"]);
+            return;
         };
 
         let pushStatus = await utils.gitPush(this.projectPath, options);

@@ -588,7 +588,7 @@ async function gitClone(info) {
 
         createOutputChannelForClone(`开始克隆 ${projectName}！\n`, false);
         createOutputChannelForClone(`备注1：克隆进度跟项目大小、网络有关，需要一定时间，请不要重复点击【克隆】按钮。`, false);
-        createOutputChannelForClone(`备注2：克隆成功后，会自动将克隆项目，加入到HBuilderX项目管理器。\n`, false);
+        createOutputChannelForClone(`备注2：克隆成功后，会自动将克隆项目，加入到HBuilderX项目管理器。如未显示在项目管理器，请手动导入或拖入。\n`, false);
 
         let status = await runGitClone(options)
         if (status == 'success') {
@@ -966,7 +966,7 @@ async function gitFetch(workingDir, isShowMsg=true) {
                 return 'success';
             })
             .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
+                let errMsg = (err).toString();
                 createOutputChannel('Git: fetch失败', errMsg);
                 return 'fail';
             });
