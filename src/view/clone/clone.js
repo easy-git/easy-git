@@ -25,7 +25,7 @@ function getProjectWizard() {
         if (osName == 'darwin') {
             return path.join(process.env.HOME, 'Documents')
         } else {
-            return path.join(process.env.HOMEPATH, 'Documents')
+            return path.join("C:", process.env.HOMEPATH, 'Documents')
         }
     }catch(e){
         return ''
@@ -284,7 +284,13 @@ function generateLogHtml(userConfig, uiData, hxData) {
                             this.btnDisable = false;
                             let repo = this.repo;
                             let projectName = ((repo.split('/')).pop()).replace('.git','');
-                            this.cloneInfo.localPath = this.ProjectWizard + projectName;
+                            let ProjectWizard = this.ProjectWizard;
+                            let lastChar = ProjectWizard.substr(ProjectWizard.length-1,1);
+                            if ( lastChar == '/' || lastChar == '\') {
+                                this.cloneInfo.localPath = this.ProjectWizard + projectName;
+                            } else {
+                                this.cloneInfo.localPath = this.ProjectWizard + '/' + projectName;
+                            };
                         }
                     },
                     created() {
