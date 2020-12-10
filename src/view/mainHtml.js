@@ -306,6 +306,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 <i title="更多操作">${MenuIcon}</i>
                                 <div id="menu" :class="[ isShowMenu ? 'menu' : 'd-none' ]" @mouseleave="isShowMenu=false">
                                     <ul>
+								        <li title="git commit，仅提交，不受其它设置影响" @click="gitCommit(true);">提交 - commit</li>
                                         <li title="git pull" @click="gitPull('');">拉取 - pull</li>
                                         <li title="git pull" @click="gitPush();">推送 - push</li>
                                         <li class="divider"></li>
@@ -673,7 +674,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             command: 'CommitMessage'
                         });
                     },
-                    gitCommit() {
+                    gitCommit(onlyCommit=false) {
                         let ChangeList = this.gitNotStagedileList;
                         let stagedList = this.gitStagedFileList;
                         let ConflictedList = this.gitConflictedFileList;
@@ -685,7 +686,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             command: 'commit',
                             comment: this.commitMessage,
                             isStaged: isStaged,
-                            exist: exist
+                            exist: exist,
+                            onlyCommit: onlyCommit
                         });
                     },
                     gitPush() {

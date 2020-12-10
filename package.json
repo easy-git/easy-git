@@ -72,7 +72,7 @@
                 "EasyGit.AlwaysAutoCommitPush": {
                     "type": "boolean",
                     "default": false,
-                    "description": "源代码管理器，点击commit图标，执行commit时，并执行push。"
+                    "description": "源代码管理器，点击commit图标，执行commit时，并执行push (仅适用于已暂存的文件，没有暂存的文件，点击commit图标，不会push。)。"
                 },
                 "EasyGit.DisableDevTools": {
                     "type": "boolean",

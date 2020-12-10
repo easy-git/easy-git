@@ -194,7 +194,14 @@ class GitFile {
     };
 
     // Git: commit
-    async commit(isStaged, exist, comment) {
+    async commit(msg) {
+        let { isStaged, exist, comment, onlyCommit } = msg;
+        
+        if (isStaged == false && onlyCommit == true) {
+            hx.window.showInformationMessage('Git:  此操作仅执行commit命令。请先暂存文件，再进行提交操作。', ['我知道了']);
+            return;
+        };
+
         if (exist == 0){
             return hx.window.setStatusBarMessage('Git: 当前不存在要提交的文件',3000,'info');
         };
@@ -218,7 +225,7 @@ class GitFile {
                 };
             };
 
-            if (AlwaysAutoCommitPush) {
+            if (AlwaysAutoCommitPush && !onlyCommit) {
                 let cpStatus = await utils.gitCommitPush(this.projectPath, comment);
                 if (cpStatus == 'success') {
                     this.refreshFileList();
@@ -355,7 +362,7 @@ class GitFile {
                 options = ['--set-upstream', 'origin', currentBranch];
             };
         };
-        
+
         if (ahead == 0 || ahead == undefined ) {
             hx.window.showInformationMessage("EasyGit: 当前没有要提交的内容。", ["我知道了"]);
             return;
@@ -511,8 +518,7 @@ function active(webviewPanel, userConfig, gitData) {
                 File.getCommitMessage();
                 break;
             case 'commit':
-                let {isStaged,exist,comment} = msg;
-                File.commit(isStaged, exist, comment);
+                File.commit(msg);
                 break;
             case 'ResetSoftHEAD':
                 File.resetLastCommit();
