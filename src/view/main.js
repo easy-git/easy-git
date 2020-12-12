@@ -363,7 +363,7 @@ class GitFile {
             };
         };
 
-        if (ahead == 0 || ahead == undefined ) {
+        if ((ahead == 0 || ahead == undefined) && BranchTracking != null) {
             hx.window.showInformationMessage("EasyGit: 当前没有要提交的内容。", ["我知道了"]);
             return;
         };
