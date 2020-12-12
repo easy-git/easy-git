@@ -23,8 +23,13 @@ function isJSON(str) {
  * @description show box
  * @更新弹窗，点击【以后再说】，则本周内不再自动弹窗提示
  */
-function showUpgradeBox() {
-    let msg = '插件【easry-git】 发布了新版本！快去HBuilderX插件市场更新吧！<a href="https://ext.dcloud.net.cn/plugin?name=easy-git">更新日志</a>\n';
+function showUpgradeBox(marketPluginVersion) {
+    if (marketPluginVersion == '' || marketPluginVersion == undefined ) {
+        return;
+    };
+    let lastChar = marketPluginVersion.charAt(marketPluginVersion.length - 1);
+    let versiondescription = lastChar == 0 ? '【easry-git】 重大更新！' : '插件【easry-git】 发布了新版本！'
+    let msg = `${versiondescription} 快去HBuilderX插件市场更新吧！<a href="https://ext.dcloud.net.cn/plugin?name=easy-git">更新日志</a>\n`;
     let btn = ['立即更新','以后再说'];
 
     hx.window.showInformationMessage(msg, btn).then(result => {
@@ -49,14 +54,14 @@ function showUpgradeBox() {
 function noUpgrade() {
     let msg = 'EasyGit: 当前是最新版本，没有可用的更新。';
     let btns = ['关闭']
-    
+
     let config = hx.workspace.getConfiguration();
     let updatePrompt = config.get('EasyGit.updatePrompt');
     let updatePromptTime = config.get('EasyGit.updatePromptTime');
     if (updatePromptTime != undefined || updatePrompt != undefined) {
         btns = ['有更新时提醒我', '关闭'];
     };
-    
+
     hx.window.showInformationMessage(msg, btns).then(result => {
         if (result === '有更新时提醒我') {
             config.update('EasyGit.updatePrompt', true).then( () => {
@@ -105,7 +110,8 @@ async function checkUpdate(mode) {
                     for (let s of plugins) {
                         if (s.name == 'easy-git') {
                             if (s.version != version) {
-                                showUpgradeBox();
+                                let marketPluginVersion = s.version;
+                                showUpgradeBox(marketPluginVersion);
                             } else {
                                 if (mode != 'auto') {
                                     noUpgrade();
