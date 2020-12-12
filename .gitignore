@@ -15,4 +15,5 @@ unpackage/dist/dev/
 *.pyc
 
 # todo.md
+docs/todo.md
 docs/test.js
