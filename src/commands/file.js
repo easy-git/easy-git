@@ -58,27 +58,33 @@ async function goCleanFile(ProjectInfo) {
 /**
  * @description 修改最后一次提交的注释
  */
-async function goCommitAmend(ProjectInfo) {
+async function goCommit(ProjectInfo, amend=false) {
+    let prompt = amend ? 'commit - 修改最后提交的commit消息' : 'commit - 请输入提交消息';
     let inputResult = await hx.window.showInputBox({
-        prompt: "commit - 请输入要修改的注释信息",
+        prompt: prompt,
         placeHolder: '消息必填'
     }).then((result)=>{
         return result
     });
     if (inputResult.trim() == '' && inputResult.length <= 3) {
-        hx.window.showErrorMessage('EasyGit: 请输入有效的注释信息！', ['我知道了']);
+        hx.window.showErrorMessage('EasyGit: 请输入有效的信息！', ['我知道了']);
         return;
     };
 
     let { projectPath } = ProjectInfo;
     ProjectInfo.easyGitInner = true;
 
-    let options = ['commit', '--amend', '-m', inputResult];
-    let amendResult = await gitRaw(projectPath, options, '修改注释');
+    let options = ['commit', '-m', inputResult];
+    if (amend) {
+        options = ['commit', '--amend', '-m', inputResult];
+    };
+
+    let msg = amend ? 'commit --amend' : 'commit';
+    let amendResult = await gitRaw(projectPath, options, msg);
     if (amendResult == 'success') {
         setTimeout(function() {
             hx.commands.executeCommand('EasyGit.log', ProjectInfo);
-        }, 2000);
+        }, 1500);
     };
 };
 
@@ -180,7 +186,7 @@ class gitRestore {
                 cmd1 = ['restore', options];
                 msg1 = '撤消对文件的修改，';
             };
-            
+
             let cancelStatus = await gitRaw(projectPath, cmd1, msg1);
             if (cancelStatus == 'success') {
                 SelectedInfo.easyGitInner = true;
@@ -195,5 +201,5 @@ module.exports = {
     gitAddFile,
     gitRestore,
     goCleanFile,
-    goCommitAmend
+    goCommit
 }

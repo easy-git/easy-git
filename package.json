@@ -20,6 +20,7 @@
         "onCommand:EasyGit.init",
         "onCommand:EasyGit.addRemoteOrigin",
         "onCommand:EasyGit.add",
+        "onCommand:EasyGit.commit",
         "onCommand:EasyGit.commitAmend",
         "onCommand:EasyGit.resetSoftLastCommit",
         "onCommand:EasyGit.resetHardLastCommit",
@@ -185,8 +186,12 @@
                 "title": "easy-git: add - 添加文件到暂存区"
             },
             {
+                "command": "EasyGit.commit",
+                "title": "easy-git: commit 提交代码"
+            },
+            {
                 "command": "EasyGit.commitAmend",
-                "title": "easy-git: commit --amend 修改最后提交的commit注释"
+                "title": "easy-git: commit --amend 修改最后提交的commit消息"
             },
             {
                 "command": "EasyGit.resetSoftLastCommit",

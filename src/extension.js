@@ -138,6 +138,12 @@ function activate(context) {
     });
     context.subscriptions.push(add);
 
+    // git commit
+    let commit = hx.commands.registerCommand('EasyGit.commit', (param)=> {
+        git.action(param, 'commit');
+    });
+    context.subscriptions.push(commit);
+
     // git commit --amend
     let commitAmend = hx.commands.registerCommand('EasyGit.commitAmend', (param)=> {
         git.action(param, 'commitAmend');

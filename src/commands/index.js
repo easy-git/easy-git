@@ -7,7 +7,7 @@ const utils = require('../common/utils.js');
 
 const { goStash, goStashPop, goStashClear } = require('./stash.js');
 const { gitInitProject } = require('./repository.js');
-const { gitAddFile, gitRestore, goCleanFile, goCommitAmend } = require('./file.js');
+const { gitAddFile, gitRestore, goCleanFile, goCommit } = require('./file.js');
 const { goSetConfig } = require('./base.js');
 
 const { Tag, Branch, Revert, Reset, Archive, reflog } = require('./ref.js');
@@ -70,8 +70,11 @@ function action(param,action_name) {
         case 'add':
             gitAddFile(ProjectInfo);
             break;
+        case 'commit':
+            goCommit(ProjectInfo);
+            break;
         case 'commitAmend':
-            goCommitAmend(ProjectInfo);
+            goCommit(ProjectInfo, true);
             break;
         case 'resetSoftLastCommit':
             let rt = new Reset();
