@@ -17,7 +17,7 @@ async function gitBlameForLineChange(projectPath, selectedFile) {
         let tmp = (lineNumber + 1).toString();
 
         let range = tmp + ',' + tmp;
-        let commands = ['blame', '-L', range, selectedFile];
+        let commands = ['blame', '--date=format:"%Y-%m-%d %H:%M:%S"' ,'-L', range, selectedFile];
 
         let errorMsg = 'Git: 获取当前行，最后修改的信息失败!'
         try{
@@ -26,9 +26,11 @@ async function gitBlameForLineChange(projectPath, selectedFile) {
             if (m == '' || m == undefined) {
                 return hx.window.setStatusBarMessage(errorMsg, 5000, 'error');
             };
-            hx.window.setStatusBarMessage(`Git: 当前行最后修改信息, ${m}`, 5000, 'info');
+            m = m.substr(0, m.length - 1);
+            hx.window.setStatusBarMessage(`Git: 当前行最后修改信息:  ${m}`, 20000, 'info');
         }catch(e){
-            return hx.window.setStatusBarMessage(errorMsg, 5000, 'error');
+            console.log(e)
+            return hx.window.setStatusBarMessage(errorMsg, 20000, 'error');
         };
     } else {
         return hx.window.showErrorMessage('EasyGit: 请将焦点置于打开的文件内容行上。', ['我知道了']);
