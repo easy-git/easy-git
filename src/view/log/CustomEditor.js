@@ -70,6 +70,7 @@ class CatCustomEditorProvider extends CustomEditorProvider {
             // GitLogCustomWebViewPanal = {};
             // isCustomFirstOpen = true;
             GitLogCustomEditorStatus = false;
+            hx.window.setStatusBarMessage('EasyGit: 日志视图已关闭, 如需要，请重新打开！', 5000, 'info');
         });
     }
 };

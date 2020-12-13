@@ -67,6 +67,7 @@ class CatDiffCustomEditorProvider extends CustomEditorProvider {
         webViewPanel.onDidDispose(function() {
             GitDiffCustomWebViewPanal = {};
             isCustomFirstOpen = false;
+            hx.window.setStatusBarMessage('EasyGit: 文件对比视图已关闭, 如需要，请重新打开！', 5000, 'info');
         });
     }
 };
