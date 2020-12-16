@@ -23,17 +23,19 @@ function isJSON(str) {
  * @description show box
  * @更新弹窗，点击【以后再说】，则本周内不再自动弹窗提示
  */
-function showUpgradeBox(marketPluginVersion) {
+function showUpgradeBox(localVersion, marketPluginVersion) {
     if (marketPluginVersion == '' || marketPluginVersion == undefined ) {
         return;
     };
     let lastChar = marketPluginVersion.charAt(marketPluginVersion.length - 1);
-    let versiondescription = lastChar == 0 ? '【easry-git】 重大更新！' : '插件【easry-git】 发布了新版本！'
-    let msg = `${versiondescription} 快去HBuilderX插件市场更新吧！<a href="https://ext.dcloud.net.cn/plugin?name=easy-git">更新日志</a>\n`;
-    let btn = ['立即更新','以后再说'];
+    let versiondescription = lastChar == 0 ? `【easy-git】发布重大更新 ${marketPluginVersion} 版本！` : `【easry-git】发布 ${marketPluginVersion} 新版本！`;
+    let msg = versiondescription
+        + `当前 ${localVersion} 版本。`
+        + `<a href="https://ext.dcloud.net.cn/plugin?name=easy-git">更新日志</a>`;
+    let btn = ['去插件市场更新','以后再说'];
 
     hx.window.showInformationMessage(msg, btn).then(result => {
-        if (result === '立即更新') {
+        if (result === '去插件市场更新') {
             const url = 'https://ext.dcloud.net.cn/plugin?name=easy-git';
             hx.env.openExternal(url);
         } else {
@@ -111,7 +113,7 @@ async function checkUpdate(mode) {
                         if (s.name == 'easy-git') {
                             if (s.version != version) {
                                 let marketPluginVersion = s.version;
-                                showUpgradeBox(marketPluginVersion);
+                                showUpgradeBox(version,marketPluginVersion);
                             } else {
                                 if (mode != 'auto') {
                                     noUpgrade();
