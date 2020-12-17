@@ -647,6 +647,7 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
             'staged': [],
             'notStaged': []
         };
+        let errorList = [];
         await git(workingDir).raw(options)
             .then((res) => {
                 let files = res.split('\n');
@@ -654,26 +655,45 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
                     if (s != '') {
                         let tag = s.slice(0,2);
                         let fpath = s.slice(3);
-                        if (tag == 'UU' || tag == 'AA') {
-                            data.conflicted.push({'tag': 'C', 'path': fpath})
-                        } else if (tag == 'MM') {
-                            data.staged.push({'tag': 'M', 'path': fpath})
-                            data.notStaged.push({'tag': 'M', 'path': fpath})
-                        }  else if (tag == 'AM') {
-                            data.staged.push({'tag': 'M', 'path': fpath})
-                            data.notStaged.push({'tag': 'M', 'path': fpath})
+                        if (tag == 'UU' || tag == 'AA' || ['DD','UA','UD',"AU"].includes(tag)) {
+                            if (['DD','UD'].includes(tag)) {
+                                data.conflicted.push({'tag': 'D', 'path': fpath});
+                            } else {
+                                data.conflicted.push({'tag': 'C', 'path': fpath});
+                            };
+                        } else if (tag == 'MM' || tag == 'AM') {
+                            data.staged.push({'tag': 'M', 'path': fpath});
+                            data.notStaged.push({'tag': 'M', 'path': fpath});
                         } else if (tag == 'AD' || tag == 'MD') {
-                            data.staged.push({'tag': 'D', 'path': fpath})
-                            data.notStaged.push({'tag': 'D', 'path': fpath})
+                            data.staged.push({'tag': 'D', 'path': fpath});
+                            data.notStaged.push({'tag': 'D', 'path': fpath});
+                        } else if (tag == 'RD') {
+                            data.staged.push({'tag': 'R', 'path': fpath});
+                            data.notStaged.push({'tag': 'R', 'path': fpath});
                         } else if (tag.slice(0,1) == ' ' || tag == '??') {
-                            data.notStaged.push({'tag': tag.trim(), 'path': fpath})
+                            data.notStaged.push({'tag': tag.trim(), 'path': fpath});
                         } else if (tag.slice(1,2) == ' ') {
-                            data.staged.push({'tag': tag.trim(), 'path': fpath})
+                            data.staged.push({'tag': tag.trim(), 'path': fpath});
+                        } else {
+                            errorList.push(s);
                         };
                     };
                 };
+
+                if (errorList.length) {
+                    let outputChannel = hx.window.createOutputChannel('EasyGit插件');
+                    outputChannel.show();
+                    outputChannel.appendLine("下列文件状态获取错误，请手动操作在命令行操作。");
+                    outputChannel.appendLine("如果您愿意帮助作者改进，反馈地址: https://ext.dcloud.net.cn/plugin?name=easy-git#rating");
+
+                    for (let s of errorList) {
+                        outputChannel.appendLine(s);
+                    };
+                    outputChannel.appendLine("\n\n");
+                }
             })
             .catch((err) => {
+                console.log(err)
                 hx.window.showInformationMessage('EasyGit: 获取文件列表失败, 请重试或联系作者反馈问题。', ['我知道了']);
                 data.msg = 'error';
             });
@@ -689,8 +709,9 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
 /**
  * @description 获取git信息
  * @param {Object} projectPath
+ * @param {Boolean} isShowFileList 是否显示文件列表，默认true
  */
-async function gitStatus(workingDir) {
+async function gitStatus(workingDir, isShowFileList=true) {
     let result = {
         'gitEnvironment': true,
         'isGit': false,
@@ -737,9 +758,11 @@ async function gitStatus(workingDir) {
         result.behind = statusSummary.behind;
 
         // 所有文件列表
-        let files = statusSummary.files;
-        if (files.length) {
-            result.FileResult = await gitFileListStatus(workingDir);
+        if (isShowFileList == true) {
+            let files = statusSummary.files;
+            if (files.length) {
+                result.FileResult = await gitFileListStatus(workingDir);
+            };
         };
     } catch (e) {
         result.gitEnvironment = false;

@@ -427,7 +427,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 @mouseover="hoverChangeFileID = 'change_'+i"
                                 @mouseleave="hoverChangeFileID = false">
                                 <div class="flex-grow-1 text-hidden">
-                                    <span :class="[v.tag == 'D' ? 'line-through' : '']" @click="gitDiff(v.path, v.tag);">{{ v.path }}</span>
+                                    <span :class="[v.tag == 'D' || v.tag == 'R' ? 'line-through' : '']" @click="gitDiff(v.path, v.tag);">{{ v.path }}</span>
                                 </div>
                                 <div class="d-inline float-right" :id="'change_'+i">
                                     <div class="d-inline"  v-if="hoverChangeFileID == 'change_'+i">
@@ -524,6 +524,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     let GitAlwaysAutoCommitPush =  ${GitAlwaysAutoCommitPush};
                     if (GitAlwaysAutoCommitPush != undefined && GitAlwaysAutoCommitPush) {
                         this.GitAlwaysAutoCommitPush = GitAlwaysAutoCommitPush;
+                        this.commitMessagePlaceholder = '消息（' + ctrl + '+Enter 提交并推送）'
                     };
                 },
                 mounted() {

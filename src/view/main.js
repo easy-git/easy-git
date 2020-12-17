@@ -425,7 +425,7 @@ class GitFile {
     async sync() {
         let fetchStatus = await utils.gitFetch(this.projectPath, false);
         if (fetchStatus == 'success') {
-            let gitInfo = await utils.gitStatus(this.projectPath);
+            let gitInfo = await utils.gitStatus(this.projectPath, false);
             let { behind } = gitInfo;
             if (behind != 0 && behind != undefined) {
                 this.webviewPanel.webView.postMessage({
