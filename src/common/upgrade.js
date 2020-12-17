@@ -31,13 +31,17 @@ function showUpgradeBox(localVersion, marketPluginVersion) {
     let versiondescription = lastChar == 0 ? `【easy-git】发布重大更新 ${marketPluginVersion} 版本！` : `【easry-git】发布 ${marketPluginVersion} 新版本！`;
     let msg = versiondescription
         + `当前 ${localVersion} 版本。`
-        + `<a href="https://ext.dcloud.net.cn/plugin?name=easy-git">更新日志</a>`;
-    let btn = ['去插件市场更新','以后再说'];
+        + `<a href="https://ext.dcloud.net.cn/plugin?name=easy-git">更新日志</a>`
+        + '<br/><br/>更新后，别忘了给个好评。<br/><br/>';
+    let btn = ['去插件市场更新','给评价','以后再说'];
 
     hx.window.showInformationMessage(msg, btn).then(result => {
         if (result === '去插件市场更新') {
             const url = 'https://ext.dcloud.net.cn/plugin?name=easy-git';
             hx.env.openExternal(url);
+        } else if (result === '给评价') {
+            const rateUrl = 'https://ext.dcloud.net.cn/plugin?name=easy-git#rating';
+            hx.env.openExternal(rateUrl);
         } else {
             let timestamp = Math.round(new Date() / 1000) + 604800;
             let config = hx.workspace.getConfiguration();
