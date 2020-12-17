@@ -656,7 +656,16 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
                         let fpath = s.slice(3);
                         if (tag == 'UU' || tag == 'AA') {
                             data.conflicted.push({'tag': 'C', 'path': fpath})
-                        }else if (tag.slice(0,1) == ' ' || tag == '??') {
+                        } else if (tag == 'MM') {
+                            data.staged.push({'tag': 'M', 'path': fpath})
+                            data.notStaged.push({'tag': 'M', 'path': fpath})
+                        }  else if (tag == 'AM') {
+                            data.staged.push({'tag': 'M', 'path': fpath})
+                            data.notStaged.push({'tag': 'M', 'path': fpath})
+                        } else if (tag == 'AD' || tag == 'MD') {
+                            data.staged.push({'tag': 'D', 'path': fpath})
+                            data.notStaged.push({'tag': 'D', 'path': fpath})
+                        } else if (tag.slice(0,1) == ' ' || tag == '??') {
                             data.notStaged.push({'tag': tag.trim(), 'path': fpath})
                         } else if (tag.slice(1,2) == ' ') {
                             data.staged.push({'tag': tag.trim(), 'path': fpath})
