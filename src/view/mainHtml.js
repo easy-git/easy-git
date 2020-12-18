@@ -300,7 +300,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         </div>
                         <div class="col-auto p-0">
                             <span class="top" @click="refresh();" title="刷新">${iconRefresh}</span>
-                            <span class="top" @click="gitCommit();" :title="GitAlwaysAutoCommitPush ? 'commit & push' : 'commit'">${CheckMarkIcon}</span>
+                            <span class="top" @click="gitCommit();" :title="GitAlwaysAutoCommitPush && gitStagedFileList.length ? 'commit & push' : 'commit'">${CheckMarkIcon}</span>
                             <span class="top" @click="gitLog();" title="查看日志">${HistoryIcon}</span>
                             <span class="top" @click.stop="clickMenu();">
                                 <i title="更多操作">${MenuIcon}</i>
@@ -484,7 +484,6 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     originurl: "${originurl}",
                     originurlBoolean: ${originurlBoolean},
                     commitMessage: '',
-                    commitMessagePlaceholder: "",
                     gitFileResult: {},
                     isShowMenu: false,
                     bodyWidth: 0,
@@ -503,19 +502,26 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     isShowStaged: true,
                     gitStagedFileList: [],
                     gitStagedFileListLength: 0,
-                    GitAlwaysAutoCommitPush: false
+                    GitAlwaysAutoCommitPush: false,
+                    ctrl: ''
                 },
                 computed: {
                     GitAssociationRemote() {
                         return this.originurlBoolean;
+                    },
+                    commitMessagePlaceholder() {
+                        if (this.GitAlwaysAutoCommitPush && this.gitStagedFileList.length) {
+                            return '消息（' + this.ctrl + '+Enter 提交并推送）';
+                        } else {
+                            return '消息（' + this.ctrl + '+Enter 提交）';
+                        };
                     }
                 },
                 created() {
-                    let ctrl = '${ctrl}';
-                    if (ctrl == 'meta') {
-                        ctrl = '⌘';
+                    this.ctrl = '${ctrl}';
+                    if (this.ctrl == 'meta') {
+                        this.ctrl = '⌘';
                     };
-                    this.commitMessagePlaceholder = '消息（' + ctrl + '+Enter 提交）'
 
                     this.gitFileResult = ${gitFileResult};
                     this.getGitFileList();
@@ -524,7 +530,6 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     let GitAlwaysAutoCommitPush =  ${GitAlwaysAutoCommitPush};
                     if (GitAlwaysAutoCommitPush != undefined && GitAlwaysAutoCommitPush) {
                         this.GitAlwaysAutoCommitPush = GitAlwaysAutoCommitPush;
-                        this.commitMessagePlaceholder = '消息（' + ctrl + '+Enter 提交并推送）'
                     };
                 },
                 mounted() {

@@ -788,7 +788,7 @@ async function gitCommitPush(workingDir, commitComment) {
             .commit(commitComment)
             .push()
             .then(() => {
-                hx.window.setStatusBarMessage('Git: commit 和 push操作执行成功！', 10000, 'info');
+                hx.window.setStatusBarMessage('Git: commit 和 push操作执行成功！');
                 return 'success'
             })
             .catch((err) => {
@@ -829,7 +829,7 @@ async function gitAdd(workingDir, files) {
         let status = await git(workingDir)
             .add(files)
             .then(() => {
-                hx.window.setStatusBarMessage('Git: 成功添加文件到暂存区。', 3000, 'info');
+                hx.window.setStatusBarMessage('Git: 成功添加文件到暂存区。');
                 return 'success';
             })
             .catch((err) => {
@@ -854,12 +854,12 @@ async function gitCommit(workingDir, comment) {
         let status = await git(workingDir)
             .commit(comment)
             .then(() => {
-                hx.window.setStatusBarMessage('Git: commit success', 3000, 'info');
+                hx.window.setStatusBarMessage('Git: commit操作成功!');
                 return 'success';
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel('Git: commit失败', errMsg);
+                createOutputChannel('Git: commit操作失败', errMsg);
                 return 'fail';
             });
         return status
@@ -882,7 +882,7 @@ async function gitAddCommit(workingDir,commitComment) {
             .add('*')
             .commit(commitComment)
             .then((res) => {
-                hx.window.setStatusBarMessage('Git: commit成功', 3000, 'info');
+                hx.window.setStatusBarMessage('Git: commit成功');
                 return 'success'
             })
             .catch((err) => {
