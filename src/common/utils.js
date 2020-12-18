@@ -655,8 +655,8 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
                     if (s != '') {
                         let tag = s.slice(0,2);
                         let fpath = s.slice(3);
-                        if (tag == 'UU' || tag == 'AA' || ['DD','UA','UD',"AU"].includes(tag)) {
-                            if (['DD','UD'].includes(tag)) {
+                        if (['DD','AU','UD','UA','DU','AA','UU'].includes(tag)) {
+                            if (['DD','UD','DU'].includes(tag)) {
                                 data.conflicted.push({'tag': 'D', 'path': fpath});
                             } else {
                                 data.conflicted.push({'tag': 'C', 'path': fpath});
