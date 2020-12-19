@@ -25,8 +25,9 @@ try{
 // 用于保存自定义编辑器信息
 let GitDiffCustomWebViewPanal = {};
 
-// 用于保存watch
-var watcher;
+// 用于保存watchFile
+let watchFile;
+let watchListener;
 
 class CatCustomDocument extends CustomDocument {
     constructor(uri) {
@@ -70,12 +71,12 @@ class CatDiffCustomEditorProvider extends CustomEditorProvider {
             GitDiffCustomWebViewPanal = {};
             isCustomFirstOpen = false;
 
+            // 移除文件监听
             try{
-                watcher.close();
-                console.log(watcher);
-            } catch(e) {
-                console.log(e)
-            };
+                if (watchFile) {
+                    fs.unwatchFile(watchFile, watchListener);
+                };
+            }catch(e){};
 
             hx.window.setStatusBarMessage('EasyGit: 文件对比视图已关闭!', 5000, 'info');
         });
@@ -117,12 +118,12 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
     GitDiff.SetView(selectedFile);
 
     // 监听文件
-    watcher = fs.watchFile(fileAbsPath, (curr, prev) => {
+    watchFile = fileAbsPath;
+    watchListener = fs.watchFile(fileAbsPath, (curr, prev) => {
         if (curr != prev) {
             GitDiff.SetView(selectedFile);
         };
     });
-    console.log(watcher)
 
     GitDiffCustomWebViewPanal.webView.onDidReceiveMessage(function(msg) {
         let action = msg.command;
