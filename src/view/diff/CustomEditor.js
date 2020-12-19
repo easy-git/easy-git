@@ -19,12 +19,14 @@ try{
     CustomDocument = hx.CustomEditor.CustomDocument;
     CustomEditorProvider = hx.CustomEditor.CustomEditorProvider;
     CustomDocumentEditEvent = hx.CustomEditor.CustomDocumentEditEvent;
-}catch(e){}
+} catch(e) {};
 
 
 // 用于保存自定义编辑器信息
 let GitDiffCustomWebViewPanal = {};
 
+// 用于保存watch
+var watcher;
 
 class CatCustomDocument extends CustomDocument {
     constructor(uri) {
@@ -57,7 +59,7 @@ class CatDiffCustomEditorProvider extends CustomEditorProvider {
                     setTimeout(function() {
                         if (isHtml == '') {
                             GitDiffCustomWebViewPanal.webView.html = getDefaultContent();
-                        }
+                        };
                     }, 2000);
                 };
             }, 3000);
@@ -67,21 +69,34 @@ class CatDiffCustomEditorProvider extends CustomEditorProvider {
         webViewPanel.onDidDispose(function() {
             GitDiffCustomWebViewPanal = {};
             isCustomFirstOpen = false;
-            hx.window.setStatusBarMessage('EasyGit: 文件对比视图已关闭, 如需要，请重新打开！', 5000, 'info');
+
+            try{
+                watcher.close();
+                console.log(watcher);
+            } catch(e) {
+                console.log(e)
+            };
+
+            hx.window.setStatusBarMessage('EasyGit: 文件对比视图已关闭!', 5000, 'info');
         });
-    }
+    };
 };
 
 
+/**
+ * @description 生成文件对比视图HTML
+ * @param {Object} ProjectData
+ * @param {Object} userConfig
+ */
 function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
+    let fileAbsPath;
     let { projectPath, projectName, selectedFile } = ProjectData;
-    isSelectedFile = selectedFile;
-
 
     if (selectedFile == undefined || selectedFile == null) {
         return;
     };
 
+    isSelectedFile = selectedFile;
     isCustomFirstOpen = true;
     try{
         GitDiffCustomWebViewPanal.webView._html = '';
@@ -90,8 +105,8 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
     try{
         projectPath = path.normalize(projectPath);
         ProjectData.projectPath = projectPath;
+        fileAbsPath = path.join(projectPath, selectedFile);
 
-        let fileAbsPath = path.join(projectPath, selectedFile);
         let fstate = fs.statSync(fileAbsPath);
         if (fstate.isFile() != true) {
             return hx.window.showErrorMessage('EasyGit: 选中有效的文件后，再进行操作！', ['我知道了']);
@@ -100,6 +115,14 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
 
     let GitDiff = new Diff(ProjectData, userConfig, GitDiffCustomWebViewPanal);
     GitDiff.SetView(selectedFile);
+
+    // 监听文件
+    watcher = fs.watchFile(fileAbsPath, (curr, prev) => {
+        if (curr != prev) {
+            GitDiff.SetView(selectedFile);
+        };
+    });
+    console.log(watcher)
 
     GitDiffCustomWebViewPanal.webView.onDidReceiveMessage(function(msg) {
         let action = msg.command;
@@ -120,10 +143,10 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
                 };
                 hx.commands.executeCommand('EasyGit.log', data);
                 break;
-            // case 'handleConflict':
-            //     let options = ['checkout', msg.options, selectedFile];
-            //     GitDiff.handleConflict(selectedFile, options);
-            //     break;
+            case 'handleConflict':
+                // let options = ['checkout', msg.options, selectedFile];
+                // GitDiff.handleConflict(selectedFile, options);
+                break;
             default:
                 break;
         };
