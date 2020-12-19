@@ -94,6 +94,9 @@ easy-git, 支持通过快捷键打开git视图。
 // 查看日志
 {"key": "","command": "EasyGit.log"}
 
+// Git commit
+{"key": "","command": "EasyGit.commit"}
+
 // Git克隆
 {"key": "","command": "EasyGit.clone"}
 
