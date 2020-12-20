@@ -510,10 +510,18 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         return this.originurlBoolean;
                     },
                     commitMessagePlaceholder() {
+                        let msg;
                         if (this.GitAlwaysAutoCommitPush && this.gitStagedFileList.length) {
-                            return '消息（' + this.ctrl + '+Enter 提交并推送）';
+                            msg = '消息（' + this.ctrl + '+Enter 提交并推送）';
                         } else {
-                            return '消息（' + this.ctrl + '+Enter 提交）';
+                            msg = '消息（' + this.ctrl + '+Enter 提交）';
+                        };
+
+                        if (this.currentBranch != '' && this.currentBranch != undefined) {
+                            let text = '在"' + this.currentBranch + '"分支提交';
+                            return msg.replace('提交', text);
+                        } else {
+                            return msg;
                         };
                     }
                 },
