@@ -44,8 +44,10 @@ class Common {
         let GitConfigUserPrompt = config.get('EasyGit.GitConfigUserPrompt');
         let isShareUsageData = config.get('EasyGit.isShareUsageData');
         let GitAlwaysAutoCommitPush = config.get('EasyGit.AlwaysAutoCommitPush');
+        let mainViewAutoRefreshFileList = config.get('EasyGit.mainViewAutoRefreshFileList');
         return {
             'DisableDevTools': DisableDevTools,
+            'mainViewAutoRefreshFileList': mainViewAutoRefreshFileList,
             'GitConfigUserPrompt': GitConfigUserPrompt,
             'GitAlwaysAutoCommitPush': GitAlwaysAutoCommitPush
         };

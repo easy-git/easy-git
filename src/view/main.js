@@ -141,7 +141,7 @@ class GitFile {
     }
 
     // refresh webview git filelist
-    async refreshFileList() {
+    async refreshFileList(isManualRefresh=false) {
         try{
             let gitInfo = await utils.gitStatus(this.projectPath);
             let { BranchTracking } = gitInfo;
@@ -149,8 +149,30 @@ class GitFile {
                 'projectName': this.projectName,
                 'projectPath': this.projectPath
             });
-            const vhtml = html.getWebviewContent(this.userConfig, this.uiData, gitData);
-            this.webviewPanel.webView.html = vhtml;
+            if (isManualRefresh == false && this.webviewPanel) {
+                let { originurl, BranchTracking, behind, ahead } = gitData;
+                ahead = ahead == 0 ? '' : ahead;
+                behind = behind == 0 ? '' : behind;
+
+                let originurlBoolean = originurl != undefined ? true : false;
+                let { GitAlwaysAutoCommitPush } = this.userConfig;
+                if (BranchTracking == null) {
+                    GitAlwaysAutoCommitPush = false;
+                };
+
+                this.webviewPanel.webView.postMessage({
+                    command: "autoRefresh",
+                    gitFileResult: gitData.FileResult,
+                    ahead: ahead,
+                    behind: behind,
+                    currentBranch: gitData.currentBranch,
+                    originurlBoolean: originurlBoolean,
+                    GitAlwaysAutoCommitPush: GitAlwaysAutoCommitPush
+                });
+            } else {
+                const vhtml = html.getWebviewContent(this.userConfig, this.uiData, gitData);
+                this.webviewPanel.webView.html = vhtml;
+            };
         }catch(e){};
     };
 
@@ -196,7 +218,7 @@ class GitFile {
     // Git: commit
     async commit(msg) {
         let { isStaged, exist, comment, onlyCommit } = msg;
-        
+
         if (isStaged == false && onlyCommit == true) {
             hx.window.showInformationMessage('Git:  此操作仅执行commit命令。请先暂存文件，再进行提交操作。', ['我知道了']);
             return;
@@ -438,6 +460,24 @@ class GitFile {
 
 };
 
+/**
+ * @description 监听文件
+ */
+function watchProjectDir(projectDir, func) {
+    const watchOpt = {
+        persistent: true,
+        recursive: true
+    };
+    try {
+        fs.watch(projectDir, watchOpt, (eventType, filename) => {
+            if (eventType && !filename.includes('.git')) {
+                setTimeout(function(){
+                    func.refreshFileList();
+                }, 3000);
+            };
+        });
+    } catch (e) {};
+};
 
 /**
  * @description 显示webview
@@ -476,11 +516,17 @@ function active(webviewPanel, userConfig, gitData) {
         'easyGitInner': true
     };
 
+    // 监听项目文件，如果有变动，则刷新
+    let { mainViewAutoRefreshFileList } = userConfig;
+    if (mainViewAutoRefreshFileList) {
+        watchProjectDir(projectPath, File);
+    };
+
     view.onDidReceiveMessage((msg) => {
         let action = msg.command;
         switch (action) {
             case 'refresh':
-                File.refreshFileList();
+                File.refreshFileList(true);
                 break;
             case 'diff':
                 let { filename, tag, isConflicted } = msg;

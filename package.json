@@ -2,7 +2,7 @@
     "name": "easy-git",
     "description": "vscode源代码管理工具风格。HBuilderX内唯一的图形化Git工具, 并支持命令面板，支持克隆、提交/更新/拉取、分支/tag管理、日志、文件对比、储藏等操作。",
     "displayName": "【easy-git】Git源代码管理工具",
-    "version": "0.6.3",
+    "version": "0.7.0",
     "publisher": "oneone",
     "engines": {
         "HBuilderX": "^2.8.3"
@@ -65,6 +65,11 @@
         "configuration": {
             "title": "easy-git - Git源码管理",
             "properties": {
+                "EasyGit.mainViewAutoRefreshFileList": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "当项目文件有变动时（如外部修改文件），源代码管理器视图自动刷新。(注：修改后重启编辑器生效)"
+                },
                 "EasyGit.AlwaysAutoAddCommit": {
                     "type": "boolean",
                     "default": false,
@@ -83,7 +88,7 @@
                 "EasyGit.VoiceBroadcast": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Git某些操作，语音播报执行结果（仅限MacOSX操作系统），修改后重启生效。"
+                    "description": "Git某些操作，语音播报执行结果（仅限MacOSX操作系统, 修改后重启生效)。"
                 },
                 "EasyGit.VoiceBroadcastLanguage": {
                     "type": "string",

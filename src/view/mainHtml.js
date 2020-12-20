@@ -538,6 +538,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         setTimeout(function() {
                             that.runSync();
                             that.updateFetchResult();
+                            that.updateProjectStatusInfo();
                         }, 500);
                         setTimeout(function() {
                             that.getCommitMessage();
@@ -551,9 +552,25 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             command: 'sync'
                         });
                     },
-                    updateFetchResult() {
+                    updateProjectStatusInfo() {
                         hbuilderx.onDidReceiveMessage((msg) => {
                             console.log(msg);
+                            if (msg.command != 'autoRefresh') {
+                                return;
+                            };
+                            this.gitFileResult = msg.gitFileResult;
+                            this.ahead = msg.ahead;
+                            this.behind = msg.behind;
+                            this.currentBranch = msg.currentBranch;
+                            this.originurlBoolean = msg.originurlBoolean;
+                            this.GitAlwaysAutoCommitPush = msg.GitAlwaysAutoCommitPush;
+
+                            // 处理文件
+                            this.getGitFileList();
+                        });
+                    },
+                    updateFetchResult() {
+                        hbuilderx.onDidReceiveMessage((msg) => {
                             if (msg.command != 'sync') {
                                 return;
                             };
@@ -695,6 +712,9 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             exist: exist,
                             onlyCommit: onlyCommit
                         });
+
+                        // 清空输入框消息
+                        this.commitMessage = '';
                     },
                     gitPush() {
                         hbuilderx.postMessage({
