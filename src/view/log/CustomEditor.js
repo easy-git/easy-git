@@ -1,4 +1,5 @@
 const hx = require('hbuilderx');
+const fs = require('fs');
 const path = require('path');
 
 const { GitLogAction } = require('./log.js');
@@ -22,6 +23,10 @@ try{
 }catch(e){}
 
 let GitLogCustomWebViewPanal = {};
+
+// 监听器
+let watcher;
+
 
 class CatCustomDocument extends CustomDocument {
     constructor(uri) {
@@ -67,9 +72,13 @@ class CatCustomEditorProvider extends CustomEditorProvider {
 
         // close customEditor
         webViewPanel.onDidDispose(function() {
-            // GitLogCustomWebViewPanal = {};
-            // isCustomFirstOpen = true;
+            if (watcher != undefined) {
+                watcher.close();
+            };
+
+            GitLogCustomWebViewPanal = {};
             GitLogCustomEditorStatus = false;
+            
             hx.window.setStatusBarMessage('EasyGit: 日志视图已关闭, 如需要，请重新打开！', 5000, 'info');
         });
     }
@@ -94,6 +103,28 @@ function history(gitData) {
     });
 };
 
+
+/**
+ * @description 监听文件
+ */
+function watchProjectDir(projectDir, func) {
+    const watchOpt = {
+        persistent: true,
+        recursive: false
+    };
+    try {
+        let dir = path.join(projectDir, '.git');
+        watcher = fs.watch(dir, watchOpt, (eventType, filename) => {
+            if (eventType && filename == 'index') {
+                setTimeout(function(){
+                    func.setView('branch', '');
+                }, 1500);
+            };
+        });
+    } catch (e) {
+        console.log(e);
+    };
+};
 
 function GitLogCustomEditorRenderHtml(gitData, userConfig) {
     let {projectPath, projectName, selectedFile, currentBranch} = gitData;
@@ -124,6 +155,9 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
         selectedFile = path.normalize(selectedFile);
         projectPath = path.normalize(projectPath);
     }catch(e){}
+
+    // 监听
+    watchProjectDir(projectPath, Log);
 
     // 选中文件或目录，则查看此文件的log记录
     if (selectedFile != '' && selectedFile != undefined) {
