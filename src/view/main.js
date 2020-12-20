@@ -491,13 +491,14 @@ class GitFile {
 /**
  * @description 监听文件
  */
+let watcherListen;
 function watchProjectDir(projectDir, func) {
     const watchOpt = {
         persistent: true,
         recursive: true
     };
     try {
-        fs.watch(projectDir, watchOpt, (eventType, filename) => {
+        watcherListen = fs.watch(projectDir, watchOpt, (eventType, filename) => {
             if (eventType && filename == '.git/HEAD') {
                 setTimeout(function(){
                     func.refreshHEAD();
@@ -509,6 +510,7 @@ function watchProjectDir(projectDir, func) {
                 }, 3000);
             };
         });
+        return watcherListen;
     } catch (e) {};
 };
 
@@ -639,6 +641,9 @@ function active(webviewPanel, userConfig, gitData) {
                         hx.window.showErrorMessage('请发布此项目到远程到后再进行操作。', ['我知道了']);
                     } else {
                         hx.commands.executeCommand('EasyGit.branch',EasyGitInnerParams);
+                        if (watcherListen != undefined) {
+                            watcherListen.close();
+                        };
                     };
                 } else {
                     File.refreshFileList();

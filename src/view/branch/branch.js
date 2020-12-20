@@ -236,6 +236,27 @@ class GitBranch {
     }
 };
 
+/**
+ * @description 监听文件
+ */
+function watchProjectDir(projectDir, func) {
+    const watchOpt = {
+        persistent: true,
+        recursive: true
+    };
+    try {
+        let dir = path.join(projectDir, '.git');
+        watcherListen = fs.watch(dir, watchOpt, (eventType, filename) => {
+            if (eventType && filename == 'HEAD') {
+                setTimeout(function(){
+                    func.LoadingBranchData();
+                }, 2000);
+            };
+        });
+        return watcherListen;
+    } catch (e) {};
+};
+
 
 /**
  * @description 显示webview
@@ -267,11 +288,17 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
     let Branch = new GitBranch(webviewPanel, ProjectGitInfo, uiData, userConfig);
     Branch.LoadingBranchData();
 
+    // 监听Git项目分支信息
+    let watcherListen = watchProjectDir(projectPath, Branch);
+
     view.onDidReceiveMessage((msg) => {
         let action = msg.command;
         switch (action) {
             case 'back':
                 hx.commands.executeCommand('EasyGit.main',currentProjectData);
+                if (watcherListen != undefined) {
+                    watcherListen.close();
+                };
                 break;
             case 'push':
                 push(projectPath);
