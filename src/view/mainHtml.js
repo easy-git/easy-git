@@ -106,6 +106,29 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     display: none;
                 }
             }
+            #refresh-progress {
+                width:20px;
+                height:2px;
+                background:${inputLineColor};
+                position:absolute;
+                animation-name:pulse;
+                animation-duration:5s;
+                animation-timing-function:linear;
+                animation-iteration-count:infinite;
+                animation-direction:alternate;
+                animation-play-state:running;
+                -webkit-animation-name:pulse;
+                -webkit-animation-duration:5s;
+                -webkit-animation-timing-function:linear;
+                -webkit-animation-iteration-count:infinite;
+                -webkit-animation-direction:alternate;
+                -webkit-animation-play-state:running;
+            }
+            @-webkit-keyframes pulse {
+                0%   {background:${inputLineColor} !important; left:0px; top:0px;}
+                50%  {background:${inputLineColor} !important; left:50%; top:0px;}
+                100% {background:${inputLineColor} !important; left:100%; top:0px;}
+            }
             .cactive:active {
                 -webkit-transform: rotate(0.9);
                 transform: scale(0.9);
@@ -171,6 +194,9 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 resize: none;
                 max-height: 98px !important;
                 color: ${fontColor};
+            }
+            .textarea::-webkit-input-placeholder {
+                font-size: 13px !important;
             }
             .add-title {
                 font-size: 14px;
@@ -294,6 +320,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
         <div id="app" v-cloak>
             <div id="filelist" class="container-fluid pb-5">
                 <div id="page-top" class="fixed-top">
+                    <div id="refresh-progress" v-show="refreshProgress"></div>
                     <div class="row m-3">
                         <div class="col-auto mr-auto p-0 project-name" :title="projectName">
                             <span class="top">{{projectName}}</span>
@@ -476,6 +503,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
             var app = new Vue({
                 el: '#app',
                 data: {
+                    refreshProgress: true,
                     projectName: "${projectName}",
                     currentBranch: "${currentBranch}",
                     behind: " ",
@@ -539,13 +567,16 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     if (GitAlwaysAutoCommitPush != undefined && GitAlwaysAutoCommitPush) {
                         this.GitAlwaysAutoCommitPush = GitAlwaysAutoCommitPush;
                     };
+
+                    let that = this;
+                    setTimeout(function() {
+                        that.refreshProgress = false;
+                    },2000);
                 },
                 mounted() {
                     that = this;
                     window.onload = function() {
                         setTimeout(function() {
-                            that.runSync();
-                            that.updateFetchResult();
                             that.updateProjectStatusInfo();
                         }, 500);
                         setTimeout(function() {
@@ -562,27 +593,36 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     },
                     updateProjectStatusInfo() {
                         hbuilderx.onDidReceiveMessage((msg) => {
-                            console.log(msg);
-                            if (msg.command != 'autoRefresh') {
+                            if (msg.command == 'sync') {
+                                this.behind = msg.behind;
                                 return;
                             };
-                            this.gitFileResult = msg.gitFileResult;
-                            this.ahead = msg.ahead;
-                            this.behind = msg.behind;
-                            this.currentBranch = msg.currentBranch;
-                            this.originurlBoolean = msg.originurlBoolean;
-                            this.GitAlwaysAutoCommitPush = msg.GitAlwaysAutoCommitPush;
 
-                            // 处理文件
-                            this.getGitFileList();
-                        });
-                    },
-                    updateFetchResult() {
-                        hbuilderx.onDidReceiveMessage((msg) => {
-                            if (msg.command != 'sync') {
+                            if (msg.command == 'animation') {
+                                this.refreshProgress = true;
+                                let that = this;
+                                setTimeout(function() {
+                                    that.refreshProgress = false;
+                                }, 3000);
                                 return;
                             };
-                            this.behind = msg.behind;
+
+                            if (msg.command == 'autoRefresh') {
+                                this.gitFileResult = msg.gitFileResult;
+                                this.ahead = msg.ahead;
+                                this.behind = msg.behind;
+                                this.currentBranch = msg.currentBranch;
+                                this.originurlBoolean = msg.originurlBoolean;
+                                this.GitAlwaysAutoCommitPush = msg.GitAlwaysAutoCommitPush;
+
+                                // 处理文件
+                                this.getGitFileList();
+                                // 关闭动画
+                                let that = this;
+                                setTimeout(function() {
+                                    that.refreshProgress = false;
+                                }, 2000);
+                            };
                         });
                     },
                     isShowConflictedList() {

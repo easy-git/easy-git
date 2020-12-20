@@ -142,6 +142,12 @@ class GitFile {
 
     // refresh webview git filelist
     async refreshFileList(isManualRefresh=false) {
+        if (this.webviewPanel) {
+            this.webviewPanel.webView.postMessage({
+                command: "animation"
+            });
+        };
+
         try{
             let gitInfo = await utils.gitStatus(this.projectPath);
             let { BranchTracking } = gitInfo;
