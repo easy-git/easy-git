@@ -145,7 +145,7 @@ class GitFile {
     async refreshHEAD() {
         let gitInfo = await utils.gitStatus(this.projectPath, false);
 
-        let { originurl, behind, ahead, currentBranch } = gitData;
+        let { originurl, behind, ahead, currentBranch } = gitInfo;
         ahead = ahead == 0 ? '' : ahead;
         behind = behind == 0 ? '' : behind;
 
