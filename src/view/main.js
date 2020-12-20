@@ -138,6 +138,26 @@ class GitFile {
         this.uiData = uiData;
         this.userConfig = userConfig;
         this.BranchTracking = false;
+        this.ProjectCurrentBranch = '';
+    }
+
+    // refresh webview git 分支信息
+    async refreshHEAD() {
+        let gitInfo = await utils.gitStatus(this.projectPath, false);
+
+        let { originurl, behind, ahead, currentBranch } = gitData;
+        ahead = ahead == 0 ? '' : ahead;
+        behind = behind == 0 ? '' : behind;
+
+        let originurlBoolean = originurl != undefined ? true : false;
+
+        this.webviewPanel.webView.postMessage({
+            command: "HEAD",
+            ahead: ahead,
+            behind: behind,
+            currentBranch: currentBranch,
+            originurlBoolean: originurlBoolean
+        });
     }
 
     // refresh webview git filelist
@@ -155,6 +175,8 @@ class GitFile {
                 'projectName': this.projectName,
                 'projectPath': this.projectPath
             });
+            this.ProjectCurrentBranch = gitData.currentBranch;
+
             if (isManualRefresh == false && this.webviewPanel) {
                 let { originurl, BranchTracking, behind, ahead } = gitData;
                 ahead = ahead == 0 ? '' : ahead;
@@ -476,6 +498,11 @@ function watchProjectDir(projectDir, func) {
     };
     try {
         fs.watch(projectDir, watchOpt, (eventType, filename) => {
+            if (eventType && filename == '.git/HEAD') {
+                setTimeout(function(){
+                    func.refreshHEAD();
+                }, 2000);
+            };
             if (eventType && !filename.includes('.git')) {
                 setTimeout(function(){
                     func.refreshFileList();

@@ -607,6 +607,13 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 return;
                             };
 
+                            if (msg.command == 'HEAD') {
+                                this.ahead = msg.ahead;
+                                this.behind = msg.behind;
+                                this.currentBranch = msg.currentBranch;
+                                this.originurlBoolean = msg.originurlBoolean;
+                            }
+
                             if (msg.command == 'autoRefresh') {
                                 this.gitFileResult = msg.gitFileResult;
                                 this.ahead = msg.ahead;
