@@ -504,6 +504,11 @@ function watchProjectDir(projectDir, func) {
                     func.refreshHEAD();
                 }, 2000);
             };
+            if (eventType && ['.git/index','.git/ORIG_HEAD'].includes(filename)) {
+                setTimeout(function(){
+                    func.refreshFileList();
+                }, 3000);
+            };
             if (eventType && !filename.includes('.git')) {
                 setTimeout(function(){
                     func.refreshFileList();
