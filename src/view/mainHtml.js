@@ -621,7 +621,6 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 this.currentBranch = msg.currentBranch;
                                 this.originurlBoolean = msg.originurlBoolean;
                                 this.GitAlwaysAutoCommitPush = msg.GitAlwaysAutoCommitPush;
-
                                 // 处理文件
                                 this.getGitFileList();
                                 // 关闭动画
@@ -667,6 +666,10 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         this.gitStagedFileListLength = (this.gitStagedFileList).length;
                         this.gitNotStagedileListLength = (this.gitNotStagedileList).length;
                         this.gitConflictedFileListLength = (this.gitConflictedFileList).length;
+
+                        if (this.gitStagedFileListLength == 0 && this.gitNotStagedileListLength == 0 && this.gitConflictedFileListLength == 0) {
+                            this.commitMessage = '';
+                        };
                     },
                     clickMenu() {
                         this.bodyWidth = document.body.clientWidth;
