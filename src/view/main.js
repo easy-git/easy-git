@@ -571,10 +571,19 @@ function active(webviewPanel, userConfig, gitData) {
             case 'diff':
                 let { filename, tag, isConflicted } = msg;
                 let fpath = path.join(projectPath, filename);
+
                 if ( tag == 'D') {
-                    return hx.window.showErrorMessage(`EasyGit: ${filename} 已被删除，无法查看信息。`, ['我知道了']);
+                    return hx.window.showInformationMessage(`EasyGit: ${filename} 已被删除，无法查看信息。`, ['我知道了']);
                 };
-                if ( tag == '?' || isConflicted) {
+
+                try{
+                    let extname = path.extname(fpath);
+                    if (['.jpg', '.png', '.gif', '.jpeg', '.bmp', '.tif', '.webp', '.zip'].includes(extname.toLowerCase())) {
+                        return hx.workspace.openTextDocument(fpath);
+                    };
+                }catch(e){};
+
+                if ( tag == '?' || tag == '??' || isConflicted) {
                     hx.workspace.openTextDocument(fpath);
                     return;
                 };
