@@ -27,6 +27,8 @@ let GitLogCustomWebViewPanal = {};
 // 监听器
 let watcher;
 
+// Git触发途径：HBuilderX内触发、外部Git命令（或其它工具）触发
+let GitHBuilderXInnerTrigger = false;
 
 class CatCustomDocument extends CustomDocument {
     constructor(uri) {
@@ -115,10 +117,12 @@ function watchProjectDir(projectDir, func) {
     try {
         let dir = path.join(projectDir, '.git');
         watcher = fs.watch(dir, watchOpt, (eventType, filename) => {
-            if (eventType && filename == 'index') {
-                setTimeout(function(){
-                    func.setView('branch', '');
-                }, 1600);
+            if (GitHBuilderXInnerTrigger == false) {
+                if (eventType && filename == 'index') {
+                    setTimeout(function(){
+                        func.setView('branch', '');
+                    }, 1500);
+                };
             };
         });
     } catch (e) {
@@ -181,6 +185,7 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
     };
 
     GitLogCustomWebViewPanal.webView.onDidReceiveMessage(function(msg) {
+        GitHBuilderXInnerTrigger = true;
         let action = msg.command;
         switch (action) {
             case 'refresh':
@@ -238,6 +243,9 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
             default:
                 break;
         };
+        setTimeout(function() {
+            GitHBuilderXInnerTrigger = false;
+        }, 1000);
     });
 }
 
