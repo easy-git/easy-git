@@ -100,6 +100,29 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                 background-color:${background} !important;
                 z-index: 999;
             }
+            #refresh-progress {
+                width:20px;
+                height:2px;
+                background:${inputLineColor};
+                position:absolute;
+                animation-name:pulse;
+                animation-duration:5s;
+                animation-timing-function:linear;
+                animation-iteration-count:infinite;
+                animation-direction:alternate;
+                animation-play-state:running;
+                -webkit-animation-name:pulse;
+                -webkit-animation-duration:5s;
+                -webkit-animation-timing-function:linear;
+                -webkit-animation-iteration-count:infinite;
+                -webkit-animation-direction:alternate;
+                -webkit-animation-play-state:running;
+            }
+            @-webkit-keyframes pulse {
+                0%   {background:${inputLineColor} !important; left:0px; top:0px;}
+                50%  {background:${inputLineColor} !important; left:50%; top:0px;}
+                100% {background:${inputLineColor} !important; left:100%; top:0px;}
+            }
             .project-name {
                 width:150px;
                 overflow:hidden;
@@ -224,6 +247,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
         <div id="app" v-cloak>
             <div class="container-fluid pb-5" v-if="!isShowModel">
                 <div id="page-top" class="fixed-top">
+                    <div id="refresh-progress" v-show="refreshProgress"></div>
                     <div class="row px-3 pt-3">
                         <div class="col-auto mr-auto project-name" :title="projectName">
                             <span class="top">{{ projectName }}</span>
@@ -442,6 +466,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
             var app = new Vue({
                 el: '#app',
                 data: {
+                    refreshProgress: true,
                     projectName: '',
                     currentBranch: '',
                     ahead: '',
@@ -503,6 +528,9 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         this.BranchList = tmp;
                     }
                 },
+                beforeCreate() {
+                    this.refreshProgress = true;
+                },
                 created() {
                     this.ahead = '${ahead}';
                     this.behind = '${behind}';
@@ -534,6 +562,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         };
                     };
                     document.getElementById('inputBranch').focus();
+                    this.refreshProgress = false;
                 },
                 methods: {
                     back() {

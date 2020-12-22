@@ -10,6 +10,9 @@ const gitAction = require('../commands/index.js');
 const icon = require('./static/icon.js');
 const html = require('./mainHtml.js')
 
+// Git触发途径：HBuilderX内触发、外部Git命令（或其它工具）触发
+let GitHBuilderXInnerTrigger = false;
+
 /**
  * @description 获取图标、各种颜色
  * @return {Object} UIData
@@ -499,20 +502,22 @@ function watchProjectDir(projectDir, func) {
     };
     try {
         watcherListen = fs.watch(projectDir, watchOpt, (eventType, filename) => {
-            if (eventType && filename == '.git/HEAD') {
-                setTimeout(function(){
-                    func.refreshHEAD();
-                }, 2000);
-            };
-            if (eventType && ['.git/index','.git/ORIG_HEAD'].includes(filename)) {
-                setTimeout(function(){
-                    func.refreshFileList();
-                }, 3000);
-            };
-            if (eventType && !filename.includes('.git')) {
-                setTimeout(function(){
-                    func.refreshFileList();
-                }, 3000);
+            if (GitHBuilderXInnerTrigger == false) {
+                if (eventType && filename == '.git/HEAD') {
+                    setTimeout(function(){
+                        func.refreshHEAD();
+                    }, 2000);
+                };
+                if (eventType && ['.git/index','.git/ORIG_HEAD'].includes(filename)) {
+                    setTimeout(function(){
+                        func.refreshFileList();
+                    }, 3000);
+                };
+                if (eventType && !filename.includes('.git')) {
+                    setTimeout(function(){
+                        func.refreshFileList();
+                    }, 3000);
+                };
             };
         });
         return watcherListen;
@@ -589,6 +594,7 @@ function active(webviewPanel, userConfig, gitData) {
     };
 
     view.onDidReceiveMessage((msg) => {
+        GitHBuilderXInnerTrigger = true;
         let action = msg.command;
         switch (action) {
             case 'refresh':
@@ -716,6 +722,9 @@ function active(webviewPanel, userConfig, gitData) {
             default:
                 break;
         };
+        setTimeout(function() {
+            GitHBuilderXInnerTrigger = false;
+        }, 1000);
     });
 
 };

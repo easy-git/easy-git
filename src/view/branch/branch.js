@@ -9,6 +9,8 @@ const { Branch } = require('../../commands/ref.js');
 const icon = require('../static/icon.js');
 const getWebviewBranchContent = require('./html.js')
 
+// Git触发途径：HBuilderX内触发、外部Git命令（或其它工具）触发
+let GitHBuilderXInnerTrigger = false;
 
 /**
  * @description 获取图标、各种颜色
@@ -239,6 +241,7 @@ class GitBranch {
 /**
  * @description 监听文件
  */
+var watcherListen;
 function watchProjectDir(projectDir, func) {
     const watchOpt = {
         persistent: true,
@@ -247,13 +250,14 @@ function watchProjectDir(projectDir, func) {
     try {
         let dir = path.join(projectDir, '.git');
         watcherListen = fs.watch(dir, watchOpt, (eventType, filename) => {
-            if (eventType && filename == 'HEAD') {
-                setTimeout(function(){
-                    func.LoadingBranchData();
-                }, 2000);
+            if (GitHBuilderXInnerTrigger == false) {
+                if (eventType && filename == 'HEAD') {
+                    setTimeout(function(){
+                        func.LoadingBranchData();
+                    }, 2000);
+                };
             };
         });
-        return watcherListen;
     } catch (e) {};
 };
 
@@ -289,9 +293,10 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
     Branch.LoadingBranchData();
 
     // 监听Git项目分支信息
-    let watcherListen = watchProjectDir(projectPath, Branch);
+    watchProjectDir(projectPath, Branch);
 
     view.onDidReceiveMessage((msg) => {
+        GitHBuilderXInnerTrigger = true;
         let action = msg.command;
         switch (action) {
             case 'back':
@@ -351,6 +356,9 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
             default:
                 break;
         };
+        setTimeout(function() {
+            GitHBuilderXInnerTrigger = false;
+        }, 1000);
     });
 
 
