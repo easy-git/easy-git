@@ -129,6 +129,10 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 50%  {background:${inputLineColor} !important; left:50%; top:0px;}
                 100% {background:${inputLineColor} !important; left:100%; top:0px;}
             }
+            .cactive {
+                -webkit-user-select:text;
+                user-select: text;
+            }
             .cactive:active {
                 -webkit-transform: rotate(0.9);
                 transform: scale(0.9);
@@ -473,8 +477,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
             </div>
             <div class="container-fluid">
                 <div class="row m-0 fixedBottom" id="git_branch">
-                    <div class="col-auto mr-auto" title="鼠标左键，进入分支管理视图; 鼠标中键，可直接切换到上一次分支。">
-                        <span class="cactive" @click.once="showBranchWindow();" @click.middle="switchLastBranch();">
+                    <div class="col-auto mr-auto" title="鼠标左键，进入分支管理视图; 鼠标右键或中键，可直接切换到上一次分支。">
+                        <span class="cactive" @click.once="showBranchWindow();" @click.right.prevent="switchLastBranch();" @click.middle="switchLastBranch();">
                             ${BranchIcon} {{ currentBranch }}
                         </span>
                     </div>
