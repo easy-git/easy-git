@@ -70,6 +70,11 @@
                     "default": true,
                     "description": "当项目文件有变动时（如外部修改文件），源代码管理器视图自动刷新。(注：修改后重启编辑器生效)"
                 },
+                "EasyGit.logViewAutoRefresh": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "当项目产生提交、拉取等操作时，日志视图自动刷新。(注：修改后重启编辑器生效)"
+                },
                 "EasyGit.AlwaysAutoAddCommit": {
                     "type": "boolean",
                     "default": false,

@@ -78,7 +78,7 @@ class CatCustomEditorProvider extends CustomEditorProvider {
 
             GitLogCustomWebViewPanal = {};
             GitLogCustomEditorStatus = false;
-            
+
             hx.window.setStatusBarMessage('EasyGit: 日志视图已关闭, 如需要，请重新打开！', 5000, 'info');
         });
     }
@@ -118,7 +118,7 @@ function watchProjectDir(projectDir, func) {
             if (eventType && filename == 'index') {
                 setTimeout(function(){
                     func.setView('branch', '');
-                }, 1500);
+                }, 1600);
             };
         });
     } catch (e) {
@@ -156,8 +156,11 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
         projectPath = path.normalize(projectPath);
     }catch(e){}
 
-    // 监听
-    watchProjectDir(projectPath, Log);
+    // 监听.git，当关闭日志视图自动刷新时，则不再监听
+    let { logViewAutoRefresh } = userConfig;
+    if (logViewAutoRefresh) {
+        watchProjectDir(projectPath, Log);
+    };
 
     // 选中文件或目录，则查看此文件的log记录
     if (selectedFile != '' && selectedFile != undefined) {
