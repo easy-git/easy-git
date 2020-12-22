@@ -45,9 +45,11 @@ class Common {
         let isShareUsageData = config.get('EasyGit.isShareUsageData');
         let GitAlwaysAutoCommitPush = config.get('EasyGit.AlwaysAutoCommitPush');
         let mainViewAutoRefreshFileList = config.get('EasyGit.mainViewAutoRefreshFileList');
+        let logViewAutoRefresh = config.get('EasyGit.logViewAutoRefresh');
         return {
             'DisableDevTools': DisableDevTools,
             'mainViewAutoRefreshFileList': mainViewAutoRefreshFileList,
+            'logViewAutoRefresh': logViewAutoRefresh,
             'GitConfigUserPrompt': GitConfigUserPrompt,
             'GitAlwaysAutoCommitPush': GitAlwaysAutoCommitPush
         };

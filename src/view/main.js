@@ -520,6 +520,26 @@ function watchProjectDir(projectDir, func) {
 };
 
 /**
+ * @description 自动刷新提示框
+ */
+let watcherPrompt;
+function watchUserPrompt() {
+    let config = hx.workspace.getConfiguration();
+    let UserPrompt = config.get('EasyGit.isShowPromptForAutoRefresh');
+    if (UserPrompt == undefined) {
+        hx.window.showInformationMessage('EasyGit新功能：项目文件发生变动时，源代码管理器视图处于打开状态，会自动刷新更改的文件列表。关闭后，后期可在【设置】中手动开启。', ['关闭自动刷新', '我知道了']).then( (btn) => {
+            if (btn == '关闭自动刷新') {
+                config.update('EasyGit.mainViewAutoRefreshFileList', false).then(() => {});
+            };
+            config.update('EasyGit.isShowPromptForAutoRefresh', true).then(() => {});
+            watcherPrompt = true;
+        });
+    } else {
+        watcherPrompt = true;
+    };
+};
+
+/**
  * @description 显示webview
  * @param {Object} userConfig 用户配置
  * @param {Object} webviewPanel
@@ -556,10 +576,16 @@ function active(webviewPanel, userConfig, gitData) {
         'easyGitInner': true
     };
 
-    // 监听项目文件，如果有变动，则刷新
+    // 监听项目文件，如果有变动，则刷新; 关闭自动刷新，则不再监听。
     let { mainViewAutoRefreshFileList } = userConfig;
     if (mainViewAutoRefreshFileList) {
         watchProjectDir(projectPath, File);
+    };
+    // 关于自动刷新功能，弹窗提示，仅提示一次
+    if (watcherPrompt == undefined) {
+        setTimeout(function() {
+            watchUserPrompt();
+        }, 3500);
     };
 
     view.onDidReceiveMessage((msg) => {
