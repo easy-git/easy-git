@@ -546,9 +546,6 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
 
                     this.rawOriginBranchList = ${remoteBranchList};
                     this.OriginBranchList = ${remoteBranchList};
-
-                    this.rawTagsList = ${TagsList};
-                    this.TagsList = ${TagsList};
                 },
                 mounted() {
                     if (this.AssignAction && JSON.stringify(this.AssignAction) != '{}') {
@@ -563,11 +560,37 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     };
                     document.getElementById('inputBranch').focus();
                     this.refreshProgress = false;
+
+                    // get tags list
+                    that = this;
+                    window.onload = function() {
+                        setTimeout(function(){
+                            that.getTagsList();
+                            that.receiveTagsList();
+                        });
+                    };
                 },
                 methods: {
                     back() {
                         hbuilderx.postMessage({
                             command: 'back'
+                        });
+                    },
+                    getTagsList() {
+                        hbuilderx.postMessage({
+                            command: 'TagList'
+                        });
+                    },
+                    receiveTagsList() {
+                        hbuilderx.onDidReceiveMessage((msg) => {
+                            if (msg.command != 'TagList') {
+                                return;
+                            };
+                            if (msg.data) {
+                                console.log(msg.data);
+                                this.rawTagsList = msg.data;
+                                this.TagsList = msg.data;
+                            }
                         });
                     },
                     showBranchWindow() {

@@ -71,21 +71,30 @@ class GitBranch {
         this.projectName = ProjectGitInfo.projectName;
         this.uiData = uiData;
         this.userConfig = userConfig;
+        this.firstInit = true;
     }
 
     async LoadingBranchData() {
         let {localBranchList, remoteBranchList} = await utils.gitBranch(this.projectPath, ['-avvv']);
-        let TagsList = await utils.gitTagsList(this.projectPath);
 
         let {GitAssignAction, behind, ahead, tracking, originurl} = this.initData;
+        if (!this.firstInit) {
+            let gitInfo = await utils.gitStatus(this.projectPath, false);
+            behind = gitInfo.behind;
+            ahead = gitInfo.ahead;
+            tracking = gitInfo.tracking;
+            originurl = gitInfo.originurl;
+        };
+        this.firstInit = false;
+
         if (behind == undefined) { behind = 0 };
         if (ahead == undefined) { ahead = 0 };
 
+        // 大部分情况下，并不需要tag，因此等到视图页面渲染后，再获取tags -> TagList
         const gitBranchData = Object.assign({
             'localBranchList': localBranchList,
             'remoteBranchList': remoteBranchList,
-        }, {
-            'TagsList': TagsList
+            'TagsList': {'data':[]}
         }, {
             'projectName': this.projectName,
             'projectPath': this.projectPath,
@@ -214,6 +223,19 @@ class GitBranch {
             };
         };
     };
+
+    // Git tag: list
+    async TagList() {
+        let TagsList = await utils.gitTagsList(this.projectPath);
+        let { error, data } = TagsList;
+        if (error) {
+            return;
+        };
+        this.webviewPanel.webView.postMessage({
+            command: "TagList",
+            data: data
+        });
+    }
 
     // Git tag: create
     async TagCreate() {
@@ -352,6 +374,9 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
                 break;
             case 'TagDetails':
                 Branch.TagDetails(msg.name);
+                break;
+            case 'TagList':
+                Branch.TagList();
                 break;
             default:
                 break;
