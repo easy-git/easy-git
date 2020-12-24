@@ -201,6 +201,9 @@ function getWebviewContent(userConfig, uiData, gitData) {
             }
             .textarea::-webkit-input-placeholder {
                 font-size: 13px !important;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
             }
             .add-title {
                 font-size: 14px;
