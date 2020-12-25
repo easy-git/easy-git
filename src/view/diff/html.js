@@ -206,7 +206,6 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                 data: {
                     titleLeft: '${titleLeft}',
                     titleRight: '${titleRight}',
-                    selectedFilePath: '${selectedFilePath}',
                     isConflicted: ${isConflicted},
                     gitDiffResult: ''
                 },
