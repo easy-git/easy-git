@@ -216,6 +216,87 @@ class GitFile {
         console.log(activeEditorName)
     };
 
+
+    // 解决冲突
+    async ManageConflict(filepath,action) {
+        let firstConflict = 0;
+        let checkResult = await utils.gitRaw(this.projectPath, ['diff', '--check', filepath], undefined, 'result');
+        if (checkResult.length && checkResult.includes('conflict')) {
+            let data = checkResult.split('\n');
+            let conflictList = data.filter(item => item.includes(filepath) );
+            let num = conflictList.length;
+            try{
+                firstConflict = conflictList[0].split(':')[1];
+            }catch(e){};
+
+            let title = `${filepath} 文件存在 ${num} 处冲突，请选择接下来的操作`;
+            let desc = '';
+            let btns = ['打开文件对比', '去解决冲突', '关闭'];
+
+            if (action == 'add') {
+                title = 'Git暂存';
+                desc = `<h4>${filepath} 文件存在 ${num} 处冲突，建议解决冲突后再暂存。</h4>`;
+                btns = ['暂存', '去解决冲突', '关闭'];
+            };
+
+            let btnText = await utils.hxShowMessageBox(title, desc, btns).then( (result)=> {
+                return result;
+            });
+            if (btnText == '去解决冲突') {
+                let fspath = path.join(this.projectPath, filepath);
+                hx.workspace.openTextDocument(fspath).then(doc => {
+                    hx.window.showTextDocument(doc, {
+                        selection: {start: {line: Number(firstConflict), character: 0}}
+                    });
+                });
+            };
+            if (btnText == '打开文件对比') {
+                let diff_parms = {
+                    "easyGitInner": true,
+                    "projectPath": this.projectPath,
+                    "projectName": this.projectName,
+                    "selectedFile": filepath,
+                };
+                hx.commands.executeCommand('EasyGit.diffFile',diff_parms);
+            }
+            return btnText;
+        };
+        return 'noConflict';
+    };
+
+    // open diff
+    async openDiff(msg) {
+        let { filename, tag, isConflicted } = msg;
+        let fpath = path.join(this.projectPath, filename);
+
+        if ( tag == 'D') {
+            return hx.window.showInformationMessage(`EasyGit: ${filename} 已被删除，无法查看信息。`, ['我知道了']);
+        };
+
+        try{
+            let extname = path.extname(fpath);
+            if (['.jpg', '.png', '.gif', '.jpeg', '.bmp', '.tif', '.webp', '.zip'].includes(extname.toLowerCase())) {
+                return hx.workspace.openTextDocument(fpath);
+            };
+        }catch(e){};
+
+        if ( tag == '?' || tag == '??') {
+            hx.workspace.openTextDocument(fpath);
+            return;
+        };
+        if (isConflicted) {
+            let result = await this.ManageConflict(filename, 'diff');
+            if (result != 'noConflict') { return; };
+        };
+        let diff_parms = {
+            "easyGitInner": true,
+            "projectPath": this.projectPath,
+            "projectName": this.projectName,
+            "selectedFile": filename,
+        };
+        hx.commands.executeCommand('EasyGit.diffFile', diff_parms);
+    };
+
     // Git: add
     async add(info) {
         let {text, tag} = info;
@@ -223,18 +304,9 @@ class GitFile {
 
         // 操作有冲突的文件
         if (tag == 'C') {
-            let checkResult = await utils.gitRaw(this.projectPath, ['diff', '--check', filepath], undefined, 'result');
-            if (checkResult.length && checkResult.includes('conflict')) {
-                let desc = `${filepath} 文件存在冲突，请选择接下来的操作。建议解决冲突后再暂存。`;
-                let btnText = await utils.hxShowMessageBox('Git暂存', desc, ['暂存', '去解决冲突','我知道了']).then( (result)=> {
-                    return result;
-                });
-                if (btnText == '去解决冲突') {
-                    let fspath = path.join(this.projectPath, filepath);
-                    hx.workspace.openTextDocument(fspath);
-                    return;
-                };
-                if (btnText == '我知道了') { return; };
+            let btnText = await this.ManageConflict(filepath, 'add');
+            if ( ['关闭','去解决冲突','打开文件对比'].includes(btnText)) {
+                return;
             };
         };
 
@@ -613,36 +685,7 @@ function active(webviewPanel, userConfig, gitData) {
                 File.refreshFileList(true);
                 break;
             case 'diff':
-                let { filename, tag, isConflicted } = msg;
-                let fpath = path.join(projectPath, filename);
-
-                if ( tag == 'D') {
-                    return hx.window.showInformationMessage(`EasyGit: ${filename} 已被删除，无法查看信息。`, ['我知道了']);
-                };
-
-                try{
-                    let extname = path.extname(fpath);
-                    if (['.jpg', '.png', '.gif', '.jpeg', '.bmp', '.tif', '.webp', '.zip'].includes(extname.toLowerCase())) {
-                        return hx.workspace.openTextDocument(fpath);
-                    };
-                }catch(e){};
-
-                if ( tag == '?' || tag == '??' || isConflicted) {
-                    hx.workspace.openTextDocument(fpath);
-                    return;
-                };
-                if (isConflicted) {
-                    hx.window.setStatusBarMessage('EasyGit: 当前打开的文件存在冲突。');
-                    hx.workspace.openTextDocument(fpath);
-                    return;
-                };
-                let diff_parms = {
-                    "easyGitInner": true,
-                    "projectPath": projectPath,
-                    "projectName": projectName,
-                    "selectedFile": msg.filename,
-                };
-                hx.commands.executeCommand('EasyGit.diffFile',diff_parms);
+                File.openDiff(msg);
                 break;
             case 'log':
                 hx.commands.executeCommand('EasyGit.log',EasyGitInnerParams);
