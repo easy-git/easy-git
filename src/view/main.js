@@ -286,7 +286,7 @@ class GitFile {
         };
         if (isConflicted) {
             let result = await this.ManageConflict(filename, 'diff');
-            if (result != 'noConflict') { return; };
+            if (result != 'noConflict' || result != '关闭') { return; };
         };
         let diff_parms = {
             "easyGitInner": true,
@@ -414,8 +414,12 @@ class GitFile {
     };
 
     // Git: 重置代码到上次提交
-    async resetHardLastCommit() {
-        let resetStatus = await utils.gitReset(this.projectPath, ['--hard', 'HEAD^'], 'Git: 重置代码到上次提交');
+    async resetHard(version) {
+        if (!['HEAD^', 'HEAD'].includes(version)) {
+            return;
+        }
+        let msg = version == 'HEAD' ? 'Git: 重置代码到当前版本' : 'Git: 重置代码到上个版本';
+        let resetStatus = await utils.gitReset(this.projectPath, ['--hard', version], msg);
         if (resetStatus == 'success') {
             this.refreshFileList();
         };
@@ -707,7 +711,7 @@ function active(webviewPanel, userConfig, gitData) {
                 File.resetLastCommit();
                 break;
             case 'ResetHardHEAD':
-                File.resetHardLastCommit();
+                File.resetHard(msg.version);
                 break;
             case 'push':
                 File.push();

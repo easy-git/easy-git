@@ -345,7 +345,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                         <li title="git pull" @click="gitPush();">推送 - push</li>
                                         <li class="divider"></li>
                                         <li title="git reset --soft HEAD^" @click="gitResetSoftHEAD();">撤销上次commit</li>
-                                        <li title="git reset --hard HEAD^" @click="gitResetHardHEAD();">重置代码到上次提交</li>
+                                        <li title="git reset --hard HEAD" @click="gitResetHardHEAD('HEAD');">重置当前修改</li>
+                                        <li title="git reset --hard HEAD^" @click="gitResetHardHEAD('HEAD^');">重置代码到上个版本</li>
                                         <li class="divider"></li>
                                         <li title="git checkout ." @click="gitCheckout('all');">放弃本地所有更改</li>
                                         <li title="git clean -df" @click="clean();">删除未跟踪的文件</li>
@@ -842,9 +843,10 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             command: 'ResetSoftHEAD'
                         });
                     },
-                    gitResetHardHEAD() {
+                    gitResetHardHEAD(text) {
                         hbuilderx.postMessage({
-                            command: 'ResetHardHEAD'
+                            command: 'ResetHardHEAD',
+                            version: text
                         });
                     },
                     openRemoteServerInBrowser() {
