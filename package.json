@@ -23,6 +23,7 @@
         "onCommand:EasyGit.commit",
         "onCommand:EasyGit.commitAmend",
         "onCommand:EasyGit.resetSoftLastCommit",
+        "onCommand:EasyGit.resetHard",
         "onCommand:EasyGit.resetHardLastCommit",
         "onCommand:EasyGit.resetHardCommitID",
         "onCommand:EasyGit.restore",
@@ -206,6 +207,10 @@
             {
                 "command": "EasyGit.resetSoftLastCommit",
                 "title": "easy-git: reset --soft HEAD^ - 撤销上次commit，即重置代码到工作区"
+            },
+            {
+                "command": "EasyGit.resetHard",
+                "title": "easy-git: reset --hard HEAD - 重置当前修改"
             },
             {
                 "command": "EasyGit.resetHardLastCommit",

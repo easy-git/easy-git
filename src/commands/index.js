@@ -80,9 +80,13 @@ function action(param,action_name) {
             let rt = new Reset();
             rt.resetSoftLastCommit(ProjectInfo);
             break;
+        case 'resetHard':
+            let rt0 = new Reset();
+            rt0.resetHard(ProjectInfo, 'HEAD');
+            break;
         case 'resetHardLastCommit':
             let rt1 = new Reset();
-            rt1.resetHardLastCommit(ProjectInfo);
+            rt1.resetHard(ProjectInfo, 'HEAD^');
             break;
         case 'resetHardCommitID':
             let rt2 = new Reset();

@@ -378,12 +378,16 @@ class Reset {
         };
     }
 
-    // Git: git reset --hard HEAD^
-    async resetHardLastCommit(ProjectInfo) {
+    // Git: git reset --hard version
+    async resetHard(ProjectInfo, version) {
+        if (!["HEAD", "HEAD^"].includes(version)) {return};
+
         let { projectPath } = ProjectInfo;
 
-        let options = ['--hard', 'HEAD^'];
-        let runResult = await gitReset(projectPath, options, 'Git: 重置代码到上次提交');
+        let options = ['--hard', version];
+        let msg = version == 'HEAD' ? 'Git: 重置代码到当前版本' : 'Git: 重置代码到上个版本';
+
+        let runResult = await gitReset(projectPath, options, msg);
         if (runResult == 'success') {
             ProjectInfo.easyGitInner = true;
             hx.commands.executeCommand('EasyGit.main',ProjectInfo);

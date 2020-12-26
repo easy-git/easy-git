@@ -156,6 +156,12 @@ function activate(context) {
     });
     context.subscriptions.push(resetSoftLastCommit);
 
+    // git reset --hard HEAD
+    let resetHard = hx.commands.registerCommand('EasyGit.resetHard', (param)=> {
+        return git.action(param, 'resetHard');
+    });
+    context.subscriptions.push(resetHard);
+
     // git reset --hard HEAD^
     let resetHardLastCommit = hx.commands.registerCommand('EasyGit.resetHardLastCommit', (param)=> {
         return git.action(param, 'resetHardLastCommit');
