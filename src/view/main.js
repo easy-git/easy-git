@@ -219,11 +219,23 @@ class GitFile {
     // Git: add
     async add(info) {
         let {text, tag} = info;
+        let filepath = text;
+
+        // 操作有冲突的文件
         if (tag == 'C') {
-            let btnText = await hx.window.showErrorMessage(`确定要暂存含有合并冲突的 ${text} 文件吗? `, ['我已解决冲突','关闭']).then( (btnText) => {
-                return btnText
-            });
-            if (btnText == '关闭') { return; };
+            let checkResult = await utils.gitRaw(this.projectPath, ['diff', '--check', filepath], undefined, 'result');
+            if (checkResult.length && checkResult.includes('conflict')) {
+                let desc = `${filepath} 文件存在冲突，请选择接下来的操作。建议解决冲突后再暂存。`;
+                let btnText = await utils.hxShowMessageBox('Git暂存', desc, ['暂存', '去解决冲突','我知道了']).then( (result)=> {
+                    return result;
+                });
+                if (btnText == '去解决冲突') {
+                    let fspath = path.join(this.projectPath, filepath);
+                    hx.workspace.openTextDocument(fspath);
+                    return;
+                };
+                if (btnText == '我知道了') { return; };
+            };
         };
 
         let files = [];
@@ -620,6 +632,7 @@ function active(webviewPanel, userConfig, gitData) {
                     return;
                 };
                 if (isConflicted) {
+                    hx.window.setStatusBarMessage('EasyGit: 当前打开的文件存在冲突。');
                     hx.workspace.openTextDocument(fpath);
                     return;
                 };
