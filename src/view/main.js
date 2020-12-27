@@ -784,7 +784,7 @@ function active(webviewPanel, userConfig, gitData) {
         };
         setTimeout(function() {
             GitHBuilderXInnerTrigger = false;
-        }, 1000);
+        }, 1500);
     });
 
 };
