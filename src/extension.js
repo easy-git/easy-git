@@ -294,6 +294,12 @@ function activate(context) {
     });
     context.subscriptions.push(reflog);
 
+    // git annotate
+    let annotate = hx.commands.registerCommand('EasyGit.annotate', (param)=> {
+        git.action(param, 'annotate')
+    });
+    context.subscriptions.push(annotate);
+
     // check update
     let checkUpdate = hx.commands.registerCommand('EasyGit.checkUpdate', ()=> {
         upgrade.checkUpdate('manual');

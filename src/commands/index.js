@@ -11,8 +11,9 @@ const { gitAddFile, gitRestore, goCleanFile, goCommit } = require('./file.js');
 const { goSetConfig } = require('./base.js');
 
 const { Tag, Branch, Revert, Reset, Archive, reflog } = require('./ref.js');
-const gitBlameForLineChange = require('./blame.js');
 
+const gitBlameForLineChange = require('./blame.js');
+const gitAnnotate = require('./annotate.js');
 
 /**
  * @description 提供webview视图外Git的操作
@@ -177,6 +178,9 @@ function action(param,action_name) {
             break;
         case 'reflog':
             reflog(ProjectInfo);
+            break;
+        case 'annotate':
+            gitAnnotate(ProjectInfo);
             break;
         default:
             break;

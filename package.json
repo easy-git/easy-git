@@ -57,6 +57,7 @@
         "onCommand:EasyGit.diffFile",
         "onCommand:EasyGit.archive",
         "onCommand:EasyGit.reflog",
+        "onCommand:EasyGit.annotate",
         "onView:EasyGitSourceCodeView",
         "onView:EasyGitCommonView",
         "onCustomEditor:EasyGit - 日志",
@@ -303,6 +304,10 @@
             {
                 "command": "EasyGit.reflog",
                 "title": "easy-git: reflog - 救命神器"
+            },
+            {
+                "command": "EasyGit.annotate",
+                "title": "easy-git: annotate - 用提交的信息来标注给定文件中的每一行"
             },
             {
                 "command": "EasyGit.set",
