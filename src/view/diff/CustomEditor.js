@@ -77,8 +77,6 @@ class CatDiffCustomEditorProvider extends CustomEditorProvider {
                     fs.unwatchFile(watchFile, watchListener);
                 };
             }catch(e){};
-
-            hx.window.setStatusBarMessage('EasyGit: 文件对比视图已关闭!', 5000, 'info');
         });
     };
 };
@@ -145,8 +143,8 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
                 hx.commands.executeCommand('EasyGit.log', data);
                 break;
             case 'handleConflict':
-                // let options = ['checkout', msg.options, selectedFile];
-                // GitDiff.handleConflict(selectedFile, options);
+                let options = ['checkout', msg.options, selectedFile];
+                GitDiff.handleConflict(selectedFile, options);
                 break;
             default:
                 break;

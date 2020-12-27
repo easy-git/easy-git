@@ -179,9 +179,10 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                         </div>
                     </div>
                     <div class="row" v-if="isConflicted">
-                        <div class="col px-5">
-                            <span title="checkout --ours" @click="gitHandleConflict('--ours')">保留当前版本 | </span>
-                            <span title="checkout --theirs" @click="gitHandleConflict('--theirs')">保留传入的版本</span>
+                        <div class="col-auto mr-auto"></div>
+                        <div class="col-auto px-5">
+                            <span title="git checkout --ours" @click="gitHandleConflict('--ours')">保留当前分支文件 | </span>
+                            <span title="git checkout --theirs" @click="gitHandleConflict('--theirs')">采用传入的文件</span>
                         </div>
                     </div>
                     <div class="row" v-else>

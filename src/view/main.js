@@ -250,15 +250,6 @@ class GitFile {
                     });
                 });
             };
-            if (btnText == '打开文件对比') {
-                let diff_parms = {
-                    "easyGitInner": true,
-                    "projectPath": this.projectPath,
-                    "projectName": this.projectName,
-                    "selectedFile": filepath,
-                };
-                hx.commands.executeCommand('EasyGit.diffFile',diff_parms);
-            }
             return btnText;
         };
         return 'noConflict';
@@ -286,7 +277,10 @@ class GitFile {
         };
         if (isConflicted) {
             let result = await this.ManageConflict(filename, 'diff');
-            if (result != 'noConflict' || result != '关闭') { return; };
+            if ( ['暂存', '去解决冲突', '关闭'].includes(result) ) { return; };
+            if (result == 'noConflict') {
+                return hx.workspace.openTextDocument(fpath);
+            };
         };
         let diff_parms = {
             "easyGitInner": true,

@@ -114,7 +114,7 @@ class Diff {
 
         let {diff_options, titleLeft, titleRight, isConflicted} = init;
 
-        let result = await utils.gitRaw(this.projectPath, diff_options, '获取Git差异', 'result');
+        let result = await utils.gitRaw(this.projectPath, diff_options, undefined, 'result');
         if (result == 'success' || result == 'fail' || result == 'error') {
             return;
         };
@@ -150,6 +150,10 @@ class Diff {
         let result = await utils.gitRaw(this.projectPath, options, '处理冲突');
         if (result == 'success') {
             this.SetView(selectedFile);
+            setTimeout(function() {
+                let msg = options[1] == '--ours' ? 'EasyGit：保留当前分支文件，操作成功。' : 'EasyGit：采用传入的文件，操作成功。'
+                hx.window.setStatusBarMessage(msg);
+            }, 3000);
         };
     }
 }
