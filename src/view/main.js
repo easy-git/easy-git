@@ -229,13 +229,13 @@ class GitFile {
                 firstConflict = conflictList[0].split(':')[1];
             }catch(e){};
 
-            let title = `${filepath} 文件存在 ${num} 处冲突，请选择接下来的操作`;
+            let title = `${filepath} 文件存在多处冲突，请选择接下来的操作`;
             let desc = '';
             let btns = ['打开文件对比', '去解决冲突', '关闭'];
 
             if (action == 'add') {
                 title = 'Git暂存';
-                desc = `<h4>${filepath} 文件存在 ${num} 处冲突，建议解决冲突后再暂存。</h4>`;
+                desc = `<h4>${filepath} 文件存在多处冲突，建议解决冲突后再暂存。</h4>`;
                 btns = ['暂存', '去解决冲突', '关闭'];
             };
 
