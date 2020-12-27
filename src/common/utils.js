@@ -1982,6 +1982,7 @@ module.exports = {
     gitClone,
     gitStatus,
     gitFileStatus,
+    gitFileListStatus,
     gitAdd,
     gitAddCommit,
     gitCommitPush,

@@ -5,6 +5,7 @@ const path = require('path');
 
 const {
     gitAdd,
+    gitFileListStatus,
     getGitVersion,
     gitClean,
     gitRaw
@@ -56,10 +57,27 @@ async function goCleanFile(ProjectInfo) {
 
 
 /**
- * @description 修改最后一次提交的注释
+ * @description commit 或 commit --amend
  */
 async function goCommit(ProjectInfo, amend=false) {
-    let prompt = amend ? 'commit - 修改最后提交的commit消息' : 'commit - 请输入提交消息';
+    let { projectPath } = ProjectInfo;
+    ProjectInfo.easyGitInner = true;
+
+    // 检查暂存区是否存在文件
+    let stageFileNum;
+    if (!amend) {
+        let StatusInfo = await gitFileListStatus(projectPath);
+        let {msg, staged} = StatusInfo;
+        if (msg == 'success' ) {
+            if (staged.length) {
+                stageFileNum = staged.length;
+            } else {
+                return hx.window.showErrorMessage('EasyGit: 当前暂存区没有任何文件，无需进行commit操作。', ['我知道了']);
+            };
+        };
+    };
+
+    let prompt = amend ? 'Git commit - 修改最后提交的commit消息' : `Git commit - 请输入commit消息 <p style="font-size: 12px;">注意: 当前暂存区已暂存 ${stageFileNum} 个文件。</p>`;
     let inputResult = await hx.window.showInputBox({
         prompt: prompt,
         placeHolder: '消息必填'
@@ -70,9 +88,6 @@ async function goCommit(ProjectInfo, amend=false) {
         hx.window.showErrorMessage('EasyGit: 请输入有效的信息！', ['我知道了']);
         return;
     };
-
-    let { projectPath } = ProjectInfo;
-    ProjectInfo.easyGitInner = true;
 
     let options = ['commit', '-m', inputResult];
     if (amend) {
