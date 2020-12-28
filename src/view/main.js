@@ -574,16 +574,33 @@ class GitFile {
 
 };
 
+
+/**
+ * @节流
+ * @param {Object} fn
+ * @param {Object} wait
+ */
+function throttle(fn, wait) {
+    var pre = Date.now();
+    return function() {
+        var context = this;
+        var args = arguments;
+        var now = Date.now();
+        if (now - pre >= wait) {
+            fn.apply(context, args);
+            pre = Date.now();
+        };
+    };
+};
+
+
 /**
  * @description 监听文件
  */
+var listeningProjectFile = false;
 let watcherListen;
 let watcherListenGitDir;
 function watchProjectDir(projectDir, func) {
-    const watchOpt = {
-        persistent: true,
-        recursive: true
-    };
     try {
         let gitDir = path.join(projectDir, '.git');
         watcherListen = chokidar.watch(projectDir, {
@@ -593,40 +610,32 @@ function watchProjectDir(projectDir, func) {
             interval: 3000,
             binaryInterval: 3000,
             atomic: 3000
-        }).on('add', fpath => {
-            if (GitHBuilderXInnerTrigger == false) {
-                func.refreshFileList();
+        }).on('all', (event, path) => {
+            if (['change', 'add', 'unlink', 'unlinkDir'].includes(event) && GitHBuilderXInnerTrigger == false) {
+                listeningProjectFile = true;
+                if (event == 'add') {
+                    throttle(func.refreshFileList(), 2000);
+                } else {
+                    throttle(func.refreshFileList(), 4000);
+                };
+                setTimeout(function(){
+                    listeningProjectFile = false;
+                }, 3000);
             };
-        }).on('change', fpath => {
-            if (GitHBuilderXInnerTrigger == false) {
-                func.refreshFileList();
-            };
-        }).on('unlink', fpath => {
-            if (GitHBuilderXInnerTrigger == false) {
-                func.refreshFileList();
-            };
-        }).on('unlinkDir', fpath => {
-            if (GitHBuilderXInnerTrigger == false) {
-                func.refreshFileList();
-            };
-        }).on('error', error => {
-            console.log(error)
         });
 
         let refsPath = path.join(gitDir, 'refs', 'remotes', 'origin');
         watcherListenGitDir = chokidar.watch(gitDir, {
             ignoreInitial: true
         }).on('change', fpath => {
-            if (GitHBuilderXInnerTrigger == false) {
+            if (GitHBuilderXInnerTrigger == false && listeningProjectFile == false) {
                 basename = path.basename(fpath);
                 if (basename == 'index.lock') return;
-                if (basename == 'HEAD' || fpath.includes(refsPath)) {
-                    setTimeout(function(){
-                        func.refreshHEAD();
-                    }, 2000);
+                if ((basename == 'HEAD' || fpath.includes(refsPath)) && listeningProjectFile == false) {
+                    throttle(func.refreshHEAD(), 2000);
                 };
-                if (['index','ORIG_HEAD'].includes(basename)) {
-                    func.refreshFileList();
+                if (['index','ORIG_HEAD'].includes(basename) && listeningProjectFile == false) {
+                    throttle(func.refreshFileList(), 3000)
                 };
             };
         });
