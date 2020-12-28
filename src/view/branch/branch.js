@@ -76,6 +76,12 @@ class GitBranch {
     }
 
     async LoadingBranchData() {
+        if (this.webviewPanel) {
+            this.webviewPanel.webView.postMessage({
+                command: "animation"
+            });
+        };
+
         let {localBranchList, remoteBranchList} = await utils.gitBranch(this.projectPath, ['-avvv']);
 
         let {GitAssignAction, behind, ahead, tracking, originurl} = this.initData;
@@ -86,10 +92,18 @@ class GitBranch {
             tracking = gitInfo.tracking;
             originurl = gitInfo.originurl;
         };
-        this.firstInit = false;
+
 
         if (behind == undefined) { behind = 0 };
         if (ahead == undefined) { ahead = 0 };
+
+        let currentBranch = '';
+        for (let s of localBranchList) {
+            if (s.current) {
+                currentBranch = s.name;
+                break;
+            };
+        };
 
         // 大部分情况下，并不需要tag，因此等到视图页面渲染后，再获取tags -> TagList
         const gitBranchData = Object.assign({
@@ -103,10 +117,20 @@ class GitBranch {
             'ahead': ahead,
             'behind': behind,
             'tracking': tracking,
-            'originurl': originurl
+            'originurl': originurl,
+            'currentBranch': currentBranch
         });
-        const bhtml = getWebviewBranchContent(this.userConfig, this.uiData, gitBranchData);
-        this.webviewPanel.webView.html = bhtml;
+
+        if (this.webviewPanel && this.firstInit == false) {
+            this.webviewPanel.webView.postMessage({
+                command: "refresh",
+                gitBranchData: gitBranchData
+            });
+        } else {
+            const bhtml = getWebviewBranchContent(this.userConfig, this.uiData, gitBranchData);
+            this.webviewPanel.webView.html = bhtml;
+            this.firstInit = false;
+        };
     };
 
     // Git branch: switch
@@ -205,8 +229,9 @@ class GitBranch {
 
     // Git branch: delete
     async delete(branchName) {
+        let title = branchName.includes('origin/') ? 'Git: 远程分支删除' :  'Git: 本地分支删除';
         let delMsg = `确定要删除 ${branchName} 分支?`;
-        let btn = await utils.hxShowMessageBox('Git: 分支删除', delMsg, ['删除','关闭']).then((result) =>{
+        let btn = await utils.hxShowMessageBox(title, delMsg, ['删除','关闭']).then((result) =>{
             return result;
         });
         if (btn == '关闭') {
@@ -274,10 +299,8 @@ function watchProjectDir(projectDir, func) {
         let dir = path.join(projectDir, '.git');
         watcherListen = fs.watch(dir, watchOpt, (eventType, filename) => {
             if (GitHBuilderXInnerTrigger == false) {
-                if (eventType && (filename == 'HEAD' || filename.includes('refs/tags'))) {
-                    setTimeout(function(){
-                        func.LoadingBranchData();
-                    }, 2000);
+                if (eventType && (['FETCH_HEAD', 'HEAD','ORIG_HEAD'].includes(filename) || filename.includes('refs/tags'))) {
+                    debounce(func.LoadingBranchData(), 2000);
                 };
             };
         });
@@ -328,14 +351,8 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
                     watcherListen.close();
                 };
                 break;
-            case 'push':
-                push(projectPath);
-                break;
             case 'publish':
                 goPublish(projectPath, msg);
-                break;
-            case 'pull':
-                pull(projectPath,msg);
                 break;
             case 'fetch':
                 fetch(projectPath,msg.text);
@@ -349,6 +366,9 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
                     };
                 } else {
                     hx.commands.executeCommand('EasyGit.main',currentProjectData);
+                    if (watcherListen != undefined) {
+                        watcherListen.close();
+                    };
                 };
                 break;
             case 'BranchSwitch':
@@ -384,38 +404,15 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
         };
         setTimeout(function() {
             GitHBuilderXInnerTrigger = false;
-        }, 1000);
+        }, 2000);
     });
 
-
-    // git push
-    async function push(projectPath) {
-        let pushStatus = await utils.gitPush(projectPath);
-        if (pushStatus == 'success') {
-            File.refreshFileList();
-        };
-    };
-
     // git publish
-    async function goPublish(projectName, msg) {
+    async function goPublish(projectPath, msg) {
         let branchName = msg.text;
-        let pushStatus = await utils.gitPush(projectPath,[]);
+        let pushStatus = await utils.gitAddRemoteOrigin(projectPath, branchName);
         if (pushStatus == 'success') {
-            File.refreshFileList();
-        };
-    };
-
-    // git pull
-    async function pull(projectPath, msg) {
-        let {text,rebase} = msg;
-        let options = Object.assign(msg);
-        let pullStatus = await utils.gitPull(projectPath,options);
-        if (pullStatus == 'success') {
-            if (text == 'file') {
-                File.refreshFileList();
-            } else {
-                Branch.LoadingBranchData();
-            };
+            Branch.LoadingBranchData();
         };
     };
 
@@ -423,11 +420,7 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
     async function fetch(projectPath, source) {
         let fetchStatus = await utils.gitFetch(projectPath);
         if (fetchStatus == 'success') {
-            if (source == 'file') {
-                File.refreshFileList();
-            } else {
-                Branch.LoadingBranchData();
-            };
+            Branch.LoadingBranchData();
         };
     };
 

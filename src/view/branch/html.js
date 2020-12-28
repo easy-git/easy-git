@@ -49,16 +49,9 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
         ahead,
         behind,
         tracking,
-        originurl
+        originurl,
+        currentBranch
     } = gitBranchData;
-
-    let currentBranch = '';
-    for (let s of localBranchList) {
-        if (s.current) {
-            currentBranch = s.name;
-            break;
-        };
-    };
 
     let branchs = JSON.stringify(localBranchList);
     remoteBranchList = JSON.stringify(remoteBranchList);
@@ -270,10 +263,10 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             </div>
                             <ul class="pl-0 mb-0" style="list-style-type:none;">
                                 <li class="lif">
-                                   <span @click="gitCreateBranch();" title="在当前工作区上创建分支">从现有来源创建新分支</span>
+                                   <span @click="gitCreateBranch();" :title="'在当前工作区上创建分支, 即基于当前'+currentBranch+'分支创建'">从现有来源创建新分支</span>
                                 </li>
                                 <li class="lif">
-                                    <span @click="gitCreatePushBranch();" title="在当前工作区上创建分支">从现有来源创建新分支并push</span>
+                                    <span @click="gitCreatePushBranch();" :title="'在当前工作区上创建分支, 即基于当前'+currentBranch+'分支创建'">从现有来源创建新分支并push</span>
                                 </li>
                                 <li class="lif">
                                     <span @click="openModelBox('none');">从...创建分支</span>
@@ -284,7 +277,12 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                 </div>
                 <div id="gather-local-branchs" class="row"  style="margin-top:198px;">
                     <div class="col-12 mt-2 px-0">
-                        <ul class="pl-0 mb-0" style="list-style-type:none;">
+                        <p class="mx-3 mb-1 major-title">
+                            <span>${BranchIcon}&nbsp;&nbsp;本地分支</span>
+                            <span v-if="!isShowLocalBranch" class="is-show" @click="isShowLocalBranch = true;">显示</span>
+                            <span v-else class="is-show" @click="isShowLocalBranch = false;">隐藏</span>
+                        </p>
+                        <ul class="pl-3 mb-0" style="list-style-type:none;" v-if="isShowLocalBranch">
                             <li class="lif gitfile" v-for="(item,idx) in BranchList" :key="idx"
                                 :id="'branch_'+idx"
                                 @mouseover="hoverStampID = 'branch_'+idx"
@@ -407,14 +405,6 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         <div class="ml-2" @click="gitFetch();" title="git fetch --all">
                             ${SyncIcon}
                         </div>
-                        <div @click="gitPull('rebase');" title="git pull --rebase">
-                            <span class="cactive num">${behind}</span>
-                            ${DownArrowIcon}
-                        </div>
-                        <div @click="gitPush();" title="git push">
-                            <span class="cactive num">${ahead}</span>
-                            <span>${UpArrowIcon}</span>
-                        </div>
                     </div>
                     <div class="col-auto push-pull" v-else>
                         <div :title="projectName + '(git) - 发布更改'" @click="publish();">
@@ -476,6 +466,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     originurlBoolean: '',
                     isShowModel: false,
                     inputBranch: '',
+                    isShowLocalBranch: true,
                     isShowOrigin: false,
                     rawOriginBranchList: [],
                     OriginBranchList: [],
@@ -528,9 +519,6 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         this.BranchList = tmp;
                     }
                 },
-                beforeCreate() {
-                    this.refreshProgress = true;
-                },
                 created() {
                     this.ahead = '${ahead}';
                     this.behind = '${behind}';
@@ -559,18 +547,57 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         };
                     };
                     document.getElementById('inputBranch').focus();
-                    this.refreshProgress = false;
+
+                    let that = this;
+                    setTimeout(function() {
+                        that.refreshProgress = false;
+                    },2000);
 
                     // get tags list
                     that = this;
                     window.onload = function() {
                         setTimeout(function(){
                             that.getTagsList();
-                            that.receiveTagsList();
-                        });
+                            that.receive();
+                        }, 1000);
                     };
                 },
                 methods: {
+                    receive() {
+                        hbuilderx.onDidReceiveMessage((msg) => {
+                            if (msg.command == 'animation') {
+                                this.refreshProgress = true;
+                                let that = this;
+                                setTimeout(function() {
+                                    that.refreshProgress = false;
+                                }, 3000);
+                                return;
+                            };
+                            if (msg.command == 'refresh') {
+                                if (msg.gitBranchData) {
+                                    let data = msg.gitBranchData;
+                                    this.rawBranchList = data.localBranchList;
+                                    this.BranchList = data.localBranchList;
+
+                                    this.rawOriginBranchList = data.remoteBranchList;
+                                    this.OriginBranchList = data.remoteBranchList;
+
+                                    this.ahead = data.ahead;
+                                    this.behind = data.behind;
+                                    this.currentBranch = data.currentBranch;
+                                    this.AssignAction = data.AssignAction;
+                                    this.tracking = data.tracking;
+                                    this.originurl = data.originurl;
+                                };
+                            };
+                            if (msg.command == 'TagList') {
+                                if (msg.data) {
+                                    this.rawTagsList = msg.data;
+                                    this.TagsList = msg.data;
+                                };
+                            };
+                        });
+                    },
                     back() {
                         hbuilderx.postMessage({
                             command: 'back'
@@ -579,18 +606,6 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     getTagsList() {
                         hbuilderx.postMessage({
                             command: 'TagList'
-                        });
-                    },
-                    receiveTagsList() {
-                        hbuilderx.onDidReceiveMessage((msg) => {
-                            if (msg.command != 'TagList') {
-                                return;
-                            };
-                            if (msg.data) {
-                                console.log(msg.data);
-                                this.rawTagsList = msg.data;
-                                this.TagsList = msg.data;
-                            }
                         });
                     },
                     showBranchWindow() {
@@ -707,13 +722,13 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
             })
         </script>
         <script>
-            let devStatus = ${DisableDevTools};
-            if (devStatus) {
-                window.oncontextmenu = function() {
-                    event.preventDefault();
-                    return false;
-                }
-            }
+            // let devStatus = ${DisableDevTools};
+            // if (devStatus) {
+            //     window.oncontextmenu = function() {
+            //         event.preventDefault();
+            //         return false;
+            //     }
+            // }
         </script>
     </body>
 </html>
