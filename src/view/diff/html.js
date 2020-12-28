@@ -266,7 +266,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
 };
 
 
-function getDefaultContent(userConfig) {
+function getDefaultContent(fname='') {
 
     let uiData = getUIData();
 
@@ -310,7 +310,7 @@ function getDefaultContent(userConfig) {
             <div class="container-fluid">
                 <div id="diff-head" class="row">
                     <div class="col text-center pt-5">
-                        <p>没有要对比的文件内容</p>
+                        <p>{{ msg }}</p>
                         <p>注意：目前仅支持对比本地有更改的文件</p>
                     </div>
                 </div>
@@ -320,12 +320,15 @@ function getDefaultContent(userConfig) {
             var app = new Vue({
                 el: '#app',
                 data: {
+                    msg: ''
                 },
                 created() {
-                },
-                mounted() {
-                },
-                methods: {
+                    let tmp = '${fname}';
+                    if (tmp == '') {
+                        this.msg = '没有要对比的文件内容'
+                    } else {
+                        this.msg = tmp + ' 没有要对比的文件内容'
+                    };
                 }
             })
         </script>

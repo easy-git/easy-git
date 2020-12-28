@@ -67,6 +67,10 @@ class Diff {
         };
 
         let {statusInfo, isConflicted} = resut;
+        if (statusInfo == undefined) {
+            return 'error';
+        };
+
         let gitIndex = statusInfo.index;
         let gitWorking_dir = (statusInfo.working_dir).trim();
 
@@ -108,7 +112,7 @@ class Diff {
         let init = await this.getDiffOptions(selectedFile);
 
         if (init == 'error') {
-            this.webviewPanel.webView.htm = getDefaultContent();
+            this.webviewPanel.webView.html = getDefaultContent(selectedFile);
             return;
         };
 
