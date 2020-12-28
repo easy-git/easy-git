@@ -1050,7 +1050,7 @@ async function gitReset(workingDir, options, msg) {
         let status = await git(workingDir)
             .reset(options)
             .then(() => {
-                hx.window.setStatusBarMessage(msg + '成功', 5000, 'info');
+                hx.window.setStatusBarMessage(msg + '成功');
                 return 'success'
             })
             .catch((err) => {

@@ -408,7 +408,7 @@ class Reset {
         let hash = selected.hash;
         if (hash == undefined) { return; };
 
-        let cmd = ["reset", "--hard", hash]
+        let cmd = ["--hard", hash];
         let runResult = await gitReset(projectPath, cmd, `重置到代码 ${hash}`);
         if (runResult == 'success') {
             ProjectInfo.easyGitInner = true;
