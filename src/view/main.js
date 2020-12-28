@@ -5,8 +5,9 @@ const chokidar = require('chokidar');
 const hx = require('hbuilderx');
 
 const file = require('../common/file.js');
-let utils = require('../common/utils.js');
 const gitAction = require('../commands/index.js');
+const debounce = require('../common/debounce.js');
+let utils = require('../common/utils.js');
 
 const icon = require('./static/icon.js');
 const html = require('./mainHtml.js')
@@ -576,26 +577,6 @@ class GitFile {
 
 
 /**
- * @节流
- * @param {Object} fn
- * @param {Object} wait
- */
-function debounce(func, wait){
-    var timer;
-    return function(...args){
-        if(timer){
-            clearTimeout(timer);
-        };
-        timer = setTimeout(function(){
-            clearTimeout(timer);
-            timer = null;
-            func.apply(null, args);
-        }, wait);
-    };
-};
-
-
-/**
  * @description 监听文件
  */
 var listeningProjectFile = false;
@@ -608,7 +589,6 @@ function watchProjectDir(projectDir, func) {
             ignored: gitDir,
             ignoreInitial: true
         }).on('all', (event, path) => {
-            console.log('---------', event, path)
             if (['change', 'add', 'unlink', 'unlinkDir'].includes(event) && GitHBuilderXInnerTrigger == false) {
                 listeningProjectFile = true;
                 if (event == 'add') {

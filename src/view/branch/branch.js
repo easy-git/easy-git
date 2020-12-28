@@ -4,6 +4,7 @@ const path = require('path');
 const hx = require('hbuilderx');
 
 let utils = require('../../common/utils.js');
+const debounce = require('../../common/debounce.js');
 const { Branch } = require('../../commands/ref.js');
 
 const icon = require('../static/icon.js');
@@ -273,7 +274,7 @@ function watchProjectDir(projectDir, func) {
         let dir = path.join(projectDir, '.git');
         watcherListen = fs.watch(dir, watchOpt, (eventType, filename) => {
             if (GitHBuilderXInnerTrigger == false) {
-                if (eventType && filename == 'HEAD') {
+                if (eventType && (filename == 'HEAD' || filename.includes('refs/tags'))) {
                     setTimeout(function(){
                         func.LoadingBranchData();
                     }, 2000);

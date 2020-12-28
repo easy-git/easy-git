@@ -2,6 +2,7 @@ const hx = require('hbuilderx');
 const fs = require('fs');
 const path = require('path');
 
+const debounce = require('../../common/debounce.js');
 const { GitLogAction } = require('./log.js');
 
 // 解决hx启动后，已打开的自定义编辑器空白的问题
@@ -119,9 +120,7 @@ function watchProjectDir(projectDir, func) {
         watcher = fs.watch(dir, watchOpt, (eventType, filename) => {
             if (GitHBuilderXInnerTrigger == false) {
                 if (eventType && filename == 'index') {
-                    setTimeout(function(){
-                        func.setView('branch', '');
-                    }, 1500);
+                    debounce(func.setView('branch', ''), 1500);
                 };
             };
         });
