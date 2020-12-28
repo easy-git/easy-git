@@ -101,7 +101,10 @@
                     "type": "string",
                     "default": "普通话",
                     "description": "Git操作，语音播报语言（默认女声普通话），修改后重启生效。",
-                    "enum": ["普通话", "粤语"]
+                    "enum": [
+                        "普通话",
+                        "粤语"
+                    ]
                 }
             }
         },
@@ -450,6 +453,7 @@
     ],
     "dependencies": {
         "axios": "^0.20.0",
+        "chokidar": "^3.4.3",
         "cross-spawn": "^7.0.3",
         "dayjs": "^1.9.6",
         "diff2html": "^3.1.14",
