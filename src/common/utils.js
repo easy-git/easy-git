@@ -960,8 +960,13 @@ async function gitPull(workingDir,options) {
     try {
         let status = await git(workingDir)
             .pull(args)
-            .then(() => {
-                hx.window.setStatusBarMessage('Git: pull success', 3000, 'info');
+            .then((res) => {
+                let msg = 'Git: pull 操作成功。';
+                if (res) {
+                    let fnum = (res.files).length;
+                    msg = `Git: pull 操作成功, 项目下共有 ${fnum} 个文件发生变动。`;
+                };
+                hx.window.setStatusBarMessage(msg);
                 return 'success';
             })
             .catch((err) => {
