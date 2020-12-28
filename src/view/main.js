@@ -580,16 +580,17 @@ class GitFile {
  * @param {Object} fn
  * @param {Object} wait
  */
-function throttle(fn, wait) {
-    var pre = Date.now();
-    return function() {
-        var context = this;
-        var args = arguments;
-        var now = Date.now();
-        if (now - pre >= wait) {
-            fn.apply(context, args);
-            pre = Date.now();
+function debounce(func, wait){
+    var timer;
+    return function(...args){
+        if(timer){
+            clearTimeout(timer);
         };
+        timer = setTimeout(function(){
+            clearTimeout(timer);
+            timer = null;
+            func.apply(null, args);
+        }, wait);
     };
 };
 
@@ -605,18 +606,15 @@ function watchProjectDir(projectDir, func) {
         let gitDir = path.join(projectDir, '.git');
         watcherListen = chokidar.watch(projectDir, {
             ignored: gitDir,
-            ignoreInitial: true,
-            usePolling: false,
-            interval: 3000,
-            binaryInterval: 3000,
-            atomic: 3000
+            ignoreInitial: true
         }).on('all', (event, path) => {
+            console.log('---------', event, path)
             if (['change', 'add', 'unlink', 'unlinkDir'].includes(event) && GitHBuilderXInnerTrigger == false) {
                 listeningProjectFile = true;
                 if (event == 'add') {
-                    throttle(func.refreshFileList(), 2000);
+                    debounce(func.refreshFileList(), 2000);
                 } else {
-                    throttle(func.refreshFileList(), 4000);
+                    debounce(func.refreshFileList(), 4000);
                 };
                 setTimeout(function(){
                     listeningProjectFile = false;
@@ -632,10 +630,10 @@ function watchProjectDir(projectDir, func) {
                 basename = path.basename(fpath);
                 if (basename == 'index.lock') return;
                 if ((basename == 'HEAD' || fpath.includes(refsPath)) && listeningProjectFile == false) {
-                    throttle(func.refreshHEAD(), 2000);
+                    debounce(func.refreshHEAD(), 2000);
                 };
                 if (['index','ORIG_HEAD'].includes(basename) && listeningProjectFile == false) {
-                    throttle(func.refreshFileList(), 3000)
+                    debounce(func.refreshFileList(), 3000);
                 };
             };
         });
@@ -701,7 +699,7 @@ function active(webviewPanel, userConfig, gitData) {
 
     // 监听项目文件，如果有变动，则刷新; 关闭自动刷新，则不再监听。
     let { mainViewAutoRefreshFileList } = userConfig;
-    if (mainViewAutoRefreshFileList) {
+    if (mainViewAutoRefreshFileList && watcherListen == undefined && watcherListenGitDir == undefined) {
         watchProjectDir(projectPath, File);
     };
     // 关于自动刷新功能，弹窗提示，仅提示一次
@@ -782,6 +780,8 @@ function active(webviewPanel, userConfig, gitData) {
                             watcherListen.close().then( () => {
                                 console.log("easy-git: stop watch");
                             });
+                            watcherListen = undefined;
+                            watcherListenGitDir = undefined;
                         };
                     };
                 } else {
