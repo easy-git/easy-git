@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const chokidar = require('chokidar');
 
 const hx = require('hbuilderx');
 
@@ -577,32 +578,58 @@ class GitFile {
  * @description 监听文件
  */
 let watcherListen;
+let watcherListenGitDir;
 function watchProjectDir(projectDir, func) {
     const watchOpt = {
         persistent: true,
         recursive: true
     };
     try {
-        watcherListen = fs.watch(projectDir, watchOpt, (eventType, filename) => {
+        let gitDir = path.join(projectDir, '.git');
+        watcherListen = chokidar.watch(projectDir, {
+            ignored: gitDir,
+            ignoreInitial: true,
+            usePolling: false,
+            interval: 3000,
+            binaryInterval: 3000,
+            atomic: 3000
+        }).on('add', fpath => {
             if (GitHBuilderXInnerTrigger == false) {
-                if (eventType && filename == '.git/HEAD') {
+                func.refreshFileList();
+            };
+        }).on('change', fpath => {
+            if (GitHBuilderXInnerTrigger == false) {
+                func.refreshFileList();
+            };
+        }).on('unlink', fpath => {
+            if (GitHBuilderXInnerTrigger == false) {
+                func.refreshFileList();
+            };
+        }).on('unlinkDir', fpath => {
+            if (GitHBuilderXInnerTrigger == false) {
+                func.refreshFileList();
+            };
+        }).on('error', error => {
+            console.log(error)
+        });
+
+        let refsPath = path.join(gitDir, 'refs', 'remotes', 'origin');
+        watcherListenGitDir = chokidar.watch(gitDir, {
+            ignoreInitial: true
+        }).on('change', fpath => {
+            if (GitHBuilderXInnerTrigger == false) {
+                basename = path.basename(fpath);
+                if (basename == 'index.lock') return;
+                if (basename == 'HEAD' || fpath.includes(refsPath)) {
                     setTimeout(function(){
                         func.refreshHEAD();
                     }, 2000);
                 };
-                if (eventType && ['.git/index','.git/ORIG_HEAD'].includes(filename)) {
-                    setTimeout(function(){
-                        func.refreshFileList();
-                    }, 3000);
-                };
-                if (eventType && !filename.includes('.git')) {
-                    setTimeout(function(){
-                        func.refreshFileList();
-                    }, 3000);
+                if (['index','ORIG_HEAD'].includes(basename)) {
+                    func.refreshFileList();
                 };
             };
         });
-        return watcherListen;
     } catch (e) {};
 };
 
@@ -742,7 +769,10 @@ function active(webviewPanel, userConfig, gitData) {
                     } else {
                         hx.commands.executeCommand('EasyGit.branch',EasyGitInnerParams);
                         if (watcherListen != undefined) {
-                            watcherListen.close();
+                            watcherListenGitDir.close();
+                            watcherListen.close().then( () => {
+                                console.log("easy-git: stop watch");
+                            });
                         };
                     };
                 } else {
