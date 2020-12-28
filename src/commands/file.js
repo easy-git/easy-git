@@ -20,7 +20,10 @@ let cmp_git;
 async function gitAddFile(ProjectInfo) {
     let options = [];
     let { projectPath, selectedFile, easyGitInner} = ProjectInfo;
-
+    
+    projectPath = path.normalize(projectPath);
+    selectedFile = path.normalize(selectedFile);
+    
     // 检查是否存在修改的文件
     let changeList = [];
     let StatusInfo = await gitFileListStatus(projectPath);
@@ -37,9 +40,6 @@ async function gitAddFile(ProjectInfo) {
             return hx.window.showErrorMessage('EasyGit: 当前目录或文件没有任何更改，无需进行暂存操作。', ['我知道了']);
         };
     };
-
-    projectPath = path.normalize(projectPath);
-    selectedFile = path.normalize(selectedFile);
 
     // 选择：整个项目
     if (projectPath == selectedFile) {
