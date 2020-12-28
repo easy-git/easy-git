@@ -64,9 +64,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
     let gitFileResult = JSON.stringify(FileResult);
     let originurlBoolean = originurl != undefined ? true : false;
     ahead = ahead == 0 ? '' : ahead;
-
-    // 2020-11-25 behind值修改为从fetch操作后再获取
-    // behind = behind == 0 ? '': behind;
+    behind = behind == 0 ? '': behind;
 
     let ctrl = 'ctrl';
     if (osName == 'darwin') {
@@ -514,7 +512,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     refreshProgress: true,
                     projectName: "${projectName}",
                     currentBranch: "${currentBranch}",
-                    behind: " ",
+                    behind: "${behind}",
                     ahead: "${ahead}",
                     tracking: "${tracking}",
                     originurl: "${originurl}",
@@ -588,6 +586,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             that.updateProjectStatusInfo();
                         }, 500);
                         setTimeout(function() {
+                            that.runSync();
                             that.getCommitMessage();
                             that.forUpdateCommitMessage();
                         }, 1000);
@@ -623,6 +622,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             }
 
                             if (msg.command == 'autoRefresh') {
+                                console.log(msg)
                                 this.gitFileResult = msg.gitFileResult;
                                 this.ahead = msg.ahead;
                                 this.behind = msg.behind;

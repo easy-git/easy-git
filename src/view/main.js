@@ -155,7 +155,6 @@ class GitFile {
         behind = behind == 0 ? '' : behind;
 
         let originurlBoolean = originurl != undefined ? true : false;
-
         this.webviewPanel.webView.postMessage({
             command: "HEAD",
             ahead: ahead,
@@ -176,7 +175,7 @@ class GitFile {
         try{
             let gitInfo = await utils.gitStatus(this.projectPath);
             let { BranchTracking } = gitInfo;
-            const gitData = Object.assign(gitInfo, {
+            let gitData = Object.assign(gitInfo, {
                 'projectName': this.projectName,
                 'projectPath': this.projectPath
             });
@@ -563,16 +562,19 @@ class GitFile {
         let fetchStatus = await utils.gitFetch(this.projectPath, false);
         if (fetchStatus == 'success') {
             let gitInfo = await utils.gitStatus(this.projectPath, false);
-            let { behind } = gitInfo;
-            if (behind != 0 && behind != undefined) {
+            let { behind, ahead } = gitInfo;
+            ahead = ahead == 0 ? '' : ahead;
+            behind = behind == 0 ? '' : behind;
+
+            if (behind != 0 && ahead != 0) {
                 this.webviewPanel.webView.postMessage({
                     command: "sync",
-                    behind: behind
+                    behind: behind,
+                    ahead: ahead
                 });
             };
         };
     };
-
 };
 
 
@@ -603,18 +605,23 @@ function watchProjectDir(projectDir, func) {
         });
 
         let refsPath = path.join(gitDir, 'refs', 'remotes', 'origin');
+        let refsHeads = path.join(gitDir, 'refs', 'heads');
         watcherListenGitDir = chokidar.watch(gitDir, {
             ignoreInitial: true
         }).on('change', fpath => {
             if (GitHBuilderXInnerTrigger == false && listeningProjectFile == false) {
                 basename = path.basename(fpath);
                 if (basename == 'index.lock') return;
-                if ((basename == 'HEAD' || fpath.includes(refsPath)) && listeningProjectFile == false) {
-                    debounce(func.refreshHEAD(), 2000);
+                GitHBuilderXInnerTrigger = true;
+                if (['FETCH_HEAD', 'HEAD','ORIG_HEAD'].includes(basename) || fpath.includes(refsPath) || fpath.includes(refsHeads)) {
+                    debounce(func.refreshHEAD(), 1000);
                 };
-                if (['index','ORIG_HEAD'].includes(basename) && listeningProjectFile == false) {
+                if (['index', 'ORIG_HEAD'].includes(basename)) {
                     debounce(func.refreshFileList(), 3000);
                 };
+                setTimeout(function(){
+                    GitHBuilderXInnerTrigger = false;
+                }, 1200);
             };
         });
     } catch (e) {};
