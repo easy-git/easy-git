@@ -160,6 +160,32 @@ class Diff {
             }, 3000);
         };
     }
+
+    // 打开文件并跳转到指定的行
+    async openFile(filepath) {
+        let fspath = path.join(this.projectPath, filepath);
+
+        let checkResult = await utils.gitRaw(this.projectPath, ['diff', '--check', filepath], undefined, 'result');
+        if (checkResult.length && checkResult.includes('conflict')) {
+            let data = checkResult.split('\n');
+            let conflictList = data.filter(item => item.includes(filepath) );
+            let num = conflictList.length;
+
+            let firstConflict = 0;
+            try{
+                firstConflict = conflictList[0].split(':')[1];
+            }catch(e){};
+
+            hx.workspace.openTextDocument(fspath).then(doc => {
+                hx.window.showTextDocument(doc, {
+                    selection: {start: {line: Number(firstConflict), character: 0}}
+                });
+            });
+        } else {
+            let fPath = path.join(projectPath, selectedFile);
+            hx.workspace.openTextDocument(fPath);
+        };
+    };
 }
 
 

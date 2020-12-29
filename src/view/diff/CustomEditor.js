@@ -130,8 +130,7 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
                 GitDiff.SetView(msg.selectedFile);
                 break;
             case 'openFile':
-                let fPath = path.join(projectPath, selectedFile);
-                hx.workspace.openTextDocument(fPath);
+                GitDiff.openFile(selectedFile);
                 break;
             case 'openLog':
                 let data = {
