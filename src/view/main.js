@@ -582,6 +582,7 @@ class GitFile {
  * @description 监听文件
  */
 var listeningProjectFile = false;
+let watchProjectPath;
 let watcherListen;
 let watcherListenGitDir;
 function watchProjectDir(projectDir, func) {
@@ -614,14 +615,14 @@ function watchProjectDir(projectDir, func) {
                 if (basename == 'index.lock') return;
                 GitHBuilderXInnerTrigger = true;
                 if (['FETCH_HEAD', 'HEAD','ORIG_HEAD'].includes(basename) || fpath.includes(refsPath) || fpath.includes(refsHeads)) {
-                    debounce(func.refreshHEAD(), 1000);
+                    debounce(func.refreshHEAD(), 800);
                 };
-                if (['index', 'ORIG_HEAD'].includes(basename)) {
-                    debounce(func.refreshFileList(), 3000);
+                if (['index', 'COMMIT_EDITMSG', 'ORIG_HEAD'].includes(basename)) {
+                    debounce(func.refreshFileList(), 1100);
                 };
                 setTimeout(function(){
                     GitHBuilderXInnerTrigger = false;
-                }, 1200);
+                }, 1000);
             };
         });
     } catch (e) {};
@@ -684,6 +685,13 @@ function active(webviewPanel, userConfig, gitData) {
         'easyGitInner': true
     };
 
+    // 记录监听的项目路径
+    if (watchProjectPath != undefined && watchProjectPath != projectPath) {
+        watcherListen = undefined;
+        watcherListenGitDir = undefined
+    };
+    watchProjectPath = projectPath;
+    
     // 监听项目文件，如果有变动，则刷新; 关闭自动刷新，则不再监听。
     let { mainViewAutoRefreshFileList } = userConfig;
     if (mainViewAutoRefreshFileList && watcherListen == undefined && watcherListenGitDir == undefined) {
