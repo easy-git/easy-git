@@ -310,7 +310,7 @@
             },
             {
                 "command": "EasyGit.annotate",
-                "title": "easy-git: annotate - 用提交的信息来标注给定文件中的每一行"
+                "title": "easy-git: annotate - 用提交信息标注文件中的每一行"
             },
             {
                 "command": "EasyGit.set",
@@ -391,7 +391,7 @@
                 },
                 {
                     "command": "EasyGit.annotate",
-                    "title": "annotate",
+                    "title": "用提交信息标注文件中的每一行",
                     "when": "isGit",
                     "group": "easygit@2"
                 },
