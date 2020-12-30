@@ -25,9 +25,6 @@ try{
 
 let GitLogCustomWebViewPanal = {};
 
-// 监听器
-let watcher;
-
 // Git触发途径：HBuilderX内触发、外部Git命令（或其它工具）触发
 let GitHBuilderXInnerTrigger = false;
 
@@ -92,6 +89,8 @@ class CatCustomEditorProvider extends CustomEditorProvider {
  * @description 解决hx启动后，已打开的自定义编辑器空白的问题
  */
 function history(gitData) {
+    if (HistoryProjectPath != undefined) return;
+
     const {projectPath, projectName} = gitData;
     if (HistoryProjectPath == projectPath && HistoryProjectName == projectName) {
         return;
@@ -110,6 +109,8 @@ function history(gitData) {
 /**
  * @description 监听文件
  */
+let watcher;
+let watchProjectPath;
 function watchProjectDir(projectDir, func) {
     const watchOpt = {
         persistent: true,
@@ -129,6 +130,11 @@ function watchProjectDir(projectDir, func) {
     };
 };
 
+/**
+ * @description 日志视图
+ * @param {Object} gitData
+ * @param {Object} userConfig
+ */
 function GitLogCustomEditorRenderHtml(gitData, userConfig) {
     let {projectPath, projectName, selectedFile, currentBranch} = gitData;
     isSelectedFile = selectedFile;
@@ -147,6 +153,7 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
         isCustomFirstOpen = true;
     };
 
+    // 仅首次运行
     history(gitData);
 
     let Log = new GitLogAction(gitData, userConfig, GitLogCustomWebViewPanal, 'customEditor');
@@ -159,9 +166,16 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
         projectPath = path.normalize(projectPath);
     }catch(e){}
 
+    // 记录监听的项目路径, 避免重复监听
+    if (watchProjectPath != undefined && watchProjectPath != projectPath) {
+        watcher.close();
+        watcher = undefined;
+    };
+    watchProjectPath = projectPath;
+
     // 监听.git，当关闭日志视图自动刷新时，则不再监听
     let { logViewAutoRefresh } = userConfig;
-    if (logViewAutoRefresh) {
+    if (logViewAutoRefresh && watcher == undefined) {
         watchProjectDir(projectPath, Log);
     };
 

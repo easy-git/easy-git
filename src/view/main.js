@@ -687,11 +687,13 @@ function active(webviewPanel, userConfig, gitData) {
 
     // 记录监听的项目路径
     if (watchProjectPath != undefined && watchProjectPath != projectPath) {
+        watcherListenGitDir.close();
+        watcherListen.close();
         watcherListen = undefined;
         watcherListenGitDir = undefined
     };
     watchProjectPath = projectPath;
-    
+
     // 监听项目文件，如果有变动，则刷新; 关闭自动刷新，则不再监听。
     let { mainViewAutoRefreshFileList } = userConfig;
     if (mainViewAutoRefreshFileList && watcherListen == undefined && watcherListenGitDir == undefined) {
