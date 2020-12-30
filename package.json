@@ -373,10 +373,27 @@
                     "group": "z_commands"
                 },
                 {
-                    "command": "EasyGit.gitBlameForLineChange",
-                    "title": "easy-git: 显示当前行最后一次修改信息",
+                    "command": "EasyGit.CommandPanel",
+                    "title": "easy-git: 命令面板",
                     "when": "isGit",
                     "group": "z_commands"
+                },
+                {
+                    "title": "easy-git",
+                    "group": "z_commands",
+                    "id": "easygit"
+                },
+                {
+                    "command": "EasyGit.gitBlameForLineChange",
+                    "title": "显示当前行最后一次修改信息",
+                    "when": "isGit",
+                    "group": "easygit@1"
+                },
+                {
+                    "command": "EasyGit.annotate",
+                    "title": "annotate",
+                    "when": "isGit",
+                    "group": "easygit@2"
                 },
                 {
                     "group": "z_commands"
