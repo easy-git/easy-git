@@ -4,6 +4,9 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 
+const chokidar = require('chokidar');
+const debounce = require('../../common/debounce.js');
+
 const { Diff } = require('./diff.js');
 const { getDefaultContent, getWebviewDiffContent } = require('./html.js');
 
@@ -21,13 +24,16 @@ try{
     CustomDocumentEditEvent = hx.CustomEditor.CustomDocumentEditEvent;
 } catch(e) {};
 
-
 // 用于保存自定义编辑器信息
 let GitDiffCustomWebViewPanal = {};
 
-// 用于保存watchFile
-let watchFile;
+// Git触发途径：HBuilderX内触发、外部Git命令（或其它工具）触发
+let GitHBuilderXInnerTrigger = false;
+
+// 监听器、监听的文件路径
 let watchListener;
+let watchFilePathName;
+
 
 class CatCustomDocument extends CustomDocument {
     constructor(uri) {
@@ -72,15 +78,35 @@ class CatDiffCustomEditorProvider extends CustomEditorProvider {
             isCustomFirstOpen = false;
 
             // 移除文件监听
-            try{
-                if (watchFile) {
-                    fs.unwatchFile(watchFile, watchListener);
-                };
-            }catch(e){};
+            if (watchListener != undefined) {
+                watchListener.close();
+            };
         });
     };
 };
 
+
+/**
+ * @description 监听文件
+ * @param {String} absolutePath 文件绝对路径
+ * @param {String} selectedFile 项目下的文件相对路径
+ */
+function watchCurrentDiffFile(absolutePath, selectedFile, func) {
+    const watchOpt = {
+        persistent: true
+    };
+    try {
+        watchListener = chokidar.watch(absolutePath, {
+            ignoreInitial: true
+        }).on('change', fpath => {
+            if (GitHBuilderXInnerTrigger == false) {
+                debounce(func.SetView(selectedFile), 300);
+            };
+        });
+    } catch (e) {
+        console.log(e);
+    };
+};
 
 /**
  * @description 生成文件对比视图HTML
@@ -88,7 +114,9 @@ class CatDiffCustomEditorProvider extends CustomEditorProvider {
  * @param {Object} userConfig
  */
 function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
-    let fileAbsPath;
+    // 文件绝对路径，因为selectedFile是相对路径
+    let absolutePath;
+
     let { projectPath, projectName, selectedFile } = ProjectData;
 
     if (selectedFile == undefined || selectedFile == null) {
@@ -104,9 +132,9 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
     try{
         projectPath = path.normalize(projectPath);
         ProjectData.projectPath = projectPath;
-        fileAbsPath = path.join(projectPath, selectedFile);
+        absolutePath = path.join(projectPath, selectedFile);
 
-        let fstate = fs.statSync(fileAbsPath);
+        let fstate = fs.statSync(absolutePath);
         if (fstate.isFile() != true) {
             return hx.window.showErrorMessage('EasyGit: 选中有效的文件后，再进行操作！', ['我知道了']);
         };
@@ -115,16 +143,19 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
     let GitDiff = new Diff(ProjectData, userConfig, GitDiffCustomWebViewPanal);
     GitDiff.SetView(selectedFile);
 
-    // 监听文件
-    watchFile = fileAbsPath;
-    watchListener = fs.watchFile(fileAbsPath, (curr, prev) => {
-        if (curr != prev) {
-            GitDiff.SetView(selectedFile);
-        };
-    });
+    // 记录监听的项目路径, 避免重复监听
+    if (watchFilePathName != undefined && watchFilePathName != absolutePath) {
+        watchListener.close();
+        watchListener = undefined;
+    };
+    watchFilePathName = absolutePath;
+
+    // 监听文件变动，自动更新对比视图
+    watchCurrentDiffFile(absolutePath, selectedFile, GitDiff);
 
     GitDiffCustomWebViewPanal.webView.onDidReceiveMessage(function(msg) {
         let action = msg.command;
+        GitHBuilderXInnerTrigger = true;
         switch (action) {
             case 'update':
                 GitDiff.SetView(msg.selectedFile);
@@ -148,6 +179,11 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
             default:
                 break;
         };
+
+        setTimeout(function() {
+            GitHBuilderXInnerTrigger = false;
+        }, 1200);
+
     });
 }
 
