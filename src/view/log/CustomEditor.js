@@ -161,11 +161,6 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
     // 默认在当前分支搜索，当搜索全部时，此值为all
     let searchType = 'branch';
 
-    try{
-        selectedFile = path.normalize(selectedFile);
-        projectPath = path.normalize(projectPath);
-    }catch(e){}
-
     // 记录监听的项目路径, 避免重复监听
     if (watchProjectPath != undefined && watchProjectPath != projectPath) {
         watcher.close();
@@ -181,12 +176,15 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
 
     // 选中文件或目录，则查看此文件的log记录
     if (selectedFile != '' && selectedFile != undefined) {
-        let sfile = selectedFile.replace(path.join(projectPath, path.sep), '');
+        let sfile = selectedFile.replace(projectPath, '');
+        if (sfile.slice(0,1) == '/') {
+            sfile = sfile.slice(1);
+        };
         if (selectedFile != projectPath) {
             Log.setView(searchType, sfile);
         } else {
             Log.setView(searchType, '');
-        }
+        };
     } else {
         Log.setView(searchType, '');
     };
