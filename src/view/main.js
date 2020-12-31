@@ -617,8 +617,11 @@ function watchProjectDir(projectDir, func) {
                 if (['FETCH_HEAD', 'HEAD','ORIG_HEAD'].includes(basename) || fpath.includes(refsPath) || fpath.includes(refsHeads)) {
                     debounce(func.refreshHEAD(), 800);
                 };
-                if (['index', 'COMMIT_EDITMSG', 'ORIG_HEAD'].includes(basename)) {
-                    debounce(func.refreshFileList(), 1100);
+                if (['index', 'ORIG_HEAD'].includes(basename)) {
+                    debounce(func.refreshFileList(), 500);
+                };
+                if (basename == 'COMMIT_EDITMSG') {
+                    func.refreshFileList();
                 };
                 setTimeout(function(){
                     GitHBuilderXInnerTrigger = false;
