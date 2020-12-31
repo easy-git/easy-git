@@ -587,9 +587,8 @@ let watcherListen;
 let watcherListenGitDir;
 function watchProjectDir(projectDir, func) {
     try {
-        let gitDir = path.join(projectDir, '.git');
         watcherListen = chokidar.watch(projectDir, {
-            ignored: gitDir,
+            ignored: path => ["node_modules", ".git", 'unpackage'].some(s => path.includes(s)),
             ignoreInitial: true
         }).on('all', (event, path) => {
             if (['change', 'add', 'unlink', 'unlinkDir'].includes(event) && GitHBuilderXInnerTrigger == false) {
@@ -605,6 +604,7 @@ function watchProjectDir(projectDir, func) {
             };
         });
 
+        let gitDir = path.join(projectDir, '.git');
         let refsPath = path.join(gitDir, 'refs', 'remotes', 'origin');
         let refsHeads = path.join(gitDir, 'refs', 'heads');
         watcherListenGitDir = chokidar.watch(gitDir, {
