@@ -286,10 +286,12 @@ class GitBranch {
     }
 };
 
+
 /**
- * @description 监听文件
+ * @description 监听Git目录变化
  */
-var watcherListen;
+let watcherListen;
+let watchProjectPath;
 function watchProjectDir(projectDir, func) {
     const watchOpt = {
         persistent: true,
@@ -300,7 +302,7 @@ function watchProjectDir(projectDir, func) {
         watcherListen = fs.watch(dir, watchOpt, (eventType, filename) => {
             if (GitHBuilderXInnerTrigger == false) {
                 if (eventType && (['FETCH_HEAD', 'HEAD','ORIG_HEAD'].includes(filename) || filename.includes('refs/tags'))) {
-                    debounce(func.LoadingBranchData(), 2000);
+                    debounce(func.LoadingBranchData(), 1200);
                 };
             };
         });
@@ -338,7 +340,14 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
     let Branch = new GitBranch(webviewPanel, ProjectGitInfo, uiData, userConfig);
     Branch.LoadingBranchData();
 
-    // 监听Git项目分支信息
+    // 记录监听的项目路径，解决项目切换问题
+    if (watchProjectPath != undefined && watchProjectPath != projectPath) {
+        watcherListen.close();
+        watcherListen = undefined;
+    };
+    watchProjectPath = projectPath;
+
+    // 监听Git目录
     watchProjectDir(projectPath, Branch);
 
     view.onDidReceiveMessage((msg) => {

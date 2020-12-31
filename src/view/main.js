@@ -688,7 +688,7 @@ function active(webviewPanel, userConfig, gitData) {
         'easyGitInner': true
     };
 
-    // 记录监听的项目路径
+    // 记录监听的项目路径, 解决项目切换问题
     if (watchProjectPath != undefined && watchProjectPath != projectPath) {
         watcherListenGitDir.close();
         watcherListen.close();
