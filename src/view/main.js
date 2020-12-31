@@ -639,7 +639,7 @@ function watchUserPrompt() {
     let config = hx.workspace.getConfiguration();
     let UserPrompt = config.get('EasyGit.isShowPromptForAutoRefresh');
     if (UserPrompt == undefined) {
-        hx.window.showInformationMessage('EasyGit新功能：项目文件发生变动时，源代码管理器视图处于打开状态，会自动刷新更改的文件列表。关闭自动刷新后，以后可在【设置 - 插件配置】中手动开启。', ['关闭自动刷新', '我知道了']).then( (btn) => {
+        hx.window.showInformationMessage('EasyGit新功能：项目文件发生变动时，源代码管理器视图处于打开状态，会自动刷新更改的文件列表。', ['关闭自动刷新', '我知道了']).then( (btn) => {
             if (btn == '关闭自动刷新') {
                 config.update('EasyGit.mainViewAutoRefreshFileList', false).then(() => {});
             };
