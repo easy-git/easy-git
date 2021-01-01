@@ -100,6 +100,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
             .diff-head .file-title {
                 display: inline-block;
                 font-size: 16px;
+                width: 80%;
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
@@ -172,11 +173,11 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                 <div id="diff-head" class="diff-head fixed-top">
                     <div class="row">
                         <div class="col px-5">
-                            <div class="d-flex">
-                                <div class="flex-grow-1">
-                                    <span class="file-title">${selectedFilePath}</span>
+                            <div class="row">
+                                <div class="col-11">
+                                    <span class="file-title" @click="openFile();">${selectedFilePath}</span>
                                 </div>
-                                <div>
+                                <div class="col-1">
                                     <span title="打开文件" @click="openFile();">${OpenFileIconSvg}</span>
                                     <span title="查看日志" @click="openLog();">${HistoryIcon}</span>
                                 </div>

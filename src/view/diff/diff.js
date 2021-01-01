@@ -216,7 +216,10 @@ class Diff {
         };
     }
 
-    // 打开文件并跳转到指定的行
+    /**
+     * @description 打开文件并跳转到指定的行
+     * @param {filepath} 项目文件相对路径
+     */
     async openFile(filepath) {
         let fspath = path.join(this.projectPath, filepath);
 
@@ -237,7 +240,7 @@ class Diff {
                 });
             });
         } else {
-            let fPath = path.join(projectPath, selectedFile);
+            let fPath = path.join(this.projectPath, filepath);
             hx.workspace.openTextDocument(fPath);
         };
     };
