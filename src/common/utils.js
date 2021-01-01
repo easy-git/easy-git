@@ -162,6 +162,24 @@ function getThemeColor(area) {
     };
 };
 
+/**
+ * @description 向临时文件插入文本
+ * @param {Object} text
+ */
+function applyEdit(text) {
+    let editorPromise = hx.window.getActiveTextEditor();
+    editorPromise.then((editor) => {
+        let workspaceEdit = new hx.WorkspaceEdit();
+        let edits = [];
+        edits.push(new hx.TextEdit({
+            start: 0,
+            end: 0
+        }, text));
+
+        workspaceEdit.set(editor.document.uri, edits);
+        hx.workspace.applyEdit(workspaceEdit);
+    });
+};
 
 /**
  * @description 读取HBuilderX.ini, 获取ProjectWizard
@@ -1973,6 +1991,7 @@ async function gitRemoveFile(filepath,filename) {
 
 module.exports = {
     hxShowMessageBox,
+    applyEdit,
     createOutputChannel,
     isGitInstalled,
     getGitVersion,

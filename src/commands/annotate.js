@@ -1,7 +1,8 @@
 const hx = require('hbuilderx');
 const fs = require('fs');
 
-const { gitRaw } = require('../common/utils.js');
+const { applyEdit, gitRaw } = require('../common/utils.js');
+
 
 /**
  * @description 显示文件的每一行最后修改的版本和作者
@@ -21,15 +22,8 @@ async function gitAnnotate(ProjectInfo) {
 
     let result = await gitRaw(projectPath, ['annotate', selectedFile], 'annotate', 'result');
     if ( !['fail','error','',undefined].includes(result) ) {
-        let old = await hx.env.clipboard.readText().then(function(text) {
-            return text;
-        });
-        await hx.env.clipboard.writeText(result);
         await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
-        await hx.commands.executeCommand('editor.action.clipboardPasteAction');
-        if (old != undefined) {
-            hx.env.clipboard.writeText(old);
-        };
+        applyEdit(result);
     } else {
         hx.window.showErrorMessage("Git: annotate没有获取到信息。", ['我知道了']);
     };
