@@ -75,7 +75,10 @@ class GitBranch {
         this.firstInit = true;
     }
 
-    async LoadingBranchData() {
+    /**
+     * @description 加载分支视图
+     */
+    async LoadingBranchView() {
         if (this.webviewPanel) {
             this.webviewPanel.webView.postMessage({
                 command: "animation"
@@ -93,7 +96,6 @@ class GitBranch {
             originurl = gitInfo.originurl;
         };
 
-
         if (behind == undefined) { behind = 0 };
         if (ahead == undefined) { ahead = 0 };
 
@@ -106,7 +108,7 @@ class GitBranch {
         };
 
         // 大部分情况下，并不需要tag，因此等到视图页面渲染后，再获取tags -> TagList
-        const gitBranchData = Object.assign({
+        let gitBranchData = Object.assign({
             'localBranchList': localBranchList,
             'remoteBranchList': remoteBranchList,
             'TagsList': {'data':[]}
@@ -120,17 +122,18 @@ class GitBranch {
             'originurl': originurl,
             'currentBranch': currentBranch
         });
+        
+        // 2021-01-01 部分操作无法刷新或刷新数据出错
+        // if (this.webviewPanel && this.firstInit == false) {
+        //     this.webviewPanel.webView.postMessage({
+        //         command: "refresh",
+        //         gitBranchData: gitBranchData
+        //     });
+        // };
 
-        if (this.webviewPanel && this.firstInit == false) {
-            this.webviewPanel.webView.postMessage({
-                command: "refresh",
-                gitBranchData: gitBranchData
-            });
-        } else {
-            const bhtml = getWebviewBranchContent(this.userConfig, this.uiData, gitBranchData);
-            this.webviewPanel.webView.html = bhtml;
-            this.firstInit = false;
-        };
+        let bhtml = getWebviewBranchContent(this.userConfig, this.uiData, gitBranchData);
+        this.webviewPanel.webView.html = bhtml;
+        this.firstInit = false;
     };
 
     // Git branch: switch
@@ -144,7 +147,7 @@ class GitBranch {
         };
         let switchStatus = await utils.gitBranchSwitch(this.projectPath,name);
         if (switchStatus == 'success') {
-            this.LoadingBranchData();
+            this.LoadingBranchView();
         };
     };
 
@@ -160,32 +163,32 @@ class GitBranch {
         if (ref == undefined) {
             let breachCreateStatus = await utils.gitBranchCreate(data);
             if (breachCreateStatus == 'success') {
-                this.LoadingBranchData();
+                this.LoadingBranchView();
             };
         } else {
             let breachCreateStatus = await utils.gitBranchCreate(data);
             if (breachCreateStatus == 'success') {
-                this.LoadingBranchData();
+                this.LoadingBranchView();
             };
         };
     };
 
-    // Git branch: create and push
+    // Git branch: 从当前分支分支直接创建新分支，并推送
     async FromCurrentBranchCreatePush(branchName) {
         if (branchName == '') {
             return hx.window.showErrorMessage('Git: 在输入框输入分支名称后，再点击创建。',['关闭']);
         };
         let cpStatus = await utils.gitBranchCreatePush(this.projectPath,branchName);
         if (cpStatus == 'success') {
-            this.LoadingBranchData();
+            this.LoadingBranchView();
         };
     };
 
-    // Git branch: push local branch to remote
+    // Git branch: 推送本地的分支到远端
     async LocalToRemote(branchName) {
         let toStatus = await utils.gitLocalBranchToRemote(this.projectPath,branchName);
         if (toStatus == 'success') {
-            this.LoadingBranchData();
+            this.LoadingBranchView();
         };
     };
 
@@ -240,12 +243,12 @@ class GitBranch {
         if (branchName.includes('origin/')) {
             let delStatus1 = await utils.gitDeleteRemoteBranch(this.projectPath,branchName);
             if (delStatus1 == 'success') {
-                this.LoadingBranchData();
+                this.LoadingBranchView();
             };
         } else {
             let delStatus2 = await utils.gitDeleteLocalBranch(this.projectPath,branchName);
             if (delStatus2 == 'success') {
-                this.LoadingBranchData();
+                this.LoadingBranchView();
             };
         };
     };
@@ -300,9 +303,10 @@ function watchProjectDir(projectDir, func) {
     try {
         let dir = path.join(projectDir, '.git');
         watcherListen = fs.watch(dir, watchOpt, (eventType, filename) => {
+            if (filename == 'index.lock') return;
             if (GitHBuilderXInnerTrigger == false) {
                 if (eventType && (['FETCH_HEAD', 'HEAD','ORIG_HEAD'].includes(filename) || filename.includes('refs/tags'))) {
-                    debounce(func.LoadingBranchData(), 1200);
+                    debounce(func.LoadingBranchView(), 1000);
                 };
             };
         });
@@ -338,7 +342,7 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
     // Git: 分支
     let {...ProjectGitInfo} = gitData;
     let Branch = new GitBranch(webviewPanel, ProjectGitInfo, uiData, userConfig);
-    Branch.LoadingBranchData();
+    Branch.LoadingBranchView();
 
     // 记录监听的项目路径，解决项目切换问题
     if (watchProjectPath != undefined && watchProjectPath != projectPath) {
@@ -371,7 +375,7 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
                     if (originurl == undefined) {
                         hx.window.showErrorMessage('请发布此项目到远程到后再进行操作。', ['我知道了']);
                     } else {
-                        Branch.LoadingBranchData();
+                        Branch.LoadingBranchView();
                     };
                 } else {
                     hx.commands.executeCommand('EasyGit.main',currentProjectData);
@@ -421,7 +425,7 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
         let branchName = msg.text;
         let pushStatus = await utils.gitAddRemoteOrigin(projectPath, branchName);
         if (pushStatus == 'success') {
-            Branch.LoadingBranchData();
+            Branch.LoadingBranchView();
         };
     };
 
@@ -429,7 +433,7 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
     async function fetch(projectPath, source) {
         let fetchStatus = await utils.gitFetch(projectPath);
         if (fetchStatus == 'success') {
-            Branch.LoadingBranchData();
+            Branch.LoadingBranchView();
         };
     };
 

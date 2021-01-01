@@ -553,25 +553,22 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         that.refreshProgress = false;
                     },2000);
 
-                    // get tags list
-                    that = this;
                     window.onload = function() {
                         setTimeout(function(){
                             that.getTagsList();
-                            that.receive();
-                        }, 1000);
+                            that.receiveInfo();
+                        }, 1500);
                     };
                 },
                 methods: {
-                    receive() {
+                    receiveInfo() {
                         hbuilderx.onDidReceiveMessage((msg) => {
                             if (msg.command == 'animation') {
                                 this.refreshProgress = true;
                                 let that = this;
                                 setTimeout(function() {
                                     that.refreshProgress = false;
-                                }, 3000);
-                                return;
+                                }, 1000);
                             };
                             if (msg.command == 'refresh') {
                                 if (msg.gitBranchData) {

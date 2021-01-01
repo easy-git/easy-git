@@ -622,7 +622,6 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             }
 
                             if (msg.command == 'autoRefresh') {
-                                console.log(msg)
                                 this.gitFileResult = msg.gitFileResult;
                                 this.ahead = msg.ahead;
                                 this.behind = msg.behind;
