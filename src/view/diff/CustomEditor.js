@@ -157,9 +157,6 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
         let action = msg.command;
         GitHBuilderXInnerTrigger = true;
         switch (action) {
-            case 'update':
-                GitDiff.SetView(msg.selectedFile);
-                break;
             case 'openFile':
                 GitDiff.openFile(selectedFile);
                 break;

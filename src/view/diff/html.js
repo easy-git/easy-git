@@ -63,7 +63,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
         d2h_linenum_color
     } = uiData;
 
-    let { titleLeft, titleRight, diffResult, isConflicted } = diffData;
+    let { titleLeft, titleRight, isDiffHtml, diffResult, isConflicted } = diffData;
 
     // .d2h-code-linenumber .d2h-code-line .d2h-cntx
     // let d2hCodeLinenumber = "width: 7.5em !important;";
@@ -159,6 +159,11 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                 border-color: ${d2h_emptyplaceholder_bg} !important;
                 background-color: ${d2h_emptyplaceholder_bg} !important;
             }
+            .f-custom-line {
+                color: ${fontColor};
+                margin: 3px 12px;
+                font-size: 14px !important;
+            }
         </style>
     </head>
     <body>
@@ -196,7 +201,13 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                 </div>
                 <div id="diff-body" class="row diff-body">
                     <div class="col p-0">
-                        <div v-html="gitDiffResult"></div>
+                        <div v-html="gitDiffResult" v-if="isDiffHtml"></div>
+                        <div class="mb-5" v-else>
+                            <p class="f-custom-line" v-for="(item,idx) in gitDiffResult" :index="idx">
+                                <span class="mx-3">{{idx+1}}</span>
+                                <span>{{item}}</span>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -205,19 +216,21 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
             var app = new Vue({
                 el: '#app',
                 data: {
+                    isDiffHtml: ${isDiffHtml},
                     titleLeft: '${titleLeft}',
                     titleRight: '${titleRight}',
                     isConflicted: ${isConflicted},
                     gitDiffResult: ''
                 },
                 mounted() {
+                    this.forInit();
+
                     that = this;
                     window.onload = function() {
                         setTimeout(function() {
                             that.forUpdate();
                         }, 800)
                     };
-                    this.forInit();
                 },
                 methods: {
                     forInit() {
@@ -227,7 +240,9 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                         hbuilderx.onDidReceiveMessage((msg) => {
                             this.gitDiffResult = '';
                             if (msg.command != 'update') {return};
-                            this.gitDiffResult = msg.result;
+                            let data = msg.result;
+                            this.isDiffHtml = data.isDiffHtml;
+                            this.gitDiffResult = data.diffResult;
                             this.titleLeft = '';
                             this.titleRight = '';
                         });
@@ -325,9 +340,9 @@ function getDefaultContent(fname='') {
                 created() {
                     let tmp = '${fname}';
                     if (tmp == '') {
-                        this.msg = '没有要对比的文件内容'
+                        this.msg = '没有要对比的文件内容, 请直接关闭当前标签卡。'
                     } else {
-                        this.msg = tmp + ' 没有要对比的文件内容'
+                        this.msg = tmp + ' 没有要对比的文件内容, 请直接关闭当前标签卡。'
                     };
                 }
             })

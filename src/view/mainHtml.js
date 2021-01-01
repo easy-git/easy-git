@@ -386,7 +386,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 <div class="row mt-3" id="git_add" style="visibility: hidden;" :style="{visibility: 'visible'}">
                     <div class="col px-0" v-if="gitConflictedFileListLength != 0">
                         <p class="add-title" id="git_add_title">
-                            <span class="a-icon" v-html="ConflictedIcon" @click="isShowConflictedList();"></span>合并更改 (冲突):
+                            <span class="a-icon" v-html="ConflictedIcon" @click="isShowConflictedList();"></span>合并更改:
                             <span class="gtag">{{ gitConflictedFileListLength }}</span>
                         </p>
                         <ul style="list-style-type:none;padding-left:0;" id="git_add_data" v-show="isShowConflicted">

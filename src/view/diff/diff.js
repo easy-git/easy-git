@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const readline = require('readline');
 
 const Diff2Html = require('diff2html');
 
@@ -93,7 +94,7 @@ class Diff {
                     options = ['diff',  lineOption, selectedFile];
                 } else {
                     options = ['diff', lineOption, 'HEAD', selectedFile];
-                }
+                };
                 titleRight = 'HEAD';
                 break;
             default:
@@ -108,9 +109,14 @@ class Diff {
         return data;
     }
 
+    /**
+     * @description 设置文件对比视图
+     * @param {String} selectedFile
+     */
     async SetView(selectedFile) {
         let init = await this.getDiffOptions(selectedFile);
 
+        // 设置html默认内容
         if (init == 'error') {
             this.webviewPanel.webView.html = getDefaultContent(selectedFile);
             return;
@@ -123,6 +129,7 @@ class Diff {
             return;
         };
 
+        // 使用Diff2Html将文件对比结果转换为html
         let diffJson = Diff2Html.parse(result);;
         let diffResult;
 
@@ -136,6 +143,7 @@ class Diff {
         diffResult = diffResult.replace(new RegExp("`","gm"), '&#x60;').replace(new RegExp("{","gm"), '&#123;').replace(new RegExp("}","gm"), '&#125;');
 
         let diffData = {
+            "isDiffHtml": true,
             "diffResult": diffResult,
             "titleLeft": titleLeft,
             "titleRight": titleRight,
@@ -150,14 +158,61 @@ class Diff {
         );
     };
 
+    read_file(path,callback){
+        return new Promise(function(resolve, reject) {
+            try{
+                let fRead = fs.createReadStream(path);
+                let objReadline = readline.createInterface({
+                    input:fRead
+                });
+                let arr = new Array();
+                objReadline.on('line',function (line) {
+                    arr.push(line);
+                });
+                objReadline.on('close',function () {
+                    resolve(arr);
+                });
+            }catch(e){
+                reject(e);
+            };
+        });
+    };
+
+    /**
+     * @description 设置处理冲突之后的视图
+     * @param {Object} selectedFile
+     */
+    async setConflictedView(selectedFile) {
+        let fpath = path.join(this.projectPath, selectedFile);
+        let content = await this.read_file(fpath,function (data) {
+            return data;
+        });
+        if (content) {
+            let diffData = {
+                "isDiffHtml": false,
+                "diffResult": content,
+                "titleLeft": '',
+                "titleRight": '',
+                "isConflicted": true
+            };
+            this.webviewPanel.webView.postMessage({
+                command: "update",
+                result: diffData
+            });
+        };
+    };
+
+    /**
+     * @description 解决冲突 git checkout --ours|--theris <filename>
+     * @param {Object} selectedFile 选择的文件路径
+     * @param {Object} options
+     */
     async handleConflict(selectedFile, options) {
         let result = await utils.gitRaw(this.projectPath, options, '处理冲突');
         if (result == 'success') {
-            this.SetView(selectedFile);
-            setTimeout(function() {
-                let msg = options[1] == '--ours' ? 'EasyGit：保留当前分支文件，操作成功。' : 'EasyGit：采用传入的文件，操作成功。'
-                hx.window.setStatusBarMessage(msg);
-            }, 3000);
+            this.setConflictedView(selectedFile);
+            let msg = options[1] == '--ours' ? 'EasyGit：保留当前分支文件，操作成功。' : 'EasyGit：采用传入的文件，操作成功。'
+            hx.window.setStatusBarMessage(msg);
         };
     }
 
