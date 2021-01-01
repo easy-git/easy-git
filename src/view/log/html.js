@@ -765,6 +765,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                     this.searchText = msg.searchText;
                                     this.projectName = msg.projectName;
                                     this.viewRefName = msg.refname;
+                                    this.closeMenu();
                                 }
                             });
                         },
