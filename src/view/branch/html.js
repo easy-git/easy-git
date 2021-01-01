@@ -278,9 +278,9 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                 <div id="gather-local-branchs" class="row"  style="margin-top:198px;">
                     <div class="col-12 mt-2 px-0">
                         <p class="mx-3 mb-1 major-title">
-                            <span>${BranchIcon}&nbsp;&nbsp;本地分支</span>
-                            <span v-if="!isShowLocalBranch" class="is-show" @click="isShowLocalBranch = true;">显示</span>
-                            <span v-else class="is-show" @click="isShowLocalBranch = false;">隐藏</span>
+                            <span @click="isShowLocalBranchList()">${BranchIcon}&nbsp;&nbsp;本地分支</span>
+                            <span v-if="!isShowLocalBranch" class="is-show" @click="isShowLocalBranchList()">显示</span>
+                            <span v-else class="is-show" @click="isShowLocalBranchList()">隐藏</span>
                         </p>
                         <ul class="pl-3 mb-0" style="list-style-type:none;" v-if="isShowLocalBranch">
                             <li class="lif gitfile" v-for="(item,idx) in BranchList" :key="idx"
@@ -688,6 +688,13 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             from: select,
                             to: this.currentBranch
                         });
+                    },
+                    isShowLocalBranchList() {
+                        if (this.isShowLocalBranch) {
+                            this.isShowLocalBranch = false;
+                        } else {
+                            this.isShowLocalBranch = true;
+                        }
                     },
                     isShowOriginList() {
                         if (this.isShowOrigin) {
