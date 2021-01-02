@@ -381,6 +381,7 @@
                 {
                     "title": "easy-git",
                     "group": "z_commands",
+                    "when": "isGit",
                     "id": "easygit"
                 },
                 {
