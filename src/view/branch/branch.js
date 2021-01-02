@@ -123,13 +123,13 @@ class GitBranch {
             'currentBranch': currentBranch
         });
         
-        // 2021-01-01 部分操作无法刷新或刷新数据出错
-        // if (this.webviewPanel && this.firstInit == false) {
-        //     this.webviewPanel.webView.postMessage({
-        //         command: "refresh",
-        //         gitBranchData: gitBranchData
-        //     });
-        // };
+        if (this.webviewPanel && this.firstInit == false) {
+            this.webviewPanel.webView.postMessage({
+                command: "reLoding",
+                data: gitBranchData
+            });
+            return;
+        };
 
         let bhtml = getWebviewBranchContent(this.userConfig, this.uiData, gitBranchData);
         this.webviewPanel.webView.html = bhtml;

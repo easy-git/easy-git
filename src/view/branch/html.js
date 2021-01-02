@@ -394,7 +394,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     </div>
                 </div>
             </div>
-            <div class="container-fluid" v-if="!isShowModel">
+            <div id="page-bottom" class="container-fluid" v-if="!isShowModel">
                 <div class="row m-0 fixedBottom" id="git_branch">
                     <div class="col-auto mr-auto" title="鼠标左键，跳转到源代码管理器视图; 鼠标右键或中键，可直接切换到上一次分支。">
                         <span @click.left="showBranchWindow();" @click.middle="switchBranch({'name':'-', 'current':false});" @click.right.prevent="switchBranch({'name':'-', 'current':false});" class="branch">
@@ -413,7 +413,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     </div>
                 </div>
             </div>
-            <div class="container-fluid" id="is-model" v-if="isShowModel">
+            <div id="is-model" class="container-fluid" v-if="isShowModel">
                 <div class="row mt-3">
                     <div class="col">
                         <form>
@@ -570,9 +570,10 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                     that.refreshProgress = false;
                                 }, 1000);
                             };
-                            if (msg.command == 'refresh') {
-                                if (msg.gitBranchData) {
-                                    let data = msg.gitBranchData;
+                            if (msg.command == 'reLoding') {
+                                this.isShowModel = false;
+                                if (msg.data) {
+                                    let data = msg.data;
                                     this.rawBranchList = data.localBranchList;
                                     this.BranchList = data.localBranchList;
 
@@ -588,6 +589,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                 };
                             };
                             if (msg.command == 'TagList') {
+                                this.isShowModel = false;
                                 if (msg.data) {
                                     this.rawTagsList = msg.data;
                                     this.TagsList = msg.data;
@@ -657,6 +659,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             ref: ref,
                             isPush: isPush
                         });
+                        this.isShowModel = false;
                     },
                     switchBranch(branch) {
                         hbuilderx.postMessage({
