@@ -308,6 +308,33 @@ class Branch {
             };
         };
     };
+
+    // 查看另一个分支的文件内容
+    async showAnotherBranchFile(data) {
+        let {projectPath, selectedFile} = data;
+        if (projectPath == undefined || selectedFile == undefined) {
+            hx.window.showErrorMessage('EasyGit: 请选择有效的文件。', ['我知道了']);
+            return;
+        };
+
+        let branchs = await this.getAllBranch(projectPath, 'local');
+        let selectedBranch = await hx.window.showQuickPick(branchs, {
+            'placeHolder': '请选择要查看文件内容的分支名称...'
+        }).then( (res)=> {
+            return res.label;
+        });
+        if (!selectedBranch) return;
+
+        // 获取文件的相对路径
+        let filename = path.relative(projectPath, selectedFile);
+        let param = `${selectedBranch}:${filename}`;
+        let fileDetails = await gitRaw(projectPath, ['show', param], undefined, 'result');
+        if (fileDetails) {
+            await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
+            applyEdit(fileDetails);
+        };
+    }
+
 };
 
 
@@ -571,6 +598,7 @@ async function reflog(ProjectInfo) {
         hx.window.showErrorMessage("Git: reflog没有获取到信息。", ['我知道了']);
     };
 };
+
 
 module.exports = {
     Tag,

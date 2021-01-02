@@ -345,6 +345,12 @@ function activate(context) {
         view_diff.run();
     });
     context.subscriptions.push(diffFile);
+
+    // git show branch:filename
+    let showAnotherBranchFile = hx.commands.registerCommand('EasyGit.showAnotherBranchFile', (param)=> {
+        git.action(param, 'showAnotherBranchFile')
+    });
+    context.subscriptions.push(showAnotherBranchFile);
 };
 
 

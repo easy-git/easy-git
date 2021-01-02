@@ -58,6 +58,7 @@
         "onCommand:EasyGit.archive",
         "onCommand:EasyGit.reflog",
         "onCommand:EasyGit.annotate",
+        "onCommand:EasyGit.showAnotherBranchFile",
         "onView:EasyGitSourceCodeView",
         "onView:EasyGitCommonView",
         "onCustomEditor:EasyGit - 日志",
@@ -313,6 +314,10 @@
                 "title": "easy-git: annotate - 用提交信息标注文件中的每一行"
             },
             {
+                "command": "EasyGit.showAnotherBranchFile",
+                "title": "easy-git: show - 查看文件在另一个分支的内容（无需切换分支）"
+            },
+            {
                 "command": "EasyGit.set",
                 "title": "easy-git: 设置easy-git"
             },
@@ -395,6 +400,15 @@
                     "title": "用提交信息标注文件中的每一行",
                     "when": "isGit",
                     "group": "easygit@2"
+                },
+                {
+                    "group": "easygit@2"
+                },
+                {
+                    "command": "EasyGit.showAnotherBranchFile",
+                    "title": "查看文件在另一个分支的内容",
+                    "when": "isGit",
+                    "group": "easygit@3"
                 },
                 {
                     "group": "z_commands"

@@ -135,6 +135,9 @@ function action(param,action_name) {
             let info = Object.assign({'hash': hashValue}, ProjectInfo);
             bch.cherryPick(info);
             break;
+        case 'showAnotherBranchFile':
+            bch.showAnotherBranchFile(ProjectInfo);
+            break;
         case 'clean':
             goCleanFile(ProjectInfo);
             break;
