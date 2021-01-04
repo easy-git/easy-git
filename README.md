@@ -10,9 +10,9 @@ Mac, 安装此插件可直接使用。
 
 Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-scm.com/download/win)
 
-## 界面预览
+## 简介
 
-![插件预览.jpg](https://img-cdn-qiniu.dcloud.net.cn/uploads/article/20201024/a4b936d51b56f9966d19370f85936b06.png)
+![插件预览.jpg](https://img-cdn-tc.dcloud.net.cn/uploads/article/20210104/b39599067d50eb46b12e3b280454ad1d.gif)
 
 在项目管理器，选中`Git`项目，右键菜单，点击【easy-git】【源代码管理】即可打开`git视图`
 
