@@ -44,6 +44,7 @@
         "onCommand:EasyGit.stashPop",
         "onCommand:EasyGit.stashPopNew",
         "onCommand:EasyGit.stashClear",
+        "onCommand:EasyGit.stashShow",
         "onCommand:EasyGit.about",
         "onCommand:EasyGit.set",
         "onCommand:EasyGit.setUserName",
@@ -284,6 +285,10 @@
             {
                 "command": "EasyGit.stashClear",
                 "title": "easy-git: stashClear - 删除所有储藏..."
+            },
+            {
+                "command": "EasyGit.stashShow",
+                "title": "easy-git: stashShow - 查看储藏"
             },
             {
                 "command": "EasyGit.gitBlameForLineChange",

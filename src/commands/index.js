@@ -5,7 +5,7 @@ const path = require('path');
 const file = require('../common/file.js');
 const utils = require('../common/utils.js');
 
-const { goStash, goStashPop, goStashClear } = require('./stash.js');
+const { goStash, goStashPop, goStashClear, goStashShow } = require('./stash.js');
 const { gitInitProject } = require('./repository.js');
 const { gitAddFile, gitRestore, goCleanFile, goCommit } = require('./file.js');
 const { goSetConfig } = require('./base.js');
@@ -155,6 +155,10 @@ function action(param,action_name) {
             break;
         case 'stashClear':
             goStashClear(ProjectInfo);
+            break;
+        case 'stashShow':
+            let stashShow = new goStashShow(ProjectInfo);
+            stashShow.main();
             break;
         case 'setUserName':
             goSetConfig(projectPath, action_name);

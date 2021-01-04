@@ -282,6 +282,12 @@ function activate(context) {
     });
     context.subscriptions.push(stashClear);
 
+    // git Stash show
+    let stashShow = hx.commands.registerCommand('EasyGit.stashShow', (param)=> {
+        git.action(param, 'stashShow')
+    });
+    context.subscriptions.push(stashShow);
+
     // git archive
     let archive = hx.commands.registerCommand('EasyGit.archive', (param)=> {
         git.action(param, 'archive')
