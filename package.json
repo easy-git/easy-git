@@ -272,23 +272,23 @@
             },
             {
                 "command": "EasyGit.stashAll",
-                "title": "easy-git: stashAll - 储藏全部(包含未跟踪的)"
+                "title": "easy-git: stash -a - 储藏全部(包含未跟踪的)"
             },
             {
                 "command": "EasyGit.stashPop",
-                "title": "easy-git: stashPop - 弹出储藏..."
+                "title": "easy-git: stash pop - 弹出储藏..."
             },
             {
                 "command": "EasyGit.stashPopNew",
-                "title": "easy-git: stashPopNew - 弹出最新储藏..."
+                "title": "easy-git: stash pop new - 弹出最新储藏..."
             },
             {
                 "command": "EasyGit.stashClear",
-                "title": "easy-git: stashClear - 删除所有储藏..."
+                "title": "easy-git: stash clear - 删除所有储藏..."
             },
             {
                 "command": "EasyGit.stashShow",
-                "title": "easy-git: stashShow - 查看储藏"
+                "title": "easy-git: stash show - 查看储藏"
             },
             {
                 "command": "EasyGit.gitBlameForLineChange",
