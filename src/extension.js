@@ -363,6 +363,30 @@ function activate(context) {
         git.action(param, 'openGitRepositoryInBrowser')
     });
     context.subscriptions.push(openGitRepositoryInBrowser);
+
+    // git config --list --local
+    let showConfigLocal = hx.commands.registerCommand('EasyGit.showConfigLocal',(param)=> {
+        git.action(param, 'showConfigLocal')
+    });
+    context.subscriptions.push(showConfigLocal);
+
+    // git config --list --global
+    let showConfigGlobal = hx.commands.registerCommand('EasyGit.showConfigGlobal',(param)=> {
+        git.action(param, 'showConfigGlobal')
+    });
+    context.subscriptions.push(showConfigGlobal);
+
+    // git config --list --system
+    let showConfigSystem = hx.commands.registerCommand('EasyGit.showConfigSystem',(param)=> {
+        git.action(param, 'showConfigSystem')
+    });
+    context.subscriptions.push(showConfigSystem);
+
+    // git config --list --show-origin
+    let showConfigAll = hx.commands.registerCommand('EasyGit.showConfigAll',(param)=> {
+        git.action(param, 'showConfigAll')
+    });
+    context.subscriptions.push(showConfigAll);
 };
 
 

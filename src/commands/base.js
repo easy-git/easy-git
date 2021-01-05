@@ -2,6 +2,8 @@ const hx = require('hbuilderx');
 
 const {
     gitConfigSet,
+    gitRaw,
+    applyEdit
 } = require('../common/utils.js');
 
 
@@ -34,7 +36,25 @@ async function goSetConfig(projectPath, action_name) {
     gitConfigSet(projectPath, {'key':key, 'value':inputResult});
 };
 
+/**
+ * @description 查看配置
+ */
+async function goShowConfig(projectPath, action) {
+    if (!projectPath) return;
+    if (!action) return;
+
+    if (["--global", "--system", "--local", "--show-origin"].includes(action)) {
+        let options = ['config', '--list', action];
+        let contents = await gitRaw(projectPath, options, '获取Git配置', 'result');
+        if (contents && contents != 'error' && contents != 'fail') {
+            await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
+            applyEdit(contents);
+        };
+    };
+}
+
 
 module.exports = {
-    goSetConfig
+    goSetConfig,
+    goShowConfig
 }

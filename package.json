@@ -61,6 +61,10 @@
         "onCommand:EasyGit.annotate",
         "onCommand:EasyGit.showAnotherBranchFile",
         "onCommand:EasyGit.openGitRepositoryInBrowser",
+        "onCommand:EasyGit.showConfigLocal",
+        "onCommand:EasyGit.showConfigGlobal",
+        "onCommand:EasyGit.showConfigSystem",
+        "onCommand:EasyGit.showConfigAll",
         "onView:EasyGitSourceCodeView",
         "onView:EasyGitCommonView",
         "onCustomEditor:EasyGit - 日志",
@@ -326,6 +330,22 @@
             {
                 "command": "EasyGit.showAnotherBranchFile",
                 "title": "easy-git: show - 查看文件在另一个分支的内容（无需切换分支）"
+            },
+            {
+                "command": "EasyGit.showConfigLocal",
+                "title": "easy-git: config --local - 查看仓库配置"
+            },
+            {
+                "command": "EasyGit.showConfigGlobal",
+                "title": "easy-git: config --global - 查看用户配置"
+            },
+            {
+                "command": "EasyGit.showConfigSystem",
+                "title": "easy-git: config --system - 查看系统配置"
+            },
+            {
+                "command": "EasyGit.showConfigAll",
+                "title": "easy-git: config --show-origin - 查看所有配置信息及所在文件"
             },
             {
                 "command": "EasyGit.set",

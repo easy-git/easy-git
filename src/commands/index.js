@@ -8,7 +8,7 @@ const utils = require('../common/utils.js');
 const { goStash, goStashPop, goStashClear, goStashShow } = require('./stash.js');
 const { gitInitProject } = require('./repository.js');
 const { gitAddFile, gitRestore, goCleanFile, goCommit } = require('./file.js');
-const { goSetConfig } = require('./base.js');
+const { goSetConfig, goShowConfig } = require('./base.js');
 
 const { Tag, Branch, Revert, Reset, Archive, reflog } = require('./ref.js');
 
@@ -191,6 +191,18 @@ function action(param,action_name) {
             break;
         case 'openGitRepositoryInBrowser':
             utils.gitRepositoryUrl(projectPath);
+            break;
+        case 'showConfigLocal':
+            goShowConfig(projectPath, '--local');
+            break;
+        case 'showConfigGlobal':
+            goShowConfig(projectPath, '--global');
+            break;
+        case 'showConfigSystem':
+            goShowConfig(projectPath, '--system');
+            break;
+        case 'showConfigAll':
+            goShowConfig(projectPath, '--show-origin');
             break;
         default:
             break;
