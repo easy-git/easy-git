@@ -236,7 +236,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
             .count-num {
                 border: 1px solid ${lineColor};
                 border-radius: 4px;
-                font-size: 5px !important;
+                font-size: 12px !important;
                 margin-left: 6px;
                 margin-bottom: 0px;
                 padding: 0px 4px;
