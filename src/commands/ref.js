@@ -4,6 +4,7 @@ const dayjs = require('dayjs');
 
 const {
     gitRaw,
+    gitTagsList,
     gitTagCreate,
     gitPush,
     gitBranch,
@@ -55,8 +56,34 @@ class Tag {
         this.projectPath = projectPath;
     }
 
+    async showTagsList() {
+        let result = await gitTagsList(this.projectPath);
+
+        let { error, data } = result;
+        if (error == true) {
+            return;
+        };
+
+        if (data.length == 0) {
+            return hx.window.showErrorMessage('当前项目下，不存在标签。',['关闭']);
+        } else {
+            let pickData = data.map( item => { return {"label": item} } );
+            hx.window.showQuickPick(pickData, {
+                placeHolder: "请选择您要操作的数据"
+            }).then( (selected) => {
+                if (selected) {
+                    let { label } = selected;
+                    this.showDetails(label);
+                };
+            });
+        }
+    };
+
     // Git: git show <tag-name>
     async showDetails(tagName) {
+        if (tagName == undefined) {
+            return this.showTagsList();
+        };
         if (tagName.length == 0) {
             return hx.window.showErrorMessage('tag名称无效。',['关闭']);
         };
