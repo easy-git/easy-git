@@ -1988,6 +1988,28 @@ async function gitRemoveFile(filepath,filename) {
     return status;
 };
 
+/**
+ * @description 在浏览器查看Git仓库
+ */
+async function gitRepositoryUrl(projectPath) {
+    let result = await gitRaw(projectPath, ['ls-remote', '--get-url', 'origin'], '获取仓库URL', 'result');
+    if (typeof(result) == 'string') {
+        let url = result;
+        if (result.includes('.git')) {
+            if (result.includes('git@') == true) {
+                url = result.replace('git@', '').replace(':','/').replace('.git','');
+                url = 'http://' + url;
+            };
+            url = url.replace(/\r\n/g,"").replace(/\n/g,"");
+            setTimeout(function() {
+                hx.env.openExternal(url);
+            }, 1000);
+        };
+    } else {
+        hx.window.showErrorMessage('获取仓库地址失败');
+    };
+}
+
 
 module.exports = {
     hxShowMessageBox,
@@ -2044,5 +2066,6 @@ module.exports = {
     FillCommitMessage,
     gitRevert,
     gitRefs,
-    gitRemoveFile
+    gitRemoveFile,
+    gitRepositoryUrl
 }

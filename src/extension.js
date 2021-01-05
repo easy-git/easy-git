@@ -357,6 +357,12 @@ function activate(context) {
         git.action(param, 'showAnotherBranchFile')
     });
     context.subscriptions.push(showAnotherBranchFile);
+
+    // git open repository in the browser
+    let openGitRepositoryInBrowser = hx.commands.registerCommand('EasyGit.openGitRepositoryInBrowser',(param)=> {
+        git.action(param, 'openGitRepositoryInBrowser')
+    });
+    context.subscriptions.push(openGitRepositoryInBrowser);
 };
 
 

@@ -60,6 +60,7 @@
         "onCommand:EasyGit.reflog",
         "onCommand:EasyGit.annotate",
         "onCommand:EasyGit.showAnotherBranchFile",
+        "onCommand:EasyGit.openGitRepositoryInBrowser",
         "onView:EasyGitSourceCodeView",
         "onView:EasyGitCommonView",
         "onCustomEditor:EasyGit - 日志",
@@ -161,6 +162,10 @@
             {
                 "command": "EasyGit.checkUpdate",
                 "title": "easy-git: 检查更新"
+            },
+            {
+                "command": "EasyGit.openGitRepositoryInBrowser",
+                "title": "easy-git: 在浏览器查看Git仓库(URL)"
             },
             {
                 "command": "EasyGit.main",

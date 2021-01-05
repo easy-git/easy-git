@@ -189,6 +189,9 @@ function action(param,action_name) {
         case 'annotate':
             gitAnnotate(ProjectInfo);
             break;
+        case 'openGitRepositoryInBrowser':
+            utils.gitRepositoryUrl(projectPath);
+            break;
         default:
             break;
     };
