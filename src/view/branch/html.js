@@ -233,7 +233,14 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                 float: right;
                 font-size: 14px;
             }
-
+            .count-num {
+                border: 1px solid ${lineColor};
+                border-radius: 4px;
+                font-size: 5px !important;
+                margin-left: 6px;
+                margin-bottom: 0px;
+                padding: 0px 4px;
+            }
         </style>
     </head>
     <body style="background-color:${background};">
@@ -278,7 +285,10 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                 <div id="gather-local-branchs" class="row"  style="margin-top:198px;">
                     <div class="col-12 mt-2 px-0">
                         <p class="mx-3 mb-1 major-title">
-                            <span @click="isShowLocalBranchList()">${BranchIcon}&nbsp;&nbsp;本地分支</span>
+                            <span @click="isShowLocalBranchList()">
+                                ${BranchIcon}&nbsp;&nbsp;本地分支
+                                <span class="count-num" v-show="BranchList.length != 0">{{ BranchList.length }}</span>
+                            </span>
                             <span v-if="!isShowLocalBranch" class="is-show" @click="isShowLocalBranchList()">显示</span>
                             <span v-else class="is-show" @click="isShowLocalBranchList()">隐藏</span>
                         </p>
@@ -334,7 +344,10 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     </div>
                     <div id="gather-origin-branchs" class="col-12 mt-2 px-0">
                         <p class="mx-3 mb-1 major-title">
-                            <span @click="isShowOriginList();">${cloudIcon}&nbsp;&nbsp;远端(origin)分支</span>
+                            <span @click="isShowOriginList();">
+                                ${cloudIcon}&nbsp;&nbsp;远端(origin)分支
+                                <span class="count-num" v-show="OriginBranchList.length != 0">{{ OriginBranchList.length }}</span>
+                            </span>
                             <span v-if="!isShowOrigin" @click="isShowOriginList();" class="is-show">显示</span>
                             <span v-else @click="isShowOriginList();" class="is-show">隐藏</span>
                         </p>
@@ -366,7 +379,10 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     </div>
                     <div id="gather-tags" class="col-12 mt-2 px-0">
                         <p class="mx-3 mb-1 major-title">
-                            <span @click="isShowTagList();">${TagIcon}&nbsp;&nbsp;标签</span>
+                            <span @click="isShowTagList();">
+                                ${TagIcon}&nbsp;&nbsp;标签
+                                <span class="count-num" v-show="TagsList.length != 0">{{ TagsList.length }}</span>
+                            </span>
                             <span v-if="!isShowTag" @click="isShowTagList();" class="is-show">显示</span>
                             <span v-else @click="isShowTagList();" class="is-show">隐藏</span>
                         </p>
