@@ -2,6 +2,7 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const process = require('process');
+const { debounce } = require('throttle-debounce');
 
 const ini = require('ini');
 const hx = require('hbuilderx');
@@ -97,7 +98,7 @@ function show(webviewPanel, userConfig) {
             }catch(e){};
 
             view.postMessage({
-                command: 'clone',
+                command: 'cloneResult',
                 status: result
             });
         };
@@ -253,7 +254,7 @@ function generateLogHtml(userConfig, uiData, hxData) {
                             <div class="form-group" v-if="isShowOption">
                                 <input type="password" class="form-control outline-none" id="git-passwd" placeholder="Git仓库密码" v-model="cloneInfo.password">
                             </div>
-                            <button type="button" class="btn-imp" @click="gitClone();">开始克隆</button>
+                            <button type="button" class="btn-imp" @click="gitClone();" :disabled="btnDisable">开始克隆</button>
                         </form>
                     </div>
                 </div>
@@ -267,6 +268,7 @@ function generateLogHtml(userConfig, uiData, hxData) {
                 var app = new Vue({
                     el: '#app',
                     data: {
+                        submitDisabled: false,
                         isShowOption: false,
                         btnDisable: true,
                         ProjectWizard: '',
@@ -297,8 +299,25 @@ function generateLogHtml(userConfig, uiData, hxData) {
                         this.ProjectWizard = '${ProjectWizard}';
                         this.cloneInfo.localPath = '${ProjectWizard}';
                     },
-                    mounted() {},
+                    mounted() {
+                        that = this;
+                        window.onload = function() {
+                            setTimeout(function() {
+                                that.getCloneResult();
+                            }, 1500);
+                        };
+                    },
                     methods: {
+                        getCloneResult() {
+                            hbuilderx.onDidReceiveMessage((msg) => {
+                                if (msg.command == 'cloneResult') {
+                                    let {status} = msg;
+                                    if (['error', 'fail'].includes(status)){
+                                        this.btnDisable = false;
+                                    };
+                                };
+                            });
+                        },
                         gitClone() {
                             this.cloneInfo.repo = this.repo;
                             if (this.isShowOption) {

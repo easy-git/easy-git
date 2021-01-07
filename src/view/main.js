@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const chokidar = require('chokidar');
-const { throttle, debounce } = require('throttle-debounce');
+const { debounce } = require('throttle-debounce');
 
 const hx = require('hbuilderx');
 
