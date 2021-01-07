@@ -1,12 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 const chokidar = require('chokidar');
+const { throttle, debounce } = require('throttle-debounce');
 
 const hx = require('hbuilderx');
 
 const file = require('../common/file.js');
 const gitAction = require('../commands/index.js');
-const debounce = require('../common/debounce.js');
 let utils = require('../common/utils.js');
 
 const icon = require('./static/icon.js');
@@ -568,21 +568,25 @@ let watcherListen;
 let watcherListenGitDir;
 function watchProjectDir(projectDir, func) {
     try {
+        const debounceFileList = debounce(2000, () => {
+            func.refreshFileList();
+        });
         watcherListen = chokidar.watch(projectDir, {
             ignored: path => ["node_modules", ".git", 'unpackage'].some(s => path.includes(s)),
             ignoreInitial: true
         }).on('all', (event, path) => {
             if (['change', 'add', 'unlink', 'unlinkDir'].includes(event) && GitHBuilderXInnerTrigger == false) {
                 listeningProjectFile = true;
-                if (event == 'add') {
-                    debounce(func.refreshFileList(), 2000);
-                } else {
-                    debounce(func.refreshFileList(), 4000);
-                };
+                debounceFileList();
                 setTimeout(function(){
                     listeningProjectFile = false;
                 }, 3000);
             };
+        });
+
+        // 监听.Git目录
+        const debounceGitHEAD = debounce(1000, () => {
+            func.refreshHEAD();
         });
 
         let gitDir = path.join(projectDir, '.git');
@@ -596,13 +600,13 @@ function watchProjectDir(projectDir, func) {
                 if (basename == 'index.lock') return;
                 GitHBuilderXInnerTrigger = true;
                 if (['FETCH_HEAD', 'HEAD','ORIG_HEAD'].includes(basename) || fpath.includes(refsPath) || fpath.includes(refsHeads)) {
-                    debounce(func.refreshHEAD(), 800);
+                    debounceGitHEAD();
                 };
                 if (['index', 'ORIG_HEAD'].includes(basename)) {
-                    debounce(func.refreshFileList(), 500);
+                    debounceFileList();
                 };
                 if (basename == 'COMMIT_EDITMSG') {
-                    func.refreshFileList();
+                    debounceFileList();
                 };
                 setTimeout(function(){
                     GitHBuilderXInnerTrigger = false;

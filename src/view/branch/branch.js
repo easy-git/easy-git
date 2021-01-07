@@ -1,10 +1,10 @@
 const fs = require('fs');
 const path = require('path');
+const { debounce } = require('throttle-debounce');
 
 const hx = require('hbuilderx');
 
 let utils = require('../../common/utils.js');
-const debounce = require('../../common/debounce.js');
 const { Branch } = require('../../commands/ref.js');
 
 const icon = require('../static/icon.js');
@@ -122,7 +122,7 @@ class GitBranch {
             'originurl': originurl,
             'currentBranch': currentBranch
         });
-        
+
         if (this.webviewPanel && this.firstInit == false) {
             this.webviewPanel.webView.postMessage({
                 command: "reLoding",
@@ -301,12 +301,16 @@ function watchProjectDir(projectDir, func) {
         recursive: true
     };
     try {
+        const debounceGit = debounce(800, () => {
+            func.LoadingBranchView();
+        });
+
         let dir = path.join(projectDir, '.git');
         watcherListen = fs.watch(dir, watchOpt, (eventType, filename) => {
             if (filename == 'index.lock') return;
             if (GitHBuilderXInnerTrigger == false) {
                 if (eventType && (['FETCH_HEAD', 'HEAD','ORIG_HEAD'].includes(filename) || filename.includes('refs/tags'))) {
-                    debounce(func.LoadingBranchView(), 1000);
+                    debounceGit();
                 };
             };
         });

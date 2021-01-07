@@ -3,9 +3,9 @@ const hx = require('hbuilderx');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
+const { debounce } = require('throttle-debounce');
 
 const chokidar = require('chokidar');
-const debounce = require('../../common/debounce.js');
 
 const { Diff } = require('./diff.js');
 const { getDefaultContent, getWebviewDiffContent } = require('./html.js');
@@ -96,11 +96,14 @@ function watchCurrentDiffFile(absolutePath, selectedFile, func) {
         persistent: true
     };
     try {
+        const debounceView = debounce(500, () => {
+            func.SetView(selectedFile)
+        });
         watchListener = chokidar.watch(absolutePath, {
             ignoreInitial: true
         }).on('change', fpath => {
             if (GitHBuilderXInnerTrigger == false) {
-                debounce(func.SetView(selectedFile), 300);
+                debounceView();
             };
         });
     } catch (e) {
