@@ -522,6 +522,7 @@
         "git-remote-origin-url": "^3.1.0",
         "ini": "^1.3.5",
         "simple-git": "^2.21.0",
+        "throttle-debounce": "^3.0.1",
         "uuid": "^8.3.0"
     }
 }
