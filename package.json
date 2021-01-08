@@ -2,7 +2,7 @@
     "name": "easy-git",
     "description": "vscode源代码管理工具风格。HBuilderX内唯一的图形化Git工具, 并支持命令面板，支持克隆、提交/更新/拉取、分支/tag管理、日志、文件对比、储藏等操作。",
     "displayName": "【easy-git】Git源代码管理工具",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "publisher": "oneone",
     "engines": {
         "HBuilderX": "^2.8.3"
@@ -65,6 +65,7 @@
         "onCommand:EasyGit.showConfigGlobal",
         "onCommand:EasyGit.showConfigSystem",
         "onCommand:EasyGit.showConfigAll",
+        "onCommand:EasyGit.help",
         "onView:EasyGitSourceCodeView",
         "onView:EasyGitCommonView",
         "onCustomEditor:EasyGit - 日志",
@@ -368,6 +369,10 @@
                 "title": "easy-git: 设置.gitattributes"
             },
             {
+                "command": "EasyGit.help",
+                "title": "easy-git: 帮助文档"
+            },
+            {
                 "command": "EasyGit.about",
                 "title": "easy-git: 关于"
             },
@@ -500,9 +505,14 @@
                     "group": "easygit@3"
                 },
                 {
+                    "command": "EasyGit.help",
+                    "title": "帮助文档",
+                    "group": "easygit@4"
+                },
+                {
                     "command": "EasyGit.about",
                     "title": "关于/评价easy-git",
-                    "group": "easygit@3"
+                    "group": "easygit@5"
                 },
                 {
                     "group": "ext_settings"

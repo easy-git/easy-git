@@ -387,6 +387,12 @@ function activate(context) {
         git.action(param, 'showConfigAll')
     });
     context.subscriptions.push(showConfigAll);
+
+    // help
+    let help = hx.commands.registerCommand('EasyGit.help',(param)=> {
+        hx.env.openExternal('https://easy-git.gitee.io/');
+    });
+    context.subscriptions.push(help);
 };
 
 
