@@ -136,6 +136,9 @@ easy-git, 支持通过快捷键打开git视图。
 // Git stash 删除所有储藏
 {"key": "","command": "EasyGit.stashClear"}
 
+// Git stash 查看某个储藏的文件列表以及差异
+{"key": "","command": "EasyGit.stashShow"}
+
 // Git Blame 显示git文件当前行最后一次修改信息
 {"key": "","command": "EasyGit.gitBlameForLineChange"}
 
@@ -168,6 +171,15 @@ easy-git, 支持通过快捷键打开git视图。
 
 // Git 归档
 {"key": "","command": "EasyGit.archive"}
+
+// Git 查看文件在另一个分支的内容(无需切换分支)
+{"key": "","command": "EasyGit.showAnotherBranchFile"}
+
+// Git 在浏览器查看Git仓库
+{"key": "","command": "EasyGit.openGitRepositoryInBrowser"}
+
+// Git cofing --list
+{"key": "","command": "EasyGit.showConfig"}
 ```
 
 ## 数据统计
@@ -180,15 +192,6 @@ easy-git, 支持通过快捷键打开git视图。
 "EasyGit.isShareUsageData": false
 ```
 
-## 数据统计
-
-为了更好的的改进插件，上报了`当天插件是否启动`、`电脑操作系统信息（字段内容windows、mac）`。
-
-如不希望上传如上信息, 请在【设置】【源码视图】内，增加如下字段:
-
-```js
-"EasyGit.isShareUsageData": false
-```
 
 ## 设置
 

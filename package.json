@@ -297,7 +297,7 @@
             },
             {
                 "command": "EasyGit.stashShow",
-                "title": "easy-git: stash show - 查看储藏"
+                "title": "easy-git: stash show - 查看储藏内容"
             },
             {
                 "command": "EasyGit.gitBlameForLineChange",
