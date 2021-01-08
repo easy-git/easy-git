@@ -1022,7 +1022,11 @@ async function gitFetch(workingDir, isShowMsg=true) {
             })
             .catch((err) => {
                 let errMsg = (err).toString();
-                createOutputChannel('Git: fetch失败', errMsg);
+                if (errMsg.includes('Could not resolve host')) {
+                    hx.window.setStatusBarMessage('Git: fetch失败，原因：Could not resolve host', 100000, 'error');
+                } else {
+                    createOutputChannel('Git: fetch失败', errMsg);
+                };
                 return 'fail';
             });
         return status
