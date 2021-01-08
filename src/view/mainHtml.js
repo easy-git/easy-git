@@ -394,7 +394,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 :id="'conflicted_'+i1"
                                 @mouseover="hoverConflictedFileID = 'conflicted_'+i1"
                                 @mouseleave="hoverConflictedFileID = false">
-                                <div class="flex-grow-1 text-hidden">
+                                <div class="flex-grow-1 text-hidden" :title="v1.path">
                                     <span :class="[v1.tag == 'D' ? 'line-through' : '']" @click="gitDiff(v1.path, v1.tag, true);">{{ v1.path }}</span>
                                 </div>
                                 <div class="d-inline float-right" :id="'conflicted_'+i1">
@@ -425,7 +425,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 :id="'stash'+ii"
                                 @mouseover="hoverStashFileID = 'stash_'+ii"
                                 @mouseleave="hoverStashFileID = false">
-                                <div class="flex-grow-1 text-hidden">
+                                <div class="flex-grow-1 text-hidden" :title="vv.path">
                                     <span :class="[vv.tag == 'D' ? 'line-through' : '']" @click="gitDiff(vv.path, vv.tag);">{{ vv.path }}</span>
                                 </div>
                                 <div class="d-inline float-right">
@@ -459,7 +459,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 :id="'change_'+i"
                                 @mouseover="hoverChangeFileID = 'change_'+i"
                                 @mouseleave="hoverChangeFileID = false">
-                                <div class="flex-grow-1 text-hidden">
+                                <div class="flex-grow-1 text-hidden" :title="v.path">
                                     <span :class="[v.tag == 'D' || v.tag == 'R' ? 'line-through' : '']" @click="gitDiff(v.path, v.tag);">{{ v.path }}</span>
                                 </div>
                                 <div class="d-inline float-right" :id="'change_'+i">
