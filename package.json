@@ -52,6 +52,8 @@
         "onCommand:EasyGit.setEmail",
         "onCommand:EasyGit.setGitingore",
         "onCommand:EasyGit.setGitattributes",
+        "onCommand:EasyGit.setEncodingForQuote",
+        "onCommand:EasyGit.setI18nLogoutputencoding",
         "onCommand:EasyGit.checkUpdate",
         "onCommand:EasyGit.gitBlameForLineChange",
         "onCommand:EasyGit.tagCreate",
@@ -339,43 +341,51 @@
             },
             {
                 "command": "EasyGit.showConfigLocal",
-                "title": "easy-git: config --local - 查看仓库配置"
+                "title": "easy-git: config --list --local - 查看仓库配置"
             },
             {
                 "command": "EasyGit.showConfigGlobal",
-                "title": "easy-git: config --global - 查看用户配置"
+                "title": "easy-git: config --list --global - 查看用户配置"
             },
             {
                 "command": "EasyGit.showConfigSystem",
-                "title": "easy-git: config --system - 查看系统配置"
+                "title": "easy-git: config --list --system - 查看系统配置"
             },
             {
                 "command": "EasyGit.showConfigAll",
                 "title": "easy-git: config --show-origin - 查看所有配置信息及所在文件"
             },
             {
-                "command": "EasyGit.set",
-                "title": "easy-git: 设置easy-git"
-            },
-            {
                 "command": "EasyGit.setGitingore",
                 "title": "easy-git: 设置.gitignore"
-            },
-            {
-                "command": "EasyGit.setUserName",
-                "title": "easy-git: 设置user.name"
-            },
-            {
-                "command": "EasyGit.setEmail",
-                "title": "easy-git: 设置user.email"
             },
             {
                 "command": "EasyGit.setGitattributes",
                 "title": "easy-git: 设置.gitattributes"
             },
             {
+                "command": "EasyGit.setUserName",
+                "title": "easy-git: config user.name - 设置user.name"
+            },
+            {
+                "command": "EasyGit.setEmail",
+                "title": "easy-git: config user.email - 设置user.email"
+            },
+            {
+                "command": "EasyGit.setEncodingForQuote",
+                "title": "easy-git: config --global core.quotepath false - 设置中文编码"
+            },
+            {
+                "command": "EasyGit.setI18nLogoutputencoding",
+                "title": "easy-git: config --global i18n.logoutputencoding utf-8 - 设置log编码"
+            },
+            {
                 "command": "EasyGit.help",
                 "title": "easy-git: 帮助文档"
+            },
+            {
+                "command": "EasyGit.set",
+                "title": "easy-git: 设置easy-git"
             },
             {
                 "command": "EasyGit.about",

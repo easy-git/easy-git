@@ -51,10 +51,37 @@ async function goShowConfig(projectPath, action) {
             applyEdit(contents);
         };
     };
-}
+};
+
+/**
+ * @description 设置中文编码
+ */
+async function goSetEncoding(info) {
+    let projectPath = '';
+    if (info == 'core.quotepath') {
+        let cmd1 = ['config', '--global', 'core.quotepath', false];
+        let status1 = await gitRaw(projectPath, cmd1, '设置core.quotepath', 'statusCode');
+        if (status1 == 'success') {
+            hx.window.showInformationMessage("设置core.quotepath=false，操作成功。", ["我知道了"]);
+        } else {
+            hx.window.showErrorMessage("设置core.quotepath=false，操作失败。", ["我知道了"]);
+        };
+    };
+
+    if (info == 'i18n.logoutputencoding') {
+        let cmd2 = ['config', '--global', 'i18n.logoutputencoding', 'utf-8'];
+        let status2 = await gitRaw(projectPath, cmd2, '设置i18n.logoutputencoding', 'statusCode');
+        if (status2 == 'success') {
+            hx.window.showInformationMessage("设置i18n.logoutputencoding=utf-8，操作成功。", ["我知道了"]);
+        } else {
+            hx.window.showErrorMessage("设置i18n.logoutputencoding=utf-8，操作失败。", ["我知道了"]);
+        };
+    };
+};
 
 
 module.exports = {
     goSetConfig,
-    goShowConfig
+    goShowConfig,
+    goSetEncoding
 }

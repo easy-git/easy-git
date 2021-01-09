@@ -8,6 +8,8 @@ const cmp_hx_version = require('./common/cmp.js');
 
 const {getThemeColor} = require('./common/utils.js');
 const upgrade = require('./common/upgrade.js');
+const { goSetEncoding } = require('./commands/base.js');
+
 let showCommandPanel = require('./commands/commandPanel.js');
 
 // hbuilderx version
@@ -94,31 +96,49 @@ function activate(context) {
         let url = "https://ext.dcloud.net.cn/plugin?name=easy-git";
         hx.env.openExternal(url);
     });
+    context.subscriptions.push(about);
 
     // 菜单【工具】【设置】
     let setting = hx.commands.registerCommand('EasyGit.set', ()=> {
         hx.commands.executeCommand('workbench.action.openGlobalSettings');
     });
+    context.subscriptions.push(setting);
 
     // 设置 git user.name
     let setUserName = hx.commands.registerCommand('EasyGit.setUserName', (param)=> {
         git.action(param, 'setUserName');
     });
+    context.subscriptions.push(setUserName);
 
     // 设置 git user.name
     let setEmail = hx.commands.registerCommand('EasyGit.setEmail', (param)=> {
         git.action(param, 'setEmail');
     });
+    context.subscriptions.push(setEmail);
+
+    // 设置 git config --global core.quotepath false
+    let setEncodingForQuote = hx.commands.registerCommand('EasyGit.setEncodingForQuote', (param)=> {
+        goSetEncoding('core.quotepath');
+    });
+    context.subscriptions.push(setEncodingForQuote);
+
+    // 设置 git config --global i18n.logoutputencoding utf-8
+    let setI18nLogoutputencoding = hx.commands.registerCommand('EasyGit.setI18nLogoutputencoding', (param)=> {
+        goSetEncoding('i18n.logoutputencoding');
+    });
+    context.subscriptions.push(setI18nLogoutputencoding);
 
     // 菜单 【.gitignore】
     let setGitignore = hx.commands.registerCommand('EasyGit.setGitingore', (param)=> {
         file.gitignore(param);
     });
+    context.subscriptions.push(setGitignore);
 
     // 菜单【.gitattributes】
     let setGitattributes= hx.commands.registerCommand('EasyGit.setGitattributes', (param)=> {
         file.gitattributes(param);
     });
+    context.subscriptions.push(setGitattributes);
 
     // Git init
     let init = hx.commands.registerCommand('EasyGit.init',(param) => {
