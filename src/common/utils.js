@@ -966,10 +966,12 @@ async function gitPull(workingDir,options) {
     let args = [];
     let msg = 'Git: git pull 正在从服务器拉取代码...';
 
-    let {rebase} = options;
-    if (rebase) {
-        args.push(['--rebase'])
-        msg = 'Git: git pull --rebase 正在从服务器拉取代码...';
+    if (options) {
+        let {rebase} = options;
+        if (rebase) {
+            args.push(['--rebase'])
+            msg = 'Git: git pull --rebase 正在从服务器拉取代码...';
+        };
     };
 
     // status bar show message

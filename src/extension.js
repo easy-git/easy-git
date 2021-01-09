@@ -198,6 +198,12 @@ function activate(context) {
     });
     context.subscriptions.push(pull);
 
+    // Git pull --rebase
+    let pullRebase = hx.commands.registerCommand('EasyGit.pullRebase', (param)=> {
+        git.action(param, 'pullRebase');
+    });
+    context.subscriptions.push(pullRebase);
+
     // Git fetch
     let fetch = hx.commands.registerCommand('EasyGit.fetch', (param)=> {
         git.action(param, 'fetch');

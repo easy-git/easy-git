@@ -30,6 +30,7 @@
         "onCommand:EasyGit.restoreStaged",
         "onCommand:EasyGit.revert",
         "onCommand:EasyGit.pull",
+        "onCommand:EasyGit.pullRebase",
         "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
         "onCommand:EasyGit.pushSetUpstream",
@@ -199,6 +200,10 @@
             {
                 "command": "EasyGit.pull",
                 "title": "easy-git: pull - 拉取"
+            },
+            {
+                "command": "EasyGit.pullRebase",
+                "title": "easy-git: pull --rebase - 拉取"
             },
             {
                 "command": "EasyGit.fetch",

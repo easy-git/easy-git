@@ -107,6 +107,9 @@ function action(param,action_name) {
             t2.restore(ProjectInfo, 'restoreChanged');
             break;
         case 'pull':
+            utils.gitPull(projectPath);
+            break;
+        case 'pullRebase':
             utils.gitPull(projectPath, {'rebase': true});
             break;
         case 'fetch':
