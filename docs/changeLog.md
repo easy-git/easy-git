@@ -6,9 +6,12 @@
 * 新增 command: EasyGit.openGitRepositoryInBrowser 在浏览器查看Git仓库，命令面板触发
 * 新增 Command: EasyGit.showAnotherBranchFile 查看文件在另一个分支的内容(无需切换分支)，命令面板触发
 * 修复 源代码管理器，文件监听，极短时间内文件多次更新，函数多次执行引发性能Bug
+* 优化 源代码管理器视图 文件悬停显示title
 * 修复 分支视图 某些情况下，this.webviewPanel.webView.postMessage失败的Bug
 * 优化 分支视图 本地分支、远程分支、tag 增加数字角标
 * 修复 命令面板 查看tag详情失败的Bug
+* 优化 命令面板区分pull和pull --rebase
+* 优化 git pull --rebase失败时，控制台增加相关操作提示语
 * 修复 克隆视图，克隆按钮重复点击引出的Bug
 * 修复 非git项目文件，编辑器右键菜单，出现easy-git空菜单的Bug
 
