@@ -318,7 +318,7 @@ function createOutputChannel(label=false,msg) {
     };
 
     let text = `${msg}`;
-    outputChannel.appendLine('\n\n' + text);
+    outputChannel.appendLine('\n' + text);
 };
 
 /**
@@ -331,7 +331,7 @@ function createOutputChannelForClone(msg, newline=true) {
 
     let text = `${msg}`;
     if (newline) {
-        outputChannel.appendLine('\n\n' + text);
+        outputChannel.appendLine('\n' + text);
     } else {
         outputChannel.appendLine(text);
     };
@@ -991,7 +991,15 @@ async function gitPull(workingDir,options) {
             })
             .catch((err) => {
                 let errMsg = (err).toString();
-                createOutputChannel('Git: pull失败', errMsg);
+                if (errMsg.includes('cannot pull with rebase')) {
+                    let msg1 = "\n说明：项目下存在未提交的文件，git pull --rebase执行失败。如果需要执行git pull, 可通过以下步骤操作。"
+                        + "\n 1. 源代码管理器视图，顶部【更多】，点击【pull - 拉取】，即执行git pull"
+                        + "\n 2. 通过命令面板，执行git pull"
+                    errMsg = errMsg + msg1;
+                    createOutputChannel('Git: pull失败', errMsg);
+                } else {
+                    createOutputChannel('Git: pull失败', errMsg);
+                };
                 return 'fail';
             });
         return status
