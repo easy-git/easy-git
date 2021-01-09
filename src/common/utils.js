@@ -975,7 +975,7 @@ async function gitPull(workingDir,options) {
     };
 
     // status bar show message
-    hx.window.setStatusBarMessage(msg, 10000,'info');
+    hx.window.setStatusBarMessage(msg, 5000,'info');
 
     try {
         let status = await git(workingDir)
