@@ -114,7 +114,7 @@ let watchProjectPath;
 function watchProjectDir(projectDir, func) {
     const watchOpt = {
         persistent: true,
-        recursive: false
+        recursive: true
     };
     try {
         const debounceView = debounce(500, () => {
@@ -122,8 +122,9 @@ function watchProjectDir(projectDir, func) {
         });
         let dir = path.join(projectDir, '.git');
         watcher = fs.watch(dir, watchOpt, (eventType, filename) => {
+            if (filename == "index.lock") {return;};
             if (GitHBuilderXInnerTrigger == false) {
-                if (eventType && filename == 'index') {
+                if (eventType && ( filename == 'index' || filename.includes('.git/refs/tags'))) {
                     debounceView();
                 };
             };
@@ -239,6 +240,7 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
                 Log.checkoutCommitForCreateBranch(msg.hash);
                 break;
             case 'create-tag':
+                GitHBuilderXInnerTrigger = false;
                 Log.createTag(msg.hash);
                 break;
             case 'showCommitFileChange':
