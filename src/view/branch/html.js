@@ -552,18 +552,6 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     this.OriginBranchList = ${remoteBranchList};
                 },
                 mounted() {
-                    if (this.AssignAction && JSON.stringify(this.AssignAction) != '{}') {
-                        let {name,value} = this.AssignAction;
-                        if (name == 'create-branch') {
-                            this.isShowModel = true;
-                            if (value != undefined && value) {
-                                this.fromToCreate.ref = value;
-                                document.getElementById('newBranchName').focus();
-                            };
-                        };
-                    };
-                    document.getElementById('inputBranch').focus();
-
                     let that = this;
                     setTimeout(function() {
                         that.refreshProgress = false;
@@ -574,6 +562,19 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             that.getTagsList();
                             that.receiveInfo();
                         }, 1500);
+                    };
+
+                    // 日志视图：选中log，右键菜单，【检出并创建新分支】
+                    if (this.AssignAction && JSON.stringify(this.AssignAction) != '{}') {
+                        let {name,value} = this.AssignAction;
+                        if (name == 'create-branch') {
+                            this.isShowModel = true;
+                            if (value != undefined && value) {
+                                this.fromToCreate.ref = value;
+                            };
+                        };
+                    } else {
+                        document.getElementById('inputBranch').focus();
                     };
                 },
                 methods: {
@@ -605,7 +606,6 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                 };
                             };
                             if (msg.command == 'TagList') {
-                                this.isShowModel = false;
                                 if (msg.data) {
                                     this.rawTagsList = msg.data;
                                     this.TagsList = msg.data;
