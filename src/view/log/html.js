@@ -611,11 +611,11 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         <li @click="checkoutCommitForCreateBranch(rightClickItem);">检出并创建新分支</li>
                         <li @click="createTag(rightClickItem)" title="git tag">创建标签</li>
                         <div class="dropdown-divider"></div>
-                        <li @click="resetCommit(rightClickItem)" :class="[searchType == 'all' || viewRefName != '' ? 'click-disable' : '']">将 {{currentBranch}} 重置到这次提交</li>
-                        <li @click="cherryPick(rightClickItem)" title="cherry pick，如置灰无法点击，请点击顶部：所有分支，查看所有log" :class="[searchType == 'all' || viewRefName != '' ? '' : 'click-disable']">
+                        <li @click="resetCommit(rightClickItem)" :class="[searchType == 'all' || viewRefName ? 'click-disable' : '']">将 {{currentBranch}} 重置到这次提交</li>
+                        <li @click="cherryPick(rightClickItem)" title="cherry pick，如置灰无法点击，请点击顶部：所有分支，查看所有log" :class="[searchType == 'all' || viewRefName ? '' : 'click-disable']">
                             将当前提交应用于 {{currentBranch}} 分支
                         </li>
-                        <li @click="revert(rightClickItem)" :class="[searchType == 'all' || viewRefName != '' ? 'click-disable' : '']">revert到这次提交...</li>
+                        <li @click="revert(rightClickItem)" :class="[searchType == 'all' || viewRefName ? 'click-disable' : '']">revert到这次提交...</li>
                         <div class="dropdown-divider"></div>
                         <li @click="copyLogMsg(rightClickItem, 'msg')">复制</li>
                         <li @click="copyLogMsg(rightClickItem, 'commit_id')">复制commit id到剪贴板</li>
