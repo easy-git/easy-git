@@ -158,7 +158,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     display:none;
                 }
                 .li-log {
-                    padding: 10px 16px;
+                    padding: 0px 16px;
                     font-size: 14px;
                     font-weight: 400;
                     color: ${fontColor};
@@ -509,8 +509,8 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                     @contextmenu.prevent.stop="openMenu($event,item)"
                                     @mouseover="hoverLogID = 'msg_'+idx"
                                     @mouseleave="mouseleaveLogItem()">
-                                    <div class="d-flex">
-                                        <div class="mr-auto htext" title="点击查看变更的文件列表" @click.stop="viewDetails(item);">
+                                    <div class="d-flex pt-2 pb-1" @click.stop="viewDetails(item);">
+                                        <div class="mr-auto htext" title="点击查看变更的文件列表">
                                             {{ item.message }}
                                         </div>
                                         <div class="pl-2" v-show="item.refs != ''">
@@ -521,7 +521,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                     </div>
                                     <div class="d-block">
                                         <div class="text">
-                                            <span class="f11" :title="item.author_email" @click.stop="goSearchAuthor('author',item.author_name);">
+                                            <span class="f11" :title="item.author_email + '点击搜索此用户提交记录'" @click.stop="goSearchAuthor('author',item.author_name);">
                                                 {{ item.author_name }}
                                             </span>
                                             <span class="f11 pl-2">
