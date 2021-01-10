@@ -78,8 +78,6 @@ class CatCustomEditorProvider extends CustomEditorProvider {
 
             GitLogCustomWebViewPanal = {};
             GitLogCustomEditorStatus = false;
-
-            hx.window.setStatusBarMessage('EasyGit: 日志视图已关闭, 如需要，请重新打开！', 5000, 'info');
         });
     }
 };
@@ -123,7 +121,7 @@ function watchProjectDir(projectDir, func) {
         let dir = path.join(projectDir, '.git');
         watcher = fs.watch(dir, watchOpt, (eventType, filename) => {
             if (GitHBuilderXInnerTrigger == false) {
-                if (eventType && (filename == 'index' || filename.includes('refs/tags'))) {
+                if (eventType && (filename == 'index' || filename.includes('refs/tags') || filename.includes('refs/heads'))) {
                     debounceView();
                 };
             };
