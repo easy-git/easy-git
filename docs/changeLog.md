@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.1.1
+* 新增 命令面板，增加编码设置功能
+* 修复 日志视图 某些情况下，某些操作日志视图没有刷新的Bug
+* 修复 日志视图 某些情况下，右键菜单，重置操作，无法点击的Bug
+* 优化 日志视图 搜索框提示
+
 ## 1.1.0
 * 新增 command: EasyGit.stashShow 查看某个储藏的文件列表以及差异, 命令面板触发
 * 新增 command: EasyGit.showConfig 即`git cofing --list`, 命令面板触发
