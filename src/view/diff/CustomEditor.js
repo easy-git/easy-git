@@ -148,8 +148,10 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
 
     // 记录监听的项目路径, 避免重复监听
     if (watchFilePathName != undefined && watchFilePathName != absolutePath) {
-        watchListener.close();
-        watchListener = undefined;
+        if (watchListener != undefined) {
+            watchListener.close();
+            watchListener = undefined;
+        };
     };
     watchFilePathName = absolutePath;
 

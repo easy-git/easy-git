@@ -122,9 +122,8 @@ function watchProjectDir(projectDir, func) {
         });
         let dir = path.join(projectDir, '.git');
         watcher = fs.watch(dir, watchOpt, (eventType, filename) => {
-            if (filename == "index.lock") {return;};
             if (GitHBuilderXInnerTrigger == false) {
-                if (eventType && ( filename == 'index' || filename.includes('.git/refs/tags'))) {
+                if (eventType && (filename == 'index' || filename.includes('refs/tags'))) {
                     debounceView();
                 };
             };
@@ -167,14 +166,16 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
 
     // 记录监听的项目路径, 避免重复监听
     if (watchProjectPath != undefined && watchProjectPath != projectPath) {
-        watcher.close();
-        watcher = undefined;
+        if (watcher != undefined) {
+            watcher.close();
+            watcher = undefined;
+        };
     };
     watchProjectPath = projectPath;
 
-    // 监听.git，当关闭日志视图自动刷新时，则不再监听
+    // 监听.git，当关闭日志视图自动刷新时，即logViewAutoRefresh=false，则不再监听
     let { logViewAutoRefresh } = userConfig;
-    if (logViewAutoRefresh && watcher == undefined) {
+    if ((logViewAutoRefresh || logViewAutoRefresh == undefined) && watcher == undefined) {
         watchProjectDir(projectPath, Log);
     };
 
