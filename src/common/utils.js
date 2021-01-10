@@ -1574,6 +1574,8 @@ async function gitLog(workingDir, searchType, filterCondition, refname) {
             filter = [...filter, ...tmp]
         };
     };
+    
+    // 去除空格
     filter = filter.filter( s => s && s.trim());
 
     if (searchType == 'all') {

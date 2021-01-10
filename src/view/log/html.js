@@ -462,8 +462,8 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                             id="search"
                                             type="text"
                                             class="form-control outline-none pl-0"
-                                            title="按下回车进行搜索，多个条件以逗号分隔。如--author=name,-n 5。默认返回50条结果，如需要更多条数，请输入: -n 数量。"
-                                            placeholder="按下回车进行搜索，多个条件以逗号分隔。如--author=name,-n 5"
+                                            title="支持git log所有参数，多个条件以逗号分隔。如--author=name,-n 5。默认返回50条结果，如需要更多条数，请输入: -n 数量。"
+                                            placeholder="支持git log所有参数，多个条件以逗号分隔。如--grep=xxx,--author=name,-n 5"
                                             style="background: ${background};"
                                             autofocus="autofocus"
                                             v-model.trim="searchText"
@@ -491,10 +491,11 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             <div class="text-center" style="margin-top: 12%;">
                                 <span>${noIcon}</span>
                                 <p class="no-result">没有结果, 请检查查询条件...</p>
-                                <p class="no-result"><a href="https://ext.dcloud.net.cn/plugin?id=2475">搜索帮助</a></p>
+                                <p class="no-result"><a href="https://easy-git.gitee.io/docs/log/search">搜索帮助</a></p>
                                 <p class="no-result" v-if="searchText">
-                                    存在多个查询条件，请以逗号分隔。例: -n 10,--auther=小糊涂 <br/>
-                                    按提交信息来过滤提交，你可以使用 --grep 标记。 例: --grep=删除
+                                    模糊查询提交消息，建议使用--grep。例如: --grep=xxx
+                                    存在多个查询条件，请以逗号分隔。例: -n 10,--auther=xxx,--grep=xxx <br/>
+                                    注意：当使用--grep、--author、--after等带有 -- 的参数进行查询时，必须使用 =
                                 </p>
                                 <p class="no-result">{{ LogErrorMsg }}</p>
                             </div>
