@@ -6,6 +6,7 @@ const {
     gitRaw,
     gitTagsList,
     gitTagCreate,
+    gitTagDelete,
     gitPush,
     gitBranch,
     gitBranchMerge,
@@ -56,45 +57,55 @@ class Tag {
         this.projectPath = projectPath;
     }
 
+    /**
+     * @description 显示所有标签列表
+     */
     async showTagsList() {
         let result = await gitTagsList(this.projectPath);
 
         let { error, data } = result;
-        if (error == true) {
-            return;
-        };
-
+        if (error == true) return;
         if (data.length == 0) {
             return hx.window.showErrorMessage('当前项目下，不存在标签。',['关闭']);
         } else {
             let pickData = data.map( item => { return {"label": item} } );
-            hx.window.showQuickPick(pickData, {
+            let selected = await hx.window.showQuickPick(pickData, {
                 placeHolder: "请选择您要操作的数据"
-            }).then( (selected) => {
-                if (selected) {
-                    let { label } = selected;
-                    this.showDetails(label);
-                };
+            }).then( (result) => {
+                return result;
             });
-        }
+            return selected;
+        };
     };
 
-    // Git: git show <tag-name>
+    /**
+     * @description 获取tag详情
+     * @param {Object} tagName
+     */
     async showDetails(tagName) {
+        // 当tag=undefined, 显示所有tag列表，以便用户选择
         if (tagName == undefined) {
-            return this.showTagsList();
+            let selectedTag = await this.showTagsList();
+            if (selectedTag) {
+                let { label } = selectedTag;
+                return this.showDetails(label);
+            };
         };
+
         if (tagName.length == 0) {
             return hx.window.showErrorMessage('tag名称无效。',['关闭']);
         };
+
         let options = [ 'show', '-s', '--format=medium', tagName ]
         let details = await gitRaw(this.projectPath, options, undefined, 'result');
         if (details) {
             createOutputChannel(`Git: ${tagName} 标签详情如下: `, details);
         };
-    }
+    };
 
-    // Git: git tag <tag-name>
+    /**
+     * @description 创建标签
+     */
     async create(hash=null, param=null) {
         let titleLabel = '当前代码';
         if (hash != null && hash != undefined) {
@@ -123,9 +134,41 @@ class Tag {
                 if (param != null && JSON.stringify(param) != '{}') {
                     hx.commands.executeCommand('EasyGit.branch', param);
                 };
-            }
-        }
-    }
+            };
+        };
+    };
+
+    /**
+     * @description 删除标签
+     * @param {Object} param
+     */
+    async delete(tagName) {
+        let tag;
+        // 当tag=undefined, 显示所有tag列表，以便用户选择
+        if (tagName == undefined) {
+            let selectedTag = await this.showTagsList();
+            if (selectedTag) {
+                let { label } = selectedTag;
+                tag = label;
+            };
+        };
+
+        if (tag == undefined) return;
+
+        let msg = `注意: 删除远端标签后，无法恢复。`;
+        let btns = ['删除本地', '同时删除本地和远端', '关闭'];
+        let selectedBtn = await hxShowMessageBox(`Git 删除标签 ${tag}`, msg , btns).then(btnText => {
+            return btnText;
+        });
+
+        if (selectedBtn == '删除本地') {
+            gitTagDelete(this.projectPath, tag);
+        };
+        if (selectedBtn == '同时删除本地和远端') {
+            await gitTagDelete(this.projectPath, tag, true);
+        };
+    };
+
 };
 
 

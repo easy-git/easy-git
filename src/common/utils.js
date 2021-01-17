@@ -1493,6 +1493,46 @@ async function gitTagCreate(workingDir,tagOptions, tagName) {
 
 
 /**
+ * @description  git delete tag
+ * @param {String} workingDir git工作目录
+ * @param {String} tagName 标签名称
+ */
+async function gitTagDelete(workingDir, tagName, isDeleteRemote=false) {
+    if (isDeleteRemote == true) {
+        let commands = ['push', '--delete', 'origin', tagName];
+        let delResult = await gitRaw(workingDir, commands);
+        if (delResult == 'success') {
+            hx.window.showInformationMessage(`远程标签 ${tagName} 删除成功。`, ['我知道了']);
+        } else {
+            hx.window.showErrorMessage(`远程标签 ${tagName} 删除失败。`, ['我知道了'])
+            return;
+        };
+    };
+
+    try {
+        let options = ['-d', tagName];
+        let status = await git(workingDir)
+            .tag(options)
+            .then(() => {
+                if (isDeleteRemote) {
+                    hx.window.setStatusBarMessage(`Git: 本地标签 ${tagName} 删除成功。`, 5000, 'info');
+                };
+                return 'success';
+            })
+            .catch((err) => {
+                let errMsg = "\n" + (err).toString();
+                createOutputChannel(`Git: 本地标签 ${tagName} 删除失败!`, errMsg);
+                return 'fail';
+            });
+        return status;
+    } catch (e) {
+        console.log(e)
+        return 'error';
+    };
+};
+
+
+/**
  * @description clean
  */
 async function gitClean(workingDir) {
@@ -1574,7 +1614,7 @@ async function gitLog(workingDir, searchType, filterCondition, refname) {
             filter = [...filter, ...tmp]
         };
     };
-    
+
     // 去除空格
     filter = filter.filter( s => s && s.trim());
 
@@ -2069,6 +2109,7 @@ module.exports = {
     gitBranchMerge,
     gitTagsList,
     gitTagCreate,
+    gitTagDelete,
     gitClean,
     gitConfigShow,
     gitConfigSet,

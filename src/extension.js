@@ -359,6 +359,12 @@ function activate(context) {
     });
     context.subscriptions.push(tagCreate);
 
+    // git tag -d
+    let tagDelete = hx.commands.registerCommand('EasyGit.tagDelete', (param)=> {
+        git.action(param, 'tagDelete');
+    });
+    context.subscriptions.push(tagDelete);
+
     // git tag details
     let tagDetails = hx.commands.registerCommand('EasyGit.tagDetails', (param)=> {
         git.action(param, 'tagDetails');

@@ -57,6 +57,7 @@
         "onCommand:EasyGit.checkUpdate",
         "onCommand:EasyGit.gitBlameForLineChange",
         "onCommand:EasyGit.tagCreate",
+        "onCommand:EasyGit.tagDelete",
         "onCommand:EasyGit.tagDetails",
         "onCommand:EasyGit.diffFile",
         "onCommand:EasyGit.archive",
@@ -317,7 +318,11 @@
             },
             {
                 "command": "EasyGit.tagDetails",
-                "title": "easy-git: tag - 标签查看详情"
+                "title": "easy-git: tag - 标签查看列表、及详情"
+            },
+            {
+                "command": "EasyGit.tagDelete",
+                "title": "easy-git: tag -d - 标签删除"
             },
             {
                 "command": "EasyGit.diffFile",

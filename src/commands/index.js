@@ -176,6 +176,9 @@ function action(param,action_name) {
             let { hash } = param;
             tag.create(hash, param);
             break;
+        case 'tagDelete':
+            tag.delete();
+            break;
         case 'tagDetails':
             let { tagName } = param;
             tag.showDetails(tagName);
