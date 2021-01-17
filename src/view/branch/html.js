@@ -263,7 +263,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                     id="inputBranch"
                                     type="text"
                                     class="form-control outline-none"
-                                    placeholder="分支/标签名称"
+                                    placeholder="分支名称"
                                     autofocus="autofocus"
                                     style="background: ${background};"
                                     v-model.trim="inputBranch"/>
