@@ -250,11 +250,11 @@
             },
             {
                 "command": "EasyGit.restoreStaged",
-                "title": "easy-git: restore --staged - 撤销暂存"
+                "title": "easy-git: restore --staged - 撤销(取消)暂存"
             },
             {
                 "command": "EasyGit.revert",
-                "title": "easy-git: revert - 撤销还原指定commit"
+                "title": "easy-git: revert - 还原指定commit"
             },
             {
                 "command": "EasyGit.clean",
@@ -435,66 +435,12 @@
                 },
                 {
                     "command": "EasyGit.branch",
-                    "title": "分支/标签视图",
+                    "title": "分支/标签管理",
                     "when": "isGit",
                     "group": "easygit@1"
                 },
                 {
                     "group": "easygit@2"
-                },
-                {
-                    "command": "EasyGit.push",
-                    "title": "push",
-                    "when": "isGit",
-                    "group": "easygit@2"
-                },
-                {
-                    "command": "EasyGit.pull",
-                    "title": "pull",
-                    "when": "isGit",
-                    "group": "easygit@2"
-                },
-                {
-                    "command": "EasyGit.pullRebase",
-                    "title": "pull -rebase",
-                    "when": "isGit",
-                    "group": "easygit@2"
-                },
-                {
-                    "group": "easygit@3"
-                },
-                {
-                    "command": "EasyGit.stash",
-                    "title": "储藏",
-                    "when": "isGit",
-                    "group": "easygit@4"
-                },
-                {
-                    "command": "EasyGit.stashAll",
-                    "title": "储藏全部(包含未跟踪的)",
-                    "when": "isGit",
-                    "group": "easygit@4"
-                },
-                {
-                    "command": "EasyGit.stashPop",
-                    "title": "弹出储藏",
-                    "when": "isGit",
-                    "group": "easygit@4"
-                },
-                {
-                    "command": "EasyGit.stashShow",
-                    "title": "查看储藏",
-                    "when": "isGit",
-                    "group": "easygit@4"
-                },
-                {
-                    "command": "EasyGit.stashClear",
-                    "title": "删除所有储藏",
-                    "when": "isGit",
-                    "group": "easygit@4"
-                },
-                {
-                    "group": "easygit@5"
                 },
                 {
                     "command": "EasyGit.setGitingore",
@@ -521,16 +467,31 @@
                     "id": "easygit"
                 },
                 {
+                    "command": "EasyGit.restoreStaged",
+                    "title": "撤销文件暂存",
+                    "when": "isGit",
+                    "group": "easygit@1"
+                },
+                {
+                    "command": "EasyGit.restore",
+                    "title": "撤销当前文件修改",
+                    "when": "isGit",
+                    "group": "easygit@1"
+                },
+                {
+                    "group": "easygit@2"
+                },
+                {
                     "command": "EasyGit.log",
                     "title": "查看当前文件提交日志",
                     "when": "isGit",
-                    "group": "easygit@1"
+                    "group": "easygit@2"
                 },
                 {
                     "command": "EasyGit.gitBlameForLineChange",
                     "title": "显示当前行最后一次修改信息",
                     "when": "isGit",
-                    "group": "easygit@1"
+                    "group": "easygit@2"
                 },
                 {
                     "command": "EasyGit.annotate",
@@ -539,7 +500,7 @@
                     "group": "easygit@2"
                 },
                 {
-                    "group": "easygit@2"
+                    "group": "easygit@3"
                 },
                 {
                     "command": "EasyGit.showAnotherBranchFile",
