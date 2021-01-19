@@ -234,7 +234,7 @@
             },
             {
                 "command": "EasyGit.resetHard",
-                "title": "easy-git: reset --hard HEAD - 重置当前修改"
+                "title": "easy-git: reset --hard HEAD - 重置当前所有修改"
             },
             {
                 "command": "EasyGit.resetHardLastCommit",

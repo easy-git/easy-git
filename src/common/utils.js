@@ -624,7 +624,7 @@ async function gitClone(info) {
 /**
  * @description 获取具体文件状态
  * @param {Object} workingDir
- * @param {Object} options
+ * @param {Object} options ["-s", selectedFile]
  */
 async function gitFileStatus(workingDir, selectedFile, options) {
     try {
@@ -635,6 +635,9 @@ async function gitFileStatus(workingDir, selectedFile, options) {
         let statusSummary = await git(workingDir)
             .status(options)
             .then( (res) => {
+                if ((res['files']).length == 0) {
+                    return 'error';
+                };
                 result.statusInfo = res['files'][0];
                 let conflicted = res.conflicted;
                 if (conflicted.length != 0) {
