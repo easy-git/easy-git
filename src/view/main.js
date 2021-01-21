@@ -675,10 +675,14 @@ function active(webviewPanel, userConfig, gitData) {
 
     // 记录监听的项目路径, 解决项目切换问题
     if (watchProjectPath != undefined && watchProjectPath != projectPath) {
-        watcherListenGitDir.close();
-        watcherListen.close();
-        watcherListen = undefined;
-        watcherListenGitDir = undefined
+        if (watcherListenGitDir != undefined) {
+            watcherListenGitDir.close();
+            watcherListenGitDir = undefined;
+        };
+        if (watcherListen != undefined) {
+            watcherListen.close();
+            watcherListen = undefined;
+        };
     };
     watchProjectPath = projectPath;
 
