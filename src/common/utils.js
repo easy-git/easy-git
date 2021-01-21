@@ -523,6 +523,7 @@ function runGitClone(options) {
     let previousProgress = 0;
     let match;
     let isPrint = [];
+    let errorMsg;
     return new Promise((resolve, reject) => {
         let default_options = ['clone', '-v', '--progress']
         let cmd = [...default_options, ...options]
@@ -554,17 +555,28 @@ function runGitClone(options) {
                         createOutputChannelForClone('Git clone完成！', false);
                         createOutputChannelForClone(data, false);
                     };
+                } else if (data.includes('publickey') && data.includes('Permission denied')) {
+                    createOutputChannelForClone(data, false);
+                    errorMsg = 'ssh publickey error';
+                } else if (data.includes('Incorrect username or password') || data.includes('Authentication failed')) {
+                    createOutputChannelForClone(data, false);
+                    errorMsg = 'Incorrect username or password'
                 } else {
                     createOutputChannelForClone(data, false);
                 };
             };
+
         });
 
         run.on('close', (code) => {
             if (code == 0) {
                 resolve('success');
             } else {
-                reject('fail');
+                if (errorMsg) {
+                    reject(errorMsg);
+                } else {
+                    reject('fail');
+                };
             };
         });
     });
@@ -616,7 +628,15 @@ async function gitClone(info) {
         };
         return status
     } catch(e) {
-        createOutputChannelForClone('克隆仓库异常' + e, false);
+        if (e == 'ssh publickey error') {
+            createOutputChannelForClone('- SSH publickey无效，克隆失败。', false);
+            createOutputChannelForClone('配置SSH, 请参考: https://easy-git.gitee.io/auth/ssh-generate', false);
+        } else if (e == 'Incorrect username or password') {
+            createOutputChannelForClone('账号密码错误，克隆失败。', false);
+        } else {
+            createOutputChannelForClone('克隆仓库异常 ' + e, false);
+        };
+        createOutputChannelForClone('如果无法解决问题，请到插件市场或ask论坛寻求帮助 https://ext.dcloud.net.cn/plugin?name=easy-git', false);
         return 'error';
     };
 };

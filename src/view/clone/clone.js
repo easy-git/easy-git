@@ -78,10 +78,6 @@ function show(webviewPanel, userConfig) {
             'projectName': projectName
         });
 
-        if (!fs.existsSync(localPath)) {
-            fs.mkdirSync(localPath);
-        };
-
         let result = await utils.gitClone(info);
         if (result == 'success') {
             utils.importProjectToExplorer(localPath);
