@@ -127,6 +127,12 @@ class GitFile {
         this.ProjectCurrentBranch = '';
     }
 
+    init(BranchTracking) {
+        if (BranchTracking) {
+            this.BranchTracking = BranchTracking;
+        }
+    }
+
     // refresh webview git 分支信息
     async refreshHEAD() {
         let gitInfo = await utils.gitStatus(this.projectPath, false);
@@ -155,7 +161,10 @@ class GitFile {
 
         try{
             let gitInfo = await utils.gitStatus(this.projectPath);
+
             let { BranchTracking } = gitInfo;
+            this.BranchTracking = BranchTracking;
+
             let gitData = Object.assign(gitInfo, {
                 'projectName': this.projectName,
                 'projectPath': this.projectPath
@@ -331,8 +340,8 @@ class GitFile {
             if (this.BranchTracking == null || this.BranchTracking == false) {
                 let gitInfo = await utils.gitStatus(this.projectPath);
                 let { BranchTracking } = gitInfo;
-                if (BranchTracking != null) {
-                    this.BranchTracking = true;
+                if (BranchTracking) {
+                    this.BranchTracking = BranchTracking;
                 } else {
                     AlwaysAutoCommitPush = false;
                 };
@@ -473,8 +482,8 @@ class GitFile {
 
         // push的前提：本地分支必须关联到远端
         if (this.BranchTracking == null || this.BranchTracking == false) {
-            if (BranchTracking != null) {
-                this.BranchTracking = true;
+            if (BranchTracking) {
+                this.BranchTracking = BranchTracking;
             } else {
                 options = ['--set-upstream', 'origin', currentBranch];
             };
@@ -503,6 +512,11 @@ class GitFile {
     async pull(msg) {
         let {text,rebase} = msg;
         let options = Object.assign(msg);
+
+        if (this.BranchTracking && (typeof(this.BranchTracking) == 'string')) {
+            options = Object.assign(msg, {'BranchTracking': this.BranchTracking});
+        };
+
         let pullStatus = await utils.gitPull(this.projectPath,options);
         if (pullStatus == 'success') {
             if (text == 'file') {
@@ -651,12 +665,14 @@ function active(webviewPanel, userConfig, gitData) {
 
     // get project info , and git info
     const { projectPath, projectName, currentBranch, originurl } = gitData;
+    let { BranchTracking } = gitData;
 
     // UI: color and svg icon
     let uiData = getUIData();
 
     // Git: 文件
     let File = new GitFile(webviewPanel, projectPath, projectName, uiData, userConfig);
+    File.init(BranchTracking);
 
     // Git: Config配置
     let GitCfg = new GitConfig(projectPath);

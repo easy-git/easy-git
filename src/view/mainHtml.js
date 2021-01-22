@@ -57,7 +57,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
         BranchTracking
     } = gitData;
 
-    if (BranchTracking == null) {
+    if (!BranchTracking) {
         GitAlwaysAutoCommitPush = false;
     };
 

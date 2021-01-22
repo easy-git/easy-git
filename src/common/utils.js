@@ -990,10 +990,20 @@ async function gitPull(workingDir,options) {
     let msg = 'Git: git pull 正在从服务器拉取代码...';
 
     if (options) {
-        let {rebase} = options;
+        let {rebase, BranchTracking} = options;
         if (rebase) {
-            args.push(['--rebase'])
+            args.push('--rebase')
             msg = 'Git: git pull --rebase 正在从服务器拉取代码...';
+        };
+        if (BranchTracking) {
+            try{
+                let remoteName = BranchTracking.replace('origin/', '');
+                if (remoteName) {
+                    args = [...args, ...['origin', remoteName]]
+                };
+            } catch(e){
+                console.log(e)
+            };
         };
     };
 
@@ -1162,13 +1172,14 @@ async function gitBranch(workingDir, options='-avvv') {
             .then((info) => {
                 let branches = info.branches;
                 for (let s in branches) {
-                    let name = branches[s].name;
+                    let name = branches[s]['name'];
                     if (name.startsWith('remotes/origin/')) {
                         let tmp = info.branches[s];
                         tmp.name = name.replace('remotes/', '');
                         remote.push(tmp);
                     } else {
-                        local.push(info.branches[s]);
+                        let tmp2 = branches[s];
+                        local.push(tmp2);
                     };
                 };
                 return { 'localBranchList':local, 'remoteBranchList': remote };
@@ -1900,13 +1911,49 @@ async function gitShowCommitFileChange(workingDir, options) {
 };
 
 /**
+ * @description 提取
+ */
+function parseRemoteBranch(info) {
+    try{
+        let remote = /\[origin\/(.+?)\]/g.exec(info)[0].replace(/\[|]/g,'')
+        return remote;
+    }catch(e){
+        return '';
+    };
+};
+
+/**
+ * @description 关联远程分支
+ */
+async function getTrackingRemoteBranch(projectPath) {
+    try{
+        let result = await gitRaw(projectPath, ['branch', '-vv'], undefined, 'result')
+        if (result) {
+            let data = result.split('\n');
+            let tracking;
+            for (let s of data) {
+                if (s.charAt(0) == '*') {
+                    tracking = parseRemoteBranch(s);
+                    break;
+                };
+            };
+            return tracking;
+        };
+        return '';
+    }catch(e){
+        return '';
+    }
+};
+
+
+/**
  * @description 关联远程仓库
  * @param {Object} projectPath
  */
 async function gitAddRemoteOrigin(projectPath) {
     let originUrl = await hx.window.showInputBox({
-        prompt:"Git远程仓库地址",
-        placeHolder: "必填"
+        prompt:"关联Git远程仓库",
+        placeHolder: "必填，请输入远程仓库地址"
     }).then((result)=>{
         return result
     });
@@ -1914,6 +1961,11 @@ async function gitAddRemoteOrigin(projectPath) {
     if (reg.test(originUrl)) {
         let commands = ['remote', 'add', 'origin', originUrl];
         let rResult = await gitRaw(projectPath, commands, '关联远程仓库', 'statusCode');
+        try{
+            await gitFetch(projectPath);
+        }catch(e){
+            hx.window.setStatusBarMessage('EasyGit: 获取Git仓库信息失败', 5000, 'info');
+        };
         return rResult;
     } else {
         hx.window.showErrorMessage('EasyGit: 远程仓库地址无效。如还需要进行关联，请在源代码管理器底部操作。', ['我知道了']);
@@ -2104,6 +2156,7 @@ module.exports = {
     checkGitUsernameEmail,
     gitInit,
     gitAddRemoteOrigin,
+    getTrackingRemoteBranch,
     gitClone,
     gitStatus,
     gitFileStatus,
