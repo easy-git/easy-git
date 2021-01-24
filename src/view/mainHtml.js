@@ -346,7 +346,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                         <li title="git reset --hard HEAD" @click="gitResetHardHEAD('HEAD');">重置当前修改</li>
                                         <li title="git reset --hard HEAD^" @click="gitResetHardHEAD('HEAD^');">重置代码到上个版本</li>
                                         <li class="divider"></li>
-                                        <li title="git checkout ." @click="gitCheckout('all');">放弃本地所有更改</li>
+                                        <li title="git checkout ." @click="gitCheckout('*');">放弃本地所有更改</li>
                                         <li title="git clean -df" @click="clean();">删除未跟踪的文件</li>
                                         <li class="divider"></li>
                                         <li title="stash" @click="gitStash('stash');">储藏</li>
@@ -415,7 +415,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         <p class="add-title" id="git_add_title">
                             <span class="a-icon" v-html="StagedIcon" @click="isShowStagedList();"></span>暂存的更改:
                             <span class="gtag">{{ gitStagedFileListLength }}</span>
-                            <span title="取消暂存所有更改" class="stash-all" @click="cancelAllStash('all');">
+                            <span title="取消所有暂存" class="stash-all" @click="cancelAllStash('all');">
                                 ${CancelIconSvg}
                             </span>
                         </p>
@@ -452,6 +452,9 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             <span class="gtag">{{ gitNotStagedileListLength }}</span>
                             <span title="暂存所有文件" class="stash-all" @click="gitAdd('all', '');">
                                 ${AddAllIcon}
+                            </span>
+                            <span title="取消所有更改" class="stash-all" @click="gitCheckout('*');">
+                                ${checkoutIconSvg}
                             </span>
                         </p>
                         <ul style="list-style-type:none;padding-left:0;" id="git_add_data" v-if="isShowChange">

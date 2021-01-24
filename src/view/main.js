@@ -451,24 +451,69 @@ class GitFile {
 
     // Git: 撤销更改 git checkout -- filename
     async checkoutFile(fileinfo) {
-        let fpath,ftag;
+        let fpath, ftag;
         if (fileinfo instanceof Object) {
             fpath = fileinfo.path;
             ftag = fileinfo.tag;
         } else {
             fpath = fileinfo;
         };
-        if (fileinfo == 'all' || !ftag.includes('?')) {
-            let checkoutlStatus = await utils.gitCheckoutFile(this.projectPath, fpath);
-            if (checkoutlStatus == 'success') {
-                this.refreshFileList();
+
+        if (fileinfo != '*') {
+            if (!ftag.includes('?')) {
+                let checkoutlStatus = await utils.gitCheckoutFile(this.projectPath, fpath);
+                if (checkoutlStatus == 'success') {
+                    this.refreshFileList();
+                };
+            } else {
+                let status = await utils.gitClean(this.projectPath, fpath);
+                if (status) {
+                    this.refreshFileList();
+                };
             };
-        };
-        if (fpath != 'all' && ftag.includes('?')) {
-            let absPath = path.join(this.projectPath, fpath);
-            let status = await utils.gitRemoveFile(absPath, fpath);
-            if (status) {
-                this.refreshFileList();
+        } else {
+            try{
+                let statusList = await utils.gitFileListStatus(this.projectPath);
+                let { notStaged } = statusList;
+                if (notStaged.length) {
+                    let total = notStaged.length;
+                    let notTrackList = notStaged.filter( item => item.tag == '??');
+                    let notTrackNum = notTrackList.length;
+                    let trackNum = total - notTrackNum;
+
+                    let btns = ['关闭'];
+                    if (trackNum) {
+                        btns.push(`放弃${trackNum}个已跟踪的文件`);
+                    };
+                    if (notTrackNum) {
+                        btns.push(`放弃${notTrackNum}个未跟踪的文件`);
+                    };
+                    if (notTrackNum && trackNum) {
+                        btns.push(`放弃所有${total}个文件`);
+                    };
+
+                    let desc = '此操作不可撤销! \n如果继续操作, 你当前的工作区文件将永久丢失。';
+                    let btnText = await utils.hxShowMessageBox('放弃所有更改', desc, btns).then( btn => {
+                        return btn;
+                    });
+                    if (btnText == `放弃${trackNum}个已跟踪的文件`) {
+                        let status = await utils.gitCheckoutFile(this.projectPath, '*');
+                        if (status == 'success') {
+                            this.refreshFileList();
+                        };
+                    } else if (btnText == `放弃所有${total}个文件`) {
+                        await utils.gitClean(this.projectPath, '*', false);
+                        if (trackNum) {
+                            await utils.gitCheckoutFile(this.projectPath, '*');
+                        };
+                        this.refreshFileList();
+                    } else if (btnText == `放弃${notTrackNum}个未跟踪的文件`) {
+                        await utils.gitClean(this.projectPath, '*', false);
+                        this.refreshFileList();
+                    };
+                };
+            }catch(e){
+                hx.window.showErrorMessage('Git: 取消所有更改，发生异常，请联系插件作者反馈。', ['我知道了']);
             };
         };
     };

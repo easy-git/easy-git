@@ -1134,23 +1134,25 @@ async function gitReset(workingDir, options, msg) {
  * @description 撤销对文件的修改
  */
 async function gitCheckoutFile(workingDir, filename) {
-    // status bar show message
-    hx.window.setStatusBarMessage(`Git: ${filename} 正在撤销对文件的修改!`,2000,'info');
-
     let args = ['--', filename]
-    if (filename == 'all') {
-        args = ['.']
+    if (filename == '*') {
+        args = ['*']
     };
+
+    let msg = filename == '*' ? 'Git: 正在撤销全部文件的修改...' : `Git: ${filename} 正在撤销对文件的修改!`;
+    hx.window.setStatusBarMessage(msg,2000,'info');
+
     try {
+
         let status = await git(workingDir)
             .checkout(args)
             .then(() => {
-                hx.window.setStatusBarMessage(`Git: ${filename} 成功撤销修改!`, 3000, 'info');
+                hx.window.setStatusBarMessage('Git: 撤销修改操作成功。', 3000, 'info');
                 return 'success'
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: ${filename} 撤销修改操作失败。`, errMsg);
+                createOutputChannel('Git: 撤销修改操作失败。', errMsg);
                 return 'fail';
             });
         return status;
@@ -1569,19 +1571,30 @@ async function gitTagDelete(workingDir, tagName, isDeleteRemote=false) {
 /**
  * @description clean
  */
-async function gitClean(workingDir) {
-    let cleanMsg = 'Git: 确认删除当前所有未跟踪的文件，删除后无法恢复。';
-    let isDeleteBtn = await hx.window.showInformationMessage(cleanMsg, ['删除','关闭']).then((result) =>{
-        return result;
-    });
-    if (isDeleteBtn == '关闭') {
-        return;
+async function gitClean(workingDir, filepath, isConfirm=true) {
+    let cleanMsg = 'Git: 确认删除当前【所有未跟踪的文件】吗？删除后无法恢复。';
+    let options = ['-d'];
+
+    if (filepath != '*') {
+        cleanMsg = `Git: 确认要删除${filepath} 吗？删除后无法恢复。`;
+        options = ['-d', filepath];
+    } else {
+        options = ['-d', '*'];
+    };
+
+    if (isConfirm) {
+        let isDeleteBtn = await hx.window.showInformationMessage(cleanMsg, ['删除','关闭']).then((result) =>{
+            return result;
+        });
+        if (isDeleteBtn == '关闭') {
+            return;
+        };
     };
 
     try {
         hx.window.setStatusBarMessage('Git: 开始删除本地未跟踪的文件', 2000, 'info');
         let status = await git(workingDir)
-            .clean('f',['-d'])
+            .clean('f', options)
             .then(() => {
                 hx.window.setStatusBarMessage(`Git: 成功删除未跟踪的文件`, 5000, 'info');
                 return 'success';

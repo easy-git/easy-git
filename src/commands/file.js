@@ -66,7 +66,7 @@ async function gitAddFile(ProjectInfo) {
  */
 async function goCleanFile(ProjectInfo) {
     let { projectPath, projectName } = ProjectInfo;
-    let cleanResult = await gitClean(projectPath);
+    let cleanResult = await gitClean(projectPath, '*');
     if (cleanResult == 'success') {
         ProjectInfo.easyGitInner = true;
         hx.commands.executeCommand('EasyGit.main', ProjectInfo);
