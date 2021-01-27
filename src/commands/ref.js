@@ -22,7 +22,8 @@ const {
     gitRefs,
     hxShowMessageBox,
     createOutputChannel,
-    applyEdit
+    applyEdit,
+    FileWriteAndOpen
 } = require('../common/utils.js');
 
 /**
@@ -400,8 +401,14 @@ class Branch {
         let param = `${selectedBranch}:${filename}`;
         let fileDetails = await gitRaw(projectPath, ['show', param], undefined, 'result');
         if (fileDetails) {
-            await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
-            applyEdit(fileDetails);
+            try{
+                const basename = path.basename(filename);
+                const fname = `temp_${selectedBranch}__${basename}`;
+                FileWriteAndOpen(fname, fileDetails);
+            } catch(e) {
+                await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
+                applyEdit(fileDetails);
+            };
         };
     }
 

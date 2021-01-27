@@ -2152,12 +2152,31 @@ async function gitRepositoryUrl(projectPath) {
     } else {
         hx.window.showErrorMessage('获取仓库地址失败');
     };
+};
+
+/**
+ * @description 新建文件、写入文件内容保存，并在hx打开
+ */
+async function FileWriteAndOpen(filename, filecontent){
+    let appDataDir = hx.env.appData;
+    let EasyGitDir = path.join(appDataDir, 'easy-git');
+    let status = fs.existsSync(EasyGitDir);
+    if (!status) {
+        fs.mkdirSync(EasyGitDir);
+    } else {
+        let fpath = path.join(EasyGitDir, filename);
+        fs.writeFile(fpath, filecontent, function (err) {
+           if (err) throw err;
+           hx.workspace.openTextDocument(fpath);
+        });
+    };
 }
 
 
 module.exports = {
     hxShowMessageBox,
     applyEdit,
+    FileWriteAndOpen,
     createOutputChannel,
     isGitInstalled,
     getGitVersion,
