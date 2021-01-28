@@ -467,46 +467,55 @@
                     "id": "easygit"
                 },
                 {
+                    "command": "EasyGit.main",
+                    "title": "打开源代码管理器",
+                    "when": "isGit",
+                    "group": "easygit@1"
+                },
+                {
+                    "command": "EasyGit.log",
+                    "title": "查看当前文件日志",
+                    "when": "isGit",
+                    "group": "easygit@1"
+                },
+                {
+                    "group": "easygit@2"
+                },
+                {
                     "command": "EasyGit.restoreStaged",
                     "title": "撤销文件暂存",
                     "when": "isGit",
-                    "group": "easygit@1"
+                    "group": "easygit@2"
                 },
                 {
                     "command": "EasyGit.restore",
                     "title": "撤销当前文件修改",
                     "when": "isGit",
-                    "group": "easygit@1"
-                },
-                {
                     "group": "easygit@2"
                 },
                 {
-                    "command": "EasyGit.log",
-                    "title": "查看当前文件提交日志",
-                    "when": "isGit",
-                    "group": "easygit@2"
+                    "group": "easygit@3"
                 },
                 {
                     "command": "EasyGit.gitBlameForLineChange",
                     "title": "显示当前行最后一次修改信息",
                     "when": "isGit",
-                    "group": "easygit@2"
+                    "group": "easygit@3"
                 },
                 {
                     "command": "EasyGit.annotate",
                     "title": "用提交信息标注文件中的每一行",
                     "when": "isGit",
-                    "group": "easygit@2"
+                    "group": "easygit@3"
                 },
                 {
-                    "group": "easygit@3"
+                    "group": "easygit@4"
                 },
                 {
                     "command": "EasyGit.showAnotherBranchFile",
                     "title": "查看文件在另一个分支的内容",
                     "when": "isGit",
-                    "group": "easygit@3"
+                    "group": "easygit@4"
                 },
                 {
                     "group": "z_commands"
