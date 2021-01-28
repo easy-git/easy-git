@@ -451,6 +451,7 @@ class GitFile {
 
     // Git: 撤销更改 git checkout -- filename
     async checkoutFile(fileinfo) {
+        GitHBuilderXInnerTrigger = true;
         let fpath, ftag;
         if (fileinfo instanceof Object) {
             fpath = fileinfo.path;
@@ -471,6 +472,7 @@ class GitFile {
                     this.refreshFileList();
                 };
             };
+            GitHBuilderXInnerTrigger = false;
         } else {
             try{
                 let statusList = await utils.gitFileListStatus(this.projectPath);
@@ -512,6 +514,7 @@ class GitFile {
                         this.refreshFileList();
                     };
                 };
+                GitHBuilderXInnerTrigger = false;
             }catch(e){
                 hx.window.showErrorMessage('Git: 取消所有更改，发生异常，请联系插件作者反馈。', ['我知道了']);
             };
@@ -627,7 +630,7 @@ let watcherListen;
 let watcherListenGitDir;
 function watchProjectDir(projectDir, func) {
     try {
-        const debounceFileList = debounce(2000, () => {
+        const debounceFileList = debounce(2200, () => {
             func.refreshFileList();
         });
         watcherListen = chokidar.watch(projectDir, {
@@ -639,12 +642,12 @@ function watchProjectDir(projectDir, func) {
                 debounceFileList();
                 setTimeout(function(){
                     listeningProjectFile = false;
-                }, 3000);
+                }, 2500);
             };
         });
 
         // 监听.Git目录
-        const debounceGitHEAD = debounce(1000, () => {
+        const debounceGitHEAD = debounce(1200, () => {
             func.refreshHEAD();
         });
 
@@ -669,7 +672,7 @@ function watchProjectDir(projectDir, func) {
                 };
                 setTimeout(function(){
                     GitHBuilderXInnerTrigger = false;
-                }, 1000);
+                }, 1500);
             };
         });
     } catch (e) {};
@@ -867,7 +870,7 @@ function active(webviewPanel, userConfig, gitData) {
         };
         setTimeout(function() {
             GitHBuilderXInnerTrigger = false;
-        }, 1500);
+        }, 1700);
     });
 
 };
