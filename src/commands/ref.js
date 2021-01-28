@@ -398,17 +398,21 @@ class Branch {
 
         // 获取文件的相对路径
         let filename = path.relative(projectPath, selectedFile);
+        filename = filename.replace(/\\/g, '/');
+
         let param = `${selectedBranch}:${filename}`;
         let fileDetails = await gitRaw(projectPath, ['show', param], undefined, 'result');
-        if (fileDetails) {
-            try{
-                const basename = path.basename(filename);
-                const fname = `temp_${selectedBranch}__${basename}`;
-                FileWriteAndOpen(fname, fileDetails);
-            } catch(e) {
-                await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
-                applyEdit(fileDetails);
-            };
+        if (fileDetails == 'error' || fileDetails == 'fail') {
+            hx.window.showErrorMessage(`EasyGit: 获取 分支${selectedBranch} 上 ${filename} 文件内容失败。`, ['我知道了']);
+            return;
+        };
+        try{
+            const basename = path.basename(filename);
+            const fname = `temp_${selectedBranch}__${basename}`;
+            FileWriteAndOpen(fname, fileDetails);
+        } catch(e) {
+            await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
+            applyEdit(fileDetails);
         };
     }
 
