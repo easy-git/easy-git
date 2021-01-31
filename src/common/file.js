@@ -35,11 +35,15 @@ function getPath(parm) {
 
 /**
  * @description 创建文件
+ * @param {Object} args
+ * @returns {String} exist(已存在) | fail(失败) | success(成功)
  */
 async function create(args) {
-
     let currentDir = '';
-    let {filename,projectPath,param} = args;
+
+    // param: 焦点在项目管理器、编辑器时，获取的文件信息
+    let { filename, projectPath, param, isOpenFile } = args;
+
     if (param != undefined && projectPath == undefined) {
        currentDir = getPath(param);
     };
@@ -53,18 +57,25 @@ async function create(args) {
     // target path
     let target_path = path.join(currentDir, filename);
     if (fs.existsSync(target_path)) {
-        await hx.workspace.openTextDocument(target_path);
-        return;
-    };
-
-    // copy file to target dir
-    fs.copyFile(template_path, target_path, (err) => {
-        if (err) {
-            console.error(err);
-            return hx.window.showErrorMessage(filename + '创建失败!');
-        } else {
-            hx.workspace.openTextDocument(target_path);
+        if (isOpenFile) {
+            hx.workspace.openTextDocument(target_path)
         };
+        return "exist";
+    };
+    
+    // copy file to target dir
+    return new Promise((resolve, reject) => {
+        fs.copyFile(template_path, target_path, (err) => {
+            if (err) {
+                hx.window.showErrorMessage(filename + '创建失败!');
+                reject('fail');
+            } else {
+                if (isOpenFile) {
+                    hx.workspace.openTextDocument(target_path);
+                };
+                resolve('success');
+            };
+        });
     });
 };
 
@@ -85,6 +96,7 @@ function gitignore(args) {
 
 
 /**
+ * @description 用于在项目管理器选中文件或编辑器存在已打开的文件时
  * @description 创建.gitattributes
  */
 function gitattributes(args) {

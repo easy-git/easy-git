@@ -1,31 +1,66 @@
 const hx = require('hbuilderx');
 
-const { gitInit, gitAddRemoteOrigin } = require('../common/utils.js');
+const {
+    gitInit,
+    gitAddRemoteOrigin,
+    gitConfigShow,
+    createOutputChannel
+} = require('../common/utils.js');
+const { create } = require('../common/file.js');
+const { goSetEncoding } = require('./base.js');
 
 /**
- * @description Git项目初始化
+ * @description Git项目初始化; 初始化成功后，创建.gitignore文件, 并询问用户是否关联远程仓库
+ * @param {Object} ProjectInfo 项目信息，即焦点在项目管理器、编辑器时，获取的文件信息
  */
 async function gitInitProject(ProjectInfo) {
-    let {projectPath,projectName} = ProjectInfo;
+    let { projectPath, projectName } = ProjectInfo;
+
     let status = await gitInit(projectPath,projectName);
+    if (status != 'success') {
+        return;
+    };
 
-    if (status == 'success') {
-        ProjectInfo.easyGitInner = true;
+    // 创建.gitignore文件
+    let createInfo = {
+        "filename": ".gitignore",
+        "projectPath": projectPath,
+        "isOpenFile": false
+    };
+    let createStatus = await create(createInfo);
+    if (createStatus == 'success') {
+        let createMsg = `已为项目【${projectName}】自动创建.gitignore文件。如不需要，请自行删除。\n`;
+        createOutputChannel(createMsg);
+    };
+
+    // 获取配置
+    let configData = await gitConfigShow(projectPath, false);
+
+    // 检查是否设置user.name和user.email
+    let gitUserName = configData['user.name'];
+    let gitEmail = configData['user.email'];
+    if (!gitUserName && !gitEmail) {
+        createOutputChannel("当前仓库，未设置user.name和user.email。提交代码到Git远程仓库，必须设置用户名和邮箱。");
+        createOutputChannel("如需设置，请在HBuilderX选中项目，点击顶部菜单【工具 -> easy-git -> 设置user.name】\n");
+    };
+
+    // 设置编码, 解决中文问题
+    let i18n = configData['i18n.logoutputencoding'];
+    if (!i18n) {
+        goSetEncoding("core.quotepath");
+        goSetEncoding("i18n.logoutputencoding");
+    };
+
+    // 打开源代码管理器
+    ProjectInfo.easyGitInner = true;
+    hx.commands.executeCommand('EasyGit.main', ProjectInfo);
+
+    createOutputChannel("当前仓库，还未关联到远程仓库上, 请在弹窗输入框中输入仓库地址。如不需要关联远程仓库，请直接关闭弹窗。\n");
+
+    // 关联远程仓库
+    let relationResult = await gitAddRemoteOrigin(projectPath);
+    if (relationResult == 'success') {
         hx.commands.executeCommand('EasyGit.main', ProjectInfo);
-
-        let btnSelect = await hx.window.showInformationMessage(
-            `EasyGit: 项目【${projectName}】初始化存储库成功！当前仓库，还未关联到远程仓库上。\n`,
-            ['关联远程仓库','关闭'],
-        ).then( (result)=> {
-            return result;
-        });
-
-        if (btnSelect == '关联远程仓库') {
-            let relationResult = await gitAddRemoteOrigin(projectPath);
-            if (relationResult == 'success') {
-                hx.commands.executeCommand('EasyGit.main', ProjectInfo);
-            };
-        };
     };
 };
 

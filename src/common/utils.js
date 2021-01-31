@@ -308,17 +308,17 @@ async function getFilesExplorerProjectInfo() {
 /**
  * @description 创建输出控制台
  */
-function createOutputChannel(label=false,msg) {
-    let channel_name = "Git";
+function createOutputChannel(mainTitle=false, msg) {
+    let channel_name = "easy-git";
     let outputChannel = hx.window.createOutputChannel(channel_name);
     outputChannel.show();
 
-    if (label) {
-        outputChannel.appendLine(label);
+    if (mainTitle) {
+        outputChannel.appendLine(mainTitle);
     };
-
-    let text = `${msg}`;
-    outputChannel.appendLine('\n' + text);
+    if (msg) {
+        outputChannel.appendLine(msg);
+    };
 };
 
 /**
@@ -496,20 +496,22 @@ function checkNodeModulesFileList(projectPath, projectName, GitStatusResult) {
  * @description 获取git信息
  * @param {Object} projectPath
  */
-async function gitInit(projectPath,projectName) {
+async function gitInit(projectPath, projectName) {
     try{
+        createOutputChannel(`项目【${projectName}】正在初始化.....`);
         let status = await git(projectPath).init()
-            .then(() => {
+            .then((res) => {
+                createOutputChannel(`项目【${projectName}】初始化存储库成功！\n`);
                 return 'success'
             })
             .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: 项目【${projectName}】 初始化Git存储库失败！`, errMsg);
+                let errMsg = '\n' + (err).toString();
+                createOutputChannel(`项目【${projectName}】初始化Git存储库失败！`, errMsg);
                 return 'fail';
             });
-        return status
+        return status;
     } catch(e) {
-        hx.window.showErrorMessage(`Git: 项目【${projectName}】初始化存储库异常！`, ['我知道了']);
+        createOutputChannel(`easy-git插件，执行初始化，出现异常！`, e);
         return 'error';
     }
 };

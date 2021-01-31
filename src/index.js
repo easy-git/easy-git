@@ -112,7 +112,8 @@ class Common {
             'projectName': projectName,
             'projectPath': projectPath,
             'selectedFile': selectedFile,
-            'GitAssignAction': GitAssignAction
+            'GitAssignAction': GitAssignAction,
+            'easyGitInner': easyGitInner
         };
     }
 };
@@ -206,7 +207,7 @@ class Main extends Common {
         this.ProjectData = await super.getProjectInfo(this.param);
 
         // 获取项目名称、项目路径
-        let { projectName, projectPath, selectedFile, GitAssignAction } = this.ProjectData;
+        let { projectName, projectPath, selectedFile, GitAssignAction, easyGitInner } = this.ProjectData;
 
         // git project status
         let gitInfo = await utils.gitStatus(projectPath);
@@ -219,7 +220,9 @@ class Main extends Common {
 
         if (this.viewType == 'main' && isGitProject) {
             // 检查是否设置了user.name和user.email
-            await utils.checkGitUsernameEmail(projectPath, projectName, this.userConfig);
+            if (!easyGitInner) {
+                await utils.checkGitUsernameEmail(projectPath, projectName, this.userConfig);
+            };
 
             // Git文件视图：检查git项目是否包含node_modules
             setTimeout(function() {
