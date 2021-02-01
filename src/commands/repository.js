@@ -34,8 +34,8 @@ async function gitInitProject(ProjectInfo) {
     // 设置编码, 解决中文问题
     let i18n = configData['i18n.logoutputencoding'];
     if (!i18n) {
-        goSetEncoding("core.quotepath");
-        goSetEncoding("i18n.logoutputencoding");
+        goSetEncoding("core.quotepath", 'StatusBar');
+        goSetEncoding("i18n.logoutputencoding", 'StatusBar');
     };
 
     // 打开源代码管理器

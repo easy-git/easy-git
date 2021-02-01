@@ -55,26 +55,32 @@ async function goShowConfig(projectPath, action) {
 
 /**
  * @description 设置中文编码
+ * @param {String} info  设置项
+ * @param {String} displayMode 消息显示类型，windows(右下角弹窗) | 状态栏 StatusBar
  */
-async function goSetEncoding(info) {
+async function goSetEncoding(info, displayMode="windows") {
     let projectPath = '';
     if (info == 'core.quotepath') {
         let cmd1 = ['config', '--global', 'core.quotepath', false];
         let status1 = await gitRaw(projectPath, cmd1, '设置core.quotepath', 'statusCode');
-        if (status1 == 'success') {
-            hx.window.showInformationMessage("设置core.quotepath=false，操作成功。", ["我知道了"]);
+
+        let msgType = status1 == 'success' ? '成功' : '失败';
+        if (displayMode == 'windows') {
+            hx.window.showInformationMessage(`设置core.quotepath=false，操作${msgType}`, ["我知道了"]);
         } else {
-            hx.window.showErrorMessage("设置core.quotepath=false，操作失败。", ["我知道了"]);
+            hx.window.setStatusBarMessage(`设置core.quotepath=false，操作${msgType}`, 5000, 'info');
         };
     };
 
     if (info == 'i18n.logoutputencoding') {
         let cmd2 = ['config', '--global', 'i18n.logoutputencoding', 'utf-8'];
         let status2 = await gitRaw(projectPath, cmd2, '设置i18n.logoutputencoding', 'statusCode');
-        if (status2 == 'success') {
-            hx.window.showInformationMessage("设置i18n.logoutputencoding=utf-8，操作成功。", ["我知道了"]);
+
+        let msgType2 = status2 == 'success' ? '成功' : '失败';
+        if (displayMode == 'windows') {
+            hx.window.showInformationMessage(`设置i18n.logoutputencoding=utf-8，操作${msgType2}`, ["我知道了"]);
         } else {
-            hx.window.showErrorMessage("设置i18n.logoutputencoding=utf-8，操作失败。", ["我知道了"]);
+            hx.window.setStatusBarMessage(`设置i18n.logoutputencoding=utf-8，操作${msgType2}`, 5000, 'info');
         };
     };
 };
