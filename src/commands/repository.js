@@ -6,7 +6,6 @@ const {
     gitConfigShow,
     createOutputChannel
 } = require('../common/utils.js');
-const { create } = require('../common/file.js');
 const { goSetEncoding } = require('./base.js');
 
 /**
@@ -19,18 +18,6 @@ async function gitInitProject(ProjectInfo) {
     let status = await gitInit(projectPath,projectName);
     if (status != 'success') {
         return;
-    };
-
-    // 创建.gitignore文件
-    let createInfo = {
-        "filename": ".gitignore",
-        "projectPath": projectPath,
-        "isOpenFile": false
-    };
-    let createStatus = await create(createInfo);
-    if (createStatus == 'success') {
-        let createMsg = `已为项目【${projectName}】自动创建.gitignore文件。如不需要，请自行删除。\n`;
-        createOutputChannel(createMsg);
     };
 
     // 获取配置
@@ -55,7 +42,8 @@ async function gitInitProject(ProjectInfo) {
     ProjectInfo.easyGitInner = true;
     hx.commands.executeCommand('EasyGit.main', ProjectInfo);
 
-    createOutputChannel("当前仓库，还未关联到远程仓库上, 请在弹窗输入框中输入仓库地址。如不需要关联远程仓库，请直接关闭弹窗。\n");
+    createOutputChannel("当前仓库，还未关联到远程仓库上, 请在弹窗输入框中输入仓库地址。如不需要关联远程仓库、或后期设置，请直接关闭弹窗。");
+    createOutputChannel("更多资料参考: https://easy-git.gitee.io/connecting/init")
 
     // 关联远程仓库
     let relationResult = await gitAddRemoteOrigin(projectPath);

@@ -501,7 +501,6 @@ async function gitInit(projectPath, projectName) {
         createOutputChannel(`项目【${projectName}】正在初始化.....`);
         let status = await git(projectPath).init()
             .then((res) => {
-                createOutputChannel(`项目【${projectName}】初始化存储库成功！\n`);
                 return 'success'
             })
             .catch((err) => {
@@ -509,6 +508,25 @@ async function gitInit(projectPath, projectName) {
                 createOutputChannel(`项目【${projectName}】初始化Git存储库失败！`, errMsg);
                 return 'fail';
             });
+
+        try {
+            // 创建.gitignore文件
+            const { create } = require('./file.js');
+            let createInfo = {
+                "filename": ".gitignore",
+                "projectPath": projectPath,
+                "isOpenFile": false
+            };
+            let createStatus = await create(createInfo);
+            if (createStatus == 'success') {
+                let createMsg = `已自动创建.gitignore文件。如不需要，请自行删除。`;
+                createOutputChannel(createMsg);
+            };
+        } catch(e) {};
+
+        if (status == 'success') {
+            createOutputChannel(`项目【${projectName}】初始化存储库成功！\n`);
+        };
         return status;
     } catch(e) {
         createOutputChannel(`easy-git插件，执行初始化，出现异常！`, e);
