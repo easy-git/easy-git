@@ -43,7 +43,7 @@ async function gitInitProject(ProjectInfo) {
     hx.commands.executeCommand('EasyGit.main', ProjectInfo);
 
     createOutputChannel("当前仓库，还未关联到远程仓库上, 请在弹窗输入框中输入仓库地址。如不需要关联远程仓库、或后期设置，请直接关闭弹窗。");
-    createOutputChannel("更多资料参考: https://easy-git.gitee.io/connecting/init")
+    createOutputChannel("新建仓库、及获取远程仓库地址，参考: https://easy-git.gitee.io/connecting/init")
 
     // 关联远程仓库
     let relationResult = await gitAddRemoteOrigin(projectPath);
