@@ -100,7 +100,7 @@ class Tag {
         let options = [ 'show', '-s', '--format=medium', tagName ]
         let details = await gitRaw(this.projectPath, options, undefined, 'result');
         if (details) {
-            createOutputChannel(`Git: ${tagName} 标签详情如下: `, details);
+            createOutputChannel(`Git: ${tagName} 标签详情如下:\n\n${details}`);
         };
     };
 
@@ -610,11 +610,11 @@ class Archive {
 
         let ArchiveResult = await gitRaw(projectPath, options, 'Git: 归档');
         if (ArchiveResult == 'success') {
-            let success_msg = `Git: ${projectName} ${refName} 归档成功。`
-            createOutputChannel(success_msg, '路径:' + ArchiveDir);
+            let success_msg = `Git: ${projectName} ${refName} 归档成功。\n 路径: ${ArchiveDir}`;
+            createOutputChannel(success_msg);
         } else {
-            let fail_msg = `Git: ${projectName} ${refName} 归档失败。`
-            createOutputChannel(fail_msg, '路径:' + ArchiveDir);
+            let fail_msg = `Git: ${projectName} ${refName} 归档失败。 \n 路径: ${ArchiveDir}`;
+            createOutputChannel(fail_msg);
         };
     }
 

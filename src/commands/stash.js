@@ -110,7 +110,7 @@ class goStashShow {
             let cmd1 = ["stash", "show", stashID];
             let filelist = await gitRaw(projectPath, cmd1, undefined, 'result');
             if (filelist) {
-                createOutputChannel(`Git: ${stashID} 文件列表如下: `, filelist);
+                createOutputChannel(`Git: ${stashID} 文件列表如下:\n\n${filelist}`);
             };
         } else if (actionId == "diff") {
             let cmd2 = ["stash", "show", stashID, "-p"];

@@ -307,16 +307,24 @@ async function getFilesExplorerProjectInfo() {
 
 /**
  * @description 创建输出控制台
+ * @param {String} title
+ * @param {String} msg
+ * @param {msgLevel} msgLevel (warning | success | error), 控制文本颜色
  */
-function createOutputChannel(mainTitle=false, msg) {
+function createOutputChannel(msg, msgLevel=null) {
     let channel_name = "easy-git";
     let outputChannel = hx.window.createOutputChannel(channel_name);
     outputChannel.show();
 
-    if (mainTitle) {
-        outputChannel.appendLine(mainTitle);
-    };
-    if (msg) {
+    // 采用try{} catch{} 写法的原因：颜色输出在3.1.0才支持，为了兼容老版本
+    try {
+        if (['warning', 'success', 'error'].includes(msgLevel)) {
+            outputChannel.appendLine({ "level": msgLevel, "line": msg});
+        } else {
+            outputChannel.appendLine(msg);
+        };
+    } catch (e) {
+        console.log(e)
         outputChannel.appendLine(msg);
     };
 };
@@ -341,9 +349,11 @@ function createOutputChannelForClone(msg, newline=true) {
  * @description 运行命令
  */
 async function runCmd(cmd) {
-    let label = '执行:' + cmd + '\n';
+    let label = '执行:' + cmd;
+    createOutputChannel(label);
     exec(cmd, function(error, stdout, stderr) {
-        createOutputChannel(label,[stdout,stderr]);
+        createOutputChannel(`${stdout} \n ${stderr}`)
+
     });
 };
 
@@ -505,7 +515,7 @@ async function gitInit(projectPath, projectName) {
             })
             .catch((err) => {
                 let errMsg = '\n' + (err).toString();
-                createOutputChannel(`项目【${projectName}】初始化Git存储库失败！`, errMsg);
+                createOutputChannel(`项目【${projectName}】初始化Git存储库失败！\n ${errMsg}`);
                 return 'fail';
             });
 
@@ -529,7 +539,7 @@ async function gitInit(projectPath, projectName) {
         };
         return status;
     } catch(e) {
-        createOutputChannel(`easy-git插件，执行初始化，出现异常！`, e);
+        createOutputChannel(`easy-git插件，执行初始化，出现异常！\n ${e}`);
         return 'error';
     }
 };
@@ -865,7 +875,7 @@ async function gitCommitPush(workingDir, commitComment) {
                         + "方法1：打开终端，进入此项目，执行git push，此时输入正确的账号密码。\n"
                         + osErrorMsg;
                 };
-                createOutputChannel(title, errMsg);
+                createOutputChannel(`${title} \n${errMsg}`);
                 return 'fail';
             });
         return status
@@ -895,7 +905,7 @@ async function gitAdd(workingDir, files) {
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: ${files} add失败`, errMsg);
+                createOutputChannel(`Git: ${files} add失败。${errMsg}`);
                 return 'fail';
             });
         return status
@@ -920,7 +930,7 @@ async function gitCommit(workingDir, comment) {
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel('Git: commit操作失败', errMsg);
+                createOutputChannel(`Git: commit操作失败。\n${errMsg}`);
                 return 'fail';
             });
         return status
@@ -948,7 +958,7 @@ async function gitAddCommit(workingDir,commitComment) {
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel('Git: add and commit失败', errMsg);
+                createOutputChannel(`Git: add and commit失败 ${errMsg}`);
                 return 'fail';
             });
         return status
@@ -991,7 +1001,7 @@ async function gitPush(workingDir, options=[]) {
                         + "方法1：打开终端，进入此项目，执行git push，此时输入正确的账号密码。\n"
                         + osErrorMsg;
                 };
-                createOutputChannel(title, errMsg);
+                createOutputChannel(`${title} \n ${errMsg}`);
                 return 'fail';
             });
         return status
@@ -1049,9 +1059,9 @@ async function gitPull(workingDir,options) {
                         + "\n 1. 源代码管理器视图，顶部【更多】，点击【pull - 拉取】，即执行git pull"
                         + "\n 2. 通过命令面板，执行git pull"
                     errMsg = errMsg + msg1;
-                    createOutputChannel('Git: pull失败', errMsg);
+                    createOutputChannel(`Git: pull失败 \n ${errMsg}`);
                 } else {
-                    createOutputChannel('Git: pull失败', errMsg);
+                    createOutputChannel(`Git: pull失败 \n ${errMsg}`);
                 };
                 return 'fail';
             });
@@ -1088,7 +1098,7 @@ async function gitFetch(workingDir, isShowMsg=true) {
                 if (errMsg.includes('Could not resolve host')) {
                     hx.window.setStatusBarMessage('Git: fetch失败，原因：Could not resolve host', 100000, 'error');
                 } else {
-                    createOutputChannel('Git: fetch失败', errMsg);
+                    createOutputChannel(`Git: fetch失败 \n ${errMsg}`);
                 };
                 return 'fail';
             });
@@ -1116,7 +1126,7 @@ async function gitCancelAdd(workingDir, filename) {
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: ${filename}取消暂存失败`, errMsg);
+                createOutputChannel(`Git: ${filename}取消暂存失败 \n ${errMsg}`);
                 return 'fail';
             });
         return status;
@@ -1139,8 +1149,8 @@ async function gitReset(workingDir, options, msg) {
                 return 'success'
             })
             .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(msg + '失败', errMsg);
+                let errMsg = "\n" + (err).toString();
+                createOutputChannel(`${msg} 失败 \n ${errMsg}`);
                 return 'fail';
             });
         return status;
@@ -1172,7 +1182,7 @@ async function gitCheckoutFile(workingDir, filename) {
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel('Git: 撤销修改操作失败。', errMsg);
+                createOutputChannel(`Git: 撤销修改操作失败。\n ${errMsg}`);
                 return 'fail';
             });
         return status;
@@ -1284,7 +1294,7 @@ async function gitBranchSwitch(workingDir,branchName) {
             })
             .catch((err) => {
                 let errMsg = (err).toString();
-                createOutputChannel(`Git: 分支${branchName}切换失败!`, errMsg);
+                createOutputChannel(`Git: 分支${branchName}切换失败! \n ${errMsg}`);
                 return 'fail';
             });
         return status;
@@ -1306,8 +1316,8 @@ async function gitDeleteLocalBranch(workingDir,branchName) {
                 return 'success';
             })
             .catch((err) => {
-                let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: 本地分支${branchName}强制删除失败!`, errMsg);
+                let errMsg = "\n" + (err).toString();
+                createOutputChannel(`Git: 本地分支${branchName}强制删除失败! \n ${errMsg}`);
                 return 'fail';
             });
         return status
@@ -1336,7 +1346,7 @@ async function gitDeleteRemoteBranch(workingDir, branchName) {
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: 远程分支${branchName}删除失败!`, errMsg);
+                createOutputChannel(`Git: 远程分支${branchName}删除失败! ${errMsg}`);
                 return 'fail';
             });
         return status
@@ -1377,7 +1387,7 @@ async function gitBranchCreate(data) {
                 })
                 .catch((err) => {
                     let errMsg = "\n" + (err).toString();
-                    createOutputChannel(`Git: 分支${newBranchName}创建失败`, errMsg);
+                    createOutputChannel(`Git: 分支${newBranchName}创建失败 ${errMsg}`);
                     return 'fail';
                 });
             return status;
@@ -1394,7 +1404,7 @@ async function gitBranchCreate(data) {
                 })
                 .catch((err) => {
                     let errMsg = "\n" + (err).toString();
-                    createOutputChannel(`Git: 分支${newBranchName}创建失败`, errMsg);
+                    createOutputChannel(`Git: 分支${newBranchName}创建失败 ${errMsg}`);
                     return 'fail';
                 });
             return status;
@@ -1423,7 +1433,7 @@ async function gitLocalBranchToRemote(workingDir,branchName) {
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: 分支${branchName} push远端失败`, errMsg);
+                createOutputChannel(`Git: 分支${branchName} push远端失败 ${errMsg}`);
                 return 'fail';
             });
         return status
@@ -1453,7 +1463,7 @@ async function gitBranchCreatePush(workingDir,branchName) {
             })
             .catch((err) => {
                 let errMsg = (err).toString();
-                createOutputChannel(`Git: 分支${branchName} 创建、推送分支失败`, errMsg);
+                createOutputChannel(`Git: 分支${branchName} 创建、推送分支失败 \n ${errMsg}`);
                 return 'fail';
             });
         return status
@@ -1479,7 +1489,7 @@ async function gitBranchMerge(workingDir,fromBranch,toBranch) {
             })
             .catch((err) => {
                 let errMsg = (err).toString();
-                createOutputChannel(`Git: 分支合并失败, 请根据控制台提示手动处理。`, errMsg);
+                createOutputChannel(`Git: 分支合并失败, 请根据控制台提示手动处理。\n ${errMsg}`);
                 voiceSay('merge.conflict');
                 if (errMsg.includes('CONFLICTS')) {
                     return 'conflicts';
@@ -1511,7 +1521,7 @@ async function gitTagsList(workingDir) {
             .catch((err) => {
                 tagsList.error = true;
                 let errMsg = (err).toString();
-                createOutputChannel(`Git: tag获取失败`, errMsg);
+                createOutputChannel(`Git: tag获取失败 \n ${errMsg}`);
             });
     } catch (e) {
         tagsList.error = true;
@@ -1537,7 +1547,7 @@ async function gitTagCreate(workingDir,tagOptions, tagName) {
             })
             .catch((err) => {
                 let errMsg = "\n" + (err).toString();
-                createOutputChannel(`Git: 标签 ${tagName} 创建失败!`, errMsg);
+                createOutputChannel(`Git: 标签 ${tagName} 创建失败! ${errMsg}`);
                 return 'fail';
             });
         return status;
@@ -1577,7 +1587,7 @@ async function gitTagDelete(workingDir, tagName, isDeleteRemote=false) {
             })
             .catch((err) => {
                 let errMsg = "\n" + (err).toString();
-                createOutputChannel(`Git: 本地标签 ${tagName} 删除失败!`, errMsg);
+                createOutputChannel(`Git: 本地标签 ${tagName} 删除失败! ${errMsg}`);
                 return 'fail';
             });
         return status;
@@ -1621,7 +1631,7 @@ async function gitClean(workingDir, filepath, isConfirm=true) {
             })
             .catch((err) => {
                 let errMsg = "\n" + (err).toString();
-                createOutputChannel(`Git: 删除未跟踪的文件失败`, errMsg);
+                createOutputChannel(`Git: 删除未跟踪的文件失败 ${errMsg}`);
                 return 'fail';
             });
         return status;
@@ -1650,7 +1660,7 @@ async function gitConfigShow(workingDir, isPrint=true) {
                     for (let i2 in data) {
                         Msg = Msg + i2 + '=' + data[i2] + '\n';
                     };
-                    createOutputChannel(`Git: 配置文件如下:`,Msg);
+                    createOutputChannel(`Git: 配置文件如下: \n ${Msg}`);
                 };
                 return data;
             })
@@ -1772,12 +1782,12 @@ async function gitStash(projectInfo, options, msg) {
                 };
             })
             .catch((err) => {
-                createOutputChannel(msg + '操作失败！', err);
+                createOutputChannel(`${msg} 操作失败！\n ${err}`);
                 return 'fail';
             });
         return status;
     } catch (e) {
-        createOutputChannel(msg + ', 插件运行异常', e);
+        createOutputChannel(`${msg}, 插件运行异常 \n ${e}`);
         return 'error';
     };
 };
@@ -1798,7 +1808,7 @@ async function gitStashList(workingDir) {
             });
         return status;
     } catch (e) {
-        createOutputChannel('Git: 获取储藏列表失败, 插件运行异常', e);
+        createOutputChannel(`Git: 获取储藏列表失败, 插件运行异常。\n ${e}`);
         return 'error';
     };
 };
@@ -1822,7 +1832,7 @@ async function gitConfigSet(workingDir, data) {
             });
         return status;
     } catch (e) {
-        createOutputChannel('Git: 设置失败, 插件运行异常', e);
+        createOutputChannel(`Git: 设置失败, 插件运行异常 \n${e}`);
         return 'error';
     };
 };
@@ -1839,12 +1849,12 @@ async function gitAddRemote(workingDir, url) {
                 return 'success';
             })
             .catch((err) => {
-                createOutputChannel('Git: 操作失败', err);
+                createOutputChannel('Git: 操作失败 \n ${err}');
                 return 'fail';
             });
         return status;
     } catch (e) {
-        createOutputChannel('Git: 操作失败，插件运行异常。', e);
+        createOutputChannel(`Git: 操作失败，插件运行异常。\n ${e}`);
         return 'error';
     };
 };
@@ -1870,14 +1880,14 @@ async function gitRaw(workingDir, commands, msg, resultType='statusCode') {
             })
             .catch((err) => {
                 if (msg != undefined) {
-                    createOutputChannel(`Git: ${msg} 操作失败。`, err);
+                    createOutputChannel(`Git: ${msg} 操作失败。\n ${err}`);
                 }
                 return 'fail';
             });
         return status;
     } catch (e) {
         if (msg != undefined) {
-            createOutputChannel(`Git: ${msg} 操作失败，插件运行异常。`, e);
+            createOutputChannel(`Git: ${msg} 操作失败，插件运行异常。\n ${e}`);
         }
         return 'error';
     };
@@ -1904,12 +1914,12 @@ async function gitCherryPick(workingDir, commands) {
                     voiceSay("merge.conflict");
                     return 'conflicts';
                 };
-                createOutputChannel(`Git: ${commands} 操作失败。`, err);
+                createOutputChannel(`Git: ${commands} 操作失败。\n ${err}`);
                 return 'fail';
             });
         return status;
     } catch (e) {
-        createOutputChannel(`Git: ${commands} 操作失败，插件运行异常。`, e);
+        createOutputChannel(`Git: ${commands} 操作失败，插件运行异常。\n ${e}`);
         return 'error';
     };
 };
@@ -2066,12 +2076,12 @@ async function gitRevert(workingDir, commands) {
                     hx.window.setStatusBarMessage('Git: revert 操作出现冲突！', 10000, 'info');
                     return 'conflicts';
                 };
-                createOutputChannel(`Git: ${commands} 操作失败。`, err);
+                createOutputChannel(`Git: ${commands} 操作失败。\n ${err}`);
                 return 'fail';
             });
         return status;
     } catch (e) {
-        createOutputChannel(`Git: ${commands} 操作失败，插件运行异常。`, e);
+        createOutputChannel(`Git: ${commands} 操作失败，插件运行异常。\n ${e}`);
         return 'error';
     };
 };

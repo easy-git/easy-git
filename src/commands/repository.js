@@ -27,7 +27,7 @@ async function gitInitProject(ProjectInfo) {
     let gitUserName = configData['user.name'];
     let gitEmail = configData['user.email'];
     if (!gitUserName && !gitEmail) {
-        createOutputChannel("当前仓库，未设置user.name和user.email。提交代码到Git远程仓库，必须设置用户名和邮箱。");
+        createOutputChannel("当前仓库，未设置user.name和user.email。提交代码到Git远程仓库，必须设置用户名和邮箱。", "error");
         createOutputChannel("如需设置，请在HBuilderX选中项目，点击顶部菜单【工具 -> easy-git -> 设置user.name】\n");
     };
 
