@@ -27,7 +27,7 @@ async function gitInitProject(ProjectInfo) {
     let gitUserName = configData['user.name'];
     let gitEmail = configData['user.email'];
     if (!gitUserName && !gitEmail) {
-        createOutputChannel("当前仓库，未设置user.name和user.email。提交代码到Git远程仓库，必须设置用户名和邮箱。", "error");
+        createOutputChannel("当前仓库，未设置user.name和user.email。提交代码到Git远程仓库，必须设置用户名和邮箱。", "warning");
         createOutputChannel("如需设置，请在HBuilderX选中项目，点击顶部菜单【工具 -> easy-git -> 设置user.name】\n");
     };
 
@@ -42,8 +42,8 @@ async function gitInitProject(ProjectInfo) {
     ProjectInfo.easyGitInner = true;
     hx.commands.executeCommand('EasyGit.main', ProjectInfo);
 
-    createOutputChannel("当前仓库，还未关联到远程仓库上, 请在弹窗输入框中输入仓库地址。如不需要关联远程仓库、或后期设置，请直接关闭弹窗。");
-    createOutputChannel("新建仓库、及获取远程仓库地址，参考: https://easy-git.gitee.io/connecting/init")
+    createOutputChannel("当前仓库，还未关联到远程仓库上, 请在弹窗输入框中输入仓库地址。如不需要关联远程仓库、或后期设置，请直接关闭弹窗。", "warning");
+    createOutputChannel("新建仓库、及获取远程仓库地址，参考: https://easy-git.gitee.io/connecting/init\n")
 
     // 关联远程仓库
     let relationResult = await gitAddRemoteOrigin(projectPath);
