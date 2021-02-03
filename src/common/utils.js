@@ -19,8 +19,9 @@ const osName = os.platform();
 const cmp_hx_version = require('./cmp.js');
 let hxVersion = hx.env.appVersion;
 hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
-const cmpVersionResult = cmp_hx_version(hxVersion, '2.9.12');
 
+const cmpVersionResult = cmp_hx_version(hxVersion, '2.9.12');
+const cmpVersionResult_for_outputChannel = cmp_hx_version(hxVersion, '3.1.1');
 /**
  * @description 背景颜色、输入框颜色、字体颜色、线条颜色
  */
@@ -321,7 +322,7 @@ function createOutputChannel(msg, msgLevel=undefined) {
 
     // 采用try{} catch{} 写法的原因：颜色输出在3.1.0才支持，为了兼容老版本
     try {
-        if (['warning', 'success', 'error', 'info'].includes(msgLevel)) {
+        if (['warning', 'success', 'error', 'info'].includes(msgLevel) && (cmpVersionResult_for_outputChannel <= 0)) {
             outputChannel.appendLine({ line: msg, level: msgLevel });
         } else {
             outputChannel.appendLine(msg);
@@ -1059,8 +1060,8 @@ async function gitPull(workingDir,options) {
                 let errMsg = (err).toString();
                 if (errMsg.includes('cannot pull with rebase')) {
                     let msg1 = "\n说明：项目下存在未提交的文件，git pull --rebase执行失败。如果需要执行git pull, 可通过以下步骤操作。"
-                        + "\n 1. 源代码管理器视图，顶部【更多】，点击【pull - 拉取】，即执行git pull"
-                        + "\n 2. 通过命令面板，执行git pull"
+                        + "\n1. 源代码管理器视图，顶部【更多】，点击【pull - 拉取】，即执行git pull"
+                        + "\n2. 通过命令面板，执行git pull"
                     errMsg = errMsg + msg1;
                     createOutputChannel(`Git: pull失败 \n ${errMsg}`, 'error');
                 } else if (errMsg.includes('could not read Username')) {
