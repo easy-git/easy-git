@@ -124,10 +124,10 @@ function getThemeColor(area) {
     let d2h_linenum_color;
     let diff_scrollbar_color;
     if (colorScheme == 'Monokai' || colorScheme == 'Atom One Dark') {
-        d2h_ins_bg = 'rgb(227,250,232)';
+        d2h_ins_bg = '#004D40';
         d2h_del_bg = '#400C12';
         d2h_code_side_line_del_bg = '#423133';
-        d2h_code_side_line_ins_bg = '#a4e2c6';
+        d2h_code_side_line_ins_bg = '#00695C';
         d2h_emptyplaceholder_bg = '#303131';
         d2h_linenum_color = fontColor;
     } else {
