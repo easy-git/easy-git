@@ -86,9 +86,11 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                 color: ${fontColor};
                 font-size: 0.92rem;
                 background-color: ${background} !important;
+                overflow-x: hidden !important;
             }
             body::-webkit-scrollbar {
-                display: none;
+                overflow-x: hidden !important;
+                overflow-y: scroll;
             }
             [v-cloak] {
                 display: none;
@@ -121,7 +123,6 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
             }
             .d2h-file-wrapper {
                 border: none !important;
-                // overflow: auto;
             }
             .d2h-files-diff .d2h-file-side-diff:last-child {
                 border-left: 1px solid ${lineColor} !important;
@@ -167,12 +168,12 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                 margin: 3px 12px;
                 font-size: 14px !important;
             }
-            // ::-webkit-scrollbar {
-            //     width: 10px;
-            // }
-            // ::-webkit-scrollbar-thumb {
-            //     background-color: ${diff_scrollbar_color};
-            // }
+            ::-webkit-scrollbar {
+                width: 10px;
+            }
+            ::-webkit-scrollbar-thumb {
+                background-color: ${diff_scrollbar_color};
+            }
         </style>
     </head>
     <body>

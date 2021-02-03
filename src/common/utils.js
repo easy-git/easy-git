@@ -130,6 +130,7 @@ function getThemeColor(area) {
         d2h_code_side_line_ins_bg = '#00695C';
         d2h_emptyplaceholder_bg = '#303131';
         d2h_linenum_color = fontColor;
+        diff_scrollbar_color = '#6F6F6F';
     } else {
         d2h_ins_bg = '#dfd';
         d2h_ins_border = '#b4e2b4'
@@ -140,7 +141,7 @@ function getThemeColor(area) {
         d2h_emptyplaceholder_bg = '#f1f1f1';
         d2h_emptyplaceholder_border = '#e1e1e1';
         d2h_linenum_color = fontColor;
-        diff_scrollbar_color = 'rgb(207,181,106)'
+        diff_scrollbar_color = 'rgb(207,181,106)';
     };
 
     return {
