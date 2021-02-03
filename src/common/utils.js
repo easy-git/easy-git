@@ -122,11 +122,12 @@ function getThemeColor(area) {
     let d2h_code_side_line_del_bg, d2h_code_side_line_ins_bg;
     let d2h_emptyplaceholder_bg, d2h_emptyplaceholder_border;
     let d2h_linenum_color;
+    let diff_scrollbar_color;
     if (colorScheme == 'Monokai' || colorScheme == 'Atom One Dark') {
-        d2h_ins_bg = '#252C2F';
-        d2h_del_bg = '#2E2527';
+        d2h_ins_bg = 'rgb(227,250,232)';
+        d2h_del_bg = '#400C12';
         d2h_code_side_line_del_bg = '#423133';
-        d2h_code_side_line_ins_bg = '#303D44';
+        d2h_code_side_line_ins_bg = '#a4e2c6';
         d2h_emptyplaceholder_bg = '#303131';
         d2h_linenum_color = fontColor;
     } else {
@@ -139,6 +140,7 @@ function getThemeColor(area) {
         d2h_emptyplaceholder_bg = '#f1f1f1';
         d2h_emptyplaceholder_border = '#e1e1e1';
         d2h_linenum_color = fontColor;
+        diff_scrollbar_color = 'rgb(207,181,106)'
     };
 
     return {
@@ -158,7 +160,8 @@ function getThemeColor(area) {
         d2h_code_side_line_ins_bg,
         d2h_emptyplaceholder_bg,
         d2h_emptyplaceholder_border,
-        d2h_linenum_color
+        d2h_linenum_color,
+        diff_scrollbar_color
     };
 };
 

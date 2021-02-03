@@ -60,7 +60,8 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
         d2h_code_side_line_ins_bg,
         d2h_emptyplaceholder_bg,
         d2h_emptyplaceholder_border,
-        d2h_linenum_color
+        d2h_linenum_color,
+        diff_scrollbar_color
     } = uiData;
 
     let { titleLeft, titleRight, isDiffHtml, diffResult, isConflicted } = diffData;
@@ -120,6 +121,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
             }
             .d2h-file-wrapper {
                 border: none !important;
+                // overflow: auto;
             }
             .d2h-files-diff .d2h-file-side-diff:last-child {
                 border-left: 1px solid ${lineColor} !important;
@@ -165,6 +167,12 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                 margin: 3px 12px;
                 font-size: 14px !important;
             }
+            // ::-webkit-scrollbar {
+            //     width: 10px;
+            // }
+            // ::-webkit-scrollbar-thumb {
+            //     background-color: ${diff_scrollbar_color};
+            // }
         </style>
     </head>
     <body>
@@ -268,13 +276,13 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
             })
         </script>
         <script>
-            let devStatus = ${DisableDevTools};
-            if (devStatus) {
-                window.oncontextmenu = function() {
-                    event.preventDefault();
-                    return false;
-                }
-            }
+            // let devStatus = ${DisableDevTools};
+            // if (devStatus) {
+            //     window.oncontextmenu = function() {
+            //         event.preventDefault();
+            //         return false;
+            //     }
+            // }
         </script>
     </body>
 </html>
