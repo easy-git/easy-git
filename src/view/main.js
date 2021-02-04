@@ -627,52 +627,49 @@ class GitFile {
 var listeningProjectFile = false;
 let watchProjectPath;
 let watcherListen;
-let watcherListenGitDir;
 function watchProjectDir(projectDir, func) {
+    let gitDir = path.join(projectDir, '.git');
+    let refsPath = path.join(gitDir, 'refs', 'remotes', 'origin');
+    let refsHeads = path.join(gitDir, 'refs', 'heads');
+
     try {
+        // 项目目录刷新事件
         const debounceFileList = debounce(2200, () => {
             func.refreshFileList();
         });
+        // .Git目录刷新事件
+        const debounceGitHEAD = debounce(1200, () => {
+            func.refreshHEAD();
+        });
+
         watcherListen = chokidar.watch(projectDir, {
-            ignored: path => ["node_modules", ".git", 'unpackage'].some(s => path.includes(s)),
+            ignored: path => ["node_modules",'unpackage'].some(s => path.includes(s)),
             ignoreInitial: true
-        }).on('all', (event, path) => {
-            if (['change', 'add', 'unlink', 'unlinkDir'].includes(event) && GitHBuilderXInnerTrigger == false) {
+        }).on('all', (event, vpath) => {
+            let basename = path.basename(vpath);
+            if (basename == 'index.lock') return;
+            let isGitDirFile = vpath.includes(('.git/' + basename)) ? true : false;
+
+            // 监听项目目录，不包含.git
+            if (isGitDirFile == false && ['change', 'add', 'unlink', 'unlinkDir'].includes(event) && GitHBuilderXInnerTrigger == false) {
                 listeningProjectFile = true;
                 debounceFileList();
                 setTimeout(function(){
                     listeningProjectFile = false;
                 }, 2500);
             };
-        });
-
-        // 监听.Git目录
-        const debounceGitHEAD = debounce(1200, () => {
-            func.refreshHEAD();
-        });
-
-        let gitDir = path.join(projectDir, '.git');
-        let refsPath = path.join(gitDir, 'refs', 'remotes', 'origin');
-        let refsHeads = path.join(gitDir, 'refs', 'heads');
-        watcherListenGitDir = chokidar.watch(gitDir, {
-            ignoreInitial: true
-        }).on('change', fpath => {
-            if (GitHBuilderXInnerTrigger == false && listeningProjectFile == false) {
-                basename = path.basename(fpath);
-                if (basename == 'index.lock') return;
-                GitHBuilderXInnerTrigger = true;
-                if (['FETCH_HEAD', 'HEAD','ORIG_HEAD'].includes(basename) || fpath.includes(refsPath) || fpath.includes(refsHeads)) {
+            // 仅监听.git
+            if (isGitDirFile == true && event == 'change' && GitHBuilderXInnerTrigger == false && listeningProjectFile == false) {
+                if (['FETCH_HEAD', 'HEAD','ORIG_HEAD'].includes(basename) || vpath.includes(refsPath) || vpath.includes(refsHeads)) {
                     debounceGitHEAD();
-                };
-                if (['index', 'ORIG_HEAD'].includes(basename)) {
+                } else if (['index', 'ORIG_HEAD'].includes(basename)) {
                     debounceFileList();
-                };
-                if (basename == 'COMMIT_EDITMSG') {
+                } else if (basename == 'COMMIT_EDITMSG') {
                     debounceFileList();
                 };
                 setTimeout(function(){
-                    GitHBuilderXInnerTrigger = false;
-                }, 1500);
+                    listeningProjectFile = false;
+                }, 2000);
             };
         });
     } catch (e) {};
@@ -739,10 +736,6 @@ function active(webviewPanel, userConfig, gitData) {
 
     // 记录监听的项目路径, 解决项目切换问题
     if (watchProjectPath != undefined && watchProjectPath != projectPath) {
-        if (watcherListenGitDir != undefined) {
-            watcherListenGitDir.close();
-            watcherListenGitDir = undefined;
-        };
         if (watcherListen != undefined) {
             watcherListen.close();
             watcherListen = undefined;
@@ -752,7 +745,7 @@ function active(webviewPanel, userConfig, gitData) {
 
     // 监听项目文件，如果有变动，则刷新; 关闭自动刷新，则不再监听。
     let { mainViewAutoRefreshFileList } = userConfig;
-    if (mainViewAutoRefreshFileList && watcherListen == undefined && watcherListenGitDir == undefined) {
+    if (mainViewAutoRefreshFileList && watcherListen == undefined) {
         watchProjectDir(projectPath, File);
     };
     // 关于自动刷新功能，弹窗提示，仅提示一次
@@ -829,12 +822,10 @@ function active(webviewPanel, userConfig, gitData) {
                     } else {
                         hx.commands.executeCommand('EasyGit.branch',EasyGitInnerParams);
                         if (watcherListen != undefined) {
-                            watcherListenGitDir.close();
                             watcherListen.close().then( () => {
                                 console.log("easy-git: stop watch");
                             });
                             watcherListen = undefined;
-                            watcherListenGitDir = undefined;
                         };
                     };
                 } else {
