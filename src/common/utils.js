@@ -35,7 +35,7 @@ function getThemeColor(area) {
     };
 
     // 背景颜色、输入框颜色、字体颜色、线条颜色
-    let background, liHoverBackground,inputColor, inputLineColor, cursorColor, fontColor, lineColor, menuBackground;
+    let background, liHoverBackground,inputColor, inputLineColor, cursorColor, fontColor, lineColor, menuBackground, scrollbarColor;
 
     // 修复 0.1版本引出的Bug （当未定义自定义主题时异常的Bug）
     let custom = {};
@@ -71,6 +71,7 @@ function getThemeColor(area) {
         inputLineColor = 'rgb(210,210,210)';
         cursorColor = 'rgb(255,255,255)';
         lineColor = 'rgb(23,23,23)';
+        scrollbarColor = '#6F6F6F';
     } else if (colorScheme == 'Atom One Dark') {
         if (custom != undefined && custom[viewBackgroundOptionName] && viewBackgroundOptionName in custom) {
             background = custom[viewBackgroundOptionName];
@@ -93,6 +94,7 @@ function getThemeColor(area) {
         inputLineColor = 'rgb(81,140,255)';
         cursorColor = 'rgb(255,255,255)';
         lineColor = 'rgb(33,37,43)';
+        scrollbarColor = '#6F6F6F';
     } else {
         if (custom != undefined && custom[viewBackgroundOptionName] && viewBackgroundOptionName in custom) {
             background = custom[viewBackgroundOptionName];
@@ -115,6 +117,7 @@ function getThemeColor(area) {
         inputLineColor = 'rgb(65,168,99)';
         cursorColor = 'rgb(0,0,0)';
         lineColor = 'rgb(225,212,178)';
+        scrollbarColor = 'rgb(207,181,106)';
     };
 
     // 文件对比相关颜色
@@ -154,6 +157,7 @@ function getThemeColor(area) {
         cursorColor,
         fontColor,
         lineColor,
+        scrollbarColor,
         d2h_ins_bg,
         d2h_ins_border,
         d2h_del_bg,

@@ -25,6 +25,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
         cursorColor,
         fontColor,
         lineColor,
+        scrollbarColor,
         d2h_ins_bg,
         d2h_ins_border,
         d2h_del_bg,
@@ -61,7 +62,14 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     font-size: 0.92rem;
                 }
                 body::-webkit-scrollbar {
-                    display: none;
+                    overflow-x: hidden !important;
+                    overflow-y: scroll;
+                }
+                ::-webkit-scrollbar {
+                    width: 9px;
+                }
+                ::-webkit-scrollbar-thumb {
+                    background-color: ${scrollbarColor};
                 }
                 * {
                     moz-user-select: -moz-none;
@@ -973,12 +981,12 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
             </script>
             <script>
                 let devStatus = ${DisableDevTools};
-                if (devStatus) {
-                    window.oncontextmenu = function() {
-                        event.preventDefault();
-                        return false;
-                    }
-                };
+                // if (devStatus) {
+                //     window.oncontextmenu = function() {
+                //         event.preventDefault();
+                //         return false;
+                //     }
+                // };
             </script>
         </body>
     </html>`

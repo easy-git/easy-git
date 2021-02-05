@@ -92,6 +92,12 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                 overflow-x: hidden !important;
                 overflow-y: scroll;
             }
+            ::-webkit-scrollbar {
+                width: 9px;
+            }
+            ::-webkit-scrollbar-thumb {
+                background-color: ${diff_scrollbar_color};
+            }
             [v-cloak] {
                 display: none;
             }
@@ -167,12 +173,6 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                 color: ${fontColor};
                 margin: 3px 12px;
                 font-size: 14px !important;
-            }
-            ::-webkit-scrollbar {
-                width: 10px;
-            }
-            ::-webkit-scrollbar-thumb {
-                background-color: ${diff_scrollbar_color};
             }
         </style>
     </head>

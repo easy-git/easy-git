@@ -28,6 +28,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
         cursorColor,
         fontColor,
         lineColor,
+        scrollbarColor,
         iconRefresh,
         CheckMarkIcon,
         UpArrowIcon,
@@ -97,7 +98,14 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 user-select:none;
             }
             body::-webkit-scrollbar {
-                display: none;
+                overflow-x: hidden !important;
+                overflow-y: scroll;
+            }
+            ::-webkit-scrollbar {
+                width: 8px;
+            }
+            ::-webkit-scrollbar-thumb {
+                background-color: ${scrollbarColor};
             }
             @media screen and (max-width: 132px) {
                 body {
