@@ -187,8 +187,9 @@ function getWebviewContent(userConfig, uiData, gitData) {
             }
             .form-control:focus  {
                 border-radius: 2px !important;
-                border: 1px solid ${inputLineColor};
+                border: 1px solid ${liHoverBackground};
                 transition: none !important;
+                color: ${fontColor};
             }
             .textarea {
                 background: ${background} !important;

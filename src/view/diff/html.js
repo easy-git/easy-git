@@ -277,13 +277,13 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
             })
         </script>
         <script>
-            // let devStatus = ${DisableDevTools};
-            // if (devStatus) {
-            //     window.oncontextmenu = function() {
-            //         event.preventDefault();
-            //         return false;
-            //     }
-            // }
+            let devStatus = ${DisableDevTools};
+            if (devStatus) {
+                window.oncontextmenu = function() {
+                    event.preventDefault();
+                    return false;
+                }
+            }
         </script>
     </body>
 </html>
