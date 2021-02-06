@@ -483,7 +483,7 @@
                 },
                 {
                     "command": "EasyGit.restoreStaged",
-                    "title": "撤销文件暂存",
+                    "title": "撤销文件当前暂存",
                     "when": "isGit",
                     "group": "easygit@2"
                 },
