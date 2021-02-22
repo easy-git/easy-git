@@ -418,7 +418,7 @@
                 {
                     "command": "EasyGit.init",
                     "title": "easy-git: 初始化存储库",
-                    "when": "!isGit && explorerResourceCount == 1 && explorerResourceIsFolder",
+                    "when": "!isGit && explorerResourceCount == 1 && explorerResourceIsWorkspaceFolder",
                     "group": "z_commands"
                 },
                 {
@@ -453,7 +453,6 @@
                 }
             ],
             "editor/context": [
-
                 {
                     "command": "EasyGit.CommandPanel",
                     "title": "easy-git: 命令面板",
