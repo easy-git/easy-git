@@ -53,6 +53,7 @@ function showClone(webviewPanel) {
         hxData = Object.assign(hxData, {"GitRepoUrl": GitRepoUrl})
     };
 
+    let isDisplayError;
     let webviewDialog = hx.window.createWebViewDialog({
         modal: true,
         title: "Git克隆",
@@ -94,16 +95,28 @@ function showClone(webviewPanel) {
             'projectName': projectName
         });
 
+        // 记录仓库地址
+        GitRepoUrl = info.repo;
+
+        // 判断git仓库地址是否有效
+        if (!GitRepoUrl.includes('git@') && (/^(http|https):\/\//.test(GitRepoUrl) == false)) {
+            isDisplayError = true;
+            webviewDialog.displayError(`Git仓库地址无效`);
+            return;
+        };
+
         if (fs.existsSync(localPath)) {
             let isEmpty = await utils.isDirEmpty(localPath);
             if (isEmpty > 0) {
+                isDisplayError = true;
                 webviewDialog.displayError(`目录 ${localPath} 已存在!`);
                 return;
             };
         };
-
-        // 记录仓库地址
-        GitRepoUrl = info.repo;
+        // 清除上次错误提示
+        if (isDisplayError) {
+            webviewDialog.displayError('');
+        };
 
         webviewDialog.setButtonStatus("开始克隆", ["loading", "disable"]);
         let result = await utils.gitClone(info);
@@ -127,6 +140,8 @@ function showClone(webviewPanel) {
             hx.commands.executeCommand('EasyGit.main', pinfo);
             hx.commands.executeCommand('workbench.view.explorer');
         } else {
+            isDisplayError = true;
+            webviewDialog.displayError('Git: 克隆失败, 请在底部控制台查看失败原因!');
             try{
                 file.deleteFolderRecursive(projectName);
             }catch(e){};
