@@ -94,10 +94,12 @@ function showClone(webviewPanel) {
             'projectName': projectName
         });
 
-        let isEmpty = await utils.isDirEmpty(localPath);
-        if (isEmpty > 0) {
-            webviewDialog.displayError(`目录 ${localPath} 已存在!`);
-            return;
+        if (fs.existsSync(localPath)) {
+            let isEmpty = await utils.isDirEmpty(localPath);
+            if (isEmpty > 0) {
+                webviewDialog.displayError(`目录 ${localPath} 已存在!`);
+                return;
+            };
         };
 
         // 记录仓库地址
