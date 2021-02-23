@@ -44,6 +44,11 @@ async function create(args) {
     // param: 焦点在项目管理器、编辑器时，获取的文件信息
     let { filename, projectPath, param, isOpenFile } = args;
 
+    // isOpenFile==undefined时,自动打开文件
+    if (isOpenFile == undefined) {
+        isOpenFile = true;
+    };
+
     if (param != undefined && projectPath == undefined) {
        currentDir = getPath(param);
     };
@@ -58,11 +63,11 @@ async function create(args) {
     let target_path = path.join(currentDir, filename);
     if (fs.existsSync(target_path)) {
         if (isOpenFile) {
-            hx.workspace.openTextDocument(target_path)
+            hx.workspace.openTextDocument(target_path);
         };
         return "exist";
     };
-    
+
     // copy file to target dir
     return new Promise((resolve, reject) => {
         fs.copyFile(template_path, target_path, (err) => {
