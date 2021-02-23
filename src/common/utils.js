@@ -172,6 +172,21 @@ function getThemeColor(area) {
 };
 
 /**
+ * @description 检查目录是否存在内容
+ * @param {Object} dirname
+ */
+function isDirEmpty(dirname) {
+    return new Promise(function(resolve, reject) {
+        return fs.readdir(dirname, function(err,files) {
+            if (err) {
+                reject(0);
+            };
+            resolve(files.length);
+        });
+    });
+};
+
+/**
  * @description 向临时文件插入文本
  * @param {Object} text
  */
@@ -2219,6 +2234,7 @@ async function FileWriteAndOpen(filename, filecontent){
 module.exports = {
     hxShowMessageBox,
     applyEdit,
+    isDirEmpty,
     FileWriteAndOpen,
     createOutputChannel,
     isGitInstalled,

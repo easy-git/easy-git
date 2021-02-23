@@ -13,7 +13,7 @@ const count = require('./common/count.js');
 const MainView = require('./view/main.js');
 const GitBranchView = require('./view/branch/branch.js');
 const initView = require('./view/init/init.js');
-const cloneView = require('./view/clone/clone.js');
+const openCloneView = require('./view/clone/clone.js');
 const openLogView = require('./view/log/index.js');
 const openDiffFileView = require('./view/diff/index.js');
 
@@ -282,7 +282,7 @@ class Main extends Common {
 
         // git clone
         if (this.viewType == 'clone' || beforeResult == 'goClone') {
-            cloneView.show(this.webviewPanel, this.userConfig);
+            openCloneView(this.webviewPanel);
             return;
         };
 
