@@ -115,6 +115,9 @@ function showClone(webviewPanel) {
         });
 
         if (result == 'success') {
+            // 清除缓存数据
+            GitRepoUrl = '';
+            // 导入克隆项目到项目管理器
             utils.importProjectToExplorer(localPath);
             let pinfo = {
                 'easyGitInner': true,
