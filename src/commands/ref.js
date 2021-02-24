@@ -367,7 +367,8 @@ class Branch {
             // 刷新视图
             hx.commands.executeCommand('EasyGit.main', ProjectInfo);
         } else {
-            hx.commands.executeCommand('EasyGit.main', ProjectInfo);
+            // 2021-02-24 暂时屏蔽，cherry-pick操作后，自动打开源代码管理器
+            // hx.commands.executeCommand('EasyGit.main', ProjectInfo);
             let bResult = await hx.window.showInformationMessage('Git: cherry-pick 操作成功！', ['现在push','以后push' ,'关闭']).then((result) => {
                 return result
             });
