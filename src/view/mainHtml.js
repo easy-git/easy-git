@@ -358,6 +358,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                         <li title="git checkout ." @click="gitCheckout('*');">放弃本地所有更改</li>
                                         <li title="git clean -df" @click="clean();">删除未跟踪的文件</li>
                                         <li class="divider"></li>
+                                        <li title="stash" @click="gitStash('stashShow');">查看储藏</li>
                                         <li title="stash" @click="gitStash('stash');">储藏</li>
                                         <li title="stash -a" @click="gitStash('stashAll');">储藏全部(包含未跟踪的)</li>
                                         <li title="stash pop" @click="gitStash('stashPop');">弹出储藏</li>

@@ -801,12 +801,15 @@ function active(webviewPanel, userConfig, gitData) {
                 File.checkoutFile(msg.text);
                 break;
             case 'stash':
+                // 包含：储藏、储藏全部、查看储藏、弹出储藏等
                 gitAction.action(EasyGitInnerParams,msg.option);
                 break;
             case 'cancelStash':
+                // 取消暂存
                 File.cancelStash(msg.text, msg.tag);
                 break;
             case 'cancelAllStash':
+                // 取消全部暂存
                 File.cancelAllStash();
                 break;
             case 'pull':
