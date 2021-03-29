@@ -224,6 +224,12 @@ function generateLogHtml(hxData) {
                             <input type="text" class="form-control outline-none" id="git-url" placeholder="Git仓库地址, 以git@或http开头" v-focus v-model="repo">
                         </div>
                     </div>
+                    <div class="form-group row m-0 mt-3">
+                        <label for="git-url" class="col-sm-2 pt-2">Git分支</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control outline-none" id="git-url" placeholder="Git分支, 选填，如不填写，则默认拉取master分支" v-model="cloneInfo.branch">
+                        </div>
+                    </div>
                     <div class="form-group row mx-0 mt-3">
                         <label for="local-path" class="col-sm-2 pt-2">本地路径</label>
                         <div class="col-sm-10">
@@ -235,10 +241,10 @@ function generateLogHtml(hxData) {
                         <div class="col-sm-10">
                             <div class="row">
                                 <div class="col">
-                                    <input type="text" class="form-control outline-none" id="git-user" placeholder="Git仓库用户名" v-model="cloneInfo.username">
+                                    <input type="text" class="form-control outline-none" id="git-user" placeholder="Git仓库用户名, 选填" v-model="cloneInfo.username">
                                 </div>
                                 <div class="col">
-                                    <input type="password" class="form-control outline-none" id="git-passwd" placeholder="Git仓库密码" v-model="cloneInfo.password">
+                                    <input type="password" class="form-control outline-none" id="git-passwd" placeholder="Git仓库密码, 选填" v-model="cloneInfo.password">
                                 </div>
                             </div>
                             <p class="form-text text-muted">如果是私有仓库，HTTP协议，需要提供账号密码</p>
@@ -268,7 +274,8 @@ function generateLogHtml(hxData) {
                             localPath: '',
                             isAuth: '',
                             username: '',
-                            password: ''
+                            password: '',
+                            branch: ''
                         }
                     },
                     computed: {
