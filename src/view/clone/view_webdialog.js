@@ -60,7 +60,7 @@ function showClone(webviewPanel) {
         dialogButtons: ["开始克隆", "关闭"],
         size: {
             width: 700,
-            height: 400
+            height: 450
         }
     }, {
         enableScripts: true
@@ -366,10 +366,10 @@ function generateLogHtml(hxData) {
                 });
             </script>
             <script>
-                // window.oncontextmenu = function() {
-                //     event.preventDefault();
-                //     return false;
-                // };
+                window.oncontextmenu = function() {
+                    event.preventDefault();
+                    return false;
+                };
             </script>
         </body>
     </html>
