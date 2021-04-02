@@ -93,8 +93,11 @@ class goStashShow {
 
         let data = [
             {"label": "返回到上一个操作", "actionId": "back"},
-            {"label": "查看储藏的文件列表", "actionId": "filelist"},
-            {"label": "查看储藏的文件内容差异", "actionId": "diff"}
+            {"label": "查看储藏的文件列表 - show stash@{n}", "actionId": "filelist"},
+            {"label": "查看储藏的文件内容差异 - show stash@{n} -p", "actionId": "diff"},
+            {"label": "应用储藏 - apply stash@{n}", "actionId": "apply"},
+            {"label": "弹出储藏 - pop stash@{n}", "actionId": "pop"},
+            {"label": "删除存储 - drop stash@{n}", "actionId": "drop"}
         ];
 
         let result = await hx.window.showQuickPick(data, {
@@ -119,6 +122,15 @@ class goStashShow {
                 await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
                 applyEdit(diffDetails);
             };
+        } else if (actionId == "pop") {
+            let cmd3 = ["stash", "pop", stashID];
+            gitRaw(projectPath, cmd3, "弹出储藏", 'result');
+        } else if (actionId == "apply") {
+            let cmd4 = ["stash", "apply", stashID];
+            gitRaw(projectPath, cmd4, "应用储藏", 'result');
+        } else if (actionId == "drop") {
+            let cmd5 = ["stash", "drop", stashID];
+            gitRaw(projectPath, cmd5, '删除储藏', 'result');
         };
     }
 

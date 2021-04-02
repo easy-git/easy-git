@@ -1798,6 +1798,10 @@ async function gitStash(projectInfo, options, msg) {
         let status = await git(projectPath)
             .stash(options)
             .then((res) => {
+                if (res.length == 0) {
+                    createOutputChannel(`${msg} 操作失败！\n`, 'error');
+                    return 'fail';
+                };
                 if (res.includes('Saved') || res == '' || res.includes('Dropped')) {
                     hx.window.setStatusBarMessage(msg + '成功', 5000, 'info');
                     hx.commands.executeCommand('EasyGit.main', projectInfo);
@@ -1898,7 +1902,7 @@ async function gitRaw(workingDir, commands, msg, resultType='statusCode') {
         let status = await git(workingDir).raw(commands)
             .then((res) => {
                 if (msg != undefined) {
-                    hx.window.setStatusBarMessage(`Git: ${msg} 操作成功。`, 5000, 'info');
+                    hx.window.setStatusBarMessage(`Git: ${msg} 操作成功。`, 60000, 'info');
                 };
                 if (resultType != 'statusCode') {
                     return res;
