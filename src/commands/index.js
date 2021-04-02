@@ -16,11 +16,27 @@ const gitBlameForLineChange = require('./blame.js');
 const gitAnnotate = require('./annotate.js');
 
 /**
+ * @description 失焦操作
+ */
+async function unfocusedAction() {
+    // 将焦点置于编辑器
+    await hx.commands.executeCommand('workbench.action.focusEditor');
+    // 获取激活的项目信息
+    let activeEditor = await hx.window.getActiveTextEditor().then(function(editor){
+        return editor;
+    });
+    return activeEditor;
+};
+
+/**
  * @description 提供webview视图外Git的操作
  */
-function action(param,action_name) {
+async function action(param,action_name) {
     if (param == null) {
-        return hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试。', ['我知道了']);
+        param = await unfocusedAction();
+        if (param == null) {
+            return hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试。', ['我知道了']);
+        };
     };
 
     let projectName, projectPath, selectedFile, easyGitInner, isFromGitView;
@@ -43,7 +59,6 @@ function action(param,action_name) {
             };
         };
     } catch(e){
-        console.log(e);
         return hx.window.showErrorMessage('easy-git: 无法获取到项目路径，请在项目管理器选中项目后再试。');
     };
 
