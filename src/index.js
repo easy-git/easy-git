@@ -46,12 +46,14 @@ class Common {
         let GitAlwaysAutoCommitPush = config.get('EasyGit.AlwaysAutoCommitPush');
         let mainViewAutoRefreshFileList = config.get('EasyGit.mainViewAutoRefreshFileList');
         let logViewAutoRefresh = config.get('EasyGit.logViewAutoRefresh');
+        let isFullTextDiffFile = config.get('EasyGit.isFullTextDiffFile')
         return {
             'DisableDevTools': DisableDevTools,
             'mainViewAutoRefreshFileList': mainViewAutoRefreshFileList,
             'logViewAutoRefresh': logViewAutoRefresh,
             'GitConfigUserPrompt': GitConfigUserPrompt,
-            'GitAlwaysAutoCommitPush': GitAlwaysAutoCommitPush
+            'GitAlwaysAutoCommitPush': GitAlwaysAutoCommitPush,
+            'isFullTextDiffFile': isFullTextDiffFile
         };
     };
 

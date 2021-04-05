@@ -18,8 +18,28 @@ class Diff {
         this.projectPath = ProjectData.projectPath;
         this.userConfig = userConfig;
         this.isFullTextDiffFile = 3;
+        this.gitDiffFilePath = '';
     }
 
+    async setFileDiffConfig() {
+        let config = await hx.workspace.getConfiguration();
+        this.isFullTextDiffFile = config.get('EasyGit.isFullTextDiffFile');
+        if (this.isFullTextDiffFile == 'full') {
+            config.update("EasyGit.isFullTextDiffFile", "3").then(() => {
+                this.userConfig.isFullTextDiffFile = '3';
+                this.SetView(this.gitDiffFilePath);
+            });
+        } else {
+            config.update("EasyGit.isFullTextDiffFile", "full").then(() => {
+                this.userConfig.isFullTextDiffFile = 'full';
+                this.SetView(this.gitDiffFilePath);
+            });
+        };
+    };
+
+    /**
+     * @description 获取文件对比配置项, 对应 git diff -U参数
+     */
     async getFileDiffConfig() {
         let config = await hx.workspace.getConfiguration();
         let isFullTextDiffFile = config.get('EasyGit.isFullTextDiffFile');
@@ -55,8 +75,11 @@ class Diff {
         }, 3500);
     }
 
+    /**
+     * @description 组织Git文件对比命令
+     * @param {Object} selectedFile
+     */
     async getDiffOptions(selectedFile) {
-
         // 是否全文显示对比
         await this.getFileDiffConfig();
 
@@ -114,6 +137,7 @@ class Diff {
      * @param {String} selectedFile
      */
     async SetView(selectedFile) {
+        this.gitDiffFilePath = selectedFile;
         let init = await this.getDiffOptions(selectedFile);
 
         // 设置html默认内容

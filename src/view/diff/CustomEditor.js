@@ -178,6 +178,9 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
                 let options = ['checkout', msg.options, selectedFile];
                 GitDiff.handleConflict(selectedFile, options);
                 break;
+            case 'fileDiffLineSet':
+                GitDiff.setFileDiffConfig();
+                break;
             default:
                 break;
         };

@@ -425,6 +425,11 @@ function activate(context) {
         hx.env.openExternal('https://easy-git.gitee.io/');
     });
     context.subscriptions.push(help);
+
+    // set keyboard
+    let keyboard = hx.commands.registerCommand('EasyGit.keyboard', () => {
+        hx.env.openExternal('https://easy-git.gitee.io/setting/keyboard');
+    })
 };
 
 

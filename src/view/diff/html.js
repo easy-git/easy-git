@@ -23,8 +23,9 @@ function getUIData() {
 
     let OpenFileIconSvg = icon.getOpenFileIcon(fontColor);
     let HistoryIcon = icon.getHistoryIcon(fontColor);
+    let DiffFullTextIcon = icon.getDiffFullIcon(fontColor);
 
-    let iconData = {OpenFileIconSvg, HistoryIcon};
+    let iconData = {OpenFileIconSvg, HistoryIcon, DiffFullTextIcon};
     let uiData = Object.assign(iconData, colorData);
     return uiData;
 };
@@ -37,8 +38,8 @@ function getUIData() {
  */
 function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
     // 是否启用开发者工具
-    let { DisableDevTools } = userConfig;
-
+    let { DisableDevTools, isFullTextDiffFile } = userConfig;
+    
     let uiData = getUIData();
 
     // color
@@ -50,8 +51,6 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
         cursorColor,
         fontColor,
         lineColor,
-        OpenFileIconSvg,
-        HistoryIcon,
         d2h_ins_bg,
         d2h_ins_border,
         d2h_del_bg,
@@ -61,7 +60,10 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
         d2h_emptyplaceholder_bg,
         d2h_emptyplaceholder_border,
         d2h_linenum_color,
-        diff_scrollbar_color
+        diff_scrollbar_color,
+        OpenFileIconSvg,
+        HistoryIcon,
+        DiffFullTextIcon
     } = uiData;
 
     let { titleLeft, titleRight, isDiffHtml, diffResult, isConflicted } = diffData;
@@ -184,12 +186,13 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                     <div class="row">
                         <div class="col px-5">
                             <div class="row">
-                                <div class="col-11">
+                                <div class="col-10">
                                     <span class="file-title" @click="openFile();">${selectedFilePath}</span>
                                 </div>
-                                <div class="col-1">
+                                <div class="col-2">
                                     <span title="打开文件" @click="openFile();">${OpenFileIconSvg}</span>
                                     <span title="查看日志" @click="openLog();">${HistoryIcon}</span>
+                                    <span :title="isFullTextDiffFileIconTitle" @click="setDiffFileConfig();">${DiffFullTextIcon}</span>
                                 </div>
                             </div>
                         </div>
@@ -231,7 +234,19 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                     titleLeft: '${titleLeft}',
                     titleRight: '${titleRight}',
                     isConflicted: ${isConflicted},
-                    gitDiffResult: ''
+                    gitDiffResult: '',
+                    isFullTextDiffFile: ''
+                },
+                computed: {
+                    // 文件对比，是否显示全文，icon悬停文本提示语
+                    isFullTextDiffFileIconTitle() {
+                        return this.isFullTextDiffFile == 'full' ? '关闭全文对比, 使用默认行数上下文生成差异' : '开启全文对比';
+                    }
+                },
+                created() {
+                    this.isFullTextDiffFile = '${isFullTextDiffFile}';
+                    let text = this.isFullTextDiffFile == 'full' ? '关闭全文对比, 使用默认行数上下文生成差异' : '开启全文对比';
+                    console.log(text)
                 },
                 mounted() {
                     this.forInit();
@@ -240,7 +255,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                     window.onload = function() {
                         setTimeout(function() {
                             that.forUpdate();
-                        }, 800)
+                        }, 800);
                     };
                 },
                 methods: {
@@ -273,18 +288,29 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                             command: 'handleConflict',
                             options: options
                         });
+                    },
+                    setDiffFileConfig() {
+                        hbuilderx.postMessage({
+                            command: 'fileDiffLineSet',
+                            options: this.isFullTextDiffFile
+                        });
+                        if (this.isFullTextDiffFile == 'full') {
+                            this.isFullTextDiffFile = false;
+                        } else {
+                            this.isFullTextDiffFile = true;
+                        };
                     }
                 }
             })
         </script>
         <script>
-            let devStatus = ${DisableDevTools};
-            if (devStatus) {
-                window.oncontextmenu = function() {
-                    event.preventDefault();
-                    return false;
-                }
-            }
+            // let devStatus = ${DisableDevTools};
+            // if (devStatus) {
+            //     window.oncontextmenu = function() {
+            //         event.preventDefault();
+            //         return false;
+            //     }
+            // };
         </script>
     </body>
 </html>
