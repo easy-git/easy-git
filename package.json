@@ -582,19 +582,27 @@
                     "group": "easygit@3"
                 },
                 {
-                    "command": "EasyGit.checkUpdate",
-                    "title": "检查更新",
+                    "command": "EasyGit.keyboard",
+                    "title": "设置快捷键",
                     "group": "easygit@3"
                 },
                 {
                     "command": "EasyGit.help",
                     "title": "帮助文档",
+                    "group": "easygit@3"
+                },
+                {
+                    "group": "easygit@4"
+                },
+                {
+                    "command": "EasyGit.checkUpdate",
+                    "title": "检查更新",
                     "group": "easygit@4"
                 },
                 {
                     "command": "EasyGit.about",
                     "title": "关于/评价easy-git",
-                    "group": "easygit@5"
+                    "group": "easygit@4"
                 },
                 {
                     "group": "ext_settings"
