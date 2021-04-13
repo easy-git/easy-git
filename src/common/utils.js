@@ -1710,7 +1710,7 @@ async function gitConfigShow(workingDir, isPrint=true) {
  * @param {String} refname 特定的本地分支、远程分支、tag名称
  */
 async function gitLog(workingDir, searchType, filterCondition, refname) {
-    filter = ['-n 50']
+    filter = ['-n 100']
     if (filterCondition != 'default') {
         if (filterCondition.includes('-n')) {
             filter = filterCondition.split(',');

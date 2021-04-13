@@ -332,7 +332,7 @@
             },
             {
                 "command": "EasyGit.diffFile",
-                "title": "easy-git: diff 对比差异"
+                "title": "easy-git: diff - 文件对比差异"
             },
             {
                 "command": "EasyGit.archive",

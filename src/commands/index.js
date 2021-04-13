@@ -60,7 +60,7 @@ async function action(param,action_name) {
             };
         };
     } catch(e){
-        return hx.window.showErrorMessage('easy-git: 无法获取到项目路径，请在项目管理器选中项目后再试。');
+        return hx.window.showErrorMessage('easy-git: 无法获取到项目路径，请在项目管理器选中项目后再试。', ["我知道了"]);
     };
     
     let ProjectInfo = {
