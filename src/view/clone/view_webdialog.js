@@ -15,7 +15,7 @@ const file = require('../../common/file.js');
 
 const osName = os.platform();
 
-const vueFile = path.join(path.resolve(__dirname, '..'), 'static', '','vue.min.js');
+const vueFile = path.join(path.resolve(__dirname, '..'), 'static', 'vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
 
 // Git仓库地址，用于数据填充

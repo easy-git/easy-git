@@ -70,6 +70,12 @@ function activate(context) {
     });
     context.subscriptions.push(branch);
 
+    // 分支对比视图
+    let branch_diff = hx.commands.registerCommand('EasyGit.branchDiff', (param) => {
+        git.action(param, 'branchDiff');
+    });
+    context.subscriptions.push(branch_diff);
+
     // 菜单【日志】
     let log = hx.commands.registerCommand('EasyGit.log', (param) => {
         if (param == undefined) {return};

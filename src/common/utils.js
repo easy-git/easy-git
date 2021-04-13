@@ -1258,7 +1258,7 @@ async function gitBranch(workingDir, options='-avvv') {
 /**
  * @description 某些情况下，gitBranch无法获取到分支信息
  * @param {Object} workingDir
- * @param {Object} commands
+ * @param {Object} commands, 比如branch
  */
 async function gitRawGetBranch(workingDir, commands) {
     try {

@@ -36,6 +36,7 @@
         "onCommand:EasyGit.pushSetUpstream",
         "onCommand:EasyGit.BranchSwitch",
         "onCommand:EasyGit.BranchDelete",
+        "onCommand:EasyGit.branchDiff",
         "onCommand:EasyGit.merge",
         "onCommand:EasyGit.mergeAbort",
         "onCommand:EasyGit.cherryPick",
@@ -280,6 +281,10 @@
             {
                 "command": "EasyGit.mergeAbort",
                 "title": "easy-git: branch merge abort - 分支合并取消"
+            },
+            {
+                "command": "EasyGit.branchDiff",
+                "title": "easy-git: branch diff - 分支对比"
             },
             {
                 "command": "EasyGit.cherryPick",

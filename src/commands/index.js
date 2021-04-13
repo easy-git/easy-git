@@ -11,6 +11,7 @@ const { gitAddFile, gitRestore, goCleanFile, goCommit } = require('./file.js');
 const { goSetConfig, goShowConfig } = require('./base.js');
 
 const { Tag, Branch, Revert, Reset, Archive, reflog } = require('./ref.js');
+const openBranchDiffView = require('./branch_diff.js');
 
 const gitBlameForLineChange = require('./blame.js');
 const gitAnnotate = require('./annotate.js');
@@ -61,7 +62,7 @@ async function action(param,action_name) {
     } catch(e){
         return hx.window.showErrorMessage('easy-git: 无法获取到项目路径，请在项目管理器选中项目后再试。');
     };
-
+    
     let ProjectInfo = {
         'projectName': projectName,
         'projectPath': projectPath,
@@ -155,6 +156,10 @@ async function action(param,action_name) {
             break;
         case 'showAnotherBranchFile':
             bch.showAnotherBranchFile(ProjectInfo);
+            break;
+        case 'branchDiff':
+            // 打开分支对比视图
+            openBranchDiffView(ProjectInfo);
             break;
         case 'clean':
             goCleanFile(ProjectInfo);
