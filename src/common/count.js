@@ -9,8 +9,6 @@ let packageFile = require('../../package.json');
 let currentDate = undefined;
 let logFlags = false;
 let mainFlags = false;
-let initFlags = false;
-let cloneFlags = false;
 let diffFlags = false;
 let CommandPanelFlags = false;
 
@@ -57,12 +55,15 @@ function getCurrentData() {
  * @param {Object} viewname
  */
 async function count(viewname) {
-    let view_flags = eval(viewname+ "Flags");
-    let view_flags_date = getCurrentData();
 
-    // only count once
-    if (view_flags && currentDate == view_flags_date) {
-        return;
+    if (["log", "main", "diff", "CommandPanel"].includes(viewname)) {
+       let view_flags = eval(viewname+ "Flags");
+       let view_flags_date = getCurrentData();
+
+       // only count once
+       if (view_flags && currentDate == view_flags_date) {
+           return;
+       };
     };
 
     let uid;
@@ -96,8 +97,6 @@ async function count(viewname) {
                     currentDate = getCurrentData();
                     if (viewname == 'log') { logFlags = true};
                     if (viewname == 'main') { mainFlags = true};
-                    if (viewname == 'init') { initFlags = true};
-                    if (viewname == 'clone') { cloneFlags = true};
                     if (viewname == 'diff') { diffFlags = true};
                     if (viewname == 'CommandPanel') { CommandPanelFlags = true};
                     resolve('Y');

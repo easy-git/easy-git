@@ -4,6 +4,7 @@ const path = require('path');
 
 const file = require('../common/file.js');
 const utils = require('../common/utils.js');
+const count = require('../common/count.js');
 
 const { goStash, goStashPop, goStashClear, goStashShow } = require('./stash.js');
 const { gitInitProject } = require('./repository.js');
@@ -62,7 +63,7 @@ async function action(param,action_name) {
     } catch(e){
         return hx.window.showErrorMessage('easy-git: 无法获取到项目路径，请在项目管理器选中项目后再试。', ["我知道了"]);
     };
-    
+
     let ProjectInfo = {
         'projectName': projectName,
         'projectPath': projectPath,
@@ -76,6 +77,13 @@ async function action(param,action_name) {
 
     // git branch: 分支相关操作
     let bch = new Branch();
+
+    // 数据统计
+    try{
+        if (["branchDiff", "BranchSwitch", "BranchMerge", "annotate", "BlameForLineChange", "stash", "stashAll"].includes(action_name)) {
+          count(action_name);
+        };
+    }catch(e){};
 
     switch (action_name){
         case 'init':

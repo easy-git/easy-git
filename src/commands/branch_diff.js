@@ -64,7 +64,6 @@ async function openBranchDiffView(ProjectInfo) {
                 break;
             case 'branchDiff':
                 let {info} = msg;
-                console.log(info)
                 branch_diff_operations(webviewDialog, webview, projectPath, info);
                 break;
             default:
@@ -215,53 +214,56 @@ function generateLogHtml(hxdata) {
                     color: rgb(65,168,99);
                     font-weight: 500;
                 }
-                .has_sel {
-                    display: ineline;
-                    width: 16px;
-                    height: 16px;
-                    border: 1px solid #B06A50;
-                    border-radius: 1px;
-                    position: relative;
-                }
 
-                .has_sel:before {
-                    content: "";
-                    width: 2px;
-                    height: 6px;
-                    background-color: #B06A50;
-                    border-radius: 1px;
-                    position: absolute;
-                    left: 4px;
-                    bottom: 3px;
-                    transform: rotate(-45deg);
-                    -ms-transform: rotate(-45deg);
-                    /* IE 9 */
-                    -moz-transform: rotate(-45deg);
-                    /* Firefox */
-                    -webkit-transform: rotate(-45deg);
-                    /* Safari 和 Chrome */
-                    -o-transform: rotate(-45deg);
-                    /* opear */
-                }
+                @media only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+                    .has_sel {
+                        display: ineline;
+                        width: 16px;
+                        height: 16px;
+                        border: 1px solid #B06A50;
+                        border-radius: 1px;
+                        position: relative;
+                    }
 
-                .has_sel:after {
-                    content: "";
-                    width: 2px;
-                    height: 10px;
-                    background-color: #B06A50;
-                    border-radius: 1px;
-                    position: absolute;
-                    left: 8px;
-                    bottom: 3px;
-                    transform: rotate(37deg);
-                    -ms-transform: rotate(37deg);
-                    /* IE 9 */
-                    -moz-transform: rotate(37deg);
-                    /* Firefox */
-                    -webkit-transform: rotate(37deg);
-                    /* Safari 和 Chrome */
-                    -o-transform: rotate(37deg);
-                    /* opear */
+                    .has_sel:before {
+                        content: "";
+                        width: 2px;
+                        height: 6px;
+                        background-color: #B06A50;
+                        border-radius: 1px;
+                        position: absolute;
+                        left: 4px;
+                        bottom: 3px;
+                        transform: rotate(-45deg);
+                        -ms-transform: rotate(-45deg);
+                        /* IE 9 */
+                        -moz-transform: rotate(-45deg);
+                        /* Firefox */
+                        -webkit-transform: rotate(-45deg);
+                        /* Safari 和 Chrome */
+                        -o-transform: rotate(-45deg);
+                        /* opear */
+                    }
+
+                    .has_sel:after {
+                        content: "";
+                        width: 2px;
+                        height: 10px;
+                        background-color: #B06A50;
+                        border-radius: 1px;
+                        position: absolute;
+                        left: 8px;
+                        bottom: 3px;
+                        transform: rotate(37deg);
+                        -ms-transform: rotate(37deg);
+                        /* IE 9 */
+                        -moz-transform: rotate(37deg);
+                        /* Firefox */
+                        -webkit-transform: rotate(37deg);
+                        /* Safari 和 Chrome */
+                        -o-transform: rotate(37deg);
+                        /* opear */
+                    }
                 }
             </style>
         </head>
@@ -291,8 +293,8 @@ function generateLogHtml(hxdata) {
                     <div class="form-group row m-0 mt-3">
                         <label for="u-p" class="col-sm-2">stat参数</label>
                         <div class="col-sm-10">
-                            <input type="checkbox" class="mr-2" v-model="stat" />
-                            <label class="display:inline;">是否显示修改的文件列表</label>
+                            <input type="checkbox" :class="{ has_sel: stat }" class="mr-2" v-model="stat" />
+                            <label class="d-inline">是否显示修改的文件列表</label>
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-2" v-if="diff_actions.length && branch1 != branch2">
