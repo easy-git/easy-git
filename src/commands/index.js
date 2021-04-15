@@ -80,7 +80,7 @@ async function action(param,action_name) {
 
     // 数据统计
     try{
-        if (["branchDiff", "BranchSwitch", "BranchMerge", "annotate", "BlameForLineChange", "stash", "stashAll"].includes(action_name)) {
+        if (["BranchDiff", "twoBranchSpecificFileDiff", "BranchSwitch", "BranchMerge", "annotate", "BlameForLineChange", "stash", "stashAll"].includes(action_name)) {
           count(action_name);
         };
     }catch(e){};
