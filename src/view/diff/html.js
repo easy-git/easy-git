@@ -39,7 +39,7 @@ function getUIData() {
 function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
     // 是否启用开发者工具
     let { DisableDevTools, isFullTextDiffFile } = userConfig;
-    
+
     let uiData = getUIData();
 
     // color
@@ -139,6 +139,10 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
             .d2h-file-side-diff::-webkit-scrollbar {
                 height: 9px !important
             }
+            /**.d2h-file-side-diff {
+                height: calc(100vh - 50px);
+                position: relative;
+            }*/
             .d2h-file-header {
                 display: none !important;
             }
@@ -304,13 +308,13 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
             })
         </script>
         <script>
-            // let devStatus = ${DisableDevTools};
-            // if (devStatus) {
-            //     window.oncontextmenu = function() {
-            //         event.preventDefault();
-            //         return false;
-            //     }
-            // };
+            let devStatus = ${DisableDevTools};
+            if (devStatus) {
+                window.oncontextmenu = function() {
+                    event.preventDefault();
+                    return false;
+                }
+            };
         </script>
     </body>
 </html>
@@ -385,10 +389,10 @@ function getDefaultContent(fname='') {
             })
         </script>
         <script>
-            // window.oncontextmenu = function() {
-            //     event.preventDefault();
-            //     return false;
-            // };
+            window.oncontextmenu = function() {
+                event.preventDefault();
+                return false;
+            };
         </script>
     </body>
 </html>

@@ -981,12 +981,12 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
             </script>
             <script>
                 let devStatus = ${DisableDevTools};
-                // if (devStatus) {
-                //     window.oncontextmenu = function() {
-                //         event.preventDefault();
-                //         return false;
-                //     }
-                // };
+                if (devStatus) {
+                    window.oncontextmenu = function() {
+                        event.preventDefault();
+                        return false;
+                    }
+                };
             </script>
         </body>
     </html>`

@@ -104,6 +104,7 @@ class Diff {
         let fileName = selectedFile.replace(this.projectPath, '').replace(/\\/g, '\/');
         let titleLeft, titleRight;
 
+        // git diff --color-words，可显示颜色
         switch (gitIndex){
             case 'M':
                 options = ['diff', lineOption, '--staged', selectedFile];
