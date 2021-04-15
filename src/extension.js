@@ -54,40 +54,59 @@ function activate(context) {
     });
     context.subscriptions.push(CommandPanel);
 
-    // 菜单【源代码管理】，菜单【工具】、及项目管理器右键菜单
-    let fv = hx.commands.registerCommand('EasyGit.main', (param) => {
+    // 菜单【源代码管理】，菜单【工具】、及项目管理器右键菜单，打开源代码管理器视图
+    let view_fv = hx.commands.registerCommand('EasyGit.main', (param) => {
         context.source = 'filesExplorer';
-        let main_view = new Main('main',param, FileView, context);
+        let main_view = new Main('main', param, FileView, context);
         main_view.run();
     });
-    context.subscriptions.push(fv);
+    context.subscriptions.push(view_fv);
 
-    // 菜单【分支管理】，菜单【工具】、及项目管理器右键菜单
-    let branch = hx.commands.registerCommand('EasyGit.branch', (param) => {
+    // 菜单【分支管理】，菜单【工具】、及项目管理器右键菜单，打开分支管理视图
+    let view_branch_manage = hx.commands.registerCommand('EasyGit.branch', (param) => {
         context.source = 'filesExplorer';
-        let view_branch = new Main('branch',param, FileView, context);
+        let view_branch = new Main('branch', param, FileView, context);
         view_branch.run();
     });
-    context.subscriptions.push(branch);
+    context.subscriptions.push(view_branch_manage);
 
-    // 分支对比视图
-    let branch_diff = hx.commands.registerCommand('EasyGit.branchDiff', (param) => {
-        git.action(param, 'branchDiff');
-    });
-    context.subscriptions.push(branch_diff);
-
-    // 菜单【日志】
-    let log = hx.commands.registerCommand('EasyGit.log', (param) => {
+    // 菜单【日志】, 打开日志视图
+    let view_log_manage = hx.commands.registerCommand('EasyGit.log', (param) => {
         if (param == undefined) {return};
         if (cmp <=0) {
             let LogCscratFile = path.join(__dirname, 'view',  'log', 'cscrat', 'EasyGit - 日志');
             hx.workspace.openTextDocument(LogCscratFile);
         };
         context.source = 'filesExplorer';
-        let view_log = new Main('log',param, CommonView, context);
+        let view_log = new Main('log', param, CommonView, context);
         view_log.run();
     });
-    context.subscriptions.push(log);
+    context.subscriptions.push(view_log_manage);
+
+    // git diff view
+    let view_diff_file = hx.commands.registerCommand('EasyGit.diffFile', (param)=> {
+        if (param == undefined) {return};
+        if (cmp <=0) {
+            let DiffCscratFile = path.join(__dirname, 'view',  'diff', 'cscrat', 'EasyGit - 对比差异');
+            hx.workspace.openTextDocument(DiffCscratFile);
+        };
+        context.source = 'filesExplorer';
+        let view_diff = new Main('diff', param, {}, context);
+        view_diff.run();
+    });
+    context.subscriptions.push(view_diff_file);
+
+    // 分支对比
+    let two_branch_diff = hx.commands.registerCommand('EasyGit.BranchDiff', (param) => {
+        git.action(param, 'BranchDiff');
+    });
+    context.subscriptions.push(two_branch_diff);
+
+    // 对比两个分支的某个文件（显示两个分支指定文件的差异）
+    let two_branch_specific_file_diff = hx.commands.registerCommand('EasyGit.twoBranchSpecificFileDiff', (param) => {
+        git.action(param, 'twoBranchSpecificFileDiff');
+    });
+    context.subscriptions.push(two_branch_specific_file_diff);
 
     // 菜单【工具】【克隆存储库】
     let clone = hx.commands.registerCommand('EasyGit.clone',(param) => {
@@ -376,19 +395,6 @@ function activate(context) {
         git.action(param, 'tagDetails');
     });
     context.subscriptions.push(tagDetails);
-
-    // git diff
-    let diffFile = hx.commands.registerCommand('EasyGit.diffFile', (param)=> {
-        if (param == undefined) {return};
-        if (cmp <=0) {
-            let DiffCscratFile = path.join(__dirname, 'view',  'diff', 'cscrat', 'EasyGit - 对比差异');
-            hx.workspace.openTextDocument(DiffCscratFile);
-        };
-        context.source = 'filesExplorer';
-        let view_diff = new Main('diff', param, {}, context);
-        view_diff.run();
-    });
-    context.subscriptions.push(diffFile);
 
     // git show branch:filename
     let showAnotherBranchFile = hx.commands.registerCommand('EasyGit.showAnotherBranchFile', (param)=> {

@@ -165,9 +165,14 @@ async function action(param,action_name) {
         case 'showAnotherBranchFile':
             bch.showAnotherBranchFile(ProjectInfo);
             break;
-        case 'branchDiff':
+        case 'BranchDiff':
             // 打开分支对比视图
             openBranchDiffView(ProjectInfo);
+            break;
+        case 'twoBranchSpecificFileDiff':
+            // 示两个分支指定文件的差异
+            let isSpecificFile = true;
+            openBranchDiffView(ProjectInfo, isSpecificFile);
             break;
         case 'clean':
             goCleanFile(ProjectInfo);

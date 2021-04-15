@@ -1,3 +1,13 @@
+/**
+ * 本文件作为 视图类 Git操作入口
+ * 视图包括：
+ *    - Git源代码管理器视图
+ *    - 克隆视图
+ *    - 文件或分支对比视图
+ *    - 日志视图
+ *    - 分支视图
+ */
+
 const hx = require('hbuilderx');
 const fs = require('fs');
 const path = require('path');

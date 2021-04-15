@@ -24,7 +24,7 @@ let cmp = cmp_hx_version(hxVersion, '3.1.2');
  *@description 打开分支比较视图
  */
 var isDisplayError;
-async function openBranchDiffView(ProjectInfo) {
+async function openBranchDiffView(ProjectInfo, isSpecificFile=false) {
     try{
         if (cmp > 0) {
             hx.window.showInformationMessage("此功能仅支持HBuilderX 3.1.2+以上版本，请升级。", ["我知道了"]);
@@ -38,12 +38,17 @@ async function openBranchDiffView(ProjectInfo) {
 
     // 获取项目本地分支
     let current_branch = await gitCurrentBranchName(projectPath);
-    let hxdata = Object.assign(ProjectInfo, {'current_branch': current_branch});
+    let hxdata = Object.assign(
+        ProjectInfo,
+        {'current_branch': current_branch, "isSpecificFile": isSpecificFile},
+    );
+
+    let dialogTitle = isSpecificFile ? 'Git 对比两个分支上的指定文件' : 'Git 分支对比';
 
     // 创建webviewdialog
     let webviewDialog = hx.window.createWebViewDialog({
         modal: true,
-        title: 'Git分支对比',
+        title: dialogTitle,
         dialogButtons: ["开始比较", "关闭"],
         size: {
             width: 730,
@@ -58,13 +63,16 @@ async function openBranchDiffView(ProjectInfo) {
 
     webview.onDidReceiveMessage((msg) => {
         let action = msg.command;
+        let { info } = msg;
         switch (action) {
             case 'closed':
                 webviewDialog.close();
                 break;
             case 'branchDiff':
-                let {info} = msg;
-                branch_diff_operations(webviewDialog, webview, projectPath, info);
+                diff_operations(webviewDialog, webview, projectPath, info);
+                break;
+            case 'twoBranchSpecificFileDiff':
+                diff_operations(webviewDialog, webview, projectPath, info, isSpecificFile);
                 break;
             default:
                 break;
@@ -78,22 +86,23 @@ async function openBranchDiffView(ProjectInfo) {
 };
 
 
-async function branch_diff_operations(webviewDialog, webview, projectPath, info) {
+async function diff_operations(webviewDialog, webview, projectPath, info, isSpecificFile=false) {
     // 清除上次错误提示
     if (isDisplayError) {
         webviewDialog.displayError('');
     };
 
-    let {branch1, branch2, param, stat} = info;
+    let {branch1, branch2, param, stat, selectedFile} = info;
+
     if (branch1 == branch2) {
-        webviewDialog.displayError('提示：分支对比操作，两个分支名称不能相同，且不能为空，请修改。');
+        webviewDialog.displayError('提示：对比操作，两个分支名称不能相同，且不能为空，请修改。');
         return;
     };
     if (branch1.length == 0|| branch2.length == 0 || !branch2 || !branch1) {
-        webviewDialog.displayError('提示：分支对比操作，分支名称不能为空。');
+        webviewDialog.displayError('提示：对比操作，分支名称不能为空。');
         return;
     };
-    if (!param || param.length == 0) {
+    if ((!param || param.length == 0 ) && !isSpecificFile) {
         webviewDialog.displayError('提示：请勾选要进行的操作。');
         return;
     };
@@ -117,15 +126,27 @@ async function branch_diff_operations(webviewDialog, webview, projectPath, info)
 
     webviewDialog.setButtonStatus("开始比较", ["loading", "disable"]);
 
-    let cmd = param.split(" ");
-    cmd.splice(1,0, `--pretty=format:"%H - %an %ad %s"`);
-    cmd.splice(2,0, `--date=format:"%Y-%m-%d %H:%M:%S"`);
+    // 组织git命令行参数
+    let cmd = [];
 
-    // 用于显示具体的文件修改列表
-    if (stat) {
-        cmd.push('--stat');
+    // 构建参数: 用于两个分支提交比较，显示两个分支指定文件的差异，用不到。
+    if (!isSpecificFile) {
+        cmd = param.split(" ");
+        cmd.splice(1,0, `--pretty=format:"%H - %an %ad %s"`);
+        cmd.splice(2,0, `--date=format:"%Y-%m-%d %H:%M:%S"`);
+
+        // 用于显示具体的文件修改列表
+        if (stat) {
+            cmd.push('--stat');
+        };
     };
 
+    // 构建参数: 显示两个分支指定文件的差异
+    if (isSpecificFile) {
+        cmd = ['diff', branch1, branch2, selectedFile];
+    };
+
+    let msg = isSpecificFile? '显示两个分支指定文件的差异' : '两个分支对比提交';
     let diff_result = await gitRaw(projectPath, cmd, '分支对比', 'result');
 
     webviewDialog.setButtonStatus("开始比较", []);
@@ -138,18 +159,23 @@ async function branch_diff_operations(webviewDialog, webview, projectPath, info)
         isDisplayError = true;
         webviewDialog.displayError('Git: 操作失败, 请在底部控制台查看失败原因!');
     } else {
-        const fname = `git-branch-diff`;
-        FileWriteAndOpen(fname, diff_result);
+        if (diff_result == '') {
+            let diff_msg = isSpecificFile ? '两个分支指定的文件比较，没有差异。' : `${branch1} 和 ${branch2} 提交没有差异。`;
+            hx.window.showInformationMessage(diff_msg, ["我知道了"]);
+        } else {
+            let fname = isSpecificFile ? 'git-diff-two-branch-file' : 'git-diff-two-branch';
+            FileWriteAndOpen(fname, diff_result);
+        };
     };
 };
 
 /**
  * @description generationhtml
- * @todo 目前通过js打开资源管理器，无法打开的目录。因此 本地存储路径输入框，不支持手动选择
- * @todo 克隆进度条
  */
 function generateLogHtml(hxdata) {
-    let {current_branch, projectName} = hxdata;
+
+    // selectedFile，isSpecificFile两个参数，用于：显示两个分支指定文件的差异
+    let {current_branch, projectName, selectedFile, isSpecificFile} = hxdata;
 
     return `
     <!DOCTYPE html>
@@ -271,7 +297,7 @@ function generateLogHtml(hxdata) {
             <div id="app" v-cloak>
                 <form>
                     <div class="form-group row m-0 mt-3">
-                        <label for="u-p" class="col-sm-2">项目信息</label>
+                        <label for="u-p" class="col-sm-2">项目名称</label>
                         <div class="col-sm-10">
                             <span>{{ projectName }}</span>
                         </div>
@@ -287,10 +313,17 @@ function generateLogHtml(hxdata) {
                                     <input type="text" class="form-control outline-none" placeholder="分支名称" v-model="branch2">
                                 </div>
                             </div>
-                            <p class="form-text text-muted mb-0 mt-2">分支比较，请输入两个不一样的分支名称。</p>
+                            <p class="form-text text-muted mb-0 mt-2">比较操作，两个分支名称必须不相同。</p>
                         </div>
                     </div>
-                    <div class="form-group row m-0 mt-3">
+                    <div class="form-group row m-0 mt-3" v-if="isSpecificFile">
+                        <label for="u-p" class="col-sm-2">指定文件路径</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control outline-none" v-model="selectedFile" />
+                            <p class="form-text text-muted mb-0 mt-2">要比较的文件，路径必须为绝对路径、或项目下文件的相对路径。</p>
+                        </div>
+                    </div>
+                    <div class="form-group row m-0 mt-3" v-if="!isSpecificFile">
                         <label for="u-p" class="col-sm-2">stat参数</label>
                         <div class="col-sm-10">
                             <input type="checkbox" :class="{ has_sel: stat }" class="mr-2" v-model="stat" />
@@ -326,16 +359,22 @@ function generateLogHtml(hxdata) {
                         branch2: '',
                         diffParam: '',
                         checked: '',
-                        stat: false
+                        stat: false,
+                        // 以下两个参数，用于：显示两个分支指定文件的差异
+                        selectedFile: '',
+                        isSpecificFile: false
                     },
                     computed: {
                         diff_actions() {
+                            if (this.isSpecificFile) {
+                                return [];
+                            };
                             let result = [];
                             let b1 = this.branch1;
                             let b2 = this.branch2;
                             if (this.branch1 && this.branch2 ) {
-                                result.push({"desc": "<span>"+ b1 +" </span>分支有, <span>"+ b2 +" </span>分支没有","action":"log "+ b1+ " ^" +b2 });
-                                result.push({"desc": "<span>"+ b2 +" </span>分支有, <span>"+ b1 +" </span>分支没有","action":"log "+ b2+ " ^" +b1 });
+                                result.push({"desc": "<span>"+ b1 +" </span>分支有, <span>"+ b2 +" </span>分支没有的提交","action":"log "+ b1+ " ^" +b2 });
+                                result.push({"desc": "<span>"+ b2 +" </span>分支有, <span>"+ b1 +" </span>分支没有的提交","action":"log "+ b2+ " ^" +b1 });
                                 result.push({"desc": "<span>"+ b2 +" </span>分支比 <span>"+ b1 +" </span>分支多提交的内容","action":"log "+ b1+ ".." +b2 });
                                 result.push({"desc": "<span>"+ b1 +" </span>分支比 <span>"+ b2 +" </span>分支多提交的内容","action":"log "+ b2+ ".." +b1 });
                                 result.push({"desc": "<span> "+ b2 +" </span>和<span> "+ b1 +" </span>两个分支不一样的地方","action":"log "+ b2+ "..." +b1 });
@@ -358,6 +397,8 @@ function generateLogHtml(hxdata) {
                     },
                     created() {
                         this.projectName = '${projectName}';
+                        this.isSpecificFile = ${isSpecificFile};
+                        this.selectedFile = '${selectedFile}';
                         if ('${current_branch}' && '${current_branch}' != 'false') {
                             this.project_branch = '${current_branch}';
                             this.branch1 = this.project_branch;
@@ -401,26 +442,36 @@ function generateLogHtml(hxdata) {
                                             "branch2": this.branch2,
                                             "stat": this.stat
                                         };
+                                        if (this.isSpecificFile) {
+                                            param = {
+                                                "selectedFile": this.selectedFile,
+                                                "branch1": this.branch1,
+                                                "branch2": this.branch2
+                                            };
+                                        };
+
+                                        let command = this.isSpecificFile ? 'twoBranchSpecificFileDiff' : 'branchDiff';
+
                                         hbuilderx.postMessage({
-                                            command: 'branchDiff',
+                                            command: command,
                                             info: param
                                         });
                                     } else if(button == '关闭'){
                                         hbuilderx.postMessage({
                                             command: 'closed'
                                         });
-                                    }
-                                }
+                                    };
+                                };
                             });
                         }
                     }
                 });
             </script>
             <script>
-                window.oncontextmenu = function() {
-                    event.preventDefault();
-                    return false;
-                };
+                // window.oncontextmenu = function() {
+                //     event.preventDefault();
+                //     return false;
+                // };
             </script>
         </body>
     </html>

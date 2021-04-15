@@ -36,7 +36,8 @@
         "onCommand:EasyGit.pushSetUpstream",
         "onCommand:EasyGit.BranchSwitch",
         "onCommand:EasyGit.BranchDelete",
-        "onCommand:EasyGit.branchDiff",
+        "onCommand:EasyGit.BranchDiff",
+        "onCommand:EasyGit.twoBranchSpecificFileDiff",
         "onCommand:EasyGit.merge",
         "onCommand:EasyGit.mergeAbort",
         "onCommand:EasyGit.cherryPick",
@@ -283,8 +284,12 @@
                 "title": "easy-git: branch merge abort - 分支合并取消"
             },
             {
-                "command": "EasyGit.branchDiff",
-                "title": "easy-git: branch diff - 分支对比"
+                "command": "EasyGit.BranchDiff",
+                "title": "easy-git: diff branch - 对比两个分支提交"
+            },
+            {
+                "command": "EasyGit.twoBranchSpecificFileDiff",
+                "title": "easy-git: diff branch file - 显示两个分支指定文件的差异"
             },
             {
                 "command": "EasyGit.cherryPick",
@@ -348,7 +353,7 @@
             },
             {
                 "command": "EasyGit.showAnotherBranchFile",
-                "title": "easy-git: show - 查看文件在另一个分支的内容（无需切换分支）"
+                "title": "easy-git: show branch file - 查看文件在另一个分支的内容（无需切换分支）"
             },
             {
                 "command": "EasyGit.showConfigLocal",
