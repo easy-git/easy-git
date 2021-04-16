@@ -3,6 +3,7 @@
 ## 1.3.2
 * 新增 两个分支对比提交功能，可通过命令面板触发，并支持绑定快捷键，command: EasyGit.BranchDiff
 * 修复 两个分支对比指定文件差异功能，可通过命令面板触发，并支持绑定快捷键，command: EasyGit.twoBranchSpecificFileDiff
+* 修复 命令面板 某些情况下，没有获取焦点的问题
 
 ## 1.3.1
 * 新增 命令面板 查看储藏功能，增加pop\apply\drop等功能
