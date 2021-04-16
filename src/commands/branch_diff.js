@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const { debounce } = require('throttle-debounce');
 
 const hx = require('hbuilderx');
 
@@ -317,9 +316,9 @@ function generateLogHtml(hxdata) {
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3" v-if="isSpecificFile">
-                        <label for="u-p" class="col-sm-2">指定文件路径</label>
+                        <label for="u-p" class="col-sm-2">文件路径</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control outline-none" v-model="selectedFile" />
+                            <input type="text" class="form-control outline-none" v-model="selectedFile" placeholder="进行差异对比的文件路径"/>
                             <p class="form-text text-muted mb-0 mt-2">要比较的文件，路径必须为绝对路径、或项目下文件的相对路径。</p>
                         </div>
                     </div>

@@ -21,13 +21,19 @@ const gitAnnotate = require('./annotate.js');
  * @description 失焦操作
  */
 async function unfocusedAction() {
-    // 将焦点置于编辑器
-    await hx.commands.executeCommand('workbench.action.focusEditor');
-    // 获取激活的项目信息
-    let activeEditor = await hx.window.getActiveTextEditor().then(function(editor){
-        return editor;
-    });
-    return activeEditor;
+    try{
+        // 将焦点置于编辑器
+        await hx.commands.executeCommand('workbench.action.focusEditor');
+        // 获取激活的项目信息
+        let activeEditor = await hx.window.getActiveTextEditor().then(function(editor){
+            return editor;
+        }).error((e)=> {
+            return null;
+        });
+        return activeEditor;
+    }catch(e){
+        return null;
+    };
 };
 
 /**
