@@ -1,6 +1,9 @@
 # Change Log
 
-## 1.3.2
+## 1.4.1
+* 新增 Git提交忽略钩子功能，用于忽略.git/hooks/commit-msg，默认不开启，需要手动在插件配置中开启。（菜单【设置】插件配置）
+
+## 1.4.0
 * 新增 两个分支对比提交功能，可通过命令面板触发，并支持绑定快捷键，command: EasyGit.BranchDiff
 * 修复 两个分支对比指定文件差异功能，可通过命令面板触发，并支持绑定快捷键，command: EasyGit.twoBranchSpecificFileDiff
 * 修复 命令面板 某些情况下，没有获取焦点的问题

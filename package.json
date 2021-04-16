@@ -82,6 +82,11 @@
         "configuration": {
             "title": "easy-git - Git源码管理",
             "properties": {
+                "EasyGit.ignoreGitHooksForCommit": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Git提交，是否忽略Git Hook（勾选后，git commit将忽略钩子；修改重启生效）"
+                },
                 "EasyGit.mainViewAutoRefreshFileList": {
                     "type": "boolean",
                     "default": true,

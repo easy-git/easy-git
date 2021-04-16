@@ -22,6 +22,12 @@ hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
 
 const cmpVersionResult = cmp_hx_version(hxVersion, '2.9.12');
 const cmpVersionResult_for_outputChannel = cmp_hx_version(hxVersion, '3.1.1');
+
+// 2021-4-16: 是否忽略Git钩子
+let config = hx.workspace.getConfiguration();
+let ignoreGitHooksForCommit = config.get('EasyGit.ignoreGitHooksForCommit');
+let noVerify = ignoreGitHooksForCommit ? '--no-verify' : false;
+
 /**
  * @description 背景颜色、输入框颜色、字体颜色、线条颜色
  */
@@ -879,7 +885,7 @@ async function gitCommitPush(workingDir, commitComment) {
     try {
         let checkCert = await checkGitCredentials(workingDir);
         let status = await git(workingDir)
-            .commit(commitComment)
+            .commit(commitComment, noVerify)
             .push()
             .then(() => {
                 hx.window.setStatusBarMessage('Git: commit 和 push操作执行成功！');
@@ -946,7 +952,7 @@ async function gitAdd(workingDir, files) {
 async function gitCommit(workingDir, comment) {
     try {
         let status = await git(workingDir)
-            .commit(comment)
+            .commit(comment, noVerify)
             .then(() => {
                 hx.window.setStatusBarMessage('Git: commit操作成功!');
                 return 'success';
@@ -974,7 +980,7 @@ async function gitAddCommit(workingDir,commitComment) {
     try {
         let status = await git(workingDir)
             .add('*')
-            .commit(commitComment)
+            .commit(commitComment, noVerify)
             .then((res) => {
                 hx.window.setStatusBarMessage('Git: commit成功');
                 return 'success'
