@@ -508,13 +508,13 @@
                 },
                 {
                     "command": "EasyGit.restoreStaged",
-                    "title": "撤销文件当前暂存",
+                    "title": "restore --staged - 撤销文件当前暂存",
                     "when": "isGit",
                     "group": "easygit@2"
                 },
                 {
                     "command": "EasyGit.restore",
-                    "title": "撤销当前文件修改",
+                    "title": "restore - 撤销当前文件修改",
                     "when": "isGit",
                     "group": "easygit@2"
                 },
@@ -523,13 +523,13 @@
                 },
                 {
                     "command": "EasyGit.gitBlameForLineChange",
-                    "title": "显示当前行最后一次修改信息",
+                    "title": "blame - 显示当前行最后一次修改信息",
                     "when": "isGit",
                     "group": "easygit@3"
                 },
                 {
                     "command": "EasyGit.annotate",
-                    "title": "用提交信息标注文件中的每一行",
+                    "title": "annotate - 用提交信息标注文件中的每一行",
                     "when": "isGit",
                     "group": "easygit@3"
                 },
