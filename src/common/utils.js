@@ -1233,8 +1233,9 @@ async function gitBranch(workingDir, options='-avvv') {
     let local = [];
     let remote = [];
     try {
+        let argv = ["--sort=-committerdate", options];
         let status = await git(workingDir)
-            .branch(options)
+            .branch(argv)
             .then((info) => {
                 let branches = info.branches;
                 for (let s in branches) {
@@ -1548,7 +1549,7 @@ async function gitTagsList(workingDir) {
     }
     try {
         let status = await git(workingDir)
-            .tags()
+            .tags(["--sort=-taggerdate"])
             .then((res) => {
                 tagsList.data = res.all;
             })

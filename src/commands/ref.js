@@ -183,7 +183,7 @@ class Branch {
 
     // Git: get project all branchs
     async getAllBranch(projectPath, type) {
-        let { localBranchList, remoteBranchList } = await gitBranch(projectPath, ['-avvv']);
+        let { localBranchList, remoteBranchList } = await gitBranch(projectPath, '-avvv');
 
         let branchs = [...localBranchList];
         if (type == 'all') {
