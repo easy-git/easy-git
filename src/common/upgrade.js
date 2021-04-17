@@ -33,13 +33,13 @@ function showUpgradeBox(localVersion, marketPluginVersion) {
         + `当前 ${localVersion} 版本。`
         + `<a href="https://ext.dcloud.net.cn/plugin?name=easy-git">更新日志</a>`
         + '<br/><br/>更新后，别忘了给个好评。<br/><br/>';
-    let btn = ['去插件市场更新','给评价','以后再说'];
+    let btn = ['去插件市场更新','评价','以后再说'];
 
     hx.window.showInformationMessage(msg, btn).then(result => {
         if (result === '去插件市场更新') {
             const url = 'https://ext.dcloud.net.cn/plugin?name=easy-git';
             hx.env.openExternal(url);
-        } else if (result === '给评价') {
+        } else if (result === '评价') {
             const rateUrl = 'https://ext.dcloud.net.cn/plugin?name=easy-git#rating';
             hx.env.openExternal(rateUrl);
         } else {
@@ -57,8 +57,8 @@ function showUpgradeBox(localVersion, marketPluginVersion) {
 /**
  * @description
  */
-function noUpgrade() {
-    let msg = 'EasyGit: 当前是最新版本，没有可用的更新。';
+function noUpgrade(version) {
+    let msg = `EasyGit: 当前版本为 ${version}，是最新版本，没有可用的更新。`;
     let btns = ['关闭']
 
     let config = hx.workspace.getConfiguration();
@@ -120,7 +120,7 @@ async function checkUpdate(mode) {
                                 showUpgradeBox(version,marketPluginVersion);
                             } else {
                                 if (mode != 'auto') {
-                                    noUpgrade();
+                                    noUpgrade(version);
                                 };
                             };
                         };
