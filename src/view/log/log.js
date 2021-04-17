@@ -133,7 +133,7 @@ class GitLogAction {
         // 设置git log数据
         this.gitData = Object.assign(
             this.gitData,
-            { "branchNum": 1, "CommitTotal": CommitTotal },
+            { "CommitTotal": CommitTotal },
             { "logData": gitLogInfo.data, 'LogErrorMsg': gitLogInfo.errorMsg },
         );
 
@@ -145,11 +145,9 @@ class GitLogAction {
 
         // 获取当前分支名称, 避免在某些情况下，在外部改变分支，此处未刷新的问题。
         try{
-            let gitBranchInfo = await utils.gitRawGetBranch(this.projectPath, 'branch');
-            this.gitData.branchNum = gitBranchInfo.length;
-            let currentBranchName = gitBranchInfo.filter( (item) => { return item.current });
-            if (currentBranchName) {
-                this.gitData.currentBranch = (currentBranchName[0]['name']).replace('* ','');
+            let currentBranchName = await utils.gitCurrentBranchName(this.projectPath);
+            if (currentBranchName && currentBranchName != '') {
+                this.gitData.currentBranch = currentBranchName;
             };
         }catch(e){};
 

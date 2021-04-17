@@ -42,7 +42,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
     } = uiData;
 
     // 获取git日志列表
-    let {projectName, projectPath, currentBranch, logData, searchText, branchNum, CommitTotal} = gitData;
+    let {projectName, projectPath, currentBranch, logData, searchText, CommitTotal} = gitData;
     logData = JSON.stringify(logData);
     if (!searchText) {
         searchText = '';
@@ -60,6 +60,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                 body {
                     color: ${fontColor};
                     font-size: 0.92rem;
+                    overflow-x: hidden !important;
                 }
                 body::-webkit-scrollbar {
                     overflow-x: hidden !important;
@@ -154,7 +155,8 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     transform: scale(0.9);
                 }
                 #git-log-body {
-                    overflow: auto;
+                    overflow-y: auto;
+                    overflow-x: hidden !important;
                 }
                 .tmp-log-body {
                     margin-bottom: 360px !important;
@@ -442,7 +444,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
         </head>
         <body style="background-color:${background} !important;">
             <div id="app" v-cloak>
-                <div id="log-list" class="container-fluid">
+                <div id="log-list" class="container-fluid p-0">
                     <div id="page-top" class="fixed-top">
                         <div class="row px-3 pt-3">
                             <div class="col">
@@ -453,10 +455,10 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                             <span title="仅显示当前分支log" class="branch"
                                                 :class="{ active: searchType == 'branch'}"
                                                 @click="switchSearchType('branch');">{{ currentBranch }} </span>
-                                            <span v-if="branchNum > 1"> | </span>
+                                            <span> | </span>
                                             <span title="显示所有分支log" class="branch"
                                                 :class="{ active: searchType == 'all'}"
-                                                @click="switchSearchType('all');" v-if="branchNum > 1">所有分支</span>
+                                                @click="switchSearchType('all');">所有分支</span>
                                         </h6>
                                     </div>
                                     <div>
@@ -494,8 +496,8 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         <div class="rect4"></div>
                         <div class="rect5"></div>
                     </div>
-                    <div id="git-log-body" class="row mb-5"  style="margin-top:80px;" v-else :class="{ 'tmp-log-body' :isShowViewDetails }">
-                        <div class="col mt-2 px-0" v-if="gitLogInfoList.length == 0">
+                    <div id="git-log-body" class="row mx-0 mb-5"  style="margin-top:80px;" v-else :class="{ 'tmp-log-body' :isShowViewDetails }">
+                        <div class="col px-0 mt-2" v-if="gitLogInfoList.length == 0">
                             <div class="text-center" style="margin-top: 12%;">
                                 <span>${noIcon}</span>
                                 <p class="no-result">没有结果, 请检查查询条件...</p>
@@ -508,7 +510,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                 <p class="no-result">{{ LogErrorMsg }}</p>
                             </div>
                         </div>
-                        <div class="col mt-2 px-0" v-else>
+                        <div class="col px-0 mt-2" v-else>
                             <ul class="pl-0 mb-0" style="list-style-type:none;">
                                 <li class="li-log gitfile"
                                     v-for="(item,idx) of gitLogInfoList" :key="idx"
@@ -644,7 +646,6 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         searchText: '',
                         currentBranch: '',
                         projectName: '',
-                        branchNum: 1,
                         CommitTotal: 0,
                         logNum: 0,
                         gitLogInfoList: [],
@@ -685,7 +686,6 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         this.gitLogInfoList = ${logData};
                         this.currentBranch = '${currentBranch}';
                         this.searchText = '${searchText}';
-                        this.branchNum = ${branchNum};
                         this.CommitTotal = ${CommitTotal};
                         this.logNum = (this.gitLogInfoList).length;
                         this.renderType = '${renderType}'
