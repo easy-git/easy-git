@@ -6,6 +6,12 @@ const os = require('os');
 // get plugin version
 let packageFile = require('../../package.json');
 
+// 主题
+let hxTheme = "Default"
+let config = hx.workspace.getConfiguration();
+let colorScheme = config.get('editor.colorScheme');
+hxTheme = colorScheme ? colorScheme : "Default";
+
 let currentDate = undefined;
 let logFlags = false;
 let mainFlags = false;
@@ -82,8 +88,9 @@ async function count(viewname) {
         'uid': uid,
         'viewname': viewname,
         'hxVersion': hxVersion,
+        'hxTheme': hxTheme,
         'pluginVersion': pluginVersion,
-        'osName': osName
+        'osName': osName,
     };
 
     return new Promise((resolve, reject) => {
