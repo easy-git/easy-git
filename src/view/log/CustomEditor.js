@@ -60,7 +60,7 @@ class CatCustomEditorProvider extends CustomEditorProvider {
                     setTimeout(function() {
                         let isHtml = '';
                         try{
-                            let isHtml = GitLogCustomWebViewPanal.webView._html;
+                            isHtml = GitLogCustomWebViewPanal.webView._html;
                             if (isHtml == '') {
                                 GitLogCustomEditorRenderHtml({},{});
                             };

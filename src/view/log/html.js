@@ -483,7 +483,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                         <span @click="searchLog();">${searchIcon}</span>
                                     </div>
                                     <div class="pt-2">
-                                        <span title="重置：并刷新日志" @click.once="refresh();">${refreshIcon}</span>
+                                        <span title="重置：并刷新日志" @click="refresh();">${refreshIcon}</span>
                                     </div>
                                 </div>
                             </div>
