@@ -82,10 +82,19 @@ async function action(param,action_name) {
     // git branch: 分支相关操作
     let bch = new Branch();
 
-    // 数据统计
+    // 不需要统计所有git操作，只统计某些
     try{
-        if (["BranchDiff", "twoBranchSpecificFileDiff", "BranchSwitch", "BranchMerge", "annotate", "BlameForLineChange", "stash", "stashAll"].includes(action_name)) {
-          count(action_name);
+        let gitCountList = [
+            "init",
+            "add", "commit", "commitAmend",
+            "cherryPick",
+            "BranchDiff", "twoBranchSpecificFileDiff", "BranchSwitch", "BranchMerge",
+            "annotate", "BlameForLineChange",
+            "stash", "stashAll",
+            "tagCreate"
+        ];
+        if (gitCountList.includes(action_name)) {
+            count(action_name);
         };
     }catch(e){};
 
