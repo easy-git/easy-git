@@ -250,13 +250,14 @@ async function gitSetForWebDialog(ProjectInfo) {
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3">
-                        <label for="u-p" class="col-sm-2 px-0 pt-2">仓库URL</label>
+                        <label for="u-p" class="col-sm-2 px-0 pt-3">仓库URL</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control outline-none" id="git-url" placeholder="要添加的Git仓库地址，以https://或git@开头" v-model.trim="init_data.RepositoryURL">
                             <p class="form-text text-muted pl-2">
-                                新建仓库？
+                                若无仓库，可到
                                 <span><a href="https://github.com/">GitHub官网</a>、</span>
                                 <span><a href="https://gitee.com/">Gitee官网</a></span>
+                                创建仓库或拷贝仓库URL
                             </p>
                         </div>
                     </div>
@@ -266,7 +267,7 @@ async function gitSetForWebDialog(ProjectInfo) {
                             <input type="text" class="form-control outline-none" id="git-branch" placeholder="要关联远程分支, 默认master分支; 如果是github，新建仓库默认分支为main" v-model.trim="RemoteBranch">
                         </div>
                     </div>
-                    <div class="form-group row m-0 mt-2">
+                    <div class="form-group row m-0">
                         <label for="u-p" class="col-sm-2 px-0 pt-3">用户名与邮箱</label>
                         <div class="col-sm-10">
                             <div class="row">

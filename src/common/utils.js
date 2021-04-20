@@ -11,6 +11,7 @@ const ini = require('ini');
 const gitRemoteOriginUrl = require('git-remote-origin-url');
 const git = require('simple-git');
 
+const count = require('./count.js');
 const voiceSay = require('./voice.js');
 
 const osName = os.platform();
@@ -657,6 +658,8 @@ async function gitClone(info) {
         password = password.replace('@','%40')
     };
 
+    let cloneWay = repo.substring(0,4) == 'git@' ? 'ssh' : 'http';
+
     if (isAuth) {
         if (/(http|https):\/\//.test(repo)) {
             let http = 'http://';
@@ -685,6 +688,10 @@ async function gitClone(info) {
         } else {
             createOutputChannelForClone('Git: 克隆失败，请参考: https://ext.dcloud.net.cn/plugin?id=2475', false);
         };
+
+        // add count
+        count(`clone_${cloneWay}_${status}`);
+
         return status
     } catch(e) {
         if (e == 'ssh publickey error') {
@@ -696,6 +703,9 @@ async function gitClone(info) {
             createOutputChannelForClone('克隆仓库异常 ' + e, false);
         };
         createOutputChannelForClone('如果无法解决问题，请到插件市场或ask论坛寻求帮助 https://ext.dcloud.net.cn/plugin?name=easy-git', false);
+
+        // add count
+        count(`clone_${cloneWay}_exception`);
         return 'error';
     };
 };
