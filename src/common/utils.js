@@ -2031,14 +2031,17 @@ async function getTrackingRemoteBranch(projectPath) {
 /**
  * @description 关联远程仓库
  * @param {Object} projectPath
+ * @param {String} originUrl
  */
-async function gitAddRemoteOrigin(projectPath) {
-    let originUrl = await hx.window.showInputBox({
-        prompt:"关联Git远程仓库",
-        placeHolder: "必填，请输入远程仓库地址"
-    }).then((result)=>{
-        return result
-    });
+async function gitAddRemoteOrigin(projectPath, originUrl=false) {
+    if (originUrl == false || originUrl == undefined || originUrl == '') {
+        originUrl = await hx.window.showInputBox({
+            prompt:"关联Git远程仓库",
+            placeHolder: "必填，请输入远程仓库地址"
+        }).then((result)=>{
+            return result
+        });
+    };
     let reg = /^(https:\/\/|http:\/\/|git@)/g;
     if (reg.test(originUrl)) {
         let commands = ['remote', 'add', 'origin', originUrl];
@@ -2047,6 +2050,9 @@ async function gitAddRemoteOrigin(projectPath) {
             await gitFetch(projectPath);
         }catch(e){
             hx.window.setStatusBarMessage('EasyGit: 获取Git仓库信息失败', 5000, 'info');
+        };
+        if (rResult == 'success') {
+            hx.window.setStatusBarMessage('EasyGit: 添加远程仓库成功。', 10000, 'info');
         };
         return rResult;
     } else {
