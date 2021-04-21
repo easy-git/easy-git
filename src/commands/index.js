@@ -11,7 +11,7 @@ const { gitInitProject } = require('./repository.js');
 const { gitAddFile, gitRestore, goCleanFile, goCommit } = require('./file.js');
 const { goSetConfig, goShowConfig } = require('./base.js');
 
-const { Tag, Branch, Revert, Reset, Archive, reflog } = require('./ref.js');
+const { Tag, Branch, Revert, Reset, Archive, reflog, showHashFileContent } = require('./ref.js');
 const openBranchDiffView = require('./branch_diff.js');
 
 const gitBlameForLineChange = require('./blame.js');
@@ -180,6 +180,9 @@ async function action(param,action_name) {
             break;
         case 'showAnotherBranchFile':
             bch.showAnotherBranchFile(ProjectInfo);
+            break;
+        case 'showHashFileContent':
+            showHashFileContent(ProjectInfo);
             break;
         case 'BranchDiff':
             // 打开分支对比视图

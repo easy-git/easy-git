@@ -16,6 +16,7 @@ const {
     gitDeleteRemoteBranch,
     gitDeleteLocalBranch,
     gitLog,
+    gitLog2,
     gitCherryPick,
     gitRevert,
     gitReset,
@@ -27,7 +28,7 @@ const {
 } = require('../common/utils.js');
 
 /**
- * @description get log
+ * @description 获取项目所有日志
  * @param {Object} projectPath
  */
 async function getProjectLogs(projectPath, isAll='branch') {
@@ -49,6 +50,28 @@ async function getProjectLogs(projectPath, isAll='branch') {
     return data;
 };
 
+/**
+ * @description 获取项目所有日志
+ * @param {Object} projectPath
+ * @param {Array} filter 过滤条件
+ */
+async function getLogsList(projectPath, filter) {
+    let Logs = await gitLog2(projectPath, filter);
+    let {success} = Logs;
+    let data = [];
+    if (success && success != undefined) {
+        for (let s of Logs.data) {
+            let shortHash = s.hash.slice(0,12);
+            let date = dayjs(s.date).format('YY/MM/DD HH:mm');
+            data.push({
+                "label": date + ' - ' + s.message + ' - ' + s.hash,
+                "description": date + '-' + s.message + ' - ' + s.hash,
+                "hash": s.hash
+            });
+        };
+    };
+    return data;
+};
 
 /**
  * @description Tag操作
@@ -415,7 +438,7 @@ class Branch {
             await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
             applyEdit(fileDetails);
         };
-    }
+    };
 
 };
 
@@ -682,11 +705,51 @@ async function reflog(ProjectInfo) {
 };
 
 
+/**
+ * @description 查看文件的历史版本内容
+ */
+async function showHashFileContent(ProjectInfo) {
+    let {projectPath, selectedFile} = ProjectInfo;
+    if (projectPath == undefined || selectedFile == undefined) {
+        hx.window.showErrorMessage('EasyGit: 获取文件路径失败，请将焦点置于要查看的文件上。。', ['我知道了']);
+        return;
+    };
+
+    let filter = [selectedFile];
+    let logsList = await getLogsList(projectPath, filter);
+    let hash = await hx.window.showQuickPick(logsList, {
+        'placeHolder': '请选择要查看的文件的历史版本...'
+    }).then( (res)=> {
+        return res.hash;
+    });
+    if (!hash) return;
+
+    // 获取文件的相对路径
+    let filename = path.relative(projectPath, selectedFile);
+    filename = filename.replace(/\\/g, '/');
+
+    let param = `${hash}:${filename}`;
+    let fileDetails = await gitRaw(projectPath, ['show', param], undefined, 'result');
+    if (fileDetails == 'error' || fileDetails == 'fail') {
+        hx.window.showErrorMessage(`EasyGit: 获取 ${hash}  ${filename} 文件内容失败。`, ['我知道了']);
+        return;
+    };
+    try{
+        const basename = path.basename(filename);
+        const fname = `${hash}__${basename}`;
+        FileWriteAndOpen(fname, fileDetails);
+    } catch(e) {
+        await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
+        applyEdit(fileDetails);
+    };
+};
+
 module.exports = {
     Tag,
     Branch,
     Revert,
     Reset,
     Archive,
-    reflog
+    reflog,
+    showHashFileContent
 };

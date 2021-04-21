@@ -67,6 +67,7 @@
         "onCommand:EasyGit.reflog",
         "onCommand:EasyGit.annotate",
         "onCommand:EasyGit.showAnotherBranchFile",
+        "onCommand:EasyGit.showHashFile",
         "onCommand:EasyGit.openGitRepositoryInBrowser",
         "onCommand:EasyGit.showConfigLocal",
         "onCommand:EasyGit.showConfigGlobal",
@@ -363,7 +364,11 @@
             },
             {
                 "command": "EasyGit.showAnotherBranchFile",
-                "title": "easy-git: show branch file - 查看文件在另一个分支的内容（无需切换分支）"
+                "title": "easy-git: show branch:file - 查看文件在另一个分支的内容（无需切换分支）"
+            },
+            {
+                "command": "EasyGit.showHashFile",
+                "title": "easy-git: show hash:file - 查看文件的某个历史版本内容"
             },
             {
                 "command": "EasyGit.showConfigLocal",

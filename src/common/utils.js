@@ -1720,7 +1720,7 @@ async function gitConfigShow(workingDir, isPrint=true) {
 };
 
 /**
- * @description 获取log
+ * @description 获取log, 主要用于日志视图
  * @param {Object} workingDir
  * @param {String} searchType 搜索类型 (all|branch)
  * @param {String} filterCondition 过滤条件，逗号分割
@@ -1763,7 +1763,7 @@ async function gitLog(workingDir, searchType, filterCondition, refname) {
             "data": []
         };
         if (workingDir == undefined || workingDir == '') {
-            result.errorMsg = '无法获取项目路径，git log执行失败。请关闭当前Git日志视图后重试。';
+            result.errorMsg = '无法获取项目路径，git log执行失败。请重试。';
             result.success = false;
             return result;
         };
@@ -1787,6 +1787,40 @@ async function gitLog(workingDir, searchType, filterCondition, refname) {
         return result;
     };
 };
+
+
+/**
+ * @description 获取log
+ * @param {Object} workingDir
+ * @param {Array} filter 过滤条件，必须是数组
+ */
+async function gitLog2(workingDir, filter) {
+    try {
+        let result = {
+            "success": true,
+            "data": []
+        };
+        let status = await git(workingDir)
+            .log(filter)
+            .then((res) => {
+                let data = res.all;
+                result.data = data
+                return result;
+            })
+            .catch((err) => {
+                errorMsg = err.message;
+                createOutputChannel(`【${workingDir}】获取日志失败。${errorMsg}`, "fail");
+                result.success = false;
+                return result;
+            });
+        return result;
+    } catch (e) {
+        createOutputChannel(`【${workingDir}】获取日志失败。${e}`, "fail");
+        result.success = false;
+        return result;
+    };
+};
+
 
 /**
  * @description 显示远程仓库信息
@@ -2327,6 +2361,7 @@ module.exports = {
     gitConfigSet,
     gitRemoteshowOrigin,
     gitLog,
+    gitLog2,
     gitStash,
     gitStashList,
     gitAddRemote,

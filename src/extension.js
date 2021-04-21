@@ -408,6 +408,12 @@ function activate(context) {
     });
     context.subscriptions.push(showAnotherBranchFile);
 
+    // git show hash:filename
+    let showHashFile = hx.commands.registerCommand('EasyGit.showHashFile', (param)=> {
+        git.action(param, 'showHashFileContent')
+    });
+    context.subscriptions.push(showHashFile);
+
     // git open repository in the browser
     let openGitRepositoryInBrowser = hx.commands.registerCommand('EasyGit.openGitRepositoryInBrowser',(param)=> {
         git.action(param, 'openGitRepositoryInBrowser')
