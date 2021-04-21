@@ -1,5 +1,8 @@
 const hx = require('hbuilderx');
 
+const os = require('os');
+const osName = os.platform();
+
 var isPopUpWindow = false;
 
 
@@ -11,11 +14,11 @@ function isJSON(str) {
                 return true;
             } else {
                 return false;
-            }
+            };
         } catch (e) {
             return false;
-        }
-    }
+        };
+    };
 };
 
 
@@ -31,28 +34,46 @@ function showUpgradeBox(localVersion, marketPluginVersion) {
     let versiondescription = lastChar == 0 ? `【easy-git】发布重大更新 ${marketPluginVersion} 版本！` : `【easry-git】发布 ${marketPluginVersion} 新版本！`;
     let msg = versiondescription
         + `当前 ${localVersion} 版本。`
-        + `<a href="https://ext.dcloud.net.cn/plugin?name=easy-git">更新日志</a>`
-        + '<br/><br/>更新后，别忘了给个好评。<br/><br/>';
-    let btn = ['去插件市场更新','评价','以后再说'];
+        + `<a href="https://ext.dcloud.net.cn/plugin?name=easy-git">更新日志</a>`;
+    let btn = ['去插件市场更新','直接升级','以后再说'];
 
     hx.window.showInformationMessage(msg, btn).then(result => {
         if (result === '去插件市场更新') {
             const url = 'https://ext.dcloud.net.cn/plugin?name=easy-git';
             hx.env.openExternal(url);
-        } else if (result === '评价') {
-            const rateUrl = 'https://ext.dcloud.net.cn/plugin?name=easy-git#rating';
-            hx.env.openExternal(rateUrl);
+        } else if (result === '直接升级') {
+            installPlugin(marketPluginVersion);
         } else {
             let timestamp = Math.round(new Date() / 1000) + 604800;
             let config = hx.workspace.getConfiguration();
             config.update('EasyGit.updatePrompt', false).then( () => {
                 config.update('EasyGit.updatePromptTime', `${timestamp}`);
             });
-        }
+        };
     });
     isPopUpWindow = true;
 };
 
+
+/**
+ * @description 安装插件
+ * @param {version} String 插件版本
+ */
+function installPlugin(version) {
+    return new Promise((resolve, reject) => {
+        let info = {
+            "id": "easy-git",
+            "name": "easy-git",
+            "version": version,
+            "category_name": "HBuilderX",
+            "category_code": "extension-for-hbuilderx",
+            "category_id": 11,
+            "platforms": []
+        };
+        let url = 'hbuilderx://ext/download?plugin=' + encodeURIComponent(JSON.stringify(info));
+        hx.env.openExternal(url);
+    });
+};
 
 /**
  * @description
