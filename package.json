@@ -19,6 +19,7 @@
         "onCommand:EasyGit.clone",
         "onCommand:EasyGit.init",
         "onCommand:EasyGit.addRemoteOrigin",
+        "onCommand:EasyGit.RemoteRmOrigin",
         "onCommand:EasyGit.add",
         "onCommand:EasyGit.commit",
         "onCommand:EasyGit.commitAmend",
@@ -202,7 +203,11 @@
             },
             {
                 "command": "EasyGit.addRemoteOrigin",
-                "title": "easy-git: add remote origin - 关联远程仓库"
+                "title": "easy-git: remote add origin url - 关联/添加远程仓库url"
+            },
+            {
+                "command": "EasyGit.RemoteRmOrigin",
+                "title": "easy-git: remote rm origin - 删除远程仓库url"
             },
             {
                 "command": "EasyGit.clone",

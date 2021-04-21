@@ -105,6 +105,9 @@ async function action(param,action_name) {
         case 'addRemoteOrigin':
             utils.gitAddRemoteOrigin(projectPath);
             break;
+        case 'RemoteRmOrigin':
+            utils.gitRmRemoteOrigin(projectPath, projectName);
+            break;
         case 'add':
             gitAddFile(ProjectInfo);
             break;

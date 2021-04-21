@@ -177,6 +177,12 @@ function activate(context) {
     });
     context.subscriptions.push(addRemoteOrigin);
 
+    // Git rem remote origin
+    let RemoteRmOrigin = hx.commands.registerCommand('EasyGit.RemoteRmOrigin',(param) => {
+        git.action(param, 'RemoteRmOrigin');
+    });
+    context.subscriptions.push(RemoteRmOrigin);
+
     // Git add
     let add = hx.commands.registerCommand('EasyGit.add', (param)=> {
         git.action(param, 'add');

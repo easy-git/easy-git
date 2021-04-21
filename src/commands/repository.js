@@ -66,6 +66,7 @@ async function gitInitProject(ProjectInfo) {
     } catch (e) {
         let relationResult = await gitAddRemoteOrigin(projectPath);
         if (relationResult == 'success') {
+            createOutputChannel(`项目【${projectName}】远程仓库添加地址成功。`, "success");
             hx.commands.executeCommand('EasyGit.main', ProjectInfo);
         };
     };
@@ -115,12 +116,18 @@ async function gitConfigSetForWebDialog(webviewDialog, ProjectInfo) {
     };
 
     if (addOriginResult) {
+        // 发送消息到webdialog
         webviewDialog.setButtonStatus("开始设置", []);
         let webview = webviewDialog.webView
         webview.postMessage({
             command: 'setResult',
             status: addOriginResult
         });
+
+        // 打印日志到控制台
+        createOutputChannel(`项目【${projectName}】远程仓库添加地址成功。`, "success");
+
+        // 打开源代码管理器视图
         let pinfo = {"easyGitInner": true, "projectPath": projectPath, "projectName": projectName};
         hx.commands.executeCommand('EasyGit.main', pinfo);
     };

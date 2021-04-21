@@ -1930,14 +1930,14 @@ async function gitRaw(workingDir, commands, msg, resultType='statusCode') {
             .catch((err) => {
                 if (msg != undefined) {
                     createOutputChannel(`Git: ${msg} 操作失败。\n ${err}`, 'error');
-                }
+                };
                 return 'fail';
             });
         return status;
     } catch (e) {
         if (msg != undefined) {
             createOutputChannel(`Git: ${msg} 操作失败，插件运行异常。\n ${e}`);
-        }
+        };
         return 'error';
     };
 };
@@ -2068,6 +2068,23 @@ async function gitAddRemoteOrigin(projectPath, originUrl=false) {
     } else {
         hx.window.showErrorMessage('EasyGit: 远程仓库地址无效。如还需要进行关联，请在源代码管理器底部操作。', ['我知道了']);
         return 'fail';
+    };
+};
+
+
+/**
+ * @description 关联远程仓库
+ * @param {Object} projectPath
+ * @param {String} originUrl
+ */
+async function gitRmRemoteOrigin(projectPath, projectName) {
+    let commands = ['remote', 'rm', 'origin'];
+    let rResult = await gitRaw(projectPath, commands, '删除远程仓库', 'result');
+    if (rResult.length == 0) {
+        createOutputChannel(`项目【${projectName}】删除远程仓库成功。`, "success");
+        createOutputChannel(`项目【${projectName}】如需再次添加，请打开Git【命令面板】，搜索：添加远程仓库`, "success");
+    } else {
+        createOutputChannel(`项目【${projectName}】删除远程仓库失败。`, "error");
     };
 };
 
@@ -2255,7 +2272,7 @@ async function FileWriteAndOpen(filename, filecontent){
            hx.workspace.openTextDocument(fpath);
         });
     };
-}
+};
 
 
 module.exports = {
@@ -2274,6 +2291,7 @@ module.exports = {
     checkGitUsernameEmail,
     gitInit,
     gitAddRemoteOrigin,
+    gitRmRemoteOrigin,
     getTrackingRemoteBranch,
     gitClone,
     gitStatus,
