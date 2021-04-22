@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+
+const chokidar = require('chokidar');
 const { debounce } = require('throttle-debounce');
 
 const hx = require('hbuilderx');
@@ -301,15 +303,25 @@ function watchProjectDir(projectDir, func) {
         recursive: true
     };
     try {
-        const debounceGit = debounce(800, () => {
+        const debounceGit = debounce(1000, () => {
             func.LoadingBranchView();
         });
 
-        let dir = path.join(projectDir, '.git');
-        watcherListen = fs.watch(dir, watchOpt, (eventType, filename) => {
-            if (filename == 'index.lock') return;
-            if (GitHBuilderXInnerTrigger == false) {
-                if (eventType && (['FETCH_HEAD', 'HEAD','ORIG_HEAD'].includes(filename) || filename.includes('refs/tags'))) {
+        const debounceGitForTag = debounce(2000, () => {
+            func.TagList();
+        });
+
+        let GitDir = path.join(projectDir, '.git');
+        let ignoredDir = path.join(projectDir, '.git', 'objects');
+        watcherListen = chokidar.watch(GitDir, {
+            ignored: ignoredDir,
+            ignoreInitial: true
+        }).on('all', (event, vpath) => {
+            if (vpath == 'index.lock' && !['FETCH_HEAD', 'HEAD','ORIG_HEAD'].includes(filename) ) return;
+            if (['change', 'add', 'unlink', 'unlinkDir'].includes(event) && GitHBuilderXInnerTrigger == false) {
+                if (vpath.includes('.git/refs/tags/')) {
+                    debounceGitForTag();
+                } else {
                     debounceGit();
                 };
             };
