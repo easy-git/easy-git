@@ -1,6 +1,8 @@
 const hx = require('hbuilderx');
 const fs = require('fs');
 const path = require('path');
+
+const chokidar = require('chokidar');
 const { debounce } = require('throttle-debounce');
 
 const { GitLogAction } = require('./log.js');
@@ -115,15 +117,20 @@ function watchProjectDir(projectDir, func) {
         recursive: true
     };
     try {
-        const debounceView = debounce(500, () => {
+        const debounceView = debounce(800, () => {
             func.setView('branch', '');
         });
-        let dir = path.join(projectDir, '.git');
-        watcher = fs.watch(dir, watchOpt, (eventType, filename) => {
-            if (GitHBuilderXInnerTrigger == false) {
-                if (eventType && (filename == 'index' || filename.includes('refs/tags') || filename.includes('refs/heads'))) {
-                    debounceView();
-                };
+
+        let GitDir = path.join(projectDir, '.git');
+        let ignoredDir = path.join(projectDir, '.git', 'objects');
+        watcher = chokidar.watch(GitDir, {
+            ignored: ignoredDir,
+            ignoreInitial: true
+        }).on('all', (event, vpath) => {
+            let fpath = vpath.replace(path.join(GitDir,'/'),'');
+            if (fpath == 'index.lock') return;
+            if (['change', 'add', 'unlink', 'unlinkDir'].includes(event) && (['index','COMMIT_EDITMSG'].includes(fpath) || fpath.includes('refs/tags') || fpath.includes('refs/heads')) && GitHBuilderXInnerTrigger == false ){
+                debounceView();
             };
         });
     } catch (e) {
