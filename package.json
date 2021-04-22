@@ -87,17 +87,17 @@
                 "EasyGit.ignoreGitHooksForCommit": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Git提交，是否忽略Git Hook（勾选后，git commit将忽略钩子；修改重启生效）"
+                    "description": "Git提交(即commit操作)，是否忽略Git Hook（勾选后，git commit将忽略钩子；修改重启生效）"
                 },
                 "EasyGit.mainViewAutoRefreshFileList": {
                     "type": "boolean",
                     "default": true,
-                    "description": "当项目文件有变动时（如外部修改文件），源代码管理器视图自动刷新。(注：修改后重启编辑器生效)"
+                    "description": "当项目文件有变动时（如外部修改文件），源代码管理器视图自动刷新；当项目超大文件超多时，实时监听项目，会消耗很多电脑CPU，<a href='https://easy-git.gitee.io/setting/autoRefresh'>详情。</a>(注：修改后重启编辑器生效)"
                 },
                 "EasyGit.logViewAutoRefresh": {
                     "type": "boolean",
                     "default": true,
-                    "description": "当项目产生提交、拉取等操作时，日志视图自动刷新。(注：修改后重启编辑器生效)"
+                    "description": "当项目产生提交、拉取等操作时，日志视图自动刷新。(注：此操作仅监听了.git目录特定几个文件，不会产生任何影响，强力建议开启。修改后重启编辑器生效)"
                 },
                 "EasyGit.AlwaysAutoAddCommit": {
                     "type": "boolean",
