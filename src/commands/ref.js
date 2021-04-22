@@ -30,29 +30,6 @@ const {
 /**
  * @description 获取项目所有日志
  * @param {Object} projectPath
- */
-async function getProjectLogs(projectPath, isAll='branch') {
-    let Logs = await gitLog(projectPath, isAll, 'default');
-    let {success} = Logs;
-
-    let data = [];
-    if (success && success != undefined) {
-        for (let s of Logs.data) {
-            let shortHash = s.hash.slice(0,12);
-            let date = dayjs(s.date).format('YY/MM/DD HH:mm:ss');
-            data.push({
-                "label": date + ' - ' + shortHash,
-                "description": s.message,
-                "hash": s.hash
-            });
-        };
-    };
-    return data;
-};
-
-/**
- * @description 获取项目所有日志
- * @param {Object} projectPath
  * @param {Array} filter 过滤条件
  */
 async function getLogsList(projectPath, filter) {
@@ -352,7 +329,7 @@ class Branch {
         let { projectPath, hash } = ProjectInfo;
 
         if (hash == undefined || hash == '') {
-            let data = await getProjectLogs(projectPath, 'all');
+            let data = await getLogsList(projectPath, ['-a', '-n 2000']);
             let selected = await hx.window.showQuickPick(data, {
                 'placeHolder': '请选择要cherry-Pick的commit......'
             }).then( (res)=> {
@@ -455,7 +432,7 @@ class Revert {
         ProjectInfo.easyGitInner = true;
 
         if (hash == undefined || hash == '') {
-            let data = await getProjectLogs(projectPath);
+            let data = await getLogsList(projectPath, ['-n 2000']);
             let selected = await hx.window.showQuickPick(data, {
                 'placeHolder': '请选择要还原撤销的commit......'
             }).then( (res)=> {
@@ -531,7 +508,7 @@ class Reset {
     async resetHardCommitID(ProjectInfo) {
         let { projectPath } = ProjectInfo;
 
-        let data = await getProjectLogs(projectPath);
+        let data = await getLogsList(projectPath, ["-n 2000"]);
         let selected = await hx.window.showQuickPick(data, {
             'placeHolder': '请选择要重置的 commit_id '
         }).then( (res)=> {
@@ -607,7 +584,7 @@ class Archive {
 
     // 打包指定commit id
     async ArchiveCommitID(projectPath){
-        let data = await getProjectLogs(projectPath, 'all');
+        let data = await getLogsList(projectPath, ["-a"]);
         let pickerData = [
             {"label": "回到上一步操作", "hash": ""}, ...data
         ]
