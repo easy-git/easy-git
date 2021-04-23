@@ -368,7 +368,7 @@
             },
             {
                 "command": "EasyGit.showHashFile",
-                "title": "easy-git: show hash:file - 查看文件的某个历史版本内容"
+                "title": "easy-git: show commitID:file - 查看文件的某个历史版本内容"
             },
             {
                 "command": "EasyGit.showConfigLocal",
