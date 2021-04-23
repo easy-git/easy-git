@@ -408,7 +408,7 @@ function activate(context) {
     });
     context.subscriptions.push(showAnotherBranchFile);
 
-    // git show hash:filename
+    // git show commitID:filename 查看当前文件的历史提交版本内容
     let showHashFile = hx.commands.registerCommand('EasyGit.showHashFile', (param)=> {
         git.action(param, 'showHashFileContent')
     });

@@ -368,7 +368,7 @@
             },
             {
                 "command": "EasyGit.showHashFile",
-                "title": "easy-git: show commitID:file - 查看文件的某个历史版本内容"
+                "title": "easy-git: show commitID:file - 查看文件的历史提交版本内容"
             },
             {
                 "command": "EasyGit.showConfigLocal",
@@ -548,7 +548,13 @@
                 },
                 {
                     "command": "EasyGit.showAnotherBranchFile",
-                    "title": "查看文件在另一个分支的内容",
+                    "title": "查看当前文件在另一个分支的内容",
+                    "when": "isGit",
+                    "group": "easygit@4"
+                },
+                {
+                    "command": "EasyGit.showHashFile",
+                    "title": "查看当前文件的历史提交版本内容",
                     "when": "isGit",
                     "group": "easygit@4"
                 },
