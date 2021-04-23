@@ -1,4 +1,5 @@
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const chokidar = require('chokidar');
 const { debounce } = require('throttle-debounce');
@@ -11,6 +12,8 @@ let utils = require('../common/utils.js');
 
 const icon = require('./static/icon.js');
 const html = require('./mainHtml.js')
+
+const osName = os.platform();
 
 // Git触发途径：HBuilderX内触发、外部Git命令（或其它工具）触发
 let GitHBuilderXInnerTrigger = false;
@@ -634,7 +637,7 @@ function watchProjectDir(projectDir, func) {
 
     try {
         // 项目目录刷新事件
-        const debounceFileList = debounce(2200, () => {
+        const debounceFileList = debounce(2300, () => {
             func.refreshFileList();
         });
         // .Git目录刷新事件
@@ -747,9 +750,12 @@ function active(webviewPanel, userConfig, gitData) {
     // 监听项目文件，如果有变动，则刷新; 关闭自动刷新，则不再监听。
     let { mainViewAutoRefreshFileList } = userConfig;
     if (mainViewAutoRefreshFileList && watcherListen == undefined) {
-        watchProjectDir(projectPath, File);
+        let waitTime = osName == 'darwin' ? 10000 : 15000;
+        setTimeout(function() {
+            watchProjectDir(projectPath, File);
+        }, waitTime);
     };
-    // 关于自动刷新功能，弹窗提示，仅提示一次
+    // 关于自动刷新功能弹窗提示，仅提示一次，并记录下来到配置文件
     if (watcherPrompt == undefined) {
         setTimeout(function() {
             watchUserPrompt();
