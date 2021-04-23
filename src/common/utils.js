@@ -2090,12 +2090,12 @@ async function gitAddRemoteOrigin(projectPath, originUrl=false) {
     if (reg.test(originUrl)) {
         let commands = ['remote', 'add', 'origin', originUrl];
         let rResult = await gitRaw(projectPath, commands, '关联远程仓库', 'statusCode');
-        try{
-            await gitFetch(projectPath);
-        }catch(e){
-            hx.window.setStatusBarMessage('EasyGit: 获取Git仓库信息失败', 5000, 'info');
-        };
         if (rResult == 'success') {
+            try{
+                await gitFetch(projectPath);
+            }catch(e){
+                hx.window.setStatusBarMessage('EasyGit: 获取Git仓库信息失败', 5000, 'info');
+            };
             hx.window.setStatusBarMessage('EasyGit: 添加远程仓库成功。', 10000, 'info');
         };
         return rResult;
