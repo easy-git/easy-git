@@ -5,7 +5,7 @@ const process = require('process');
 const {exec} = require('child_process');
 
 const hx = require('hbuilderx');
-const spawn = require('cross-spawn')
+const spawn = require('cross-spawn');
 const ini = require('ini');
 
 const gitRemoteOriginUrl = require('git-remote-origin-url');
@@ -284,7 +284,7 @@ function checkIsGitProject(projectPath) {
 }
 
 /**
- * @description 获取项目管理器的项目数量
+ * @description 获取项目管理器的项目数量，以及每个项目名称、项目路径、是否git等信息。
  */
 async function getFilesExplorerProjectInfo() {
     let data = {
@@ -383,7 +383,6 @@ async function runCmd(cmd) {
     createOutputChannel(label);
     exec(cmd, function(error, stdout, stderr) {
         createOutputChannel(`${stdout} \n ${stderr}`)
-
     });
 };
 
@@ -844,14 +843,6 @@ async function gitStatus(workingDir, isShowFileList=true) {
     result.originurl = await gitRemoteOriginUrl(workingDir).catch(function (err){
         return undefined
     });
-
-    // 仓库地址
-    // checkResult = await checkIsGitProject(workingDir);
-    // if (checkResult) {
-    //     result.GitRepository = checkResult;
-    // } else {
-    //     result.GitRepository = workingDir;
-    // };
 
     try {
         let statusSummary = await git(workingDir).status();
