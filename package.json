@@ -2,7 +2,7 @@
     "name": "easy-git",
     "description": "vscode源代码管理工具风格。HBuilderX内唯一的图形化Git工具, 并支持命令面板，支持克隆、提交/更新/拉取、分支/tag管理、日志、文件对比、储藏等操作。",
     "displayName": "【easy-git】Git源代码管理工具",
-    "version": "1.4.2",
+    "version": "1.4.3",
     "publisher": "oneone",
     "engines": {
         "HBuilderX": "^2.8.3"
@@ -92,12 +92,12 @@
                 "EasyGit.mainViewAutoRefreshFileList": {
                     "type": "boolean",
                     "default": true,
-                    "description": "当项目文件有变动时（如外部修改文件），源代码管理器视图自动刷新；当项目超大文件超多时，实时监听项目，会消耗很多电脑CPU，<a href='https://easy-git.gitee.io/setting/autoRefresh'>详情。</a>(注：修改后重启编辑器生效)"
+                    "description": "当项目文件有变动时（如外部修改文件），源代码管理器视图自动刷新；当电脑性能不高且项目超大文件超多时，建议关闭，<a href='https://easy-git.gitee.io/setting/autoRefresh'>详情。</a>(注：修改后重启编辑器生效)"
                 },
                 "EasyGit.logViewAutoRefresh": {
                     "type": "boolean",
                     "default": true,
-                    "description": "当项目产生提交、拉取等操作时，日志视图自动刷新。(注：此操作仅监听了.git目录特定几个文件，不会产生任何影响，强力建议开启。修改后重启编辑器生效)"
+                    "description": "当项目产生提交、拉取等操作时，日志视图自动刷新。(建议开启)"
                 },
                 "EasyGit.AlwaysAutoAddCommit": {
                     "type": "boolean",
@@ -112,12 +112,12 @@
                 "EasyGit.DisableDevTools": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Git视图页面，是否禁用右键菜单开发者工具 (非必要时，请勿开启开发者工具)。"
+                    "description": "Git视图页面，是否禁用右键菜单开发者工具，即审查元素 (非必要时，请勿开启)。"
                 },
                 "EasyGit.VoiceBroadcast": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Git某些操作，语音播报执行结果（仅限MacOSX操作系统, 修改后重启生效)。"
+                    "description": "Git某些操作，语音播报执行结果（仅限MacOSX操作系统, 修改后重启编辑器生效)。"
                 },
                 "EasyGit.VoiceBroadcastLanguage": {
                     "type": "string",
