@@ -645,6 +645,7 @@ function watchProjectDir(projectDir, func) {
             func.refreshHEAD();
         });
 
+        let lastFileInfo;
         watcherListen = chokidar.watch(projectDir, {
             ignored: path => ["node_modules",'unpackage', '.git/objects'].some(s => path.includes(s)),
             ignoreInitial: true
@@ -653,13 +654,21 @@ function watchProjectDir(projectDir, func) {
             if (basename == 'index.lock') return;
             let isGitDirFile = vpath.includes(('.git/' + basename)) ? true : false;
 
+            // 2021-03-26 解决频繁编辑一个文件，触发监听的问题
+            if (event == 'change' && !isGitDirFile) {
+                let tmpStr = 'event' + ' - ' + vpath;
+                if (lastFileInfo == tmpStr) { return };
+                lastFileInfo = tmpStr;
+            };
+
             // 监听项目目录，不包含.git
             if (isGitDirFile == false && ['change', 'add', 'unlink', 'unlinkDir'].includes(event) && GitHBuilderXInnerTrigger == false) {
                 listeningProjectFile = true;
+                lastFileInfo = undefined;
                 debounceFileList();
                 setTimeout(function(){
                     listeningProjectFile = false;
-                }, 2500);
+                }, 2000);
             };
             // 仅监听.git
             if (isGitDirFile == true && event == 'change' && GitHBuilderXInnerTrigger == false && listeningProjectFile == false) {
@@ -755,12 +764,14 @@ function active(webviewPanel, userConfig, gitData) {
             watchProjectDir(projectPath, File);
         }, waitTime);
     };
+
     // 关于自动刷新功能弹窗提示，仅提示一次，并记录下来到配置文件
-    if (watcherPrompt == undefined) {
-        setTimeout(function() {
-            watchUserPrompt();
-        }, 3500);
-    };
+    // 2021-03-24 已解决自动刷新问题，不需要提示了。
+    // if (watcherPrompt == undefined) {
+    //     setTimeout(function() {
+    //         watchUserPrompt();
+    //     }, 3500);
+    // };
 
     view.onDidReceiveMessage((msg) => {
         GitHBuilderXInnerTrigger = true;
