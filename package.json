@@ -2,7 +2,7 @@
     "name": "easy-git",
     "description": "vscode源代码管理工具风格。HBuilderX内唯一的图形化Git工具, 并支持命令面板，支持克隆、提交/更新/拉取、分支/tag管理、日志、文件对比、储藏等操作。",
     "displayName": "【easy-git】Git源代码管理工具",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "publisher": "oneone",
     "engines": {
         "HBuilderX": "^2.8.3"
