@@ -113,11 +113,12 @@ async function goCommit(ProjectInfo, amend=false) {
     };
 
     let msg = amend ? 'commit --amend' : 'commit';
-    let amendResult = await gitRaw(projectPath, options, msg);
-    if (amendResult == 'success') {
-        setTimeout(function() {
-            hx.commands.executeCommand('EasyGit.log', ProjectInfo);
-        }, 1500);
+    let commitResult = await gitRaw(projectPath, options, msg);
+    if (commitResult == 'success') {
+        // 2021-03-26 命令面板commit操作，不再打开日志视图
+        // setTimeout(function() {
+        //     hx.commands.executeCommand('EasyGit.log', ProjectInfo);
+        // }, 1500);
     };
 };
 
