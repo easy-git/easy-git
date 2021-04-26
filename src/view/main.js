@@ -630,6 +630,7 @@ class GitFile {
 var listeningProjectFile = false;
 let watchProjectPath;
 let watcherListen;
+var lastListeningFileInfo;
 function watchProjectDir(projectDir, func) {
     let gitDir = path.join(projectDir, '.git');
     let refsPath = path.join(gitDir, 'refs', 'remotes', 'origin');
@@ -637,7 +638,7 @@ function watchProjectDir(projectDir, func) {
 
     try {
         // 项目目录刷新事件
-        const debounceFileList = debounce(2300, () => {
+        const debounceFileList = debounce(1800, () => {
             func.refreshFileList();
         });
         // .Git目录刷新事件
@@ -645,7 +646,6 @@ function watchProjectDir(projectDir, func) {
             func.refreshHEAD();
         });
 
-        let lastFileInfo;
         watcherListen = chokidar.watch(projectDir, {
             ignored: path => ["node_modules",'unpackage', '.git/objects'].some(s => path.includes(s)),
             ignoreInitial: true
@@ -655,10 +655,16 @@ function watchProjectDir(projectDir, func) {
             let isGitDirFile = vpath.includes(('.git/' + basename)) ? true : false;
 
             // 2021-03-26 解决频繁编辑一个文件，触发监听的问题
+            if (event == 'change' && vpath == path.join(gitDir, 'index')) {
+                lastListeningFileInfo = undefined;
+            };
+
             if (event == 'change' && !isGitDirFile) {
                 let tmpStr = 'event' + ' - ' + vpath;
-                if (lastFileInfo == tmpStr) { return };
-                lastFileInfo = tmpStr;
+                if (lastListeningFileInfo == tmpStr) {
+                    return;
+                };
+                lastListeningFileInfo = tmpStr;
             };
 
             // 监听项目目录，不包含.git
@@ -759,7 +765,7 @@ function active(webviewPanel, userConfig, gitData) {
     // 监听项目文件，如果有变动，则刷新; 关闭自动刷新，则不再监听。
     let { mainViewAutoRefreshFileList } = userConfig;
     if (mainViewAutoRefreshFileList && watcherListen == undefined) {
-        let waitTime = osName == 'darwin' ? 10000 : 15000;
+        let waitTime = osName == 'darwin' ? 5000 : 13000;
         setTimeout(function() {
             watchProjectDir(projectPath, File);
         }, waitTime);
@@ -882,7 +888,7 @@ function active(webviewPanel, userConfig, gitData) {
         };
         setTimeout(function() {
             GitHBuilderXInnerTrigger = false;
-        }, 1700);
+        }, 1500);
     });
 
 };
