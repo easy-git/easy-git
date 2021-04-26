@@ -247,12 +247,19 @@ function generateLogHtml(hxData) {
                                     <input type="password" class="form-control outline-none" id="git-passwd" placeholder="Git仓库密码, 选填" v-model="cloneInfo.password">
                                 </div>
                             </div>
-                            <p class="form-text text-muted">如果是私有仓库，HTTP协议，需要提供账号密码</p>
+                            <p class="form-text text-muted">如果是私有仓库，HTTP协议，克隆，需要提供账号密码</p>
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3">
                         <div class="col">
-                            <p class="clone-help">如克隆遇到问题，请<a href="https://easy-git.gitee.io/connecting/">参考文档</a>，或<a href="https://ext.dcloud.net.cn/plugin?id=2475">反馈给作者</a></p>
+                            <p class="clone-help">
+                                如克隆遇到问题，请<a href="https://easy-git.gitee.io/connecting/">参考文档</a>，
+                                或<a href="https://ext.dcloud.net.cn/plugin?id=2475">反馈给作者</a>。
+                                <span v-if="isSSH">
+                                    使用SSH克隆，需要配置好SSH公钥，
+                                    <a href="https://easy-git.gitee.io/auth/ssh-generate">配置SSH</a>
+                                </span>
+                            </p>
                         </div>
                     </div>
                 </form>
@@ -279,6 +286,11 @@ function generateLogHtml(hxData) {
                         }
                     },
                     computed: {
+                        isSSH: function() {
+                            let repo = this.repo;
+                            let tmp = repo.toLowerCase().trim();
+                            return tmp.substring(0,4) == 'git@' ? true : false;
+                        },
                         isShowUserPasswd: function() {
                             let repo = this.repo;
                             if (repo && repo.length >= 7) {
