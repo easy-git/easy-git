@@ -17,3 +17,5 @@ unpackage/dist/dev/
 # todo.md
 docs/todo.md
 docs/test.js
+
+*.zip
