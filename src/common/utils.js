@@ -363,7 +363,7 @@ function createOutputChannel(msg, msgLevel=undefined) {
  * @description 创建输出控制台
  */
 function createOutputChannelForClone(msg, newline=true) {
-    let channel_name = "Git";
+    let channel_name = "easy-git";
     let outputChannel = hx.window.createOutputChannel(channel_name);
     outputChannel.show();
 
@@ -677,31 +677,29 @@ async function gitClone(info) {
         options.push(repo);
         options.push(localPath);
 
-        createOutputChannelForClone(`开始克隆 ${projectName}！\n`, false);
-        createOutputChannelForClone(`备注1：克隆进度跟项目大小、网络有关，需要一定时间，请不要重复点击【克隆】按钮。`, false);
-        createOutputChannelForClone(`备注2：克隆成功后，会自动将克隆项目，加入到HBuilderX项目管理器。如未显示在项目管理器，请手动导入或拖入。\n`, false);
+        createOutputChannel(`开始克隆 ${projectName}！\n`, 'success');
+        createOutputChannel(`备注1：克隆进度跟项目大小、网络有关，需要一定时间，请不要重复点击【克隆】按钮。`, 'info');
+        createOutputChannel(`备注2：克隆成功后，会自动将克隆项目，加入到HBuilderX项目管理器。如未显示在项目管理器，请手动导入或拖入。\n`, 'info');
 
         let status = await runGitClone(options)
         if (status == 'success') {
-            createOutputChannelForClone(`克隆成功。本地路径: ${localPath}`, false);
+            createOutputChannel(`克隆成功。本地路径: ${localPath}`, 'success');
+            count(`clone_${cloneWay}_success`);
         } else {
-            createOutputChannelForClone('Git: 克隆失败，请参考: https://ext.dcloud.net.cn/plugin?id=2475', false);
+            createOutputChannel('Git: 克隆失败，请参考: https://ext.dcloud.net.cn/plugin?id=2475', 'error');
+            count(`clone_${cloneWay}_${status}`);
         };
-
-        // add count
-        count(`clone_${cloneWay}_${status}`);
-
         return status
     } catch(e) {
         if (e == 'ssh publickey error') {
-            createOutputChannelForClone('- SSH publickey无效，克隆失败。', false);
-            createOutputChannelForClone('配置SSH, 请参考: https://easy-git.gitee.io/auth/ssh-generate', false);
+            createOutputChannel('- SSH publickey无效，克隆失败。', 'error');
+            createOutputChannel('配置SSH, 请参考: https://easy-git.gitee.io/auth/ssh-generate', false);
         } else if (e == 'Incorrect username or password') {
-            createOutputChannelForClone('账号密码错误，克隆失败。', false);
+            createOutputChannel('账号密码错误，克隆失败。', 'error');
         } else {
-            createOutputChannelForClone('克隆仓库异常 ' + e, false);
+            createOutputChannel('克隆仓库异常 ' + e, 'error');
         };
-        createOutputChannelForClone('如果无法解决问题，请到插件市场或ask论坛寻求帮助 https://ext.dcloud.net.cn/plugin?name=easy-git', false);
+        createOutputChannel('如果无法解决问题，请到插件市场或ask论坛寻求帮助 https://ext.dcloud.net.cn/plugin?name=easy-git', false);
 
         // add count
         count(`clone_${cloneWay}_exception`);
@@ -2210,6 +2208,9 @@ async function gitRefs(workingDir) {
 
 /**
  * @description 对话框
+ *     - 插件API: hx.window.showMessageBox, 本身存在很大问题，请谨慎使用
+ *     - 已屏蔽esc事件，不支持esc关闭弹窗；因此弹窗上的x按钮，也无法点击。
+ *     - 按钮组中必须提供`关闭`
  * @param {String} title
  * @param {String} text
  * @param {String} buttons 按钮，必须大于1个
