@@ -87,10 +87,6 @@ function show(webviewPanel) {
             hx.commands.executeCommand('EasyGit.main', pinfo);
             hx.commands.executeCommand('workbench.view.explorer');
         } else {
-            try{
-                file.deleteFolderRecursive(projectName);
-            }catch(e){};
-
             view.postMessage({
                 command: 'cloneResult',
                 status: result

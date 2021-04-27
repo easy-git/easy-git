@@ -158,6 +158,5 @@ module.exports = {
     create,
     remove,
     gitignore,
-    gitattributes,
-    deleteFolderRecursive
+    gitattributes
 }

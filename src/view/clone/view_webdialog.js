@@ -142,9 +142,6 @@ function showClone(webviewPanel) {
         } else {
             isDisplayError = true;
             webviewDialog.displayError('Git: 克隆失败, 请在底部控制台查看失败原因!');
-            try{
-                file.deleteFolderRecursive(projectName);
-            }catch(e){};
         };
     };
 };
