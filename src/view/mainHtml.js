@@ -479,7 +479,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                     <div class="d-inline"  v-if="hoverChangeFileID == 'change_'+i">
                                         <span title="打开文件" @click="openFile(v.path);">${OpenFileIconSvg}</span>
                                         <span title="加入暂存 (git add)" @click="gitAdd(v.path, v.tag);">${AddIconSvg}</span>
-                                        <span title="撤销对文件的修改 (git checkout --)" @click="gitCheckout(v);">${checkoutIconSvg}</span>
+                                        <span title="放弃、撤销对文件的修改 (git checkout --)" @click="gitCheckout(v);">${checkoutIconSvg}</span>
                                     </div>
                                     <div class="d-inline ml-1 pt-2">
                                         <span class="file-label" :class="[v.tag == 'D' ? 'fred' : v.tag == 'U' ? 'fgreen':'f111']"> {{ v.tag }} </span>

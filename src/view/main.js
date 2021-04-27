@@ -465,14 +465,26 @@ class GitFile {
 
         if (fileinfo != '*') {
             if (!ftag.includes('?')) {
-                let checkoutlStatus = await utils.gitCheckoutFile(this.projectPath, fpath);
-                if (checkoutlStatus == 'success') {
-                    this.refreshFileList();
+                let checkoutBoxMsg = `确定要放弃 ${fpath} 中的更改吗？`;
+                let btnText = await utils.hxShowMessageBox('放弃更改', checkoutBoxMsg, ['放弃更改', '取消']).then( btn => {
+                    return btn;
+                });
+                if (btnText == '放弃更改') {
+                    let checkoutlStatus = await utils.gitCheckoutFile(this.projectPath, fpath);
+                    if (checkoutlStatus == 'success') {
+                        this.refreshFileList();
+                    };
                 };
             } else {
-                let status = await utils.gitClean(this.projectPath, fpath);
-                if (status) {
-                    this.refreshFileList();
+                let cleanBoxMsg = `确定要删除 ${fpath} 吗？\n\n此操作不可撤销！\n如果继续操作，此文件将永久丢失。`;
+                let btnText = await utils.hxShowMessageBox('放弃更改', cleanBoxMsg, ['删除文件', '取消']).then( btn => {
+                    return btn;
+                });
+                if (btnText == '删除文件') {
+                    let cleanStatus = await utils.gitClean(this.projectPath, fpath, false);
+                    if (cleanStatus) {
+                        this.refreshFileList();
+                    };
                 };
             };
             GitHBuilderXInnerTrigger = false;
