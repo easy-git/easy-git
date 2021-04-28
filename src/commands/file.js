@@ -195,10 +195,10 @@ class gitRestore {
         if (checkResult == undefined || checkResult == 'error') {
             let { index, working_dir } = checkResult;
             if (actionName == 'restoreStaged') {
-                hx.window.setStatusBarMessage('EasyGit: 操作中止，当前文件没有暂存。', 10000, 'error')
+                hx.window.setStatusBarMessage('EasyGit: 操作中止，当前文件没有暂存。', 30000, 'error')
             };
             if (actionName == 'restoreChanged') {
-                hx.window.setStatusBarMessage('EasyGit: 操作中止，当前文件没有修改。', 10000, 'error')
+                hx.window.setStatusBarMessage('EasyGit: 操作中止，当前文件没有修改。', 30000, 'error')
             };
             return;
         };
