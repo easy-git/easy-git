@@ -180,12 +180,8 @@
         ],
         "commands": [
             {
-                "command": "EasyGit.checkUpdate",
-                "title": "easy-git: 检查更新"
-            },
-            {
-                "command": "EasyGit.openGitRepositoryInBrowser",
-                "title": "easy-git: 在浏览器查看Git仓库(URL)"
+                "command": "EasyGit.clone",
+                "title": "easy-git: clone - 克隆"
             },
             {
                 "command": "EasyGit.main",
@@ -204,16 +200,16 @@
                 "title": "easy-git: init - 初始化仓库"
             },
             {
+                "command": "EasyGit.openGitRepositoryInBrowser",
+                "title": "easy-git: 在浏览器查看Git仓库(URL)"
+            },
+            {
                 "command": "EasyGit.addRemoteOrigin",
                 "title": "easy-git: remote add origin url - 关联/添加远程仓库url"
             },
             {
                 "command": "EasyGit.RemoteRmOrigin",
                 "title": "easy-git: remote rm origin - 删除远程仓库url"
-            },
-            {
-                "command": "EasyGit.clone",
-                "title": "easy-git: clone - 克隆"
             },
             {
                 "command": "EasyGit.pull",
@@ -416,6 +412,14 @@
                 "title": "easy-git: config --global i18n.logoutputencoding utf-8 - 设置log编码"
             },
             {
+                "command": "EasyGit.CommandPanel",
+                "title": "easy-git: 打开命令面板"
+            },
+            {
+                "command": "EasyGit.set",
+                "title": "easy-git: 设置easy-git"
+            },
+            {
                 "command": "EasyGit.help",
                 "title": "easy-git: 帮助文档"
             },
@@ -424,16 +428,12 @@
                 "title": "easy-git: 打开快捷键帮助文档"
             },
             {
-                "command": "EasyGit.set",
-                "title": "easy-git: 设置easy-git"
+                "command": "EasyGit.checkUpdate",
+                "title": "easy-git: 检查更新"
             },
             {
                 "command": "EasyGit.about",
                 "title": "easy-git: 关于"
-            },
-            {
-                "command": "EasyGit.CommandPanel",
-                "title": "easy-git: 打开命令面板"
             }
         ],
         "expressions": {
