@@ -28,6 +28,7 @@
         "onCommand:EasyGit.resetHardLastCommit",
         "onCommand:EasyGit.resetHardCommitID",
         "onCommand:EasyGit.restore",
+        "onCommand:EasyGit.checkoutFile",
         "onCommand:EasyGit.restoreStaged",
         "onCommand:EasyGit.revert",
         "onCommand:EasyGit.pull",
@@ -260,7 +261,11 @@
             },
             {
                 "command": "EasyGit.restore",
-                "title": "easy-git: restore/checkout - 撤消对文件的修改"
+                "title": "easy-git: restore - 撤消对文件的修改"
+            },
+            {
+                "command": "EasyGit.checkoutFile",
+                "title": "easy-git: checkout -- filename - 撤消对文件的修改"
             },
             {
                 "command": "EasyGit.restoreStaged",

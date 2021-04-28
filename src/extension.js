@@ -231,11 +231,17 @@ function activate(context) {
     });
     context.subscriptions.push(restoreStaged);
 
-    // git restore --staged file
+    // git restore file
     let restoreChanged = hx.commands.registerCommand('EasyGit.restore', (param)=> {
         git.action(param, 'restoreChanged');
     });
     context.subscriptions.push(restoreChanged);
+
+    // git checkout -- file 备注：发现一些用户还是习惯性的使用checkout去放弃修改，为了兼容，故此增加此项。
+    let checkoutFile = hx.commands.registerCommand('EasyGit.checkoutFile', (param)=> {
+        git.action(param, 'restoreChanged');
+    });
+    context.subscriptions.push(checkoutFile);
 
     // git revert
     let revert = hx.commands.registerCommand('EasyGit.revert', (param)=> {
