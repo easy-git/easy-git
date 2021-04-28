@@ -8,9 +8,10 @@ const {
     gitTagCreate,
     gitTagDelete,
     gitPush,
-    gitBranch,
+    gitBranchList,
     gitBranchMerge,
     gitBranchSwitch,
+    gitBranchRename,
     gitCurrentBranchName,
     gitLocalBranchToRemote,
     gitDeleteRemoteBranch,
@@ -183,7 +184,7 @@ class Branch {
 
     // Git: get project all branchs
     async getAllBranch(projectPath, type) {
-        let { localBranchList, remoteBranchList } = await gitBranch(projectPath, '-avvv');
+        let { localBranchList, remoteBranchList } = await gitBranchList(projectPath, '-avvv');
 
         let branchs = [...localBranchList];
         if (type == 'all') {
@@ -306,6 +307,28 @@ class Branch {
                 ProjectInfo.easyGitInner = true;
                 hx.commands.executeCommand('EasyGit.branch', ProjectInfo);
             };
+        };
+    };
+
+    // Git: branch rename
+    async renameBranch(ProjectInfo) {
+        let { projectPath } = ProjectInfo;
+
+        let newBranchName = await hx.window.showInputBox({
+            prompt:"Git: 请提供新的分支名称",
+            placeHolder: "必填"
+        }).then((result)=>{
+            return result;
+        });
+
+        let renameStatus = await gitBranchRename(projectPath, newBranchName);
+        if (renameStatus == 'success') {
+            let msg = `分支重命名成功！\n但是还未关联远程仓库，是否推送到远端？ \n点击【立即推送】，将执行：git push --set-upstream origin ${newBranchName}`
+            hxShowMessageBox('Git 分支重命名', msg, ['立即推送','以后再说']).then( (result)=> {
+                if (result == '立即推送') {
+                    gitLocalBranchToRemote(projectPath, newBranchName);
+                };
+            });
         };
     };
 

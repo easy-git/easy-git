@@ -87,7 +87,7 @@ class GitBranch {
             });
         };
 
-        let {localBranchList, remoteBranchList} = await utils.gitBranch(this.projectPath, '-avvv');
+        let {localBranchList, remoteBranchList} = await utils.gitBranchList(this.projectPath, '-avvv');
 
         let {GitAssignAction, behind, ahead, tracking, originurl} = this.initData;
         if (!this.firstInit) {

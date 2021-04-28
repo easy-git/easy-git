@@ -167,6 +167,9 @@ async function action(param,action_name) {
         case 'BranchDelete':
             bch.del(ProjectInfo);
             break;
+        case 'BranchRename':
+            bch.renameBranch(ProjectInfo);
+            break;
         case 'BranchMerge':
             bch.merge(ProjectInfo);
             break;

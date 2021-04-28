@@ -1236,9 +1236,9 @@ async function gitCheckoutFile(workingDir, filename, isConfirm=false) {
 
 
 /**
- * @description 分支操作
+ * @description 获取本地及远程分支列表
  */
-async function gitBranch(workingDir, options='-avvv') {
+async function gitBranchList(workingDir, options='-avvv') {
     let local = [];
     let remote = [];
     try {
@@ -1332,7 +1332,7 @@ async function gitBranchSwitch(workingDir,branchName) {
         let status = await git(workingDir)
             .checkout([branchName])
             .then(() => {
-                hx.window.setStatusBarMessage(`Git: 分支切换成功, 当前分支是 ${branchName}`, 3000, 'info');
+                hx.window.setStatusBarMessage(`Git: 分支切换成功, 当前分支是 ${branchName}`, 20000, 'info');
                 voiceSay(`branch.switch.success`, `当前分支是 ${branchName}`);
                 return 'success';
             })
@@ -1347,6 +1347,34 @@ async function gitBranchSwitch(workingDir,branchName) {
     }
 };
 
+/**
+ * @description 分支重命名
+ * @param {type} workingDir Git工作目录
+ * @param {type} newBranchName 新分支名称
+ */
+async function gitBranchRename(workingDir,newBranchName) {
+    if (newBranchName.trim() == '') {
+        hx.window.showErrorMessage('easy-git: 分支重命名，新分支名称不能为空。', ['我知道了']);
+        return;
+    };
+    try {
+        let argv = ["-m", newBranchName];
+        let status = await git(workingDir)
+            .branch(argv)
+            .then(() => {
+                hx.window.setStatusBarMessage(`Git: 分支重命名成功, 当前分支是 ${newBranchName}`, 20000, 'info');
+                return 'success';
+            })
+            .catch((err) => {
+                let errMsg = (err).toString();
+                createOutputChannel(`Git: 分支${newBranchName}重命名失败! \n ${errMsg}`, 'error');
+                return 'fail';
+            });
+        return status;
+    } catch (e) {
+        return 'error';
+    }
+};
 
 /**
  * @description 强制删除本地分支
@@ -2203,7 +2231,7 @@ async function gitRefs(workingDir) {
     };
     try{
         let refs = {};
-        let branches = await gitBranch(workingDir);
+        let branches = await gitBranchList(workingDir);
         refs = Object.assign(branches);
 
         let tags = await gitTagsList(workingDir);
@@ -2346,7 +2374,7 @@ module.exports = {
     gitCheckoutFile,
     gitDiffFile,
     gitShowCommitFileChange,
-    gitBranch,
+    gitBranchList,
     gitRawGetBranch,
     gitCurrentBranchName,
     gitBranchSwitch,
@@ -2354,6 +2382,7 @@ module.exports = {
     gitDeleteLocalBranch,
     gitDeleteRemoteBranch,
     gitLocalBranchToRemote,
+    gitBranchRename,
     gitBranchCreatePush,
     gitBranchMerge,
     gitTagsList,

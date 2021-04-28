@@ -291,6 +291,12 @@ function activate(context) {
     });
     context.subscriptions.push(BranchDelete);
 
+    // Git Branch reanmeEasyGit.BranchRename
+    let BranchRename = hx.commands.registerCommand('EasyGit.BranchRename', (param)=> {
+        git.action(param, 'BranchRename');
+    });
+    context.subscriptions.push(BranchRename);
+
     // Git merge
     let merge = hx.commands.registerCommand('EasyGit.merge', (param)=> {
         git.action(param, 'BranchMerge');

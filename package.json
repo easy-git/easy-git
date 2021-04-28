@@ -38,6 +38,7 @@
         "onCommand:EasyGit.pushSetUpstream",
         "onCommand:EasyGit.BranchSwitch",
         "onCommand:EasyGit.BranchDelete",
+        "onCommand:EasyGit.BranchRename",
         "onCommand:EasyGit.BranchDiff",
         "onCommand:EasyGit.twoBranchSpecificFileDiff",
         "onCommand:EasyGit.merge",
@@ -286,6 +287,10 @@
             {
                 "command": "EasyGit.BranchDelete",
                 "title": "easy-git: branch delete - 分支删除"
+            },
+            {
+                "command": "EasyGit.BranchRename",
+                "title": "easy-git: branch -m - 重命名当前分支"
             },
             {
                 "command": "EasyGit.merge",
