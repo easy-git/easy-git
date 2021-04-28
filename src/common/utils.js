@@ -1196,7 +1196,7 @@ async function gitReset(workingDir, options, msg) {
 /**
  * @description 撤销对文件的修改
  */
-async function gitCheckoutFile(workingDir, filename) {
+async function gitCheckoutFile(workingDir, filename, isConfirm=false) {
     let args = ['--', filename]
     if (filename == '*') {
         args = ['*']
@@ -1204,6 +1204,16 @@ async function gitCheckoutFile(workingDir, filename) {
 
     let msg = filename == '*' ? 'Git: 正在撤销全部文件的修改...' : `Git: ${filename} 正在撤销对文件的修改!`;
     hx.window.setStatusBarMessage(msg,2000,'info');
+
+    if (isConfirm) {
+        let boxMsg = `确定要放弃 ${filename} 中的更改吗？`;
+        let btnText = await hxShowMessageBox('放弃更改', boxMsg, ['放弃更改', '取消']).then( btn => {
+            return btn;
+        });
+        if (btnText == '取消') {
+            return;
+        };
+    };
 
     try {
 
@@ -1634,23 +1644,24 @@ async function gitTagDelete(workingDir, tagName, isDeleteRemote=false) {
 
 /**
  * @description clean
+ * @param {isConfirm} 布尔值，默认值false 用于源代码管理器视图，点击后弹窗确认。命令面板调用，不需要弹窗确认。
  */
 async function gitClean(workingDir, filepath, isConfirm=true) {
-    let cleanMsg = 'Git: 确认删除当前【所有未跟踪的文件】吗？删除后无法恢复。';
+    let cleanMsg = 'Git: 确认删除当前【所有未跟踪的文件】吗？\n\n此操作不可撤销！\n如果继续操作，此文件将永久丢失。';
     let options = ['-d'];
 
     if (filepath != '*') {
-        cleanMsg = `Git: 确认要删除${filepath} 吗？删除后无法恢复。`;
+        cleanMsg = `Git: 确认要删除${filepath} 吗？\n\n此操作不可撤销！\n如果继续操作，此文件将永久丢失。`;
         options = ['-d', filepath];
     } else {
         options = ['-d', '*'];
     };
 
     if (isConfirm) {
-        let isDeleteBtn = await hx.window.showInformationMessage(cleanMsg, ['删除','关闭']).then((result) =>{
-            return result;
+        let isDeleteBtn = await hxShowMessageBox('放弃更改', cleanMsg, ['删除文件', '取消']).then( btn => {
+            return btn;
         });
-        if (isDeleteBtn == '关闭') {
+        if (isDeleteBtn == '取消') {
             return;
         };
     };

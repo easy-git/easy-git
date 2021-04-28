@@ -2,7 +2,7 @@
     "name": "easy-git",
     "description": "vscode源代码管理工具风格。HBuilderX内唯一的图形化Git工具, 并支持命令面板，支持克隆、提交/更新/拉取、分支/tag管理、日志、文件对比、储藏等操作。",
     "displayName": "【easy-git】Git源代码管理工具",
-    "version": "1.4.4",
+    "version": "1.4.5",
     "publisher": "oneone",
     "engines": {
         "HBuilderX": "^2.8.3"
@@ -260,7 +260,7 @@
             },
             {
                 "command": "EasyGit.restore",
-                "title": "easy-git: restore - 撤消对文件的修改"
+                "title": "easy-git: restore/checkout - 撤消对文件的修改"
             },
             {
                 "command": "EasyGit.restoreStaged",
@@ -272,7 +272,7 @@
             },
             {
                 "command": "EasyGit.clean",
-                "title": "easy-git: clean - 删除未跟踪的文件"
+                "title": "easy-git: clean -df - 删除全部未跟踪的文件"
             },
             {
                 "command": "EasyGit.pushSetUpstream",
