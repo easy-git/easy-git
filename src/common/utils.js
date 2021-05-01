@@ -2165,7 +2165,7 @@ class FillCommitMessage {
         return message.replace(/^\s*#.*$\n?/gm, '').trim();
     }
 
-    async readFile(mergeMsgPath) {
+    readFile(mergeMsgPath) {
         return new Promise((resolve,reject) => {
             fs.readFile(mergeMsgPath, 'utf8', (err, data) => {
                 if (err) {
@@ -2330,13 +2330,12 @@ async function FileWriteAndOpen(filename, filecontent){
     let status = fs.existsSync(EasyGitDir);
     if (!status) {
         fs.mkdirSync(EasyGitDir);
-    } else {
-        let fpath = path.join(EasyGitDir, filename);
-        fs.writeFile(fpath, filecontent, function (err) {
-           if (err) throw err;
-           hx.workspace.openTextDocument(fpath);
-        });
     };
+    let fpath = path.join(EasyGitDir, filename);
+    fs.writeFile(fpath, filecontent, function (err) {
+       if (err) throw err;
+       hx.workspace.openTextDocument(fpath);
+    });
 };
 
 
