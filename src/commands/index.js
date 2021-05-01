@@ -7,7 +7,7 @@ const utils = require('../common/utils.js');
 const count = require('../common/count.js');
 
 const { goStash, goStashPop, goStashClear, goStashShow } = require('./stash.js');
-const { gitInitProject } = require('./repository.js');
+const { gitInitProject } = require('./repository_init.js');
 const { gitAddFile, gitRestore, goCleanFile, goCommit } = require('./file.js');
 const { goSetConfig, goShowConfig } = require('./base.js');
 
