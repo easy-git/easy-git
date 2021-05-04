@@ -5,10 +5,12 @@ const Main = require("./index.js");
 const file = require('./common/file.js');
 const git = require('./commands/index.js');
 const cmp_hx_version = require('./common/cmp.js');
-
-const {getThemeColor} = require('./common/utils.js');
 const upgrade = require('./common/upgrade.js');
+
+const { getThemeColor } = require('./common/utils.js');
+const { Gitee, onUriForResponse } = require('./common/oauth.js');
 const { goSetEncoding } = require('./commands/base.js');
+const { gitRepositoryCreate } = require('./commands/repository.js');
 
 let showCommandPanel = require('./commands/commandPanel.js');
 
@@ -48,11 +50,37 @@ function activate(context) {
         hx.window.registerCustomEditorProvider("EasyGit - 对比差异", providerForDiff);
     };
 
+    try {
+        // 解决某些hx版本上，registerUriHandler拼写错误的Bug
+        let cmpUri = cmp_hx_version(hxVersion, '2.8.12');
+        if (cmpUri > 0) {
+            hx.window.registerUriHanlder({
+                handleUri: function(uri) {
+                    onUriForResponse(uri);
+                }
+            }, context);
+        } else {
+            hx.window.registerUriHandler({
+                handleUri: function(uri) {
+                    onUriForResponse(uri);
+                }
+            }, context);
+        };
+    } catch (e) {
+        console.error(e);
+    };
+
     // 命令面板
     let CommandPanel = hx.commands.registerCommand('EasyGit.CommandPanel', (param) => {
         showCommandPanel(param);
     });
     context.subscriptions.push(CommandPanel);
+
+    // 创建远程仓库
+    let CreateRemoteRepository = hx.commands.registerCommand('EasyGit.CreateRemoteRepository', () => {
+        gitRepositoryCreate();
+    });
+    context.subscriptions.push(CreateRemoteRepository);
 
     // 菜单【源代码管理】，菜单【工具】、及项目管理器右键菜单，打开源代码管理器视图
     let view_fv = hx.commands.registerCommand('EasyGit.main', (param) => {

@@ -19,3 +19,5 @@ docs/todo.md
 docs/test.js
 
 *.zip
+oauth.source.js
+mix.source.js
