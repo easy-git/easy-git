@@ -585,13 +585,13 @@
                     "group": "ext_settings"
                 },
                 {
-                    "command": "EasyGit.main",
-                    "title": "Git: 源代码管理",
+                    "command": "EasyGit.CommandPanel",
+                    "title": "Git: 命令面板",
                     "group": "ext_settings"
                 },
                 {
-                    "command": "EasyGit.CommandPanel",
-                    "title": "Git: 命令面板",
+                    "command": "EasyGit.main",
+                    "title": "Git: 源代码管理",
                     "group": "ext_settings"
                 },
                 {
