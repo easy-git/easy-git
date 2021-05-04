@@ -9,6 +9,7 @@ const cmp_hx_version = require('../common/cmp.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'bootstrap.min.css');
+const customCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'custom.css');
 
 // get hbuilderx version
 let hxVersion = hx.env.appVersion;
@@ -18,9 +19,7 @@ let cmp = cmp_hx_version(hxVersion, '3.1.2');
 let giteeOAuth = new Gitee();
 let githubOAuth = new Github();
 
-/**
- * @description 用于git init之后的操作
- */
+
 class Api {
     constructor(webviewDialog) {
         this.webviewDialog = webviewDialog;
@@ -68,14 +67,9 @@ class Api {
     };
 
     async CreateRepo(CreateInfo) {
-        let {host, name, isPrivate} = CreateInfo;
+        let {host, name, isPrivate, isClone, cloneProtocol} = CreateInfo;
         if (!name.length) {
             this.webviewDialog.displayError('创建：仓库名称无效，请重新输入。');
-            return;
-        };
-
-        if (!['gitee','github'].includes(host)) {
-            this.webviewDialog.displayError('程序运行异常，请联系开发者。');
             return;
         };
 
@@ -127,15 +121,24 @@ class Api {
             if (html_url) {
                 createOutputChannel(`http访问地址：${html_url}`)
             };
-            if (ssh_url) {
-                createOutputChannel(`ssh访问地址：${ssh_url}`)
-            };
             if (clone_url) {
                 createOutputChannel(`https访问地址：${clone_url}`)
+            };
+            if (ssh_url) {
+                createOutputChannel(`ssh访问地址：${ssh_url}\n\n`)
             };
             this.webview.postMessage({
                 type: 'closed'
             });
+
+            if (isClone) {
+                const openWebDialog = require('../view/clone/view_webdialog.js');
+                let repo_url = ssh_url;
+                if (cloneProtocol == 'http') {
+                    repo_url = clone_url ? clone_url : html_url;
+                };
+                openWebDialog(repo_url);
+            };
         };
     }
 }
@@ -204,6 +207,7 @@ async function gitRepositoryCreate() {
         <head>
             <meta charset="UTF-8">
             <link rel="stylesheet" href="${bootstrapCssFile}">
+            <link rel="stylesheet" href="${customCssFile}">
             <script src="${vueFile}"></script>
             <style type="text/css">
                 body {
@@ -224,46 +228,6 @@ async function gitRepositoryCreate() {
                 }
                 [v-cloak] {
                     display: none;
-                }
-                .outline-none {
-                    box-shadow: none !important;
-                }
-                select {
-                    border: none;
-                    border-bottom: 1px solid #000000;
-                    border-radius: 0px;
-                    outline: none;
-                }
-                select:focus {
-                    border-bottom: 1px solid rgb(65,168,99) !important;
-                }
-                select:focus {
-                    border-bottom: 1px solid rgb(65,168,99) !important;
-                }
-                .form-control {
-                    color: #000000 !important;
-                    font-size: 0.93rem !important;
-                    border-left: none !important;
-                    border-right: none !important;
-                    border-top: none !important;
-                    border-radius: 0 !important;
-                }
-                .form-control:focus {
-                    border: 1px solid rgb(65,168,99) !important;
-                    border-left: none !important;
-                    border-right: none !important;
-                    border-top: none !important;
-                    border-radius: 0 !important;
-                }
-                .form-group .form-control::-webkit-input-placeholder, .form-control::-webkit-input-placeholder {
-                    font-size: 0.9rem !important;
-                    font-weight: 200 !important;
-                }
-                input[type="text"]:disabled {
-                	background-color: #FFF;
-                    border-top: 1px solid #FFF;
-                    border-left: 1px solid #FFF;
-                    border-right: 1px solid #FFF;
                 }
                 .authbtn {
                     border: 1px solid #eee;
@@ -347,10 +311,24 @@ async function gitRepositoryCreate() {
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-4">
-                        <label for="u-p" class="col-sm-2 px-0">仓库类型</label>
+                        <label for="repo-type" class="col-sm-2 px-0">仓库类型</label>
                         <div class="col-sm-10 d-inline">
                             <input name="rep" type="radio" class="mr-1" value="false" v-model="repos.isPrivate"/>公开(所有人可见)
                             <input name="rep" type="radio" class="ml-3 mr-1" value="true" v-model="repos.isPrivate"/>私有(仅仓库成员可见)
+                        </div>
+                    </div>
+                    <div class="form-group row m-0 mt-3">
+                        <label for="repo-isClone" class="col-sm-2 px-0">克隆</label>
+                        <div class="col-sm-10">
+                            <input type="checkbox" :class="{ has_sel: isClone }" class="mr-2" v-model="isClone" />
+                            <label class="d-inline">远程仓库创建后，是否克隆到本地</label>
+                        </div>
+                    </div>
+                    <div class="form-group row m-0 mt-3" v-if="isClone">
+                        <label for="repo-type" class="col-sm-2 px-0">克隆协议</label>
+                        <div class="col-sm-10 d-inline">
+                            <input name="Protocol" type="radio" class="mr-1" value="http" v-model="cloneProtocol"/>HTTPS/HTTP
+                            <input name="Protocol" type="radio" class="ml-3 mr-1" value="ssh" v-model="cloneProtocol"/>SSH
                         </div>
                     </div>
                 </form>
@@ -369,6 +347,8 @@ async function gitRepositoryCreate() {
                         host: 'gitee',
                         isShowOrgsList: false,
                         isClickOAuthBtn: false,
+                        isClone: false,
+                        cloneProtocol: 'http',
                         repos: {
                             owner: '',
                             name: '',
@@ -478,6 +458,10 @@ async function gitRepositoryCreate() {
                                     let button = msg.button;
                                     if(button == '开始创建'){
                                         let data = Object.assign({"host": this.host}, this.repos);
+                                        if (this.isClone) {
+                                            data.isClone = this.isClone;
+                                            data.cloneProtocol = this.cloneProtocol;
+                                        };
                                         hbuilderx.postMessage({
                                             type: 'create',
                                             data: data

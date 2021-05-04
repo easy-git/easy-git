@@ -1,0 +1,84 @@
+/**
+ * 复选框
+ */
+@media only screen and (min-resolution: 192dpi),
+only screen and (min-resolution: 2dppx) {
+    .has_sel {
+        display: ineline;
+        width: 16px;
+        height: 16px;
+        border: 1px solid #B06A50;
+        border-radius: 1px;
+        position: relative;
+    }
+
+    .has_sel:before {
+        content: "";
+        width: 2px;
+        height: 6px;
+        background-color: #B06A50;
+        border-radius: 1px;
+        position: absolute;
+        left: 4px;
+        bottom: 3px;
+        transform: rotate(-45deg);
+        -ms-transform: rotate(-45deg);
+        -moz-transform: rotate(-45deg);
+        -webkit-transform: rotate(-45deg);
+        -o-transform: rotate(-45deg);
+    }
+
+    .has_sel:after {
+        content: "";
+        width: 2px;
+        height: 10px;
+        background-color: #B06A50;
+        border-radius: 1px;
+        position: absolute;
+        left: 8px;
+        bottom: 3px;
+        transform: rotate(37deg);
+        -ms-transform: rotate(37deg);
+        -moz-transform: rotate(37deg);
+        -webkit-transform: rotate(37deg);
+        -o-transform: rotate(37deg);
+    }
+}
+
+
+/**
+ * 输入框
+ */
+input[type="text"]:disabled {
+    background-color: #FFF;
+    border-top: 1px solid #FFF;
+    border-left: 1px solid #FFF;
+    border-right: 1px solid #FFF;
+}
+
+.outline-none {
+    box-shadow: none !important;
+}
+
+.form-control {
+    color: #000000 !important;
+    font-size: 0.93rem !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+    border-radius: 0 !important;
+}
+
+.form-control:focus {
+    border: 1px solid rgb(65, 168, 99) !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+    border-radius: 0 !important;
+}
+
+.form-group .form-control::-webkit-input-placeholder,
+.form-control::-webkit-input-placeholder {
+    font-size: 0.9rem !important;
+    font-weight: 200 !important;
+}

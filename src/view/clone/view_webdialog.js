@@ -39,15 +39,17 @@ function getProjectWizard() {
 
 /**
  * @description 仓库克隆
- * @param {Object} webviewPanel
- * @param {Object} gitData
+ * @param {String} clone_url 用于外部调用
  */
-function showClone(webviewPanel) {
+function showClone(clone_url="") {
 
     // HBuilderX数据
     let ProjectWizard = getProjectWizard();
     let hxData = { 'ProjectWizard': ProjectWizard };
 
+    if (clone_url != "") {
+        GitRepoUrl = clone_url;
+    }
     // 上次克隆失败的仓库地址, 用于数据填充
     if (GitRepoUrl && GitRepoUrl.length) {
         hxData = Object.assign(hxData, {"GitRepoUrl": GitRepoUrl})
