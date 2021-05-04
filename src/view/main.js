@@ -638,7 +638,7 @@ function watchProjectDir(projectDir, func) {
 
     try {
         // 项目目录刷新事件
-        const debounceFileList = debounce(1800, () => {
+        const debounceFileList = debounce(2000, () => {
             func.refreshFileList();
         });
         // .Git目录刷新事件
@@ -654,11 +654,12 @@ function watchProjectDir(projectDir, func) {
             if (basename == 'index.lock') return;
             let isGitDirFile = vpath.includes(('.git/' + basename)) ? true : false;
 
-            // 2021-03-26 解决频繁编辑一个文件，触发监听的问题
             if (event == 'change' && vpath == path.join(gitDir, 'index')) {
                 lastListeningFileInfo = undefined;
             };
 
+            // 2021-03-26 解决频繁编辑一个文件，触发监听的问题
+            // 2021-05-04 也是修改后，实时监听。有必要？已知问题：在低配置电脑上，会引发性能问题。
             if (event == 'change' && !isGitDirFile) {
                 let tmpStr = 'event' + ' - ' + vpath;
                 if (lastListeningFileInfo == tmpStr) {
@@ -674,7 +675,7 @@ function watchProjectDir(projectDir, func) {
                 debounceFileList();
                 setTimeout(function(){
                     listeningProjectFile = false;
-                }, 2000);
+                }, 1800);
             };
             // 仅监听.git
             if (isGitDirFile == true && event == 'change' && GitHBuilderXInnerTrigger == false && listeningProjectFile == false) {
@@ -687,7 +688,7 @@ function watchProjectDir(projectDir, func) {
                 };
                 setTimeout(function(){
                     listeningProjectFile = false;
-                }, 2000);
+                }, 1800);
             };
         });
     } catch (e) {};
