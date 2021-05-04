@@ -162,7 +162,7 @@ async function gitSetForWebDialog(ProjectInfo) {
         dialogButtons: ["开始设置", "关闭"],
         size: {
             width: 730,
-            height: 400
+            height: 430
         }
     }, {
         enableScripts: true
@@ -185,6 +185,14 @@ async function gitSetForWebDialog(ProjectInfo) {
                     {"projectPath": projectPath, "projectName": projectName},
                 )
                 gitConfigSetForWebDialog(webviewDialog, setData);
+                break;
+            case 'createRemoteRepo':
+                let LocalRepoParams = {
+                    "easyGitInner": true,
+                    "projectPath": projectPath,
+                    "projectName": projectName
+                };
+                hx.commands.executeCommand('EasyGit.CreateRemoteRepository', LocalRepoParams);
                 break;
             default:
                 break;
@@ -260,11 +268,14 @@ async function gitSetForWebDialog(ProjectInfo) {
                         <label for="u-p" class="col-sm-2 px-0 pt-3">仓库URL</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control outline-none" id="git-url" placeholder="要添加的Git仓库地址，以https://或git@开头" v-model.trim="init_data.RepositoryURL">
-                            <p class="form-text text-muted pl-2">
+                            <p class="form-text text-muted pl-2 mb-0">
                                 若无仓库，可到
                                 <span><a href="https://github.com/">GitHub官网</a>、</span>
                                 <span><a href="https://gitee.com/">Gitee官网</a></span>
-                                创建仓库或拷贝仓库URL
+                                等托管服务器拷贝仓库URL
+                            </p>
+                            <p class="form-text text-muted pl-2">
+                                或点击此处: <span style="color: #007bff !important;" @click="gitCreateRemoteRepo();">创建远程仓库</span>
                             </p>
                         </div>
                     </div>
@@ -349,6 +360,11 @@ async function gitSetForWebDialog(ProjectInfo) {
                                 };
                             });
                         },
+                        gitCreateRemoteRepo() {
+                            hbuilderx.postMessage({
+                                command: 'createRemoteRepo'
+                            });
+                        },
                         gitSet() {
                             hbuilderx.onDidReceiveMessage((msg)=>{
                                 if(msg.type == 'DialogButtonEvent'){
@@ -370,10 +386,10 @@ async function gitSetForWebDialog(ProjectInfo) {
                 });
             </script>
             <script>
-                window.oncontextmenu = function() {
-                    event.preventDefault();
-                    return false;
-                };
+                // window.oncontextmenu = function() {
+                //     event.preventDefault();
+                //     return false;
+                // };
             </script>
         </body>
     </html>`
