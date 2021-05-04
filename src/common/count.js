@@ -15,7 +15,9 @@ hxTheme = colorScheme ? colorScheme : "Default";
 let currentDate = undefined;
 let logFlags = false;
 let mainFlags = false;
+let initFlags = false;
 let diffFlags = false;
+let cloneFlags = false;
 let CommandPanelFlags = false;
 
 let hxVersion = hx.env.appVersion;
@@ -62,7 +64,7 @@ function getCurrentData() {
  */
 async function count(viewname) {
 
-    if (["log", "main", "diff", "CommandPanel"].includes(viewname)) {
+    if (["log", "main", "diff", "CommandPanel", "clone", "init"].includes(viewname)) {
        let view_flags = eval(viewname+ "Flags");
        let view_flags_date = getCurrentData();
 
@@ -105,6 +107,8 @@ async function count(viewname) {
                     if (viewname == 'log') { logFlags = true};
                     if (viewname == 'main') { mainFlags = true};
                     if (viewname == 'diff') { diffFlags = true};
+                    if (viewname == 'clone') { cloneFlags = true};
+                    if (viewname == 'init') { initFlags = true};
                     if (viewname == 'CommandPanel') { CommandPanelFlags = true};
                     resolve('Y');
                 })
