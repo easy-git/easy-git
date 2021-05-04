@@ -647,7 +647,7 @@ function watchProjectDir(projectDir, func) {
         });
 
         watcherListen = chokidar.watch(projectDir, {
-            ignored: path => ["node_modules",'unpackage', '.git/objects'].some(s => path.includes(s)),
+            ignored: path => ["node_modules",'unpackage', 'dist', '.git/objects'].some(s => path.includes(s)),
             ignoreInitial: true
         }).on('all', (event, vpath) => {
             let basename = path.basename(vpath);
