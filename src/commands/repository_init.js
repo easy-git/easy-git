@@ -386,10 +386,10 @@ async function gitSetForWebDialog(ProjectInfo) {
                 });
             </script>
             <script>
-                // window.oncontextmenu = function() {
-                //     event.preventDefault();
-                //     return false;
-                // };
+                window.oncontextmenu = function() {
+                    event.preventDefault();
+                    return false;
+                };
             </script>
         </body>
     </html>`
