@@ -43,7 +43,7 @@ async function openBranchDiffView(ProjectInfo, isSpecificFile=false) {
     );
 
     let dialogTitle = isSpecificFile ? 'Git 对比两个分支上的指定文件' : 'Git 分支对比';
-
+    let height = isSpecificFile ? 400 : 450;
     // 创建webviewdialog
     let webviewDialog = hx.window.createWebViewDialog({
         modal: true,
@@ -51,7 +51,7 @@ async function openBranchDiffView(ProjectInfo, isSpecificFile=false) {
         dialogButtons: ["开始比较", "关闭"],
         size: {
             width: 730,
-            height: 450
+            height: height
         }
     }, {
         enableScripts: true
@@ -261,13 +261,9 @@ function generateLogHtml(hxdata) {
                         bottom: 3px;
                         transform: rotate(-45deg);
                         -ms-transform: rotate(-45deg);
-                        /* IE 9 */
                         -moz-transform: rotate(-45deg);
-                        /* Firefox */
                         -webkit-transform: rotate(-45deg);
-                        /* Safari 和 Chrome */
                         -o-transform: rotate(-45deg);
-                        /* opear */
                     }
 
                     .has_sel:after {
@@ -281,13 +277,9 @@ function generateLogHtml(hxdata) {
                         bottom: 3px;
                         transform: rotate(37deg);
                         -ms-transform: rotate(37deg);
-                        /* IE 9 */
                         -moz-transform: rotate(37deg);
-                        /* Firefox */
                         -webkit-transform: rotate(37deg);
-                        /* Safari 和 Chrome */
                         -o-transform: rotate(37deg);
-                        /* opear */
                     }
                 }
             </style>
@@ -316,7 +308,7 @@ function generateLogHtml(hxdata) {
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3" v-if="isSpecificFile">
-                        <label for="u-p" class="col-sm-2">文件路径</label>
+                        <label for="u-p" class="col-sm-2 pt-2">文件路径</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control outline-none" v-model="selectedFile" placeholder="进行差异对比的文件路径"/>
                             <p class="form-text text-muted mb-0 mt-2">要比较的文件，路径必须为绝对路径、或项目下文件的相对路径。</p>
@@ -467,10 +459,10 @@ function generateLogHtml(hxdata) {
                 });
             </script>
             <script>
-                // window.oncontextmenu = function() {
-                //     event.preventDefault();
-                //     return false;
-                // };
+                window.oncontextmenu = function() {
+                    event.preventDefault();
+                    return false;
+                };
             </script>
         </body>
     </html>
