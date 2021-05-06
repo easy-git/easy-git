@@ -1,11 +1,14 @@
 const path = require('path');
+const fs = require('fs');
 const hx = require('hbuilderx');
-const { gitRaw, createOutputChannel } = require('../common/utils.js');
-const { axiosPost, axiosGet } = require('../common/axios.js');
-const { Gitee, Github } = require('../common/oauth.js');
+const chokidar = require('chokidar');
+
 const { goSetEncoding } = require('./base.js');
 
 const cmp_hx_version = require('../common/cmp.js');
+const { axiosPost, axiosGet } = require('../common/axios.js');
+const { Gitee, Github } = require('../common/oauth.js');
+const { gitRaw, createOutputChannel } = require('../common/utils.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'bootstrap.min.css');
@@ -19,19 +22,43 @@ let cmp = cmp_hx_version(hxVersion, '3.1.2');
 let giteeOAuth = new Gitee();
 let githubOAuth = new Github();
 
-
+var watcher;
 class Api {
     constructor(webviewDialog) {
         this.webviewDialog = webviewDialog;
         this.webview = webviewDialog.webView;
     };
 
+    listeningAuthorize(host) {
+        const appDataDir = hx.env.appData;
+        const OAuthConfigDir = path.join(appDataDir, 'easy-git', 'oauth');
+        const status = fs.existsSync(OAuthConfigDir);
+        if (!status) {
+            fs.mkdirSync(OAuthConfigDir);
+        };
+
+        try {
+            watcher = chokidar.watch(OAuthConfigDir, {
+                ignoreInitial: true
+            }).on('all', (event, vpath) => {
+                let tmp = path.basename(vpath)
+                if (tmp == `.${host}`) {
+                    this.refreshAuthorizeStatus(host)
+                };
+            });
+        } catch (e) {
+            console.log(e);
+        };
+    };
+
     goAuthorize(host) {
         if (host == 'gitee') {
             giteeOAuth.authorize(true);
+            this.listeningAuthorize(host);
         };
         if (host == 'github') {
             githubOAuth.authorize(true);
+            this.listeningAuthorize(host);
         };
     };
 
@@ -40,6 +67,12 @@ class Api {
             let authResult = await giteeOAuth.readLocalToken();
             this.webview.postMessage({
                 type: 'authorizeResult', host: 'gitee', data: authResult
+            });
+        };
+        if (host == 'github') {
+            let authResult = await githubOAuth.readLocalToken();
+            this.webview.postMessage({
+                type: 'authorizeResult', host: 'github', data: authResult
             });
         };
     };
@@ -105,7 +138,6 @@ class Api {
             };
         };
         let createResult = await axiosPost(url, params, headers).catch( error=> {
-            console.error(typeof(error))
             createOutputChannel(`${host}: 创建远程仓库发生异常。`, "error");
             let resMsg = error instanceof Object;
             if (resMsg) {
@@ -115,6 +147,7 @@ class Api {
             this.webviewDialog.setButtonStatus("开始创建", []);
             return;
         });
+
         if (createResult) {
             createOutputChannel(`${host}: 创建远程仓库成功。`, "success");
             let {html_url, ssh_url, clone_url} = createResult;
@@ -140,8 +173,8 @@ class Api {
                 openWebDialog(repo_url);
             };
         };
-    }
-}
+    };
+};
 
 /**
  * @description 创建远程仓库
@@ -180,6 +213,9 @@ async function gitRepositoryCreate() {
         let { data } = msg;
         switch (type) {
             case 'closed':
+                if (watcher) {
+                    watcher.close();
+                };
                 webviewDialog.close();
                 break;
             case 'create':
@@ -242,6 +278,10 @@ async function gitRepositoryCreate() {
                     color: blue;
                     font-size: 12px;
                 }
+                button:active {
+                    -webkit-transform: rotate(0.9);
+                    transform: scale(0.9);
+                }
                 .forlist {
                     list-style: none;
                     padding-left: 10px;
@@ -265,8 +305,8 @@ async function gitRepositoryCreate() {
                     <div class="form-group row m-0">
                         <label for="u-p" class="col-sm-2 px-0">托管主机</label>
                         <div class="col-sm-10 d-inline">
-                            <input name="host" type="radio" class="mr-1" value="github" v-model="host"/>GitHub
-                            <input name="host" type="radio" class="mr-1 ml-3" value="gitee" v-model="host"/>Gitee
+                            <input name="host" type="radio" class="mr-1" :class="{has_sel: host=='github'}" value="github" v-model="host"/>GitHub
+                            <input name="host" type="radio" class="mr-1 ml-3" :class="{has_sel: host=='gitee'}" value="gitee" v-model="host"/>Gitee
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3">
@@ -282,13 +322,13 @@ async function gitRepositoryCreate() {
                                 <span class="text-muted">{{host}}已授权</span>
                             </div>
                             <div v-else-if="['fail-authorize','permission-denied'].includes(oauth_info.status) ">
-                                <button class="authbtn d-inline" @click="goAuthorize();" >重新授权</button>
-                                <button class="ml-3 refreshbtn d-inline" @click="goAuthorizeRefresh();">刷新</button>
+                                <button type="button" class="authbtn d-inline" @click="goAuthorize();" >重新授权</button>
+                                <button type="button" class="ml-3 refreshbtn d-inline" @click="goAuthorizeRefresh();">刷新</button>
                                 <span class="text-muted pl-2" v-if="oauth_info.msg">{{oauth_info.msg}}</span>
                             </div>
                             <div v-else>
-                                <button class="authbtn d-inline" @click="goAuthorize();" >连接{{host}}账号</button>
-                                <button class="ml-3 refreshbtn d-inline" @click="goAuthorizeRefresh();">刷新</button>
+                                <button type="button" class="authbtn d-inline outline-none" @click="goAuthorize();" >连接{{host}}账号</button>
+                                <button type="button" class="ml-3 refreshbtn d-inline outline-none" @click="goAuthorizeRefresh();">刷新</button>
                                 <span class="text-muted pl-2" v-if="oauth_info.msg">{{oauth_info.msg}}</span>
                             </div>
                         </div>
@@ -313,8 +353,8 @@ async function gitRepositoryCreate() {
                     <div class="form-group row m-0 mt-4">
                         <label for="repo-type" class="col-sm-2 px-0">仓库类型</label>
                         <div class="col-sm-10 d-inline">
-                            <input name="rep" type="radio" class="mr-1" value="false" v-model="repos.isPrivate"/>公开(所有人可见)
-                            <input name="rep" type="radio" class="ml-3 mr-1" value="true" v-model="repos.isPrivate"/>私有(仅仓库成员可见)
+                            <input name="rep" type="radio" class="mr-1" value="0" :class="{has_sel: isPrivate == '0' }" v-model="isPrivate"/>公开(所有人可见)
+                            <input name="rep" type="radio" class="ml-3 mr-1" value="1" :class="{has_sel: isPrivate == '1'}" v-model="isPrivate"/>私有(仅仓库成员可见)
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3">
@@ -327,8 +367,8 @@ async function gitRepositoryCreate() {
                     <div class="form-group row m-0 mt-3" v-if="isClone">
                         <label for="repo-type" class="col-sm-2 px-0">克隆协议</label>
                         <div class="col-sm-10 d-inline">
-                            <input name="Protocol" type="radio" class="mr-1" value="http" v-model="cloneProtocol"/>HTTPS/HTTP
-                            <input name="Protocol" type="radio" class="ml-3 mr-1" value="ssh" v-model="cloneProtocol"/>SSH
+                            <input name="Protocol" type="radio" class="mr-1" value="http" :class="{has_sel: cloneProtocol=='http'}" v-model="cloneProtocol"/>HTTPS/HTTP
+                            <input name="Protocol" type="radio" class="ml-3 mr-1" value="ssh" :class="{has_sel: cloneProtocol=='ssh'}"  v-model="cloneProtocol"/>SSH
                         </div>
                     </div>
                 </form>
@@ -349,11 +389,12 @@ async function gitRepositoryCreate() {
                         isClickOAuthBtn: false,
                         isClone: false,
                         cloneProtocol: 'http',
+                        isPrivate: '0',
                         repos: {
                             owner: '',
                             name: '',
                             description: '',
-                            isPrivate: true
+                            isPrivate: ''
                         }
                     },
                     computed: {
@@ -453,11 +494,11 @@ async function gitRepositoryCreate() {
                         },
                         gitSet() {
                             hbuilderx.onDidReceiveMessage((msg)=>{
-                                console.log(msg)
                                 if(msg.type == 'DialogButtonEvent'){
                                     let button = msg.button;
                                     if(button == '开始创建'){
                                         let data = Object.assign({"host": this.host}, this.repos);
+                                        data.isPrivate = this.isPrivate == 1 ? true : false;
                                         if (this.isClone) {
                                             data.isClone = this.isClone;
                                             data.cloneProtocol = this.cloneProtocol;

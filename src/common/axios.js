@@ -12,7 +12,7 @@ function axiosPost(url, params = {}, customHeader = {}) {
         headers = Object.assign(headers, customHeader);
     };
     const instance = axios.create({
-        timeout: 1000,
+        timeout: 20000,
         headers: headers
     });
     return new Promise((resolve, reject) => {
