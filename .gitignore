@@ -7,6 +7,13 @@
 
 # JavaScript
 !node_modules/
+node_modules/**/.babelrc
+node_modules/**/.eslintignore
+node_modules/**/.flowconfig
+node_modules/**/.eslintrc
+node_modules/**/README.md
+node_modules/**/.editorconfig
+
 .eslintcache
 unpackage/dist/build/
 unpackage/dist/dev/
