@@ -7,7 +7,7 @@ const { goSetEncoding } = require('./base.js');
 
 const cmp_hx_version = require('../common/cmp.js');
 const { axiosPost, axiosGet } = require('../common/axios.js');
-const { Gitee, Github } = require('../common/oauth.js');
+const { Gitee, Github, gitRepoCreate } = require('../common/oauth.js');
 const { gitRaw, createOutputChannel } = require('../common/utils.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'vue.min.js');
@@ -47,7 +47,7 @@ class Api {
                 };
             });
         } catch (e) {
-            console.log(e);
+            console.error(e);
         };
     };
 
@@ -77,28 +77,6 @@ class Api {
         };
     };
 
-    async get_access_token(host) {
-        if (host == 'gitee') {
-            let giteeOAuthInfo = await giteeOAuth.readLocalToken();
-            let {status,access_token} = giteeOAuthInfo;
-            if (status != 'success-authorize' && access_token == '') {
-                createOutputChannel("Gitee：身份信息无效，或权限不够，请重新授权认证。", "error");
-                return 'fail';
-            };
-            return access_token;
-        } else if (host == 'github') {
-            let githubOAuthInfo = await githubOAuth.readLocalToken();
-            let {status,access_token} = githubOAuthInfo;
-            if (status != 'success-authorize' && access_token == '') {
-                createOutputChannel("Github：身份信息无效，或权限不够，请重新授权认证。", "error");
-                return 'fail';
-            };
-            return access_token;
-        } else {
-            return 'fail';
-        };
-    };
-
     async CreateRepo(CreateInfo) {
         let {host, name, isPrivate, isClone, cloneProtocol} = CreateInfo;
         if (!name.length) {
@@ -109,70 +87,7 @@ class Api {
         this.webviewDialog.displayError('');
         this.webviewDialog.setButtonStatus("开始创建", ["loading", "disable"]);
 
-        let access_token = await this.get_access_token(host);
-        if (access_token == 'fail') {
-            this.webviewDialog.displayError('错误：token无效，请重新授权。');
-            this.webviewDialog.setButtonStatus("开始创建", []);
-            return;
-        }
-
-        let url = "";
-        if (host == 'gitee') {
-            url = "https://gitee.com/api/v5/user/repos";
-        };
-        if (host == 'github') {
-            url = "https://api.github.com/user/repos"
-        };
-
-        let params = {
-            "access_token": access_token,
-            "name":name,
-            "private": isPrivate
-        };
-
-        let headers = {};
-        if (host == 'github') {
-            headers = {
-                "Authorization": `token ${access_token}`,
-                "Accept": "application/vnd.github.v3+json"
-            };
-        };
-        let createResult = await axiosPost(url, params, headers).catch( error=> {
-            createOutputChannel(`${host}: 创建远程仓库发生异常。`, "error");
-            let resMsg = error instanceof Object;
-            if (resMsg) {
-                let message = JSON.stringify(error);
-                createOutputChannel(`${host}: 服务器返回，${message}`, "error");
-            };
-            this.webviewDialog.setButtonStatus("开始创建", []);
-            return;
-        });
-
-        if (createResult) {
-            createOutputChannel(`${host}: 创建远程仓库成功。`, "success");
-            let {html_url, ssh_url, clone_url} = createResult;
-            if (html_url) {
-                createOutputChannel(`http访问地址：${html_url}`)
-            };
-            if (clone_url) {
-                createOutputChannel(`https访问地址：${clone_url}`)
-            };
-            if (ssh_url) {
-                createOutputChannel(`ssh访问地址：${ssh_url}\n\n`)
-            };
-            this.webview.postMessage({
-                type: 'closed'
-            });
-
-            if (isClone) {
-                const openWebDialog = require('../view/clone/view_webdialog.js');
-                let repo_url = ssh_url;
-                if (cloneProtocol == 'http') {
-                    repo_url = clone_url ? clone_url : html_url;
-                };
-                openWebDialog(repo_url);
-            };
-        };
+        gitRepoCreate(CreateInfo, this.webviewDialog);
     };
 };
 
