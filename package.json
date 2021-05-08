@@ -13,6 +13,7 @@
     "main": "./src/extension",
     "activationEvents": [
         "onUri",
+        "onCommand:EasyGit.oauth",
         "onCommand:EasyGit.CommandPanel",
         "onCommand:EasyGit.CreateRemoteRepository",
         "onCommand:EasyGit.main",
@@ -182,6 +183,10 @@
             }
         ],
         "commands": [
+            {
+                "command": "EasyGit.oauth",
+                "title": "easy-git: oauth - 授权github/gitee等Git服务器"
+            },
             {
                 "command": "EasyGit.clone",
                 "title": "easy-git: clone - 克隆"
@@ -601,6 +606,14 @@
                 },
                 {
                     "group": "easygit@2"
+                },
+                {
+                    "command": "EasyGit.oauth",
+                    "title": "OAuth授权Git托管服务器",
+                    "group": "easygit@1"
+                },
+                {
+                    "group": "easygit@1"
                 },
                 {
                     "command": "EasyGit.setUserName",

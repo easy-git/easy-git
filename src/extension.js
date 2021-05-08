@@ -8,6 +8,7 @@ const cmp_hx_version = require('./common/cmp.js');
 const upgrade = require('./common/upgrade.js');
 
 const { getThemeColor } = require('./common/utils.js');
+const { openOAuthBox } = require('./common/oauth.js');
 const { Gitee, onUriForResponse } = require('./common/oauth.js');
 const { goSetEncoding } = require('./commands/base.js');
 const { gitRepositoryCreate } = require('./commands/repository.js');
@@ -493,7 +494,14 @@ function activate(context) {
     // set keyboard
     let keyboard = hx.commands.registerCommand('EasyGit.keyboard', () => {
         hx.env.openExternal('https://easy-git.gitee.io/setting/keyboard');
-    })
+    });
+    context.subscriptions.push(keyboard);
+
+    // oauth
+    let gitOAuth = hx.commands.registerCommand('EasyGit.oauth', () => {
+        openOAuthBox();
+    });
+    context.subscriptions.push(gitOAuth);
 };
 
 

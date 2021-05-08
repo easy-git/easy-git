@@ -56,6 +56,10 @@ input[type="text"]:disabled {
     border-right: 1px solid #FFF;
 }
 
+.form-text {
+    font-size: 13px;
+}
+
 .outline-none {
     box-shadow: none !important;
     outline: none !important;
@@ -80,6 +84,49 @@ input[type="text"]:disabled {
 
 .form-group .form-control::-webkit-input-placeholder,
 .form-control::-webkit-input-placeholder {
-    font-size: 0.9rem !important;
+    font-size: 0.85rem !important;
     font-weight: 200 !important;
+}
+
+.input-icon {
+    position: absolute;
+    margin-top: -30px;
+    right: 20px
+}
+
+.input-icon:active {
+    -webkit-transform: rotate(0.9);
+    transform: scale(0.9);
+}
+
+
+/**
+ * ul
+ */
+.ul-list {
+    max-height: 144px !important;
+    overflow-y: auto;
+    list-style: none;
+    padding-left: 10px;
+    position: absolute;
+    z-index: 1600;
+    border-radius: 3px;
+    box-shadow: 0 0 8px 0 rgba(55, 49, 29, .15);
+    background-color: #FFF;
+    width: 100%;
+    background-clip: padding-box;
+    border: 1px solid #e8e0ca;
+}
+
+.ul-list li {
+    height: 36px;
+    line-height: 36px;
+    width: 100%;
+    border-bottom: 1px solid #f5f5f5;
+    font-size: 12px;
+    color: #333;
+}
+
+.ul-list li:hover {
+    color: rgb(65, 168, 99);
 }

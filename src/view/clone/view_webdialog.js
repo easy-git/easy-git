@@ -7,16 +7,17 @@ const { debounce } = require('throttle-debounce');
 const ini = require('ini');
 const hx = require('hbuilderx');
 
-const icon = require('../static/icon.js');
-
 const MainView = require('../main.js');
 const utils = require('../../common/utils.js');
-const file = require('../../common/file.js');
-
-const osName = os.platform();
+const { Gitee, openOAuthBox } = require('../../common/oauth.js');
+const {getSyncIcon} = require('../static/icon.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'static', 'vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
+const customCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'custom.css');
+
+const osName = os.platform();
+const SyncIcon = getSyncIcon('#d4d4d4');
 
 // Git仓库地址，用于数据填充
 var GitRepoUrl = '';
@@ -36,9 +37,94 @@ function getProjectWizard() {
     };
 };
 
+/**
+ * @description 获取用户仓库列表
+ */
+async function getUserAllGitRepos(webview) {
+    let gitee = new Gitee();
+    let repos = await gitee.getUserRepos();
+    if (repos == 'fail-authorize') {
+        webview.postMessage({
+            command: 'authResult',
+            data: false
+        });
+        return;
+    };
+    if (repos) {
+        webview.postMessage({
+            command: 'authResult',
+            data: true
+        });
+        webview.postMessage({
+            command: 'repos',
+            data: repos
+        });
+    };
+};
 
 /**
- * @description 仓库克隆
+ * @description 开始克隆
+ */
+var isDisplayError;
+async function clone(webviewDialog, webview, info) {
+    let {localPath} = info;
+    let projectName = localPath.split('/').pop();
+    info = Object.assign(info,{
+        'projectName': projectName
+    });
+
+    // 记录仓库地址
+    GitRepoUrl = info.repo;
+
+    // 判断git仓库地址是否有效
+    if (!GitRepoUrl.includes('git@') && (/^(http|https):\/\//.test(GitRepoUrl) == false)) {
+        isDisplayError = true;
+        webviewDialog.displayError(`Git仓库地址无效`);
+        return;
+    };
+
+    if (fs.existsSync(localPath)) {
+        let isEmpty = await utils.isDirEmpty(localPath);
+        if (isEmpty > 0) {
+            isDisplayError = true;
+            webviewDialog.displayError(`目录 ${localPath} 已存在!`);
+            return;
+        };
+    };
+    // 清除上次错误提示
+    if (isDisplayError) {
+        webviewDialog.displayError('');
+    };
+
+    webviewDialog.setButtonStatus("开始克隆", ["loading", "disable"]);
+    let result = await utils.gitClone(info);
+
+    webviewDialog.setButtonStatus("开始克隆", []);
+    webview.postMessage({
+        command: 'cloneResult',
+        status: result
+    });
+
+    if (result == 'success') {
+        // 清除缓存数据
+        GitRepoUrl = '';
+        // 导入克隆项目到项目管理器
+        utils.importProjectToExplorer(localPath);
+        let pinfo = {
+            'easyGitInner': true,
+            'projectName': projectName,
+            'projectPath': localPath
+        };
+        hx.commands.executeCommand('EasyGit.main', pinfo);
+        hx.commands.executeCommand('workbench.view.explorer');
+    } else {
+        isDisplayError = true;
+        webviewDialog.displayError('Git: 克隆失败, 请在底部控制台查看失败原因!');
+    };
+};
+
+/**
+ * @description 打开克隆视图
  * @param {String} clone_url 用于外部调用
  */
 function showClone(clone_url="") {
@@ -55,14 +141,13 @@ function showClone(clone_url="") {
         hxData = Object.assign(hxData, {"GitRepoUrl": GitRepoUrl})
     };
 
-    let isDisplayError;
     let webviewDialog = hx.window.createWebViewDialog({
         modal: true,
         title: "Git克隆",
         dialogButtons: ["开始克隆", "关闭"],
         size: {
             width: 700,
-            height: 450
+            height: 470
         }
     }, {
         enableScripts: true
@@ -75,10 +160,16 @@ function showClone(clone_url="") {
         let action = msg.command;
         switch (action) {
             case 'clone':
-                clone(msg.info);
+                clone(webviewDialog, webview, msg.info);
                 break;
             case 'closed':
                 webviewDialog.close();
+                break;
+            case 'authorize':
+                openOAuthBox();
+                break;
+            case 'MyGitRepos':
+                getUserAllGitRepos(webview);
                 break;
             default:
                 break;
@@ -89,63 +180,6 @@ function showClone(clone_url="") {
     promi.then(function (data) {
         // 处理错误信息
     });
-
-    async function clone(info) {
-        let {localPath} = info;
-        let projectName = localPath.split('/').pop();
-        info = Object.assign(info,{
-            'projectName': projectName
-        });
-
-        // 记录仓库地址
-        GitRepoUrl = info.repo;
-
-        // 判断git仓库地址是否有效
-        if (!GitRepoUrl.includes('git@') && (/^(http|https):\/\//.test(GitRepoUrl) == false)) {
-            isDisplayError = true;
-            webviewDialog.displayError(`Git仓库地址无效`);
-            return;
-        };
-
-        if (fs.existsSync(localPath)) {
-            let isEmpty = await utils.isDirEmpty(localPath);
-            if (isEmpty > 0) {
-                isDisplayError = true;
-                webviewDialog.displayError(`目录 ${localPath} 已存在!`);
-                return;
-            };
-        };
-        // 清除上次错误提示
-        if (isDisplayError) {
-            webviewDialog.displayError('');
-        };
-
-        webviewDialog.setButtonStatus("开始克隆", ["loading", "disable"]);
-        let result = await utils.gitClone(info);
-
-        webviewDialog.setButtonStatus("开始克隆", []);
-        webview.postMessage({
-            command: 'cloneResult',
-            status: result
-        });
-
-        if (result == 'success') {
-            // 清除缓存数据
-            GitRepoUrl = '';
-            // 导入克隆项目到项目管理器
-            utils.importProjectToExplorer(localPath);
-            let pinfo = {
-                'easyGitInner': true,
-                'projectName': projectName,
-                'projectPath': localPath
-            };
-            hx.commands.executeCommand('EasyGit.main', pinfo);
-            hx.commands.executeCommand('workbench.view.explorer');
-        } else {
-            isDisplayError = true;
-            webviewDialog.displayError('Git: 克隆失败, 请在底部控制台查看失败原因!');
-        };
-    };
 };
 
 
@@ -165,6 +199,7 @@ function generateLogHtml(hxData) {
         <head>
             <meta charset="UTF-8">
             <link rel="stylesheet" href="${bootstrapCssFile}">
+            <link rel="stylesheet" href="${customCssFile}">
             <script src="${vueFile}"></script>
             <style type="text/css">
                 body {
@@ -186,41 +221,43 @@ function generateLogHtml(hxData) {
                 [v-cloak] {
                     display: none;
                 }
-                .outline-none {
-                    box-shadow: none !important;
-                }
-                .form-control {
-                    color: #000000 !important;
-                    font-size: 0.93rem !important;
-                    border-left: none !important;
-                    border-right: none !important;
-                    border-top: none !important;
-                    border-radius: 0 !important;
-                }
-                .form-control:focus {
-                    border: 1px solid rgb(65,168,99) !important;
-                    border-left: none !important;
-                    border-right: none !important;
-                    border-top: none !important;
-                    border-radius: 0 !important;
-                }
-                .form-group .form-control::-webkit-input-placeholder, .form-control::-webkit-input-placeholder {
-                    font-size: 0.9rem !important;
-                    font-weight: 200 !important;
-                }
                 .clone-help {
                     font-size: 0.9rem;
                     color: #8f8f8f;
+                }
+                .link-text {
+                    color: #007bff;
+                    margin-left: 10px;
                 }
             </style>
         </head>
         <body>
             <div id="app" v-cloak>
                 <form>
+                    <div class="form-group row m-0">
+                        <label for="repo-type" class="col-sm-2">克隆协议</label>
+                        <div class="col-sm-10 d-inline">
+                            <input name="Protocol" type="radio" class="mr-2" value="http" :class="{has_sel: cloneProtocol=='http'}" v-model="cloneProtocol" @click="isManualSelectedProtocol='http'"/>HTTPS/HTTP
+                            <input name="Protocol" type="radio" class="ml-3 mr-2" value="ssh" :class="{has_sel: cloneProtocol=='ssh'}"  v-model="cloneProtocol" @click="isManualSelectedProtocol='ssh'"/>SSH
+                        </div>
+                    </div>
                     <div class="form-group row m-0 mt-3">
                         <label for="git-url" class="col-sm-2 pt-2">Git仓库</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control outline-none" id="git-url" placeholder="Git仓库地址, 以git@或http开头" v-focus v-model="repo">
+                        <div class="col-sm-10" @mouseleave="isShowRecommend=false">
+                            <div>
+                                <input type="text"
+                                    class="form-control outline-none" id="git-url"
+                                    placeholder="Git仓库地址, 以git@或http开头"
+                                    v-focus v-model="repo"
+                                    @mouseover="isShowRecommend=true"
+                                    @onblur="isShowRecommend=false "
+                                    @onfocus="isShowRecommend=true">
+                                <span class="input-icon" title="当您授权Github等托管服务器后，可点此处刷新我的Git仓库列表" v-show="isClickAuth || oauthResult" @click="getUserAllGitRepos();">${SyncIcon}</span>
+                            </div>
+                            <p class="form-text text-muted mb-0">授权访问github、gitee，<a href="https://easy-git.gitee.io/oauth">详情，</a>自动加载您所有的仓库URL，克隆更方便。<span class="link-text" @click="goAuthorize();">授权</span> </p>
+                            <ul class="ul-list" style="margin-top: -22px;width: 485px;" v-show="ReposRecommendationList.length && isShowRecommend" @mouseleave="isShowRecommend=false">
+                                <li v-for="(item,idx) in ReposRecommendationList" :key="idx" @click="selectMyRepos(item);">{{item}}</li>
+                            </ul>
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3">
@@ -254,10 +291,7 @@ function generateLogHtml(hxData) {
                             <p class="clone-help">
                                 如克隆遇到问题，请<a href="https://easy-git.gitee.io/connecting/">参考文档</a>，
                                 或<a href="https://ext.dcloud.net.cn/plugin?id=2475">反馈给作者</a>。
-                                <span v-if="isSSH">
-                                    使用SSH克隆，需要配置好SSH公钥，
-                                    <a href="https://easy-git.gitee.io/auth/ssh-generate">配置SSH</a>
-                                </span>
+                                使用SSH克隆，需要配置好SSH公钥，<a href="https://easy-git.gitee.io/auth/ssh-generate">配置SSH</a>
                             </p>
                         </div>
                     </div>
@@ -275,6 +309,11 @@ function generateLogHtml(hxData) {
                         submitDisabled: false,
                         ProjectWizard: '',
                         repo: '',
+                        isClickAuth: false,
+                        oauthResult: '',
+                        isShowRecommend: false,
+                        MyAllReposList: {},
+                        isManualSelectedProtocol: '',
                         cloneInfo: {
                             repo: '',
                             localPath: '',
@@ -290,6 +329,15 @@ function generateLogHtml(hxData) {
                             let tmp = repo.toLowerCase().trim();
                             return tmp.substring(0,4) == 'git@' ? true : false;
                         },
+                        cloneProtocol: function() {
+                            if (['http','ssh'].includes(this.isManualSelectedProtocol)) {
+                                return this.isManualSelectedProtocol;
+                            };
+                            let repo = this.repo;
+                            let tmp = repo.toLowerCase().trim();
+                            let result = tmp.substring(0,4) == 'git@' ? 'ssh' : 'http';
+                            return result;
+                        },
                         isShowUserPasswd: function() {
                             let repo = this.repo;
                             if (repo && repo.length >= 7) {
@@ -298,6 +346,18 @@ function generateLogHtml(hxData) {
                                 return result;
                             };
                             return false;
+                        },
+                        ReposRecommendationList: function() {
+                            let searchWord = this.repo;
+                            let Protocol = this.cloneProtocol;
+                            if (Protocol == 'http') {
+                                Protocol = 'https';
+                            };
+                            let result = this.MyAllReposList[Protocol];
+                            if (result && searchWord) {
+                                result = result.filter( x => x.includes(searchWord));
+                            };
+                            return result == undefined ? [] : result;
                         }
                     },
                     watch: {
@@ -328,13 +388,31 @@ function generateLogHtml(hxData) {
                             window.addEventListener('hbuilderxReady', () => {
                                 this.gitClone();
                                 this.getCloneResult();
+                                this.getUserAllGitRepos();
                             })
-                        })
+                        });
+
+                        that = this;
+                        window.onload = function() {
+                            setTimeout(function() {
+                                that.getUserAllGitRepos();
+                            }, 1000);
+                        };
                     },
                     methods: {
+                        getUserAllGitRepos() {
+                            hbuilderx.postMessage({
+                                command: 'MyGitRepos'
+                            });
+                        },
+                        goAuthorize() {
+                            this.isClickAuth = true;
+                            hbuilderx.postMessage({
+                                command: 'authorize'
+                            });
+                        },
                         getCloneResult() {
                             hbuilderx.onDidReceiveMessage((msg) => {
-                                console.log(msg)
                                 if (msg.command == 'cloneResult') {
                                     let {status} = msg;
                                     if (['error', 'fail'].includes(status)){
@@ -345,6 +423,12 @@ function generateLogHtml(hxData) {
                                             command: 'closed'
                                         });
                                     };
+                                };
+                                if (msg.command == 'repos') {
+                                    this.MyAllReposList = msg.data;
+                                };
+                                if (msg.command == 'authResult') {
+                                    this.oauthResult = msg.data;
                                 };
                             });
                         },
@@ -372,15 +456,19 @@ function generateLogHtml(hxData) {
                                     }
                                 }
                             });
+                        },
+                        selectMyRepos(item) {
+                            this.isShowRecommend = false;
+                            this.repo = item;
                         }
                     }
                 });
             </script>
             <script>
-                window.oncontextmenu = function() {
-                    event.preventDefault();
-                    return false;
-                };
+                // window.oncontextmenu = function() {
+                //     event.preventDefault();
+                //     return false;
+                // };
             </script>
         </body>
     </html>
