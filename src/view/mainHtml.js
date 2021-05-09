@@ -355,7 +355,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                         <li title="git reset --hard HEAD" @click="gitResetHardHEAD('HEAD');">重置当前修改</li>
                                         <li title="git reset --hard HEAD^" @click="gitResetHardHEAD('HEAD^');">重置代码到上个版本</li>
                                         <li class="divider"></li>
-                                        <li title="git checkout ." @click="gitCheckout('*');">放弃本地所有更改</li>
+                                        <li title="git restore" @click="gitCheckout('*');">放弃本地所有更改</li>
                                         <li title="git clean -df" @click="clean();">删除未跟踪的文件</li>
                                         <li class="divider"></li>
                                         <li title="stash" @click="gitStash('stashShow');">查看储藏</li>
@@ -476,7 +476,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                     <div class="d-inline"  v-if="hoverChangeFileID == 'change_'+i">
                                         <span title="打开文件" @click="openFile(v.path);">${OpenFileIconSvg}</span>
                                         <span title="加入暂存 (git add)" @click="gitAdd(v.path, v.tag);">${AddIconSvg}</span>
-                                        <span title="放弃、撤销对文件的修改 (git checkout --)" @click="gitCheckout(v);">${checkoutIconSvg}</span>
+                                        <span title="放弃、撤销对文件的修改 (git restore)" @click="gitCheckout(v);">${checkoutIconSvg}</span>
                                     </div>
                                     <div class="d-inline ml-1 pt-2">
                                         <span class="file-label" :class="[v.tag == 'D' ? 'fred' : v.tag == 'U' ? 'fgreen':'f111']"> {{ v.tag }} </span>
