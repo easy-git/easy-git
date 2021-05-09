@@ -78,8 +78,8 @@ function activate(context) {
     context.subscriptions.push(CommandPanel);
 
     // 创建远程仓库
-    let CreateRemoteRepository = hx.commands.registerCommand('EasyGit.CreateRemoteRepository', () => {
-        gitRepositoryCreate();
+    let CreateRemoteRepository = hx.commands.registerCommand('EasyGit.CreateRemoteRepository', (param) => {
+        gitRepositoryCreate(param);
     });
     context.subscriptions.push(CreateRemoteRepository);
 

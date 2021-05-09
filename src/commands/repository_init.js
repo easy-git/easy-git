@@ -17,11 +17,15 @@ const cmp_hx_version = require('../common/cmp.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'bootstrap.min.css');
+const customCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'custom.css');
 
 // get hbuilderx version
 let hxVersion = hx.env.appVersion;
 hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
 let cmp = cmp_hx_version(hxVersion, '3.1.2');
+
+var gitUserName;
+var gitEmail;
 
 /**
  * @description Git项目初始化; 初始化成功后，创建.gitignore文件, 并询问用户是否关联远程仓库
@@ -39,8 +43,8 @@ async function gitInitProject(ProjectInfo) {
     let configData = await gitConfigShow(projectPath, false);
 
     // 检查是否设置user.name和user.email
-    let gitUserName = configData['user.name'];
-    let gitEmail = configData['user.email'];
+    gitUserName = configData['user.name'];
+    gitEmail = configData['user.email'];
     if (gitUserName == false || gitEmail == false) {
         createOutputChannel("当前仓库，未设置user.name或user.email。提交代码到Git远程仓库，必须设置用户名和邮箱。", "warning");
         createOutputChannel("如需设置，请在弹窗中输入。或后期HBuilderX选中项目，点击顶部菜单【工具 -> easy-git -> 设置user.name】\n");
@@ -59,15 +63,20 @@ async function gitInitProject(ProjectInfo) {
     // 打开源代码管理器
     ProjectInfo.easyGitInner = true;
 
+    // 打开源代码管理器视图
+    let pinfo = {"easyGitInner": true, "projectPath": projectPath, "projectName": projectName};
+    hx.commands.executeCommand('EasyGit.main', pinfo);
+
     // 关联远程仓库
     try {
-        let pdata = Object.assign(ProjectInfo, {"username": gitUserName, "email": gitEmail})
-        gitSetForWebDialog(pdata);
+        let pdata = Object.assign(ProjectInfo)
+        setTimeout(function() {
+            gitSetForWebDialog(pdata);
+        }, 2000);
     } catch (e) {
         let relationResult = await gitAddRemoteOrigin(projectPath);
         if (relationResult == 'success') {
             createOutputChannel(`项目【${projectName}】远程仓库添加地址成功。`, "success");
-            hx.commands.executeCommand('EasyGit.main', ProjectInfo);
         };
     };
 };
@@ -126,10 +135,6 @@ async function gitConfigSetForWebDialog(webviewDialog, ProjectInfo) {
 
         // 打印日志到控制台
         createOutputChannel(`项目【${projectName}】远程仓库添加地址成功。`, "success");
-
-        // 打开源代码管理器视图
-        let pinfo = {"easyGitInner": true, "projectPath": projectPath, "projectName": projectName};
-        hx.commands.executeCommand('EasyGit.main', pinfo);
     };
 };
 
@@ -147,13 +152,20 @@ async function gitSetForWebDialog(ProjectInfo) {
     };
 
     // 获取项目信息
-    let { projectName, projectPath, username, email } = ProjectInfo;
-    if (username == undefined) {
-        username = "";
+    let { projectName, projectPath, repo_url } = ProjectInfo;
+    if (repo_url == undefined) {
+        repo_url = "";
     };
-    if (email == undefined) {
-        email = "";
+
+    // 用于填充html中的email和username字段
+    let username = '', email = '';
+    if (gitUserName != undefined && gitUserName) {
+        username = gitUserName;
     };
+    if (gitEmail != undefined && gitEmail) {
+        email = gitEmail;
+    };
+
 
     // 创建webviewdialog
     let webviewDialog = hx.window.createWebViewDialog({
@@ -176,23 +188,22 @@ async function gitSetForWebDialog(ProjectInfo) {
         switch (action) {
             case 'closed':
                 webviewDialog.close();
-                hx.commands.executeCommand('EasyGit.main', ProjectInfo);
                 break;
             case 'set':
                 let setData = Object.assign(
                     info,
-                    {"oldUserName": username, "oldEmail": email},
+                    {"oldUserName": gitUserName, "oldEmail": gitEmail},
                     {"projectPath": projectPath, "projectName": projectName},
                 )
                 gitConfigSetForWebDialog(webviewDialog, setData);
                 break;
             case 'createRemoteRepo':
                 let LocalRepoParams = {
-                    "easyGitInner": true,
-                    "projectPath": projectPath,
-                    "projectName": projectName
+                    "fromProjectPath": projectPath,
+                    "fromProjectName": projectName
                 };
                 hx.commands.executeCommand('EasyGit.CreateRemoteRepository', LocalRepoParams);
+                webviewDialog.close();
                 break;
             default:
                 break;
@@ -209,6 +220,7 @@ async function gitSetForWebDialog(ProjectInfo) {
         <head>
             <meta charset="UTF-8">
             <link rel="stylesheet" href="${bootstrapCssFile}">
+            <link rel="stylesheet" href="${customCssFile}">
             <script src="${vueFile}"></script>
             <style type="text/css">
                 body {
@@ -230,29 +242,6 @@ async function gitSetForWebDialog(ProjectInfo) {
                 [v-cloak] {
                     display: none;
                 }
-                .outline-none {
-                    box-shadow: none !important;
-                }
-                .form-control {
-                    color: #000000 !important;
-                    font-size: 0.93rem !important;
-                    border-left: none !important;
-                    border-right: none !important;
-                    border-top: none !important;
-                    border-radius: 0 !important;
-                }
-                .form-control:focus {
-                    border: 1px solid rgb(65,168,99) !important;
-                    border-left: none !important;
-                    border-right: none !important;
-                    border-top: none !important;
-                    border-radius: 0 !important;
-                }
-                .form-group .form-control::-webkit-input-placeholder, .form-control::-webkit-input-placeholder {
-                    font-size: 0.9rem !important;
-                    font-weight: 200 !important;
-                }
-
             </style>
         </head>
         <body>
@@ -336,6 +325,7 @@ async function gitSetForWebDialog(ProjectInfo) {
                         this.projectName = '${projectName}';
                         this.init_data.username = '${username}';
                         this.init_data.email = '${email}';
+                        this.init_data.RepositoryURL = '${repo_url}';
                     },
                     mounted() {
                         this.$nextTick(() => {
@@ -396,5 +386,6 @@ async function gitSetForWebDialog(ProjectInfo) {
 };
 
 module.exports = {
-    gitInitProject
+    gitInitProject,
+    gitSetForWebDialog
 }

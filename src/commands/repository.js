@@ -4,6 +4,7 @@ const hx = require('hbuilderx');
 const chokidar = require('chokidar');
 
 const { goSetEncoding } = require('./base.js');
+const { gitSetForWebDialog } = require('./repository_init.js');
 
 const cmp_hx_version = require('../common/cmp.js');
 const { axiosPost, axiosGet } = require('../common/axios.js');
@@ -78,7 +79,10 @@ class Api {
     };
 
     async CreateRepo(CreateInfo) {
-        let {host, name, isPrivate, isClone, cloneProtocol} = CreateInfo;
+        // isRemoteAdd, fromProjectPath, fromProjectName 这3个字段用于处理从初始化窗口跳转过来的数据。
+        let { isRemoteAdd, fromProjectPath, fromProjectName } = CreateInfo;
+
+        let { host, name, isPrivate, isClone, Protocol } = CreateInfo;
         if (!name.length) {
             this.webviewDialog.displayError('创建：仓库名称无效，请重新输入。');
             return;
@@ -87,15 +91,45 @@ class Api {
         this.webviewDialog.displayError('');
         this.webviewDialog.setButtonStatus("开始创建", ["loading", "disable"]);
 
-        gitRepoCreate(CreateInfo, this.webviewDialog);
+        let createResult = await gitRepoCreate(CreateInfo, this.webviewDialog);
+        
+        if (isRemoteAdd) {
+            if (!fromProjectPath && !fromProjectName) {
+                return hx.window.showErrorMessage(`警告：获取本地项目名称和项目路径失败，【本地关联远程仓库】操作中断。`, ['我知道了']);
+            };
+            try{
+                let { status, ssh_url, http_url } = createResult;
+                if (status == 'success') {
+                    let repo_url = Protocol == 'ssh' ? ssh_url : http_url;
+                    let setInfo = {
+                        "repo_url": repo_url,
+                        "projectName": fromProjectName,
+                        "projectPath": fromProjectPath
+                    };
+                    gitSetForWebDialog(setInfo);
+                };
+            }catch(e){
+                console.log(e)
+                let emsg = isRemoteAdd ? '，因此中断【本地关联远程仓库】操作，请自行处理' : '';
+                hx.window.showErrorMessage(`警告：远程仓库创建成功后，解析返回值失败${emsg}。`, ['我知道了']);
+            }
+        };
     };
 };
 
 /**
  * @description 创建远程仓库
- * @param {Object} ProjectInfo
+ * @param {Object} FromData 用于处理从初始化过来的数据
  */
-async function gitRepositoryCreate() {
+async function gitRepositoryCreate(FromData={}) {
+
+    // 用于处理从初始化过来的数据
+    let { fromProjectPath, fromProjectName } = FromData;
+    if (!fromProjectPath || !fromProjectName) {
+        fromProjectPath = '';
+        fromProjectName = '';
+    };
+
     try{
         if (cmp > 0) {
             hx.window.showInformationMessage("此功能仅支持HBuilderX 3.1.2+以上版本，请升级。", ["我知道了"]);
@@ -161,25 +195,6 @@ async function gitRepositoryCreate() {
             <link rel="stylesheet" href="${customCssFile}">
             <script src="${vueFile}"></script>
             <style type="text/css">
-                body {
-                    font-size: 14px;
-                }
-                body::-webkit-scrollbar {
-                    display: none;
-                }
-                * {
-                    outline: none;
-                    moz-user-select: -moz-none;
-                    -moz-user-select: none;
-                    -o-user-select:none;
-                    -khtml-user-select:none;
-                    -webkit-user-select:none;
-                    -ms-user-select:none;
-                    user-select:none;
-                }
-                [v-cloak] {
-                    display: none;
-                }
                 .authbtn {
                     border: 1px solid #eee;
                     border-radius: 5px;
@@ -272,18 +287,25 @@ async function gitRepositoryCreate() {
                             <input name="rep" type="radio" class="ml-3 mr-1" value="1" :class="{has_sel: isPrivate == '1'}" v-model="isPrivate"/>私有(仅仓库成员可见)
                         </div>
                     </div>
-                    <div class="form-group row m-0 mt-3">
+                    <div class="form-group row m-0 mt-3" v-if="fromProjectName == '' && fromProjectPath == ''">
                         <label for="repo-isClone" class="col-sm-2 px-0">克隆</label>
                         <div class="col-sm-10">
                             <input type="checkbox" :class="{ has_sel: isClone }" class="mr-2" v-model="isClone" />
                             <label class="d-inline">远程仓库创建后，是否克隆到本地</label>
                         </div>
                     </div>
-                    <div class="form-group row m-0 mt-3" v-if="isClone">
-                        <label for="repo-type" class="col-sm-2 px-0">克隆协议</label>
+                    <div class="form-group row m-0 mt-3" v-if="fromProjectName && fromProjectPath">
+                        <label for="repo-type" class="col-sm-2 px-0">添加远程仓库</label>
                         <div class="col-sm-10 d-inline">
-                            <input name="Protocol" type="radio" class="mr-1" value="http" :class="{has_sel: cloneProtocol=='http'}" v-model="cloneProtocol"/>HTTPS/HTTP
-                            <input name="Protocol" type="radio" class="ml-3 mr-1" value="ssh" :class="{has_sel: cloneProtocol=='ssh'}"  v-model="cloneProtocol"/>SSH
+                            <input type="checkbox" :class="{ has_sel: isRemoteAdd }" class="mr-2" v-model="isRemoteAdd" />
+                            <label class="d-inline">远程仓库创建后，是否关联刚创建的项目{{fromProjectName}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group row m-0 mt-3">
+                        <label for="repo-type" class="col-sm-2 px-0">协议</label>
+                        <div class="col-sm-10 d-inline">
+                            <input name="Protocol" type="radio" class="mr-1" value="http" :class="{has_sel: Protocol=='http'}" v-model="Protocol"/>HTTPS/HTTP
+                            <input name="Protocol" type="radio" class="ml-3 mr-1" value="ssh" :class="{has_sel: Protocol=='ssh'}"  v-model="Protocol"/>SSH
                         </div>
                     </div>
                 </form>
@@ -297,13 +319,16 @@ async function gitRepositoryCreate() {
                 var app = new Vue({
                     el: '#app',
                     data: {
+                        fromProjectPath: '',
+                        fromProjectName: '',
+                        isRemoteAdd: true,
                         giteeOAuthInfo: {},
                         githubOAuthInfo: {},
                         host: 'gitee',
                         isShowOrgsList: false,
                         isClickOAuthBtn: false,
                         isClone: false,
-                        cloneProtocol: 'http',
+                        Protocol: 'http',
                         isPrivate: '0',
                         repos: {
                             owner: '',
@@ -356,6 +381,8 @@ async function gitRepositoryCreate() {
                         }
                      },
                     created() {
+                        this.fromProjectPath = '${fromProjectPath}';
+                        this.fromProjectName = '${fromProjectName}';
                         this.giteeOAuthInfo = ${giteeOAuthInfoForHtml};
                         this.githubOAuthInfo = ${githubOAuthInfoForHtml};
                     },
@@ -416,7 +443,13 @@ async function gitRepositoryCreate() {
                                         data.isPrivate = this.isPrivate == 1 ? true : false;
                                         if (this.isClone) {
                                             data.isClone = this.isClone;
-                                            data.cloneProtocol = this.cloneProtocol;
+                                            data.Protocol = this.Protocol;
+                                        };
+                                        if (this.fromProjectPath && this.fromProjectName) {
+                                            data.isRemoteAdd = this.isRemoteAdd;
+                                            data.Protocol = this.Protocol;
+                                            data.fromProjectPath = this.fromProjectPath;
+                                            data.fromProjectName = this.fromProjectName;
                                         };
                                         hbuilderx.postMessage({
                                             type: 'create',
