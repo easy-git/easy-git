@@ -465,10 +465,10 @@ function generateLogHtml(hxData) {
                 });
             </script>
             <script>
-                // window.oncontextmenu = function() {
-                //     event.preventDefault();
-                //     return false;
-                // };
+                window.oncontextmenu = function() {
+                    event.preventDefault();
+                    return false;
+                };
             </script>
         </body>
     </html>

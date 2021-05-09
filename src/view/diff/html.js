@@ -193,7 +193,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                                 <div class="col-10">
                                     <span class="file-title" @click="openFile();">${selectedFilePath}</span>
                                 </div>
-                                <div class="col-2">
+                                <div class="col-2 mr-2" style="right: 0; position: absolute; text-align: end;">
                                     <span title="打开文件" @click="openFile();">${OpenFileIconSvg}</span>
                                     <span title="查看日志" @click="openLog();">${HistoryIcon}</span>
                                     <span :title="isFullTextDiffFileIconTitle" @click="setDiffFileConfig();">${DiffFullTextIcon}</span>
