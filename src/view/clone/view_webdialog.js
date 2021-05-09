@@ -8,7 +8,12 @@ const ini = require('ini');
 const hx = require('hbuilderx');
 
 const MainView = require('../main.js');
-const { isDirEmpty, getDirFileList, gitClone, importProjectToExplorer } = require('../../common/utils.js');
+const {
+    isDirEmpty,
+    getDirFileList,
+    gitClone,
+    importProjectToExplorer } = require('../../common/utils.js');
+const { axiosGet } = require('../../common/axios.js');
 const { Gitee, Github, openOAuthBox } = require('../../common/oauth.js');
 const { getSyncIcon } = require('../static/icon.js');
 
@@ -56,6 +61,28 @@ async function checkSSH(webviewDialog, webview) {
         webviewDialog.displayError(emsg);
     };
     return publicKey;
+};
+
+async function githubSearch(word, webviewDialog, webview) {
+    if (word.length < 2) {return};
+    webviewDialog.displayError('');
+
+    let url = `https://api.github.com/search/repositories?q=${word}`
+    let headers = {"Accept": "application/vnd.github.v3+json"};
+    let result = await axiosGet(url, headers).catch(error=> {
+        return 'fail';
+    });
+
+    let data = {"ssh":[],"https":[]};
+    if (result == 'fail') {
+        webviewDialog.displayError("Github搜索失败，请检查网络。")
+        return data;
+    } else {
+        data.ssh = result.map( x => x["ssh_url"]);
+        data.https = result.map( x => x["html_url"]);
+        webview.postMessage({command: 'githubSearchResult',data: data});
+        return data;
+    };
 };
 
 /**
@@ -320,9 +347,9 @@ function generateLogHtml(hxData) {
                     <div class="form-group row m-0 mt-3">
                         <div class="col">
                             <p class="clone-help">
-                                如克隆遇到问题，请<a href="https://easy-git.gitee.io/connecting/">参考文档</a>，
+                                如遇到问题，请<a href="https://easy-git.gitee.io/connecting/">参考文档</a>，
                                 或<a href="https://ext.dcloud.net.cn/plugin?id=2475">反馈给作者</a>。
-                                使用SSH克隆，需要配置好SSH公钥，<a href="https://easy-git.gitee.io/auth/ssh-generate">配置SSH</a>
+                                使用SSH克隆，需配置SSH，<a href="https://easy-git.gitee.io/auth/ssh-generate">配置SSH</a>
                             </p>
                         </div>
                     </div>

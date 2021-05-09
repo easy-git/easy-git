@@ -39,9 +39,10 @@ function axiosPost(url, params = {}, customHeader = {}) {
  * @description  axios get请求
  * @param {Object} url
  */
-function axiosGet(url) {
+function axiosGet(url, headers={}) {
     const instance = axios.create({
-        timeout: 5000
+        timeout: 5000,
+        headers: headers
     });
     return new Promise((resolve, reject) => {
         instance.get(url).then((res) => {
