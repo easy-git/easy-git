@@ -500,6 +500,14 @@
                     "group": "easygit@3"
                 },
                 {
+                    "command": "EasyGit.oauth",
+                    "title": "OAuth授权",
+                    "group": "easygit@4"
+                },
+                {
+                    "group": "easygit@4"
+                },
+                {
                     "command": "EasyGit.setGitingore",
                     "title": "设置.gitignore",
                     "when": "isGit",
@@ -609,7 +617,7 @@
                 },
                 {
                     "command": "EasyGit.oauth",
-                    "title": "OAuth授权Git托管服务器",
+                    "title": "OAuth授权",
                     "group": "easygit@1"
                 },
                 {
