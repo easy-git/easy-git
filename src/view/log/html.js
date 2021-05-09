@@ -226,6 +226,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
 
                 .view-log-details .fname:hover {
                     text-decoration: underline;
+                    cursor: pointer;
                 }
                 .view-log-details .intro {
                     font-size: 12px;
@@ -601,6 +602,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                 </ul>
                              </div>
                              <div class="flex-average change-files commit-file-details" v-if="CommitFileChangeDetails != ''">
+                                <p class="mb-0 ml-3">{{ ShowCommitFilePath }}</p>
                                 <div v-html="CommitFileChangeDetails"></div>
                              </div>
                         </div>
@@ -655,6 +657,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         logDetails: {},
                         logDetailsFiles: [],
                         loading: false,
+                        ShowCommitFilePath: '',
                         CommitFileChangeDetails: '',
                         renderType: 'webView',
                         viewRefName: '',
@@ -861,6 +864,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                 let firstFile = files.length ? files[0] : {};
                                 if (JSON.stringify(firstFile) != '{}') {
                                     let {file} = firstFile;
+                                    this.ShowCommitFilePath = file;
                                     this.showCommitFileChange(file);
                                 };
                             }catch(e){
@@ -933,8 +937,9 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                 hash: hash
                             })
                         },
-                        // 显示commit 文件具体修改
+                        // 显示文件具体修改
                         showCommitFileChange(filePath) {
+                            this.ShowCommitFilePath = filePath;
                             this.CommitFileChangeDetails = '';
                             let {message, diff, hash} = this.logDetails;
                             let isMergeMessage = false;
