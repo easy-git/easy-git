@@ -8,9 +8,9 @@ const ini = require('ini');
 const hx = require('hbuilderx');
 
 const MainView = require('../main.js');
-const utils = require('../../common/utils.js');
+const { isDirEmpty, getDirFileList, gitClone, importProjectToExplorer } = require('../../common/utils.js');
 const { Gitee, Github, openOAuthBox } = require('../../common/oauth.js');
-const {getSyncIcon} = require('../static/icon.js');
+const { getSyncIcon } = require('../static/icon.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'static', 'vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
@@ -35,6 +35,27 @@ function getProjectWizard() {
     }catch(e){
         return '';
     };
+};
+
+
+/**
+ * @description 检查SSH
+ * @param {Object} webviewDialog
+ * @param {Object} webview
+ */
+async function checkSSH(webviewDialog, webview) {
+    const USERHOME = process.env.HOME;
+    const sshDir = path.join(USERHOME, '.ssh');
+    const emsg = "警告：您电脑不存在ssh public key文件，使用ssh协议克隆，可能会克隆失败，后期也无法提交代码。如不需要，请忽略。";
+    if (!fs.existsSync(sshDir)) {
+        webviewDialog.displayError(emsg);
+        return [];
+    };
+    let publicKey = await getDirFileList(sshDir, '.pub');
+    if (publicKey.length == 0) {
+        webviewDialog.displayError(emsg);
+    };
+    return publicKey;
 };
 
 /**
@@ -88,7 +109,7 @@ async function clone(webviewDialog, webview, info) {
     };
 
     if (fs.existsSync(localPath)) {
-        let isEmpty = await utils.isDirEmpty(localPath);
+        let isEmpty = await isDirEmpty(localPath);
         if (isEmpty > 0) {
             isDisplayError = true;
             webviewDialog.displayError(`目录 ${localPath} 已存在!`);
@@ -101,7 +122,7 @@ async function clone(webviewDialog, webview, info) {
     };
 
     webviewDialog.setButtonStatus("开始克隆", ["loading", "disable"]);
-    let result = await utils.gitClone(info);
+    let result = await gitClone(info);
 
     webviewDialog.setButtonStatus("开始克隆", []);
     webview.postMessage({
@@ -113,7 +134,7 @@ async function clone(webviewDialog, webview, info) {
         // 清除缓存数据
         GitRepoUrl = '';
         // 导入克隆项目到项目管理器
-        utils.importProjectToExplorer(localPath);
+        importProjectToExplorer(localPath);
         let pinfo = {
             'easyGitInner': true,
             'projectName': projectName,
@@ -151,7 +172,7 @@ function showClone(clone_url="") {
         dialogButtons: ["开始克隆", "关闭"],
         size: {
             width: 700,
-            height: 470
+            height: 480
         }
     }, {
         enableScripts: true
@@ -169,11 +190,17 @@ function showClone(clone_url="") {
             case 'closed':
                 webviewDialog.close();
                 break;
+            case 'clearDisplayError':
+                webviewDialog.displayError('');
+                break;
             case 'authorize':
                 openOAuthBox();
                 break;
             case 'MyGitRepos':
                 getUserAllGitRepos(webview);
+                break;
+            case 'checkSSH':
+                checkSSH(webviewDialog, webview);
                 break;
             default:
                 break;
@@ -238,11 +265,11 @@ function generateLogHtml(hxData) {
         <body>
             <div id="app" v-cloak>
                 <form>
-                    <div class="form-group row m-0">
+                    <div class="form-group row m-0 mt-3">
                         <label for="repo-type" class="col-sm-2">克隆协议</label>
                         <div class="col-sm-10 d-inline">
                             <input name="Protocol" type="radio" class="mr-2" value="http" :class="{has_sel: cloneProtocol=='http'}" v-model="cloneProtocol" @click="isManualSelectedProtocol='http'"/>HTTPS/HTTP
-                            <input name="Protocol" type="radio" class="ml-3 mr-2" value="ssh" :class="{has_sel: cloneProtocol=='ssh'}"  v-model="cloneProtocol" @click="isManualSelectedProtocol='ssh'"/>SSH
+                            <input name="Protocol" type="radio" class="ml-3 mr-2" value="ssh" :class="{has_sel: cloneProtocol=='ssh'}"  v-model="cloneProtocol" @click="isManualSelectedProtocol='ssh'" title="使用SSH可以让你在你的电脑和 Git 通讯的时候使用安全连接"/>SSH
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3">
@@ -375,6 +402,13 @@ function generateLogHtml(hxData) {
                             } else {
                                 this.cloneInfo.localPath = this.ProjectWizard + '/' + projectName;
                             };
+                        },
+                        cloneProtocol: function (newVal, oldVal) {
+                            if (this.cloneProtocol== 'ssh') {
+                                this.checkSSH();
+                            } else {
+                                this.clearDisplayError();
+                            }
                         }
                     },
                     created() {
@@ -404,6 +438,16 @@ function generateLogHtml(hxData) {
                         };
                     },
                     methods: {
+                        checkSSH() {
+                            hbuilderx.postMessage({
+                                command: 'checkSSH'
+                            });
+                        },
+                        clearDisplayError() {
+                            hbuilderx.postMessage({
+                                command: 'clearDisplayError'
+                            });
+                        },
                         getUserAllGitRepos() {
                             hbuilderx.postMessage({
                                 command: 'MyGitRepos'

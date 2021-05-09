@@ -194,6 +194,25 @@ function isDirEmpty(dirname) {
 };
 
 /**
+ * @description 获取指定目录文件列表
+ * @param {type} dirname 目录名
+ * @param {type} suffix 后缀
+ */
+function getDirFileList(dirname, suffix=false) {
+    return new Promise(function(resolve, reject) {
+        return fs.readdir(dirname, function(err,files) {
+            if (err) {
+                reject([]);
+            };
+            if (files && suffix) {
+                files = files.filter( x => x.includes(suffix) );
+            };
+            resolve(files);
+        });
+    });
+};
+
+/**
  * @description 向临时文件插入文本
  * @param {Object} text
  */
@@ -2343,6 +2362,7 @@ module.exports = {
     hxShowMessageBox,
     applyEdit,
     isDirEmpty,
+    getDirFileList,
     FileWriteAndOpen,
     createOutputChannel,
     isGitInstalled,
