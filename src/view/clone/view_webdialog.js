@@ -9,7 +9,7 @@ const hx = require('hbuilderx');
 
 const MainView = require('../main.js');
 const utils = require('../../common/utils.js');
-const { Gitee, openOAuthBox } = require('../../common/oauth.js');
+const { Gitee, Github, openOAuthBox } = require('../../common/oauth.js');
 const {getSyncIcon} = require('../static/icon.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'static', 'vue.min.js');
@@ -41,25 +41,29 @@ function getProjectWizard() {
  * @description 获取用户仓库列表
  */
 async function getUserAllGitRepos(webview) {
-    let gitee = new Gitee();
-    let repos = await gitee.getUserRepos();
-    if (repos == 'fail-authorize') {
-        webview.postMessage({
-            command: 'authResult',
-            data: false
-        });
-        return;
+    let allRepos = {"ssh":[],"https":[]};
+
+    let ge = new Gitee();
+    let giteeRepos = await ge.getUserRepos();
+
+    let gtb = new Github();
+    let githubRepos = await gtb.getUserRepos();
+
+    if (githubRepos == 'fail-authorize' && giteeRepos == 'fail-authorize') {
+        return webview.postMessage({command: 'authResult',data: false});
     };
-    if (repos) {
-        webview.postMessage({
-            command: 'authResult',
-            data: true
-        });
-        webview.postMessage({
-            command: 'repos',
-            data: repos
-        });
+    if (githubRepos) {
+        allRepos = githubRepos;
     };
+    if (giteeRepos) {
+        let {ssh, https} = giteeRepos;
+        allRepos.ssh = [ ...allRepos["ssh"], ...ssh ]
+        allRepos.https = [ ...allRepos["https"], ...https ]
+    };
+    if (allRepos) {
+        webview.postMessage({command: 'authResult',data: true});
+        webview.postMessage({command: 'repos',data: allRepos});
+    }
 };
 
 /**

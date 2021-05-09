@@ -219,6 +219,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     color: rgb(245,108,108);
                 }
                 .view-log-details {
+                    z-index: 9999;
                     border-top: 1px solid ${lineColor};
                     background-color: ${background};
                     -webkit-box-shadow:2px 2px 5px 3px ${background};

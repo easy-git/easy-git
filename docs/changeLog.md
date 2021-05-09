@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.4.5
+* 新增 Git OAuth授权功能，支持github、gitee；授权后，您可在本地创建远程仓库。
+* 新增 命令面板 支持分支重命名 command: EasyGit.BranchRename
+* 修复 由于文件写入方法错误，导致某些git操作第一次失败的Bug
+* 优化 源代码管理器视图 右上角... 移除菜单【设置.gitattributes】和 【设置.gitignore】
+* 优化 源代码管理器视图 放弃更改 右下角弹窗改为中间弹窗
+* 修复 文件对比视图 顶部3个icon没有居右的Bug
+
 ## 1.4.4
 * 优化 源代码管理器视图 文件刷新
 * 优化 命令面板commit操作，不再打开日志视图
