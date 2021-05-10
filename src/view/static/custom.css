@@ -153,3 +153,7 @@ input[type="text"]:disabled {
 .ul-list li:hover {
     color: rgb(65, 168, 99);
 }
+
+.text-underline {
+    text-decoration: underline;
+}

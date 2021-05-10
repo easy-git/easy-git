@@ -63,23 +63,28 @@ async function checkSSH(webviewDialog, webview) {
     return publicKey;
 };
 
-async function githubSearch(word, webviewDialog, webview) {
+async function openGithubSearch(word, webviewDialog, webview) {
     if (word.length < 2) {return};
     webviewDialog.displayError('');
 
     let url = `https://api.github.com/search/repositories?q=${word}`
     let headers = {"Accept": "application/vnd.github.v3+json"};
-    let result = await axiosGet(url, headers).catch(error=> {
+    let SearchResult = await axiosGet(url, headers).catch(error=> {
         return 'fail';
     });
-
     let data = {"ssh":[],"https":[]};
-    if (result == 'fail') {
+
+    if (SearchResult == 'fail') {
         webviewDialog.displayError("Github搜索失败，请检查网络。")
         return data;
     } else {
-        data.ssh = result.map( x => x["ssh_url"]);
-        data.https = result.map( x => x["html_url"]);
+        let { items } = SearchResult;
+        if ( items.length == 0) {
+            webviewDialog.displayError("Github搜索，没有搜索到结果。")
+            return data;
+        };
+        data.ssh = items.map( x => x["ssh_url"]);
+        data.https = items.map( x => x["clone_url"]);
         webview.postMessage({command: 'githubSearchResult',data: data});
         return data;
     };
@@ -229,6 +234,10 @@ function showClone(clone_url="") {
             case 'checkSSH':
                 checkSSH(webviewDialog, webview);
                 break;
+            case 'GithubSearch':
+                let q = msg.data;
+                openGithubSearch(q, webviewDialog, webview);
+                break;
             default:
                 break;
         };
@@ -293,59 +302,114 @@ function generateLogHtml(hxData) {
             <div id="app" v-cloak>
                 <form>
                     <div class="form-group row m-0 mt-3">
-                        <label for="repo-type" class="col-sm-2">克隆协议</label>
+                        <label for="repo-type" class="col-sm-2 px-0">克隆协议</label>
                         <div class="col-sm-10 d-inline">
-                            <input name="Protocol" type="radio" class="mr-2" value="http" :class="{has_sel: cloneProtocol=='http'}" v-model="cloneProtocol" @click="isManualSelectedProtocol='http'"/>HTTPS/HTTP
-                            <input name="Protocol" type="radio" class="ml-3 mr-2" value="ssh" :class="{has_sel: cloneProtocol=='ssh'}"  v-model="cloneProtocol" @click="isManualSelectedProtocol='ssh'" title="使用SSH可以让你在你的电脑和 Git 通讯的时候使用安全连接"/>SSH
+                            <input name="Protocol" type="radio" class="mr-2" value="http"
+                                :class="{has_sel: cloneProtocol=='http'}"
+                                v-model="cloneProtocol"
+                                @click="isManualSelectedProtocol='http'"/>HTTPS/HTTP
+                            <input name="Protocol" type="radio" class="ml-3 mr-2" value="ssh"
+                                :class="{has_sel: cloneProtocol=='ssh'}"
+                                v-model="cloneProtocol"
+                                @click="isManualSelectedProtocol='ssh'"/>SSH
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3">
-                        <label for="git-url" class="col-sm-2 pt-2">Git仓库</label>
+                        <label for="git-url" class="col-sm-2 pt-2 px-0">
+                            <span @click="switchType(false);" :class="{ 'text-underline': !isSearch }">Git仓库</span> /
+                            <span @click="switchType(true);" :class="{ 'text-underline': isSearch }" title="在Github搜索">搜索</span>
+                        </label>
                         <div class="col-sm-10" @mouseleave="isShowRecommend=false">
-                            <div>
+                            <div v-if="isSearch">
                                 <input type="text"
                                     class="form-control outline-none" id="git-url"
-                                    placeholder="Git仓库地址, 以git@或http开头"
+                                    placeholder="搜索Github，输入关键字，回车搜索，仅返回前10条结果..."
+                                    v-focus
+                                    v-model="repo"
+                                    @keyup.enter="GithubSearch()"
+                                    @mouseover="isShowRecommend=true"
+                                    @onblur="isShowRecommend=false "
+                                    @onfocus="isShowRecommend=true">
+                            </div>
+                            <div v-else>
+                                <input type="text"
+                                    class="form-control outline-none" id="git-url"
+                                    placeholder="输入Git仓库地址, 以git@或http开头"
                                     v-focus v-model="repo"
                                     @mouseover="isShowRecommend=true"
                                     @onblur="isShowRecommend=false "
                                     @onfocus="isShowRecommend=true">
-                                <span class="input-icon" title="当您授权Github等托管服务器后，可点此处刷新我的Git仓库列表" v-show="isClickAuth || oauthResult" @click="getUserAllGitRepos();">${SyncIcon}</span>
+                                <span
+                                    class="input-icon"
+                                    title="当您授权Github等托管服务器后，可点此处刷新我的Git仓库列表"
+                                    v-show="isClickAuth || oauthResult"
+                                    @click="getUserAllGitRepos();">${SyncIcon}
+                                </span>
                             </div>
-                            <p class="form-text text-muted mb-0">授权访问github、gitee，<a href="https://easy-git.gitee.io/oauth">详情，</a>自动加载您所有的仓库URL，克隆更方便。<span class="link-text" @click="goAuthorize();">授权</span> </p>
-                            <ul class="ul-list" style="margin-top: -22px;width: 485px;" v-show="ReposRecommendationList.length && isShowRecommend" @mouseleave="isShowRecommend=false">
-                                <li v-for="(item,idx) in ReposRecommendationList" :key="idx" @click="selectMyRepos(item);">{{item}}</li>
+                            <p class="form-text text-muted mb-0">
+                                授权访问github、gitee，<a href="https://easy-git.gitee.io/oauth">详情，
+                                </a>自动加载您所有的仓库URL，克隆更方便。
+                                <span class="link-text" @click="goAuthorize();">授权</span>
+                            </p>
+                            <ul class="ul-list"
+                                style="margin-top: -22px;width: 485px;"
+                                v-show="githubReposList.length && isShowRecommend"
+                                @mouseleave="isShowRecommend=false"
+                                v-if="isSearch">
+                                <li
+                                    v-for="(item,idx) in githubReposList" :key="idx"
+                                    @click="selectMyRepos(item);">
+                                    {{item}}
+                                </li>
+                            </ul>
+                            <ul class="ul-list"
+                                style="margin-top: -22px;width: 485px;"
+                                v-show="myReposList.length && isShowRecommend"
+                                @mouseleave="isShowRecommend=false"
+                                v-else>
+                                <li v-for="(item,idx) in myReposList" :key="idx" @click="selectMyRepos(item);">
+                                    {{item}}
+                                </li>
                             </ul>
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3">
-                        <label for="git-url" class="col-sm-2 pt-2">Git分支</label>
+                        <label for="git-url" class="col-sm-2 pt-2 px-0">Git分支</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control outline-none" id="git-url" placeholder="Git分支, 选填，如不填写，则默认拉取master分支" v-model="cloneInfo.branch">
+                            <input type="text" class="form-control outline-none" id="git-url"
+                                placeholder="Git分支, 选填，如不填写，则默认拉取master分支"
+                                v-model="cloneInfo.branch" />
                         </div>
                     </div>
                     <div class="form-group row mx-0 mt-3">
-                        <label for="local-path" class="col-sm-2 pt-2">本地路径</label>
+                        <label for="local-path" class="col-sm-2 pt-2 px-0">本地路径</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control outline-none" placeholder="本地存储路径" v-model="cloneInfo.localPath">
+                            <input type="text" class="form-control outline-none" placeholder="本地存储路径"
+                                v-model="cloneInfo.localPath" />
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3" v-show="isShowUserPasswd">
-                        <label for="u-p" class="col-sm-2 pt-2">账号密码</label>
+                        <label for="u-p" class="col-sm-2 pt-2 px-0">账号密码</label>
                         <div class="col-sm-10">
                             <div class="row">
                                 <div class="col">
-                                    <input type="text" class="form-control outline-none" id="git-user" placeholder="Git仓库用户名, 选填" v-model="cloneInfo.username">
+                                    <input type="text"
+                                        class="form-control outline-none" id="git-user"
+                                        placeholder="Git仓库用户名, 选填"
+                                        v-model="cloneInfo.username">
                                 </div>
                                 <div class="col">
-                                    <input type="password" class="form-control outline-none" id="git-passwd" placeholder="Git仓库密码, 选填" v-model="cloneInfo.password">
+                                    <input type="password"
+                                        class="form-control outline-none" id="git-passwd"
+                                        placeholder="Git仓库密码, 选填"
+                                        v-model="cloneInfo.password">
                                 </div>
                             </div>
                             <p class="form-text text-muted">如果是私有仓库，HTTP协议，克隆，需要提供账号密码</p>
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3">
-                        <div class="col">
+                        <div class="col px-0">
                             <p class="clone-help">
                                 如遇到问题，请<a href="https://easy-git.gitee.io/connecting/">参考文档</a>，
                                 或<a href="https://ext.dcloud.net.cn/plugin?id=2475">反馈给作者</a>。
@@ -379,7 +443,9 @@ function generateLogHtml(hxData) {
                             username: '',
                             password: '',
                             branch: ''
-                        }
+                        },
+                        isSearch: false,
+                        githubSearchResult: {}
                     },
                     computed: {
                         isSSH: function() {
@@ -405,13 +471,25 @@ function generateLogHtml(hxData) {
                             };
                             return false;
                         },
-                        ReposRecommendationList: function() {
+                        myReposList: function() {
                             let searchWord = this.repo;
                             let Protocol = this.cloneProtocol;
                             if (Protocol == 'http') {
                                 Protocol = 'https';
                             };
                             let result = this.MyAllReposList[Protocol];
+                            if (result && searchWord) {
+                                result = result.filter( x => x.includes(searchWord));
+                            };
+                            return result == undefined ? [] : result;
+                        },
+                        githubReposList: function() {
+                            let searchWord = this.repo;
+                            let Protocol = this.cloneProtocol;
+                            if (Protocol == 'http') {
+                                Protocol = 'https';
+                            };
+                            let result = this.githubSearchResult[Protocol];
                             if (result && searchWord) {
                                 result = result.filter( x => x.includes(searchWord));
                             };
@@ -465,6 +543,10 @@ function generateLogHtml(hxData) {
                         };
                     },
                     methods: {
+                        switchType(e) {
+                            this.isSearch = e;
+                            this.isShowRecommend = false;
+                        },
                         checkSSH() {
                             hbuilderx.postMessage({
                                 command: 'checkSSH'
@@ -486,6 +568,12 @@ function generateLogHtml(hxData) {
                                 command: 'authorize'
                             });
                         },
+                        GithubSearch() {
+                            hbuilderx.postMessage({
+                                command: 'GithubSearch',
+                                data: this.repo
+                            });
+                        },
                         getCloneResult() {
                             hbuilderx.onDidReceiveMessage((msg) => {
                                 if (msg.command == 'cloneResult') {
@@ -504,6 +592,9 @@ function generateLogHtml(hxData) {
                                 };
                                 if (msg.command == 'authResult') {
                                     this.oauthResult = msg.data;
+                                };
+                                if (msg.command == 'githubSearchResult') {
+                                    this.githubSearchResult = msg.data;
                                 };
                             });
                         },
