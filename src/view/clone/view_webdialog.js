@@ -100,10 +100,10 @@ async function getUserAllGitRepos(webview) {
     if (githubRepos == 'fail-authorize' && giteeRepos == 'fail-authorize') {
         return webview.postMessage({command: 'authResult',data: false});
     };
-    if (githubRepos) {
+    if (githubRepos != 'fail-authorize') {
         allRepos = githubRepos;
     };
-    if (giteeRepos) {
+    if (giteeRepos != 'fail-authorize') {
         let {ssh, https} = giteeRepos;
         allRepos.ssh = [ ...allRepos["ssh"], ...ssh ]
         allRepos.https = [ ...allRepos["https"], ...https ]
@@ -111,7 +111,7 @@ async function getUserAllGitRepos(webview) {
     if (allRepos) {
         webview.postMessage({command: 'authResult',data: true});
         webview.postMessage({command: 'repos',data: allRepos});
-    }
+    };
 };
 
 /**
