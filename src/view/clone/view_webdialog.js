@@ -316,14 +316,14 @@ function generateLogHtml(hxData) {
                     </div>
                     <div class="form-group row m-0 mt-3">
                         <label for="git-url" class="col-sm-2 pt-2 px-0">
-                            <span @click="switchType(false);" :class="{ 'text-underline': !isSearch }">Git仓库</span> /
+                            <span @click="switchType(false);" :class="{ 'text-underline': !isSearch }" title="提供Git存储库URL">Git仓库</span> /
                             <span @click="switchType(true);" :class="{ 'text-underline': isSearch }" title="在Github搜索">搜索</span>
                         </label>
                         <div class="col-sm-10" @mouseleave="isShowRecommend=false">
                             <div v-if="isSearch">
                                 <input type="text"
                                     class="form-control outline-none" id="git-url"
-                                    placeholder="搜索Github，输入关键字，回车搜索，仅返回前10条结果..."
+                                    placeholder="从Github克隆，输入关键字，回车搜索Github，仅返回前10条结果..."
                                     v-focus
                                     v-model="repo"
                                     @keyup.enter="GithubSearch()"
@@ -334,7 +334,7 @@ function generateLogHtml(hxData) {
                             <div v-else>
                                 <input type="text"
                                     class="form-control outline-none" id="git-url"
-                                    placeholder="输入Git仓库地址, 以git@或http开头"
+                                    placeholder="输入Git存储库URL（以git@或http开头）, 或选择仓库地址"
                                     v-focus v-model="repo"
                                     @mouseover="isShowRecommend=true"
                                     @onblur="isShowRecommend=false "
