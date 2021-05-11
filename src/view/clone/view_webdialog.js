@@ -64,15 +64,19 @@ async function checkSSH(webviewDialog, webview) {
 };
 
 async function openGithubSearch(word, webviewDialog, webview) {
+    let data = {"ssh":[],"https":[]};
+
     if (word.length < 2) {return};
     webviewDialog.displayError('');
+
+    hx.window.setStatusBarMessage(`easy-git: 正在github搜索 ${word} ....`, 20000, 'info');
 
     let url = `https://api.github.com/search/repositories?q=${word}`
     let headers = {"Accept": "application/vnd.github.v3+json"};
     let SearchResult = await axiosGet(url, headers).catch(error=> {
         return 'fail';
     });
-    let data = {"ssh":[],"https":[]};
+    hx.window.clearStatusBarMessage();
 
     if (SearchResult == 'fail') {
         webviewDialog.displayError("Github搜索失败，请检查网络。")
