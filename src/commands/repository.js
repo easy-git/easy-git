@@ -301,7 +301,7 @@ async function gitRepositoryCreate(FromData={}) {
                             <label class="d-inline">远程仓库创建后，是否关联刚创建的项目{{fromProjectName}}</label>
                         </div>
                     </div>
-                    <div class="form-group row m-0 mt-3">
+                    <div class="form-group row m-0 mt-3" v-if="isClone || (fromProjectName && fromProjectPath)">
                         <label for="repo-type" class="col-sm-2 px-0">协议</label>
                         <div class="col-sm-10 d-inline">
                             <input name="Protocol" type="radio" class="mr-1" value="http" :class="{has_sel: Protocol=='http'}" v-model="Protocol"/>HTTPS/HTTP

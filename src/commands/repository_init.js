@@ -64,15 +64,13 @@ async function gitInitProject(ProjectInfo) {
     ProjectInfo.easyGitInner = true;
 
     // 打开源代码管理器视图
-    let pinfo = {"easyGitInner": true, "projectPath": projectPath, "projectName": projectName};
-    hx.commands.executeCommand('EasyGit.main', pinfo);
+    // let pinfo = {"easyGitInner": true, "projectPath": projectPath, "projectName": projectName};
+    // hx.commands.executeCommand('EasyGit.main', pinfo);
 
     // 关联远程仓库
     try {
         let pdata = Object.assign(ProjectInfo)
-        setTimeout(function() {
-            gitSetForWebDialog(pdata);
-        }, 2000);
+        gitSetForWebDialog(pdata);
     } catch (e) {
         let relationResult = await gitAddRemoteOrigin(projectPath);
         if (relationResult == 'success') {
@@ -135,6 +133,10 @@ async function gitConfigSetForWebDialog(webviewDialog, ProjectInfo) {
 
         // 打印日志到控制台
         createOutputChannel(`项目【${projectName}】远程仓库添加地址成功。`, "success");
+
+        // 刷新项目管理器
+        let pinfo = {"easyGitInner": true, "projectPath": projectPath, "projectName": projectName};
+        hx.commands.executeCommand('EasyGit.main', pinfo);
     };
 };
 
