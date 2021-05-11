@@ -1,6 +1,6 @@
 {
     "name": "easy-git",
-    "description": "vscode源代码管理工具风格。HBuilderX内唯一的图形化Git工具, 并支持命令面板，支持克隆、提交/更新/拉取、分支/tag管理、日志、文件对比、储藏等操作。",
+    "description": "1.4.5重大更新。支持连接Github、gitee账号，克隆视图支持搜索github获取仓库URL，克隆更便捷。",
     "displayName": "【easy-git】Git源代码管理工具",
     "version": "1.4.5",
     "publisher": "oneone",
@@ -500,17 +500,17 @@
                     "group": "easygit@3"
                 },
                 {
-                    "command": "EasyGit.oauth",
-                    "title": "OAuth授权",
-                    "group": "easygit@4"
-                },
-                {
-                    "group": "easygit@4"
-                },
-                {
                     "command": "EasyGit.setGitingore",
                     "title": "设置.gitignore",
                     "when": "isGit",
+                    "group": "easygit@4"
+                },
+                {
+                    "group": "easygit@4"
+                },
+                {
+                    "command": "EasyGit.oauth",
+                    "title": "OAuth授权",
                     "group": "easygit@4"
                 },
                 {
