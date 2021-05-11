@@ -110,10 +110,10 @@ async function count(viewname) {
                     if (viewname == 'clone') { cloneFlags = true};
                     if (viewname == 'init') { initFlags = true};
                     if (viewname == 'CommandPanel') { CommandPanelFlags = true};
-                    resolve('Y');
+                    resolve(response);
                 })
                 .catch(function(error) {
-                    reject('N');
+                    reject(error);
                 })
         } catch (e) {
             reject('Y');

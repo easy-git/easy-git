@@ -690,8 +690,8 @@ async function gitClone(info) {
     try{
         let options = [];
         if (branch) {
-            let t = '-b ' + branch;
-            options.push(t);
+            options.push("-b");
+            options.push(branch);
         };
         options.push(repo);
         options.push(localPath);
