@@ -139,10 +139,10 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
             .d2h-file-side-diff::-webkit-scrollbar {
                 height: 9px !important
             }
-            /**.d2h-file-side-diff {
-                height: calc(100vh - 50px);
+            .d2h-file-side-diff {
+                min-height: calc(100vh - 50px);
                 position: relative;
-            }*/
+            }
             .d2h-file-header {
                 display: none !important;
             }
