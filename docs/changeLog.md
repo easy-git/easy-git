@@ -1,7 +1,8 @@
 # Change Log
 
 ## 1.4.5
-* 新增 Git OAuth授权功能，支持github、gitee；授权后，您可在本地创建远程仓库。
+* 新增 Git OAuth授权功能，支持github、gitee [详情](https://easy-git.gitee.io/oauth)
+* 新增 克隆视图 增加Github仓库搜索的功能 输入关键字回车搜索 即可获取Github搜索的仓库列表
 * 新增 命令面板 支持分支重命名 command: EasyGit.BranchRename
 * 修复 由于文件写入方法错误，导致某些git操作第一次失败的Bug
 * 优化 源代码管理器视图 右上角... 移除菜单【设置.gitattributes】和 【设置.gitignore】
