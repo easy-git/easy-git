@@ -202,6 +202,13 @@ class GitBranch {
             'easyGitInner': true
         };
         let mergeStatus = await utils.gitBranchMerge(this.projectPath, fromBranch, toBranch);
+
+        // 合并
+        if (mergeStatus == 'Already up to date.') {
+            utils.hxShowMessageBox('Git 分支合并', "合并结果：Already up to date。没有要合并的提交或文件。", ["关闭"]).then(btnText => {})
+            return;
+        };
+
         hx.commands.executeCommand('EasyGit.main', param);
         if (mergeStatus != undefined) {
             let that = this;

@@ -373,6 +373,13 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                         v-if="item.name != 'origin/master'">
                                         ${XIcon}
                                     </span>
+                                    <span
+                                        class="ml-1"
+                                        v-if="currentBranch != (item.name).split('/')[1]"
+                                        :title="'合并此分支到当前 ' + currentBranch + ' 分支'"
+                                        @click="gitMergeBranch(item.name);">
+                                        ${MergeIcon}
+                                    </span>
                                 </div>
                             </li>
                         </ul>

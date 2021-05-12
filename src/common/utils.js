@@ -1575,6 +1575,9 @@ async function gitBranchMerge(workingDir,fromBranch,toBranch) {
         let status = await git(workingDir)
             .mergeFromTo(fromBranch,toBranch)
             .then((res) => {
+                if ((res.files).length == 0) {
+                    return 'Already up to date.';
+                };
                 hx.window.setStatusBarMessage(`Git: 分支${toBranch}，合并${fromBranch}的代码，合并成功！在命令面板中，可取消合并。`, 10000, 'info');
                 return 'success';
             })
