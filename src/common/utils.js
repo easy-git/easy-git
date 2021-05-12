@@ -2358,6 +2358,20 @@ async function FileWriteAndOpen(filename, filecontent){
     });
 };
 
+/**
+ * @description 创建多级目录，同步方法
+ * @param {Object} dirname
+ */
+function mkdirsSync(dirname) {
+    if (fs.existsSync(dirname)) {
+        return true;
+    } else {
+        if (mkdirsSync(path.dirname(dirname))) {
+            fs.mkdirSync(dirname);
+            return true;
+        };
+    };
+};
 
 module.exports = {
     hxShowMessageBox,
@@ -2423,5 +2437,6 @@ module.exports = {
     gitRevert,
     gitRefs,
     gitRemoveFile,
-    gitRepositoryUrl
+    gitRepositoryUrl,
+    mkdirsSync
 }
