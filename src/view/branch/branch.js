@@ -242,7 +242,12 @@ class GitBranch {
     // Git branch: delete
     async delete(branchName) {
         let title = branchName.includes('origin/') ? 'Git: 远程分支删除' :  'Git: 本地分支删除';
-        let delMsg = `确定要删除 ${branchName} 分支?`;
+        let delMsg = `确定要删除 ${branchName} 分支? \n\n`;
+        if (title.includes("远程分支")) {
+            delMsg = delMsg + "请注意：远程分支删除后无法恢复。"
+        } else {
+            delMsg = delMsg + "请注意：如果本地分支未推送到远端，当删除本地分支后，代码无法恢复。"
+        };
         let btn = await utils.hxShowMessageBox(title, delMsg, ['删除','关闭']).then((result) =>{
             return result;
         });
