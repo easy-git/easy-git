@@ -2276,6 +2276,7 @@ async function gitRefs(workingDir) {
 function hxShowMessageBox(title, text, buttons = ['关闭']) {
     return new Promise((resolve, reject) => {
         try {
+            let escape = buttons.length >= 3 ? -1 : -10;
             if (cmpVersionResult <= 0) {
                 hx.window.showMessageBox({
                     type: 'info',
@@ -2283,7 +2284,7 @@ function hxShowMessageBox(title, text, buttons = ['关闭']) {
                     text: text,
                     buttons: buttons,
                     defaultButton: 0,
-                    escapeButton: -10
+                    escapeButton: escape
                 }).then(button => {
                     resolve(button);
                 })
