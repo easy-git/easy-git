@@ -2279,7 +2279,7 @@ async function gitRefs(workingDir) {
 function hxShowMessageBox(title, text, buttons = ['关闭']) {
     return new Promise((resolve, reject) => {
         try {
-            let escape = buttons.length >= 3 ? -1 : -10;
+            let escape = buttons.length == 1 && buttons == ['关闭'] ? -1 : -10;
             if (cmpVersionResult <= 0) {
                 hx.window.showMessageBox({
                     type: 'info',
