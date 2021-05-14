@@ -458,6 +458,11 @@
         "menus": {
             "explorer/context": [
                 {
+                    "command": "EasyGit.clone",
+                    "title": "Git克隆",
+                    "when": "explorerResourceCount == 0"
+                },
+                {
                     "command": "EasyGit.main",
                     "title": "easy-git: 源代码管理",
                     "when": "isGit && explorerResourceCount == 1",
