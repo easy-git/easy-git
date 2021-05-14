@@ -1258,7 +1258,7 @@ async function gitCheckoutFile(workingDir, filename, isConfirm=false) {
  */
 async function gitCheckoutConflicted(workingDir, filename) {
     let boxMsg = `${filename} 存在处理，请选择解决冲突的方案。\n\n保留本地：git checout --ours \n保留远端：git checkout --theirs`;
-    let btnText = await hxShowMessageBox('Git 合并冲突', boxMsg, ['保留远端', '保留本地', '关闭']).then( btn => {
+    let btnText = await hxShowMessageBox('Git 合并冲突', boxMsg, ['关闭', '保留远端', '保留本地']).then( btn => {
         return btn;
     });
 
