@@ -50,6 +50,7 @@ function getUIData() {
     let uploadIcon = icon.getUploadIcon(fontColor);
     let ChevronDownIcon = icon.getChevronDown(fontColor);
     let ChevronRightIcon = icon.getChevronRight(fontColor);
+    let HandleIcon = icon.getHandleIcon(fontColor);
 
     let iconData = {
         CancelIconSvg,
@@ -72,7 +73,8 @@ function getUIData() {
         HistoryIcon,
         uploadIcon,
         ChevronRightIcon,
-        ChevronDownIcon
+        ChevronDownIcon,
+        HandleIcon
     };
 
     let uiData = Object.assign(iconData,colorData);
@@ -414,7 +416,7 @@ class GitFile {
     };
 
     // Git: cancel add
-    async cancelStash(fileUri, tag) {
+    async cancelStaged(fileUri, tag) {
         if (!fileUri) {return;};
         if (tag == 'R') {
             let tmp = (fileUri.split('->')[1]).trim();
@@ -432,7 +434,7 @@ class GitFile {
     };
 
     // Git: cancel all add
-    async cancelAllStash() {
+    async cancelAllStaged() {
         let data = {
             'projectPath': this.projectPath,
             'projectName': this.projectName,
@@ -772,14 +774,6 @@ function active(webviewPanel, userConfig, gitData) {
         }, waitTime);
     };
 
-    // 关于自动刷新功能弹窗提示，仅提示一次，并记录下来到配置文件
-    // 2021-03-24 已解决自动刷新问题，不需要提示了。
-    // if (watcherPrompt == undefined) {
-    //     setTimeout(function() {
-    //         watchUserPrompt();
-    //     }, 3500);
-    // };
-
     view.onDidReceiveMessage((msg) => {
         GitHBuilderXInnerTrigger = true;
         let action = msg.command;
@@ -825,17 +819,20 @@ function active(webviewPanel, userConfig, gitData) {
             case 'checkoutFile':
                 File.checkoutFile(msg.text);
                 break;
+            case 'mergeConflicted':
+                utils.gitCheckoutConflicted(projectPath, msg.data);
+                break;
             case 'stash':
                 // 包含：储藏、储藏全部、查看储藏、弹出储藏等
                 gitAction.action(EasyGitInnerParams,msg.option);
                 break;
-            case 'cancelStash':
+            case 'cancelStaged':
                 // 取消暂存
-                File.cancelStash(msg.text, msg.tag);
+                File.cancelStaged(msg.text, msg.tag);
                 break;
-            case 'cancelAllStash':
+            case 'cancelAllStaged':
                 // 取消全部暂存
-                File.cancelAllStash();
+                File.cancelAllStaged();
                 break;
             case 'pull':
                 File.pull(msg);

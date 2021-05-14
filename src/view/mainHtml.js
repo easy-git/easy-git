@@ -44,7 +44,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
         HistoryIcon,
         uploadIcon,
         ChevronDownIcon,
-        ChevronRightIcon
+        ChevronRightIcon,
+        HandleIcon
     } = uiData;
     let {
         projectPath,
@@ -406,6 +407,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 </div>
                                 <div class="d-inline float-right" :id="'conflicted_'+i1">
                                     <div class="d-inline" v-if="hoverConflictedFileID == 'conflicted_'+i1">
+                                        <span title="解决冲突" @click="mergeConflicted(v1.path);">${HandleIcon}</span>
                                         <span title="打开文件" @click="openFile(v1.path);">${OpenFileIconSvg}</span>
                                         <span title="加入暂存 (git add)" @click="gitAdd(v1.path, v1.tag);">${AddIconSvg}</span>
                                     </div>
@@ -422,7 +424,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         <p class="add-title" id="git_add_title">
                             <span class="a-icon" v-html="StagedIcon" @click="isShowStagedList();"></span>暂存的更改:
                             <span class="gtag">{{ gitStagedFileListLength }}</span>
-                            <span title="取消所有暂存" class="stash-all" @click="cancelAllStash('all');">
+                            <span title="取消所有暂存" class="stash-all" @click="cancelAllStaged('all');">
                                 ${CancelIconSvg}
                             </span>
                         </p>
@@ -440,7 +442,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                         <span title="打开文件" @click="openFile(vv.path);">${OpenFileIconSvg}</span>
                                         <span
                                             title="取消暂存 git restore --staged <file>"
-                                            @click="cancelStash(vv.path, vv.tag);">
+                                            @click="cancelStaged(vv.path, vv.tag);">
                                             ${CancelIconSvg}
                                         </span>
                                     </div>
@@ -648,6 +650,12 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             };
                         });
                     },
+                    mergeConflicted(fpath) {
+                        hbuilderx.postMessage({
+                            command: 'mergeConflicted',
+                            data: fpath
+                        });
+                    },
                     isShowConflictedList() {
                         if (this.ConflictedIcon == '${ChevronDownIcon}') {
                             this.isShowConflicted = false;
@@ -738,16 +746,16 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             text: fileUri
                         });
                     },
-                    cancelStash(fileUri, tag) {
+                    cancelStaged(fileUri, tag) {
                         hbuilderx.postMessage({
-                            command: 'cancelStash',
+                            command: 'cancelStaged',
                             text: fileUri,
                             tag: tag
                         });
                     },
-                    cancelAllStash() {
+                    cancelAllStaged() {
                         hbuilderx.postMessage({
-                            command: 'cancelAllStash'
+                            command: 'cancelAllStaged'
                         });
                     },
                     gitAdd(fileUri, tag) {
@@ -877,7 +885,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 window.oncontextmenu = function() {
                     event.preventDefault();
                     return false;
-                }
+                };
             };
         </script>
     </body>

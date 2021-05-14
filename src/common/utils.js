@@ -1235,7 +1235,6 @@ async function gitCheckoutFile(workingDir, filename, isConfirm=false) {
     };
 
     try {
-
         let status = await git(workingDir)
             .checkout(args)
             .then(() => {
@@ -1253,6 +1252,36 @@ async function gitCheckoutFile(workingDir, filename, isConfirm=false) {
     }
 };
 
+
+/**
+ * @description 处理合并冲突，即git checkout ----theirs|--ours <filename>
+ */
+async function gitCheckoutConflicted(workingDir, filename) {
+    let boxMsg = `${filename} 存在处理，请选择解决冲突的方案。\n\n保留本地：git checout --ours \n保留远端：git checkout --theirs`;
+    let btnText = await hxShowMessageBox('Git 合并冲突', boxMsg, ['保留远端', '保留本地', '关闭']).then( btn => {
+        return btn;
+    });
+
+    if (btnText != '保留远端' && btnText != '保留本地') {
+        return;
+    };
+
+    let parm = btnText == '保留远端' ? '--theirs' : '--ours';
+    let cmd = [parm, filename];
+    console.log(cmd)
+    let status = await git(workingDir)
+        .checkout(cmd)
+        .then(() => {
+            hx.window.setStatusBarMessage(`Git: ${btnText}，操作成功。`, 5000, 'info');
+            return 'success'
+        })
+        .catch((err) => {
+            let errMsg = "\n\n" + (err).toString();
+            createOutputChannel(`Git: ${btnText}，操作成功。\n ${errMsg}`, 'error');
+            return 'fail';
+        });
+    return status;
+};
 
 /**
  * @description 获取本地及远程分支列表
@@ -2441,5 +2470,6 @@ module.exports = {
     gitRefs,
     gitRemoveFile,
     gitRepositoryUrl,
+    gitCheckoutConflicted,
     mkdirsSync
 }
