@@ -11,7 +11,7 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 
 ## 简介
 
-![插件预览.jpg](https://img-cdn-tc.dcloud.net.cn/uploads/article/20210104/b39599067d50eb46b12e3b280454ad1d.gif)
+![插件预览.jpg](https://easy-git.gitee.io/static/intro.gif)
 
 在项目管理器，选中`Git`项目，右键菜单，点击【easy-git】【源代码管理】即可打开`git视图`
 
@@ -33,7 +33,7 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 
 菜单【设置】【插件配置】【easy-git】功能
 
-![](https://img-cdn-qiniu.dcloud.net.cn/uploads/questions/20200808/08fb87da3924ee29b723f0e5162d1377.jpg)
+更多介绍见：[插件设置](https://easy-git.gitee.io/setting/)
 
 ## `问题`
 
