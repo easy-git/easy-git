@@ -29,7 +29,7 @@ const openDiffFileView = require('./view/diff/index.js');
 
 // 用户本地是否安装Git
 let isInstallGitForLocal;
-
+let hxColorScheme;
 
 class Common {
     constructor() {}
@@ -56,7 +56,18 @@ class Common {
         let GitAlwaysAutoCommitPush = config.get('EasyGit.AlwaysAutoCommitPush');
         let mainViewAutoRefreshFileList = config.get('EasyGit.mainViewAutoRefreshFileList');
         let logViewAutoRefresh = config.get('EasyGit.logViewAutoRefresh');
-        let isFullTextDiffFile = config.get('EasyGit.isFullTextDiffFile')
+        let isFullTextDiffFile = config.get('EasyGit.isFullTextDiffFile');
+
+        // 记录上次主题，当编辑器主题跟easygit颜色不协调时，右下角弹窗提醒。
+        let ColorScheme = config.get('editor.colorScheme');
+        if ( hxColorScheme == undefined ) {
+            hxColorScheme = ColorScheme;
+        } else {
+            if (hxColorScheme != ColorScheme) {
+                hx.window.showErrorMessage("EasyGit: 检测到当前HBuilderX主题已更改，如发现easygit窗口颜色异常，请重启HBuilderX。", ["我知道了"]);
+            };
+        };
+
         return {
             'DisableDevTools': DisableDevTools,
             'mainViewAutoRefreshFileList': mainViewAutoRefreshFileList,
