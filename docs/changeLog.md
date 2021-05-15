@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.4.6
+* 新增 源代码管理器视图 合并更改 增加 git checkout --ours|--thereis功能
+* 修复 源代码管理器视图 消息输入框 高度没有自适应的Bug
+* 修复 源代码、日志、文件对比、分支视图，某些点击事件，鼠标悬停样式不对的Bug
+* 新增 分支视图 支持合并远程分支到当前分支
+* 优化 切换上一个分支 当本地只有一个分支时，控制台报错。改为：状态栏消息提示
+* 优化 项目管理器 点击空白处 显示Git克隆菜单
+* 优化 oauth授权认证 弹窗增加【了解如何使用】入口
+* 优化 命令面板 分支删除与分支合并提示语
 ## 1.4.5
 * 新增 Git OAuth授权功能，支持连接github、gitee账号 [详情](https://easy-git.gitee.io/oauth)
 * 新增 克隆视图 增加Github仓库搜索的功能 输入关键字回车搜索 即可获取Github搜索的仓库列表，克隆更便捷 [详情](https://easy-git.gitee.io/connecting/github-search)
