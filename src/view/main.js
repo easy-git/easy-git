@@ -370,6 +370,10 @@ class GitFile {
             let AlwaysAutoAddCommit = hxConfig.get('EasyGit.AlwaysAutoAddCommit');
 
             if (AlwaysAutoAddCommit == "never") {
+                this.webviewPanel.webView.postMessage({
+                    command: "CommitMessage",
+                    commitMessage: comment
+                });
                 hx.window.setStatusBarMessage("EasyGit: 当前已关闭回车提交功能，如有需要请到插件设置中开启。", 5000, 'info');
                 return;
             } else if (AlwaysAutoAddCommit == true) {
@@ -383,6 +387,10 @@ class GitFile {
                 ).then( (result) => { return result; })
 
                 if (userSelect == '从不') {
+                    this.webviewPanel.webView.postMessage({
+                        command: "CommitMessage",
+                        commitMessage: comment
+                    });
                     hxConfig.update("EasyGit.AlwaysAutoAddCommit", "never").then(() => {
                         hx.window.setStatusBarMessage("EasyGit已开启：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。", 5000,'info');
                     });
