@@ -48,6 +48,11 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
         searchText = '';
     };
 
+    background = (background).toLowerCase();
+    if (['#ffffff', '#fff'].includes(background)) {
+        lineColor = '#EEE';
+    };
+
     return `
     <!DOCTYPE html>
     <html lang="en">
