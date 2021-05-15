@@ -26,12 +26,8 @@ function getUIData() {
     let OpenFileIconSvg = icon.getOpenFileIcon(fontColor);
 
     let iconData = {helpIcon, refreshIcon, searchIcon, noIcon, OpenFileIconSvg};
-    let uiData = Object.assign(iconData,colorData);
-    return uiData
+    return Object.assign(iconData,colorData);
 };
-
-// UI: color and svg icon
-let uiData = getUIData();
 
 
 class GitLogAction {
@@ -40,7 +36,6 @@ class GitLogAction {
         this.webviewPanel = webView;
         this.projectPath = gitBasicData.projectPath;
         this.projectName = gitBasicData.projectName;
-        this.uiData = uiData;
         this.userConfig = userConfig;
         this.gitData = gitBasicData;
         this.currentProjectInfoForFlush = {
@@ -151,11 +146,14 @@ class GitLogAction {
             };
         }catch(e){};
 
+        // UI: color and svg icon
+        let uiData = getUIData();
+
         // set webview
         try{
             let isHtml = this.webviewPanel.webView._html;
             if (isHtml == '') {
-                this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData, this.renderType);
+                this.webviewPanel.webView.html = generateLogHtml(this.userConfig, uiData, this.gitData, this.renderType);
             } else {
                 this.webviewPanel.webView.postMessage({
                     projectName: this.projectName,
@@ -167,7 +165,7 @@ class GitLogAction {
                 });
             };
         }catch(e){
-            this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.uiData, this.gitData, this.renderType);
+            this.webviewPanel.webView.html = generateLogHtml(this.userConfig, uiData, this.gitData, this.renderType);
         }
     }
 
@@ -361,6 +359,5 @@ class GitLogAction {
 
 
 module.exports = {
-    getUIData,
     GitLogAction
 }

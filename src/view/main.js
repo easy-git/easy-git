@@ -15,6 +15,10 @@ const html = require('./mainHtml.js')
 
 const osName = os.platform();
 
+// 主题
+let hxConfig = hx.workspace.getConfiguration();
+let hxColorScheme = hxConfig.get('editor.colorScheme')
+
 // Git触发途径：HBuilderX内触发、外部Git命令（或其它工具）触发
 let GitHBuilderXInnerTrigger = false;
 
@@ -76,11 +80,11 @@ function getUIData() {
         ChevronDownIcon,
         HandleIcon
     };
-
-    let uiData = Object.assign(iconData,colorData);
-    return uiData;
+    return Object.assign(iconData,colorData);
 };
 
+// UI: color and svg icon
+var uiData = getUIData();
 
 /**
  * @description  set .gitignore and .gitattributes
@@ -336,10 +340,8 @@ class GitFile {
             return hx.window.showErrorMessage('Git: 请填写commit message后再提交。', ['我知道了']);
         };
 
-        let config = await hx.workspace.getConfiguration();
-
         if (isStaged) {
-            let AlwaysAutoCommitPush = config.get('EasyGit.AlwaysAutoCommitPush');
+            let AlwaysAutoCommitPush = hxConfig.get('EasyGit.AlwaysAutoCommitPush');
 
             // commit & push的前提：本地分支必须关联到远端
             if (this.BranchTracking == null || this.BranchTracking == false) {
@@ -365,7 +367,7 @@ class GitFile {
             };
         } else {
             // 需要判断用户是否开启了：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。
-            let AlwaysAutoAddCommit = config.get('EasyGit.AlwaysAutoAddCommit');
+            let AlwaysAutoAddCommit = hxConfig.get('EasyGit.AlwaysAutoAddCommit');
 
             if (AlwaysAutoAddCommit == "never") {
                 hx.window.setStatusBarMessage("EasyGit: 当前已关闭回车提交功能，如有需要请到插件设置中开启。", 5000, 'info');
@@ -376,18 +378,18 @@ class GitFile {
                     this.refreshFileList();
                 };
             } else {
-                let userSelect = await utils.hxShowMessageBox('EasyGit', 
+                let userSelect = await utils.hxShowMessageBox('EasyGit',
                     '没有可提交的暂存更改。\n是否要自动暂存所有更改并直接提交? \n\n 点击【是】或【总是】后，即执行add+commit操作', ["从不",'总是','是','关闭'],
                 ).then( (result) => { return result; })
 
                 if (userSelect == '从不') {
-                    config.update("EasyGit.AlwaysAutoAddCommit", "never").then(() => {
+                    hxConfig.update("EasyGit.AlwaysAutoAddCommit", "never").then(() => {
                         hx.window.setStatusBarMessage("EasyGit已开启：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。", 5000,'info');
                     });
                     return;
                 };
                 if (userSelect == '总是') {
-                    config.update("EasyGit.AlwaysAutoAddCommit", true).then(() => {
+                    hxConfig.update("EasyGit.AlwaysAutoAddCommit", true).then(() => {
                         hx.window.setStatusBarMessage("EasyGit已开启：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。", 5000,'info');
                     });
                 };
@@ -710,15 +712,14 @@ function watchProjectDir(projectDir, func) {
  */
 let watcherPrompt;
 function watchUserPrompt() {
-    let config = hx.workspace.getConfiguration();
-    let UserPrompt = config.get('EasyGit.isShowPromptForAutoRefresh');
+    let UserPrompt = hxConfig.get('EasyGit.isShowPromptForAutoRefresh');
     if (UserPrompt == undefined) {
         hx.window.showInformationMessage('EasyGit：项目文件发生变动时，源代码管理器视图会自动刷新更改的文件列表。<a href="https://easy-git.gitee.io/setting/autoRefresh">详情</a>', ['关闭自动刷新', '我知道了']).then( (btn) => {
             if (btn == '关闭自动刷新') {
-                config.update('EasyGit.mainViewAutoRefreshFileList', false).then(() => {});
+                hxConfig.update('EasyGit.mainViewAutoRefreshFileList', false).then(() => {});
             };
             // 当EasyGit.isShowPromptForAutoRefresh为true时，不再提示
-            config.update('EasyGit.isShowPromptForAutoRefresh', true).then(() => {});
+            hxConfig.update('EasyGit.isShowPromptForAutoRefresh', true).then(() => {});
             watcherPrompt = true;
         });
     } else {
@@ -743,8 +744,11 @@ function active(webviewPanel, userConfig, gitData) {
     const { projectPath, projectName, currentBranch, originurl } = gitData;
     let { BranchTracking } = gitData;
 
-    // UI: color and svg icon
-    let uiData = getUIData();
+    // 当主题发生变化时，重新获取
+    let currentTheme = hxConfig.get('editor.colorScheme');
+    if (currentTheme != hxColorScheme) {
+        uiData = getUIData();
+    };
 
     // Git: 文件
     let File = new GitFile(webviewPanel, projectPath, projectName, uiData, userConfig);
