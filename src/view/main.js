@@ -366,7 +366,9 @@ class GitFile {
         } else {
             // 需要判断用户是否开启了：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。
             let AlwaysAutoAddCommit = config.get('EasyGit.AlwaysAutoAddCommit');
-
+            
+            if (AlwaysAutoAddCommit == false) {return};
+            
             if (AlwaysAutoAddCommit) {
                 let acStatus = await utils.gitAddCommit(this.projectPath, comment);
                 if (acStatus == 'success') {
@@ -377,6 +379,12 @@ class GitFile {
                     '没有可提交的暂存更改。\n是否要自动暂存所有更改并直接提交? \n',["从不",'总是','是','关闭'],
                 ).then( (result) => { return result; })
 
+                if (userSelect == '从不') {
+                    config.update("EasyGit.AlwaysAutoAddCommit", false).then(() => {
+                        hx.window.setStatusBarMessage("EasyGit已开启：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。", 5000,'info');
+                    });
+                    return;
+                };
                 if (userSelect == '是' || userSelect == '总是') {
                     const goAddCI = async () => {
                         let acStatus = await utils.gitAddCommit(this.projectPath, comment);
@@ -387,7 +395,7 @@ class GitFile {
                     goAddCI();
                     if (userSelect == '总是') {
                         config.update("EasyGit.AlwaysAutoAddCommit", true).then(() => {
-                            hx.window.setStatusBarMessage("Git已开启：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。", 5000,'info');
+                            hx.window.setStatusBarMessage("EasyGit已关闭：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。", 5000,'info');
                         });
                     };
                 };
