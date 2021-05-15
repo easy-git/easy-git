@@ -385,12 +385,12 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     <div class="col mt-2">
                         <div>
                             <textarea rows=1
+                                id="commitMsg"
                                 v-model="commitMessage"
                                 class="form-control outline-none textarea"
                                 :placeholder="commitMessagePlaceholder"
                                 @keyup.${ctrl}.enter="gitCommit();"
-                                :title="GitAlwaysAutoCommitPush ? 'commit & push' : 'commit'"
-                                onfocus="window.activeobj=this;this.clock=setInterval(function(){activeobj.style.height=(activeobj.scrollHeight + 2)+'px';},100);">
+                                :title="GitAlwaysAutoCommitPush ? 'commit & push' : 'commit'">
                             </textarea>
                         </div>
                     </div>
@@ -607,6 +607,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             that.forUpdateCommitMessage();
                         }, 1000);
                     };
+
+                    document.querySelector('#commitMsg').addEventListener('input', function () {
+                      this.style.height = 'auto';
+                      this.style.height = this.scrollHeight + 'px';
+                    })
                 },
                 methods: {
                     runSync() {
