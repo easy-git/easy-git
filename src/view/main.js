@@ -377,7 +377,7 @@ class GitFile {
                 };
             } else {
                 let userSelect = await utils.hxShowMessageBox('EasyGit', 
-                    '没有可提交的暂存更改。\n是否要自动暂存所有更改并直接提交? \n', ["从不",'总是','是','关闭'],
+                    '没有可提交的暂存更改。\n是否要自动暂存所有更改并直接提交? \n\n 点击【是】或【总是】后，即执行add+commit操作', ["从不",'总是','是','关闭'],
                 ).then( (result) => { return result; })
 
                 if (userSelect == '从不') {
