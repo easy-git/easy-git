@@ -391,9 +391,7 @@ class GitFile {
                         command: "CommitMessage",
                         commitMessage: comment
                     });
-                    hxConfig.update("EasyGit.AlwaysAutoAddCommit", "never").then(() => {
-                        hx.window.setStatusBarMessage("EasyGit已开启：当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。", 5000,'info');
-                    });
+                    hxConfig.update("EasyGit.AlwaysAutoAddCommit", "never").then(() => {});
                     return;
                 };
                 if (userSelect == '总是') {
