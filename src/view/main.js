@@ -374,7 +374,7 @@ class GitFile {
                 };
             } else {
                 let userSelect = await hx.window.showInformationMessage(
-                    '没有可提交的暂存更改。\n是否要自动暂存所有更改并直接提交? \n',['总是','是','关闭'],
+                    '没有可提交的暂存更改。\n是否要自动暂存所有更改并直接提交? \n',["从不",'总是','是','关闭'],
                 ).then( (result) => { return result; })
 
                 if (userSelect == '是' || userSelect == '总是') {

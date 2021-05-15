@@ -107,7 +107,7 @@
                 "EasyGit.AlwaysAutoAddCommit": {
                     "type": "boolean",
                     "default": false,
-                    "description": "当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交。"
+                    "description": "当没有可提交的暂存更改时，总是自动暂存所有更改并直接提交（即add+commit)。"
                 },
                 "EasyGit.AlwaysAutoCommitPush": {
                     "type": "boolean",
