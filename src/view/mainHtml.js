@@ -309,6 +309,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 line-height: 1.6rem;
                 padding-left: 20px;
                 font-size:0.83rem !important;
+                cursor:default;
             }
             .menu ul>li:hover {
                 background-color: ${liHoverBackground};
@@ -328,6 +329,9 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 top: -1px;
                 position: relative;
                 color: ${fontColor};
+            }
+            .cursor-default {
+                cursor:default;
             }
         </style>
     </head>
@@ -402,7 +406,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 :id="'conflicted_'+i1"
                                 @mouseover="hoverConflictedFileID = 'conflicted_'+i1"
                                 @mouseleave="hoverConflictedFileID = false">
-                                <div class="flex-grow-1 text-hidden" :title="v1.path">
+                                <div class="flex-grow-1 text-hidden cursor-default" :title="v1.path" >
                                     <span :class="[v1.tag == 'D' ? 'line-through' : '']" @click="gitDiff(v1.path, v1.tag, true);">{{ v1.path }}</span>
                                 </div>
                                 <div class="d-inline float-right" :id="'conflicted_'+i1">
@@ -434,7 +438,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 :id="'stash'+ii"
                                 @mouseover="hoverStashFileID = 'stash_'+ii"
                                 @mouseleave="hoverStashFileID = false">
-                                <div class="flex-grow-1 text-hidden" :title="vv.path">
+                                <div class="flex-grow-1 text-hidden cursor-default" :title="vv.path">
                                     <span :class="[vv.tag == 'D' ? 'line-through' : '']" @click="gitDiff(vv.path, vv.tag);">{{ vv.path }}</span>
                                 </div>
                                 <div class="d-inline float-right">
@@ -471,7 +475,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 :id="'change_'+i"
                                 @mouseover="hoverChangeFileID = 'change_'+i"
                                 @mouseleave="hoverChangeFileID = false">
-                                <div class="flex-grow-1 text-hidden" :title="v.path">
+                                <div class="flex-grow-1 text-hidden cursor-default" :title="v.path">
                                     <span :class="[v.tag == 'D' || v.tag == 'R' ? 'line-through' : '']" @click="gitDiff(v.path, v.tag);">{{ v.path }}</span>
                                 </div>
                                 <div class="d-inline float-right" :id="'change_'+i">
@@ -491,7 +495,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
             </div>
             <div class="container-fluid">
                 <div class="row m-0 fixedBottom" id="git_branch">
-                    <div class="col-auto mr-auto" title="鼠标左键，进入分支管理视图; 鼠标右键或中键，可直接切换到上一次分支。">
+                    <div class="col-auto mr-auto" title="鼠标左键，进入分支管理视图; 鼠标右键或中键，可直接切换到上一次分支。" style="cursor:default;">
                         <span class="cactive" @click.once="showBranchWindow();" @click.right.prevent="switchLastBranch();" @click.middle="switchLastBranch();">
                             ${BranchIcon} {{ currentBranch }}
                         </span>

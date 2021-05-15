@@ -181,6 +181,9 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                 margin: 3px 12px;
                 font-size: 14px !important;
             }
+            .cursor-default {
+                cursor: default;
+            }
         </style>
     </head>
     <body>
@@ -203,7 +206,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                     </div>
                     <div class="row" v-if="isConflicted">
                         <div class="col-auto mr-auto"></div>
-                        <div class="col-auto px-5">
+                        <div class="col-auto px-5 cursor-default">
                             <span title="git checkout --ours" @click="gitHandleConflict('--ours')">保留当前分支文件 | </span>
                             <span title="git checkout --theirs" @click="gitHandleConflict('--theirs')">采用传入的文件</span>
                         </div>

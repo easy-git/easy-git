@@ -241,6 +241,9 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                 margin-bottom: 0px;
                 padding: 0px 4px;
             }
+            .cursor-default {
+                cursor:default;
+            }
         </style>
     </head>
     <body style="background-color:${background};">
@@ -269,13 +272,13 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                     v-model.trim="inputBranch"/>
                             </div>
                             <ul class="pl-0 mb-0" style="list-style-type:none;">
-                                <li class="lif">
+                                <li class="lif cursor-default">
                                    <span @click="gitCreateBranch();" :title="'在当前工作区上创建分支, 即基于当前'+currentBranch+'分支创建'">从现有来源创建新分支</span>
                                 </li>
-                                <li class="lif">
+                                <li class="lif cursor-default">
                                     <span @click="gitCreatePushBranch();" :title="'在当前工作区上创建分支, 即基于当前'+currentBranch+'分支创建'">从现有来源创建新分支并push</span>
                                 </li>
-                                <li class="lif">
+                                <li class="lif cursor-default">
                                     <span @click="openModelBox('none');">从...创建分支</span>
                                 </li>
                             </ul>
@@ -284,7 +287,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                 </div>
                 <div id="gather-local-branchs" class="row"  style="margin-top:198px;">
                     <div class="col-12 mt-2 px-0">
-                        <p class="mx-3 mb-1 major-title">
+                        <p class="mx-3 mb-1 major-title cursor-default">
                             <span @click="isShowLocalBranchList()">
                                 ${BranchIcon}&nbsp;&nbsp;本地分支
                                 <span class="count-num" v-show="BranchList.length != 0">{{ BranchList.length }}</span>
@@ -297,7 +300,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                 :id="'branch_'+idx"
                                 @mouseover="hoverStampID = 'branch_'+idx"
                                 @mouseleave="hoverStampID = false">
-                                <div class="d-inline">
+                                <div class="d-inline cursor-default">
                                     <span
                                         :style="{'color': BranchStyle(item)}"
                                         @click="switchBranch(item);"
@@ -305,7 +308,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                         {{ item.current ? '*' + item.name : (item.name).replace('origin/','') }}
                                     </span>
                                 </div>
-                                <div id="branch_action_local" class="d-inline float-right" v-if="hoverStampID == 'branch_'+idx">
+                                <div id="branch_action_local" class="d-inline float-right cursor-default" v-if="hoverStampID == 'branch_'+idx">
                                     <span class="ml-1"
                                         title="打标签, 创建后会自动推送到远端"
                                         @click="CreateTag();"
@@ -343,7 +346,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         </ul>
                     </div>
                     <div id="gather-origin-branchs" class="col-12 mt-2 px-0">
-                        <p class="mx-3 mb-1 major-title">
+                        <p class="mx-3 mb-1 major-title cursor-default">
                             <span @click="isShowOriginList();">
                                 ${cloudIcon}&nbsp;&nbsp;远端(origin)分支
                                 <span class="count-num" v-show="OriginBranchList.length != 0">{{ OriginBranchList.length }}</span>
@@ -385,7 +388,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         </ul>
                     </div>
                     <div id="gather-tags" class="col-12 mt-2 px-0">
-                        <p class="mx-3 mb-1 major-title">
+                        <p class="mx-3 mb-1 major-title cursor-default">
                             <span @click="isShowTagList();">
                                 ${TagIcon}&nbsp;&nbsp;标签
                                 <span class="count-num" v-show="TagsList.length != 0">{{ TagsList.length }}</span>
@@ -419,7 +422,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
             </div>
             <div id="page-bottom" class="container-fluid" v-if="!isShowModel">
                 <div class="row m-0 fixedBottom" id="git_branch">
-                    <div class="col-auto mr-auto" title="鼠标左键，跳转到源代码管理器视图; 鼠标右键或中键，可直接切换到上一次分支。">
+                    <div class="col-auto mr-auto cursor-default" title="鼠标左键，跳转到源代码管理器视图; 鼠标右键或中键，可直接切换到上一次分支。">
                         <span @click.left="showBranchWindow();" @click.middle="switchBranch({'name':'-', 'current':false});" @click.right.prevent="switchBranch({'name':'-', 'current':false});" class="branch">
                             ${BranchIcon} {{currentBranch}}
                         </span>

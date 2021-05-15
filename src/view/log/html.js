@@ -442,6 +442,9 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                 .d2h-code-line {
                     padding: 0 1.5rem !important;
                 }
+                .cursor-default {
+                    cursor: default;
+                }
             </style>
         </head>
         <body style="background-color:${background} !important;">
@@ -452,7 +455,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             <div class="col">
                                 <div class="d-flex">
                                     <div class="mr-auto">
-                                        <h6 class="project-info">
+                                        <h6 class="project-info cursor-default">
                                             <span>{{ projectName }} / </span>
                                             <span title="仅显示当前分支log" class="branch"
                                                 :class="{ active: searchType == 'branch'}"
@@ -463,7 +466,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                                 @click="switchSearchType('all');">所有分支</span>
                                         </h6>
                                     </div>
-                                    <div>
+                                    <div class="cursor-default">
                                         <span @click="showRefList();" title="可查看指定分支或标签的log">跳转到: {{ viewRefName }} </span>
                                     </div>
                                 </div>
