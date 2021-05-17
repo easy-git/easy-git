@@ -787,7 +787,7 @@ function active(webviewPanel, userConfig, gitData) {
     // 监听项目文件，如果有变动，则刷新; 关闭自动刷新，则不再监听。
     let { mainViewAutoRefreshFileList } = userConfig;
     if (mainViewAutoRefreshFileList && watcherListen == undefined) {
-        let waitTime = osName == 'darwin' ? 5000 : 13000;
+        let waitTime = osName == 'darwin' ? 5000 : 11000;
         setTimeout(function() {
             watchProjectDir(projectPath, File);
         }, waitTime);
