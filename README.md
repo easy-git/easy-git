@@ -15,7 +15,7 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 
 ## 简介
 
-![插件预览.jpg](https://easy-git.gitee.io/static/intro.gif)
+![插件预览.jpg](https://easy-git.github.io/static/intro.gif)
 
 在项目管理器，选中`Git`项目，右键菜单，点击【easy-git】【源代码管理】即可打开`git视图`
 
@@ -37,7 +37,7 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 
 菜单【设置】【插件配置】【easy-git】功能
 
-更多介绍见：[插件设置](https://easy-git.gitee.io/setting/)
+更多介绍见：[插件设置](https://easy-git.github.io/setting/)
 
 ## `问题`
 
@@ -50,50 +50,50 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 
 ## 文档目录
 
-1. [主页](https://easy-git.gitee.io/)
-2. [插件安装](https://easy-git.gitee.io/home/install)
-3. [OAuth授权](https://easy-git.gitee.io/oauth)
+1. [主页](https://easy-git.github.io/)
+2. [插件安装](https://easy-git.github.io/home/install)
+3. [OAuth授权](https://easy-git.github.io/oauth)
 4. 插件设置
- - [插件设置](https://easy-git.gitee.io/setting)
- - [设置快捷键](https://easy-git.gitee.io/setting/keyboard)
- - [语音提示](https://easy-git.gitee.io/setting/voice)
- - [自动刷新](https://easy-git.gitee.io/setting/autoRefresh)
+ - [插件设置](https://easy-git.github.io/setting)
+ - [设置快捷键](https://easy-git.github.io/setting/keyboard)
+ - [语音提示](https://easy-git.github.io/setting/voice)
+ - [自动刷新](https://easy-git.github.io/setting/autoRefresh)
 5. Git 克隆/连接
- - [前言](https://easy-git.gitee.io/connecting)
- - [开始克隆](https://easy-git.gitee.io/connecting/clone)
- - [搜索Github存储库](https://easy-git.gitee.io/connecting/github-search)
- - [初始化](https://easy-git.gitee.io/connecting/init)
+ - [前言](https://easy-git.github.io/connecting)
+ - [开始克隆](https://easy-git.github.io/connecting/clone)
+ - [搜索Github存储库](https://easy-git.github.io/connecting/github-search)
+ - [初始化](https://easy-git.github.io/connecting/init)
 6. 源代码管理器
- - [概览](https://easy-git.gitee.io/docs/file)
- - [拉取 - pull](https://easy-git.gitee.io/docs/file/pull)
- - [提交 - commit](https://easy-git.gitee.io/docs/file/commit)
- - [推送 - push](https://easy-git.gitee.io/docs/file/push)
- - [暂存 - add](https://easy-git.gitee.io/docs/file/add)
- - [取消暂存 - restore](https://easy-git.gitee.io/docs/file/cancel_add)
- - [撤销修改 - restore](https://easy-git.gitee.io/docs/file/cancel_change)
+ - [概览](https://easy-git.github.io/docs/file)
+ - [拉取 - pull](https://easy-git.github.io/docs/file/pull)
+ - [提交 - commit](https://easy-git.github.io/docs/file/commit)
+ - [推送 - push](https://easy-git.github.io/docs/file/push)
+ - [暂存 - add](https://easy-git.github.io/docs/file/add)
+ - [取消暂存 - restore](https://easy-git.github.io/docs/file/cancel_add)
+ - [撤销修改 - restore](https://easy-git.github.io/docs/file/cancel_change)
 7. 储藏 (stash)
- - [储藏](https://easy-git.gitee.io/docs/stash/stash)
- - [弹出储藏](https://easy-git.gitee.io/docs/stash/pop)
- - [查看储藏](https://easy-git.gitee.io/docs/stash/show)
+ - [储藏](https://easy-git.github.io/docs/stash/stash)
+ - [弹出储藏](https://easy-git.github.io/docs/stash/pop)
+ - [查看储藏](https://easy-git.github.io/docs/stash/show)
 8. 日志视图
- - [概览](https://easy-git.gitee.io/docs/log)
- - [查看log详情](https://easy-git.gitee.io/docs/log/details)
- - [搜索](https://easy-git.gitee.io/docs/log/search)
+ - [概览](https://easy-git.github.io/docs/log)
+ - [查看log详情](https://easy-git.github.io/docs/log/details)
+ - [搜索](https://easy-git.github.io/docs/log/search)
 9. 分支/标签
- - [简介](https://easy-git.gitee.io/docs/refs)
- - [分支切换](https://easy-git.gitee.io/docs/refs/branch/switch)
- - [分支创建](https://easy-git.gitee.io/docs/refs/branch/create)
- - [标签创建 - tag](https://easy-git.gitee.io/docs/refs/tag/create)
+ - [简介](https://easy-git.github.io/docs/refs)
+ - [分支切换](https://easy-git.github.io/docs/refs/branch/switch)
+ - [分支创建](https://easy-git.github.io/docs/refs/branch/create)
+ - [标签创建 - tag](https://easy-git.github.io/docs/refs/tag/create)
 10. 命令面板
- - [概览](https://easy-git.gitee.io/CommandPanel)
+ - [概览](https://easy-git.github.io/CommandPanel)
 11. Git技巧
- - [查看当前行最后一次修改信息](https://easy-git.gitee.io/docs/blame)
- - [用提交信息标注文件中的每一行](https://easy-git.gitee.io/docs/annotate)
- - [查看文件的某个历史版本内容](https://easy-git.gitee.io/docs/fileHistory)
+ - [查看当前行最后一次修改信息](https://easy-git.github.io/docs/blame)
+ - [用提交信息标注文件中的每一行](https://easy-git.github.io/docs/annotate)
+ - [查看文件的某个历史版本内容](https://easy-git.github.io/docs/fileHistory)
 12. 身份认证
- - [检查现有 SSH 密钥](https://easy-git.gitee.io/auth/ssh-check)
- - [生成新的 SSH 密钥](https://easy-git.gitee.io/auth/ssh-generate)
- - [Git配置多个SSH-Key](https://easy-git.gitee.io/auth/ssh-more)
- - [windows: 记住Git凭据](https://easy-git.gitee.io/auth/http)
+ - [检查现有 SSH 密钥](https://easy-git.github.io/auth/ssh-check)
+ - [生成新的 SSH 密钥](https://easy-git.github.io/auth/ssh-generate)
+ - [Git配置多个SSH-Key](https://easy-git.github.io/auth/ssh-more)
+ - [windows: 记住Git凭据](https://easy-git.github.io/auth/http)
 13. 问题
- - [Q1: 中文乱码问题](https://easy-git.gitee.io/question/quote)
+ - [Q1: 中文乱码问题](https://easy-git.github.io/question/quote)
