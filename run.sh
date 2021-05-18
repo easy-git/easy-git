@@ -1,11 +1,21 @@
 #!/bin/bash
 
-cli_dir="/Applications/HBuilderX.app/Contents/MacOS/"
-plugin_dir="/Applications/HBuilderX.app/Contents/HBuilderX/plugins/"
+hxVersion="HBuilderX.app"
+
+if [ $1=="release" ];then
+    hxVersion='HBuilderX.app'
+fi
+
+if [ $1=="alpha" ];then
+    hxVersion='HBuilderX-Alpha.app'
+fi
+
+cli_dir="/Applications/$hxVersion/Contents/MacOS/"
+plugin_dir="/Applications/$hxVersion/Contents/HBuilderX/plugins/"
 easyGitSourceDir="/Users/xiaohutu/Github/easy-git"
 
 # 杀死相关进程
-ps -ef | grep HBuilderX.app | grep -v grep | awk '{print $3}' | xargs kill -9
+ps -ef | grep $hxVersion | grep -v grep | awk '{print $3}' | xargs kill -9
 
 # 复制插件
 cd $easyGitSourceDir && rm -rf easy-git.zip
