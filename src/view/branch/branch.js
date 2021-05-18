@@ -217,7 +217,7 @@ class GitBranch {
                 let btns = ['稍后推送', '立即推送'];
                 if (mergeStatus == 'conflicts') {
                     msg = `${toBranch} 合并 ${fromBranch} 分支，部分文件存在冲突，请选择接下来的操作？\n\n源代码管理器视图，每个文件，鼠标悬停，即可显示解决冲突的图标，点击可以选择：采用远端、采用本地。`;
-                    btns = ['关闭', '取消合并']
+                    btns = ['取消合并', '关闭']
                 };
                 if (mergeStatus == 'fail') {
                     msg = `${toBranch} 合并 ${fromBranch} 分支，合并失败，请解决错误后，再次进行合并。\n 错误信息，请查看控制台。`;
@@ -251,7 +251,7 @@ class GitBranch {
         let btn = await utils.hxShowMessageBox(title, delMsg, ['删除','关闭']).then((result) =>{
             return result;
         });
-        if (btn == '关闭') {
+        if (btn != '删除') {
             return;
         };
         if (branchName.includes('origin/')) {

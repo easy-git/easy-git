@@ -249,7 +249,7 @@ class Branch {
             let btns = ['稍后推送', '立即推送'];
             if (mergeResult == 'conflicts') {
                 msg = `${this.currentBranch} 合并 ${selected} 分支，部分文件存在冲突，请选择接下来的操作？`;
-                btns = ['关闭', '取消合并', '去解决冲突']
+                btns = ['取消合并', '去解决冲突', '关闭']
             };
             if (mergeResult == 'fail') {
                 msg = `${this.currentBranch} 合并 ${selected} 分支，合并失败，请解决错误后，再进行合并。\n 错误信息，请查看控制台。`;

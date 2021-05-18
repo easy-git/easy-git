@@ -505,7 +505,7 @@ class GitFile {
                     let notTrackNum = notTrackList.length;
                     let trackNum = total - notTrackNum;
 
-                    let btns = ['关闭'];
+                    let btns = [];
                     if (trackNum) {
                         btns.push(`放弃${trackNum}个已跟踪的文件`);
                     };
@@ -515,11 +515,13 @@ class GitFile {
                     if (notTrackNum && trackNum) {
                         btns.push(`放弃所有${total}个文件`);
                     };
+                    btns.push('关闭');
 
                     let desc = '此操作不可撤销! \n如果继续操作, 你当前的工作区文件将永久丢失。';
                     let btnText = await utils.hxShowMessageBox('放弃所有更改', desc, btns).then( btn => {
                         return btn;
                     });
+                    if (btnText == null) return;
                     if (btnText == `放弃${trackNum}个已跟踪的文件`) {
                         let status = await utils.gitCheckoutFile(this.projectPath, '*');
                         if (status == 'success') {

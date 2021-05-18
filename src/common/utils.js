@@ -1229,7 +1229,7 @@ async function gitCheckoutFile(workingDir, filename, isConfirm=false) {
         let btnText = await hxShowMessageBox('放弃更改', boxMsg, ['放弃更改', '取消']).then( btn => {
             return btn;
         });
-        if (btnText == '取消') {
+        if (btnText != '放弃更改') {
             return;
         };
     };
@@ -1258,7 +1258,7 @@ async function gitCheckoutFile(workingDir, filename, isConfirm=false) {
  */
 async function gitCheckoutConflicted(workingDir, filename) {
     let boxMsg = `${filename} 存在处理，请选择解决冲突的方案。\n\n保留本地：git checout --ours \n保留远端：git checkout --theirs`;
-    let btnText = await hxShowMessageBox('Git 合并冲突', boxMsg, ['关闭', '保留远端', '保留本地']).then( btn => {
+    let btnText = await hxShowMessageBox('Git 合并冲突', boxMsg, ['保留远端', '保留本地', '关闭']).then( btn => {
         return btn;
     });
 
@@ -1744,7 +1744,7 @@ async function gitClean(workingDir, filepath, isConfirm=true) {
         let isDeleteBtn = await hxShowMessageBox('放弃更改', cleanMsg, ['删除文件', '取消']).then( btn => {
             return btn;
         });
-        if (isDeleteBtn == '取消') {
+        if (isDeleteBtn != '删除文件') {
             return;
         };
     };
@@ -2304,7 +2304,7 @@ async function gitRefs(workingDir) {
  * @description 对话框
  *     - 插件API: hx.window.showMessageBox, 本身存在很大问题，请谨慎使用
  *     - 已屏蔽esc事件，不支持esc关闭弹窗；因此弹窗上的x按钮，也无法点击。
- *     - 按钮组中必须提供`关闭`
+ *     - 按钮组中必须提供`关闭`操作。且关闭按钮需要位于数组最后。
  * @param {String} title
  * @param {String} text
  * @param {String} buttons 按钮，必须大于1个
@@ -2312,7 +2312,13 @@ async function gitRefs(workingDir) {
 function hxShowMessageBox(title, text, buttons = ['关闭']) {
     return new Promise((resolve, reject) => {
         try {
-            let escape = buttons.length == 1 && buttons == ['关闭'] ? -1 : -10;
+            let escape = -10;
+            if ( buttons.length > 1  && (buttons.includes('关闭') || buttons.includes('取消')) ) {
+                if (osName == 'darwin') {
+                    buttons = buttons.reverse();
+                };
+                escape = -1;
+            };
             if (cmpVersionResult <= 0) {
                 hx.window.showMessageBox({
                     type: 'info',
