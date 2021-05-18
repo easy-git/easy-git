@@ -9,9 +9,10 @@
 * 优化 项目管理器 点击空白处 显示Git克隆菜单
 * 优化 oauth授权认证 弹窗增加【了解如何使用】入口
 * 优化 命令面板 分支删除与分支合并提示语
+
 ## 1.4.5
-* 新增 Git OAuth授权功能，支持连接github、gitee账号 [详情](https://easy-git.gitee.io/oauth)
-* 新增 克隆视图 增加Github仓库搜索的功能 输入关键字回车搜索 即可获取Github搜索的仓库列表，克隆更便捷 [详情](https://easy-git.gitee.io/connecting/github-search)
+* 新增 Git OAuth授权功能，支持连接github、gitee账号 [详情](https://easy-git.github.io/oauth)
+* 新增 克隆视图 增加Github仓库搜索的功能 输入关键字回车搜索 即可获取Github搜索的仓库列表，克隆更便捷 [详情](https://easy-git.github.io/connecting/github-search)
 * 修复 克隆视图 克隆指定分支失败的Bug
 * 新增 命令面板 支持分支重命名 command: EasyGit.BranchRename
 * 修复 由于文件写入方法错误，导致某些git操作第一次失败的Bug
