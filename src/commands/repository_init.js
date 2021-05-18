@@ -58,7 +58,7 @@ async function gitInitProject(ProjectInfo) {
     };
 
     createOutputChannel("当前仓库，还未关联到远程仓库上, 请在弹窗输入框中输入仓库地址。如不需要关联远程仓库、或后期设置，请直接关闭弹窗。", "warning");
-    createOutputChannel("新建仓库、及获取远程仓库地址，参考: https://easy-git.gitee.io/connecting/init\n")
+    createOutputChannel("新建仓库、及获取远程仓库地址，参考: https://easy-git.github.io/connecting/init\n")
 
     // 打开源代码管理器
     ProjectInfo.easyGitInner = true;

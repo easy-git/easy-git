@@ -38,9 +38,9 @@ class Common {
     async CheckGitEnv() {
         isInstallGitForLocal = await utils.isGitInstalled();
         if (!isInstallGitForLocal) {
-            hx.window.showErrorMessage('检测到您本机未安装Git环境! 如已安装，还提示此错误，请重启HBuilderX。<a href="https://easy-git.gitee.io/home/git-install">安装教程</a>',['查看教程','关闭']).then((result) => {
+            hx.window.showErrorMessage('检测到您本机未安装Git环境! 如已安装，还提示此错误，请重启HBuilderX。<a href="https://easy-git.github.io/home/git-install">安装教程</a>',['查看教程','关闭']).then((result) => {
                 if (result == '查看教程') {
-                    hx.env.openExternal('https://easy-git.gitee.io/home/git-install');
+                    hx.env.openExternal('https://easy-git.github.io/home/git-install');
                 };
             });
         };

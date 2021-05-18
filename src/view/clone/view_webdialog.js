@@ -351,7 +351,7 @@ function generateLogHtml(hxData) {
                                 </span>
                             </div>
                             <p class="form-text text-muted mb-0">
-                                授权访问github、gitee，<a href="https://easy-git.gitee.io/oauth">详情，
+                                授权访问github、gitee，<a href="https://easy-git.github.io/oauth">详情，
                                 </a>自动加载您所有的仓库URL，克隆更方便。
                                 <span class="link-text" @click="goAuthorize();">授权</span>
                             </p>
@@ -415,9 +415,9 @@ function generateLogHtml(hxData) {
                     <div class="form-group row m-0 mt-3">
                         <div class="col px-0">
                             <p class="clone-help">
-                                如遇到问题，请<a href="https://easy-git.gitee.io/connecting/">参考文档</a>，
+                                如遇到问题，请<a href="https://easy-git.github.io/connecting/">参考文档</a>，
                                 或<a href="https://ext.dcloud.net.cn/plugin?id=2475">反馈给作者</a>。
-                                使用SSH克隆，需配置SSH，<a href="https://easy-git.gitee.io/auth/ssh-generate">配置SSH</a>
+                                使用SSH克隆，需配置SSH，<a href="https://easy-git.github.io/auth/ssh-generate">配置SSH</a>
                             </p>
                         </div>
                     </div>

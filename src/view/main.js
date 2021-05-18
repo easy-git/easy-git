@@ -720,7 +720,7 @@ let watcherPrompt;
 function watchUserPrompt() {
     let UserPrompt = hxConfig.get('EasyGit.isShowPromptForAutoRefresh');
     if (UserPrompt == undefined) {
-        hx.window.showInformationMessage('EasyGit：项目文件发生变动时，源代码管理器视图会自动刷新更改的文件列表。<a href="https://easy-git.gitee.io/setting/autoRefresh">详情</a>', ['关闭自动刷新', '我知道了']).then( (btn) => {
+        hx.window.showInformationMessage('EasyGit：项目文件发生变动时，源代码管理器视图会自动刷新更改的文件列表。<a href="https://easy-git.github.io/setting/autoRefresh">详情</a>', ['关闭自动刷新', '我知道了']).then( (btn) => {
             if (btn == '关闭自动刷新') {
                 hxConfig.update('EasyGit.mainViewAutoRefreshFileList', false).then(() => {});
             };

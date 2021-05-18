@@ -712,7 +712,7 @@ async function gitClone(info) {
     } catch(e) {
         if (e == 'ssh publickey error') {
             createOutputChannel('- SSH publickey无效，克隆失败。', 'error');
-            createOutputChannel('配置SSH, 请参考: https://easy-git.gitee.io/auth/ssh-generate', false);
+            createOutputChannel('配置SSH, 请参考: https://easy-git.github.io/auth/ssh-generate', false);
         } else if (e == 'Incorrect username or password') {
             createOutputChannel('账号密码错误，克隆失败。', 'error');
         } else {
@@ -1109,7 +1109,7 @@ async function gitPull(workingDir,options) {
                     createOutputChannel(`Git: pull失败 \n ${errMsg}`, 'error');
                 } else if (errMsg.includes('could not read Username')) {
                     createOutputChannel(`Git: pull失败 \n ${errMsg}`, 'error');
-                    createOutputChannel('关于身份认证信息的解决方法: https://easy-git.gitee.io/question/username', 'info')
+                    createOutputChannel('关于身份认证信息的解决方法: https://easy-git.github.io/question/username', 'info')
                 } else {
                     createOutputChannel(`Git: pull失败 \n ${errMsg}`, 'error');
                 };
@@ -1151,7 +1151,7 @@ async function gitFetch(workingDir, isShowMsg=true) {
                     createOutputChannel(`Git: fetch失败 \n\n ${errMsg}`, 'error');
                 };
 
-                createOutputChannel("fetch操作说明：\n1. 当您打开Git源代码管理器时，easy-git插件会自动进行git fetch操作。\n2. git fetch 并没更改本地仓库的代码，只是拉取了远程 commit 等数据。\n3. fetch操作，错误说明: https://easy-git.gitee.io/docs/file/fetch\n", "info");
+                createOutputChannel("fetch操作说明：\n1. 当您打开Git源代码管理器时，easy-git插件会自动进行git fetch操作。\n2. git fetch 并没更改本地仓库的代码，只是拉取了远程 commit 等数据。\n3. fetch操作，错误说明: https://easy-git.github.io/docs/file/fetch\n", "info");
                 return 'fail';
             });
         return status
