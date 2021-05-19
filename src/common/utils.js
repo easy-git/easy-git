@@ -42,7 +42,7 @@ function getThemeColor(area) {
     };
 
     // 背景颜色、输入框颜色、字体颜色、线条颜色
-    let background, liHoverBackground,inputColor, inputLineColor, cursorColor, fontColor, lineColor, menuBackground, scrollbarColor;
+    let background, liHoverBackground, inputColor, inputBgColor, inputLineColor, cursorColor, fontColor, lineColor, menuBackground, scrollbarColor;
 
     // 修复 0.1版本引出的Bug （当未定义自定义主题时异常的Bug）
     let custom = {};
@@ -75,7 +75,8 @@ function getThemeColor(area) {
             liHoverBackground = 'rgb(78,80,73)';
         };
         inputColor = 'rgb(255,254,250)';
-        inputLineColor = 'rgb(210,210,210)';
+        inputBgColor = '#2E2E2E';
+        inputLineColor = 'rgb(81,140,255)';
         cursorColor = 'rgb(255,255,255)';
         lineColor = 'rgb(23,23,23)';
         scrollbarColor = '#6F6F6F';
@@ -98,6 +99,7 @@ function getThemeColor(area) {
             liHoverBackground = 'rgb(44,47,55)';
         };
         inputColor = 'rgb(255,254,250)';
+        inputBgColor = '#2E2E2E';
         inputLineColor = 'rgb(81,140,255)';
         cursorColor = 'rgb(255,255,255)';
         lineColor = 'rgb(33,37,43)';
@@ -161,6 +163,7 @@ function getThemeColor(area) {
         liHoverBackground,
         inputColor,
         inputLineColor,
+        inputBgColor,
         cursorColor,
         fontColor,
         lineColor,

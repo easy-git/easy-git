@@ -92,7 +92,7 @@ class Api {
         this.webviewDialog.setButtonStatus("开始创建", ["loading", "disable"]);
 
         let createResult = await gitRepoCreate(CreateInfo, this.webviewDialog);
-        
+
         if (isRemoteAdd) {
             if (!fromProjectPath && !fromProjectName) {
                 return hx.window.showErrorMessage(`警告：获取本地项目名称和项目路径失败，【本地关联远程仓库】操作中断。`, ['我知道了']);
@@ -235,8 +235,8 @@ async function gitRepositoryCreate(FromData={}) {
                     <div class="form-group row m-0">
                         <label for="u-p" class="col-sm-2 px-0">托管主机</label>
                         <div class="col-sm-10 d-inline">
-                            <input name="host" type="radio" class="mr-1" :class="{has_sel: host=='github'}" value="github" v-model="host"/>GitHub
-                            <input name="host" type="radio" class="mr-1 ml-3" :class="{has_sel: host=='gitee'}" value="gitee" v-model="host"/>Gitee
+                            <input name="host" type="radio" class="mr-1" value="github" v-model="host"/>GitHub
+                            <input name="host" type="radio" class="mr-1 ml-3" value="gitee" v-model="host"/>Gitee
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3">
@@ -283,29 +283,29 @@ async function gitRepositoryCreate(FromData={}) {
                     <div class="form-group row m-0 mt-4">
                         <label for="repo-type" class="col-sm-2 px-0">仓库类型</label>
                         <div class="col-sm-10 d-inline">
-                            <input name="rep" type="radio" class="mr-1" value="0" :class="{has_sel: isPrivate == '0' }" v-model="isPrivate"/>公开(所有人可见)
-                            <input name="rep" type="radio" class="ml-3 mr-1" value="1" :class="{has_sel: isPrivate == '1'}" v-model="isPrivate"/>私有(仅仓库成员可见)
+                            <input name="rep" type="radio" class="mr-1" value="0" v-model="isPrivate"/>公开(所有人可见)
+                            <input name="rep" type="radio" class="ml-3 mr-1" value="1" v-model="isPrivate"/>私有(仅仓库成员可见)
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3" v-if="fromProjectName == '' && fromProjectPath == ''">
                         <label for="repo-isClone" class="col-sm-2 px-0">克隆</label>
                         <div class="col-sm-10">
-                            <input type="checkbox" :class="{ has_sel: isClone }" class="mr-2" v-model="isClone" />
+                            <input type="checkbox" class="mr-2" v-model="isClone" />
                             <label class="d-inline">远程仓库创建后，是否克隆到本地</label>
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3" v-if="fromProjectName && fromProjectPath">
                         <label for="repo-type" class="col-sm-2 px-0">添加远程仓库</label>
                         <div class="col-sm-10 d-inline">
-                            <input type="checkbox" :class="{ has_sel: isRemoteAdd }" class="mr-2" v-model="isRemoteAdd" />
+                            <input type="checkbox" class="mr-2" v-model="isRemoteAdd" />
                             <label class="d-inline">远程仓库创建后，是否关联刚创建的项目{{fromProjectName}}</label>
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3" v-if="isClone || (fromProjectName && fromProjectPath)">
                         <label for="repo-type" class="col-sm-2 px-0">协议</label>
                         <div class="col-sm-10 d-inline">
-                            <input name="Protocol" type="radio" class="mr-1" value="http" :class="{has_sel: Protocol=='http'}" v-model="Protocol"/>HTTPS/HTTP
-                            <input name="Protocol" type="radio" class="ml-3 mr-1" value="ssh" :class="{has_sel: Protocol=='ssh'}"  v-model="Protocol"/>SSH
+                            <input name="Protocol" type="radio" class="mr-1" value="http" v-model="Protocol"/>HTTPS/HTTP
+                            <input name="Protocol" type="radio" class="ml-3 mr-1" value="ssh" v-model="Protocol"/>SSH
                         </div>
                     </div>
                 </form>

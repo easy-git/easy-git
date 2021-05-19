@@ -4,6 +4,7 @@ const path = require('path');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
+const inputCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'input.css');
 
 
 /**
@@ -22,6 +23,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
         liHoverBackground,
         inputColor,
         inputLineColor,
+        inputBgColor,
         cursorColor,
         fontColor,
         lineColor,
@@ -68,6 +70,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
     <head>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="${bootstrapCssFile}">
+        <link rel="stylesheet" href="${inputCssFile}">
         <script src="${vueFile}"></script>
         <style type="text/css">
             body {
@@ -134,13 +137,11 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                 border-radius: 2px !important;
                 font-size: 0.9rem !important;
                 border: 1px solid ${lineColor};
+                background-color: ${inputBgColor} !important;
             }
             .form-control:focus {
                 border-radius: 2px !important;
-            }
-            input:focus {
-                border: 1px solid ${inputLineColor};
-                caret-color: ${cursorColor};
+                border: 1px solid ${inputLineColor} !important;
             }
             .top {
                 font-size: 0.95rem;
@@ -243,6 +244,11 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
             }
             .cursor-default {
                 cursor:default;
+            }
+            input[type=radio]:checked,
+            input[type=checkbox]:checked {
+                background-color: ${inputLineColor} !important;
+                border-color: ${inputLineColor} !important;
             }
         </style>
     </head>

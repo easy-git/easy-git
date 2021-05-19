@@ -13,6 +13,7 @@ const cmp_hx_version = require('../common/cmp.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'bootstrap.min.css');
+const customCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'custom.css');
 
 // get hbuilderx version
 let hxVersion = hx.env.appVersion;
@@ -182,49 +183,9 @@ function generateLogHtml(hxdata) {
         <head>
             <meta charset="UTF-8">
             <link rel="stylesheet" href="${bootstrapCssFile}">
+            <link rel="stylesheet" href="${customCssFile}">
             <script src="${vueFile}"></script>
             <style type="text/css">
-                body {
-                    font-size: 14px;
-                }
-                body::-webkit-scrollbar {
-                    display: none;
-                }
-                * {
-                    outline: none;
-                    moz-user-select: -moz-none;
-                    -moz-user-select: none;
-                    -o-user-select:none;
-                    -khtml-user-select:none;
-                    -webkit-user-select:none;
-                    -ms-user-select:none;
-                    user-select:none;
-                }
-                [v-cloak] {
-                    display: none;
-                }
-                .outline-none {
-                    box-shadow: none !important;
-                }
-                .form-control {
-                    color: #000000 !important;
-                    font-size: 0.93rem !important;
-                    border-left: none !important;
-                    border-right: none !important;
-                    border-top: none !important;
-                    border-radius: 0 !important;
-                }
-                .form-control:focus {
-                    border: 1px solid rgb(65,168,99) !important;
-                    border-left: none !important;
-                    border-right: none !important;
-                    border-top: none !important;
-                    border-radius: 0 !important;
-                }
-                .form-group .form-control::-webkit-input-placeholder, .form-control::-webkit-input-placeholder {
-                    font-size: 0.9rem !important;
-                    font-weight: 200 !important;
-                }
                 .diff_param {
                     list-style: none;
                     padding-left: 0;
@@ -238,49 +199,6 @@ function generateLogHtml(hxdata) {
                 .diff_param li span{
                     color: rgb(65,168,99);
                     font-weight: 500;
-                }
-
-                @media only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-                    .has_sel {
-                        display: ineline;
-                        width: 16px;
-                        height: 16px;
-                        border: 1px solid #B06A50;
-                        border-radius: 1px;
-                        position: relative;
-                    }
-
-                    .has_sel:before {
-                        content: "";
-                        width: 2px;
-                        height: 6px;
-                        background-color: #B06A50;
-                        border-radius: 1px;
-                        position: absolute;
-                        left: 4px;
-                        bottom: 3px;
-                        transform: rotate(-45deg);
-                        -ms-transform: rotate(-45deg);
-                        -moz-transform: rotate(-45deg);
-                        -webkit-transform: rotate(-45deg);
-                        -o-transform: rotate(-45deg);
-                    }
-
-                    .has_sel:after {
-                        content: "";
-                        width: 2px;
-                        height: 10px;
-                        background-color: #B06A50;
-                        border-radius: 1px;
-                        position: absolute;
-                        left: 8px;
-                        bottom: 3px;
-                        transform: rotate(37deg);
-                        -ms-transform: rotate(37deg);
-                        -moz-transform: rotate(37deg);
-                        -webkit-transform: rotate(37deg);
-                        -o-transform: rotate(37deg);
-                    }
                 }
             </style>
         </head>
@@ -326,7 +244,7 @@ function generateLogHtml(hxdata) {
                         <div class="col-sm-10 pl-2">
                             <ul class="diff_param">
                                 <li :title="item.action" v-for="(item,idx) in diff_actions" :key="idx">
-                                    <input type="radio" name="dp" class="mr-2" :class="{ has_sel: diffParam == item.action }" v-model="diffParam" :value="item.action" @click="setBranchDiffParam(item.action);"/>
+                                    <input type="radio" name="dp" class="mr-2" v-model="diffParam" :value="item.action" @click="setBranchDiffParam(item.action);"/>
                                     <label style="display:inline;word-wrap:break-word;" v-html="item.desc"></label>
                                 </li>
                             </ul>

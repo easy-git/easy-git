@@ -309,11 +309,9 @@ function generateLogHtml(hxData) {
                         <label for="repo-type" class="col-sm-2 px-0">克隆协议</label>
                         <div class="col-sm-10 d-inline">
                             <input name="Protocol" type="radio" class="mr-2" value="http"
-                                :class="{has_sel: cloneProtocol=='http'}"
                                 v-model="cloneProtocol"
                                 @click="isManualSelectedProtocol='http'"/>HTTPS/HTTP
                             <input name="Protocol" type="radio" class="ml-3 mr-2" value="ssh"
-                                :class="{has_sel: cloneProtocol=='ssh'}"
                                 v-model="cloneProtocol"
                                 @click="isManualSelectedProtocol='ssh'"/>SSH
                         </div>
