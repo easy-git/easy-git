@@ -698,11 +698,15 @@ class Archive {
 async function reflog(ProjectInfo) {
     let { projectPath } = ProjectInfo;
     let result = await gitRaw(projectPath, ['reflog'], 'reflog', 'result');
-    if (result != undefined && result != '') {
-        await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
-        applyEdit(result);
+    if (result != undefined && result != '' && result != 'fail') {
+        try{
+            FileWriteAndOpen('git_reflog', result);
+        } catch(e) {
+            await hx.commands.executeCommand('workbench.action.files.newUntitledFile');
+            applyEdit(result);
+        };
     } else {
-        hx.window.showErrorMessage("Git: reflog没有获取到信息。", ['我知道了']);
+        hx.window.showErrorMessage("Git: reflog没有获取到信息，或获取失败", ['我知道了']);
     };
 };
 
