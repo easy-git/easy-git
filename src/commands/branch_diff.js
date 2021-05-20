@@ -235,7 +235,7 @@ function generateLogHtml(hxdata) {
                     <div class="form-group row m-0 mt-3" v-if="!isSpecificFile">
                         <label for="u-p" class="col-sm-2">stat参数</label>
                         <div class="col-sm-10">
-                            <input type="checkbox" :class="{ has_sel: stat }" class="mr-2" v-model="stat" />
+                            <input type="checkbox" class="mr-2" v-model="stat" />
                             <label class="d-inline">是否显示修改的文件列表</label>
                         </div>
                     </div>
