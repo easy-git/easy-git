@@ -36,7 +36,7 @@ function showUpgradeBox(localVersion, marketPluginVersion) {
         + `当前 ${localVersion} 版本。`
         + `<a href="https://ext.dcloud.net.cn/plugin?name=easy-git">更新日志</a>`
         + '<br/><br/>注意：更新后，重启HBuilderX才能生效。';
-    let btn = ['去插件市场更新','直接升级','以后再说'];
+    let btn = ['去插件市场更新', '以后再说'];
 
     hx.window.showInformationMessage(msg, btn).then(result => {
         if (result === '去插件市场更新') {
