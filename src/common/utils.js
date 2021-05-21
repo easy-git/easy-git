@@ -284,10 +284,10 @@ function checkIsGitProject(projectPath) {
             process.chdir(projectPath);
             exec('git rev-parse --git-dir', function(error, stdout, stderr) {
                 if (error) {
-                    reject(false)
+                    reject('No')
                 };
                 if (stderr.includes('not a git repository')) {
-                    reject(false);
+                    reject('No');
                 };
                 let tmp = stdout.trim();
                 if (tmp.length == '.git') {
@@ -296,14 +296,16 @@ function checkIsGitProject(projectPath) {
                     let ppath = path.dirname(tmp);
                     resolve(ppath);
                 } else {
-                    resolve(false);
+                    resolve('No');
                 };
             });
         }catch(e){
-            reject(false);
+            reject('No');
         };
+    }).catch((error) => {
+        throw new Error(error);
     });
-}
+};
 
 /**
  * @description 获取项目管理器的项目数量，以及每个项目名称、项目路径、是否git等信息。
@@ -335,7 +337,7 @@ async function getFilesExplorerProjectInfo() {
             if (!fs.existsSync(gitfsPath)) {
                 try{
                     let checkResult = await checkIsGitProject(selectPath);
-                    if (checkResult) {
+                    if (checkResult != 'No') {
                         tmp.GitRepository = checkResult;
                         tmp.isGit = true;
                     };
@@ -438,6 +440,8 @@ function getGitVersion() {
                 reject(undefined)
             };
         });
+    }).catch((error) => {
+        throw new Error(error);
     });
 };
 
@@ -2422,6 +2426,7 @@ module.exports = {
     hxShowMessageBox,
     applyEdit,
     isDirEmpty,
+    checkIsGitProject,
     getDirFileList,
     FileWriteAndOpen,
     createOutputChannel,

@@ -76,6 +76,12 @@ async function action(param,action_name) {
         'isFromGitView': isFromGitView
     };
 
+    let isGit = await utils.checkIsGitProject(projectPath).catch( error => { return 'No' });
+    if (isGit == 'No') {
+        hx.window.showErrorMessage("EasyGit: 请将焦点置于项目管理器Git项目、或在编辑器打开Git项目下的文件后，再进行操作。", ["我知道了"]);
+        return;
+    };
+
     // git tag: 标签相关操作
     let tag = new Tag(projectPath);
 
