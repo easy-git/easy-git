@@ -95,6 +95,13 @@ async function generating_ssh_keys(webviewDialog, data) {
         return;
     };
 
+    if (usage) {
+        if (git_host.length <= 4 || git_host == undefined) {
+            webviewDialog.displayError(`无效的${git_host}, 请填写有效的Git主机信息。`);
+            return;
+        };
+    };
+
     if (passphrase == undefined) {
         passphrase = '';
     };
@@ -123,8 +130,10 @@ async function generating_ssh_keys(webviewDialog, data) {
     };
 
     // .ssh/config
-    let file_content = `Host ${git_host}\n\tHostName ${git_host}\n\tPreferredAuthentications publickey\n\tIdentityFile ${ssh_fpath}`
-    edit_ssh_config_file(ssh_config_file, file_content);
+    if (usage) {
+        const file_content = `\n\n#-------- easy-git ---------\nHost ${git_host}\n\tHostName ${git_host}\n\tPreferredAuthentications publickey\n\tIdentityFile ${ssh_fpath}`
+        edit_ssh_config_file(ssh_config_file, file_content);
+    };
 
     hx.window.showInformationMessage(`SSH密钥生成成功。`, ['复制公钥内容', '关闭']).then( btn => {
         if (btn == '复制公钥内容') {
@@ -150,11 +159,11 @@ async function sshKeygen() {
     // 创建webviewdialog
     let webviewDialog = hx.window.createWebViewDialog({
         modal: true,
-        title: "SSH 公钥生成工具",
+        title: "SSH key生成工具",
         dialogButtons: ["创建", "关闭"],
         size: {
-            width: 730,
-            height: 430
+            width: 740,
+            height: 490
         }
     }, {
         enableScripts: true
