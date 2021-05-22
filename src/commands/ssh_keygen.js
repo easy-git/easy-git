@@ -24,7 +24,7 @@ function runCmd(cmd) {
     return new Promise((resolve, reject) => {
         exec(cmd, function(error, stdout, stderr) {
             if (error) {
-                createOutputChannel(`SSH生成密钥失败，详情：\n${error}`, 'error');
+                createOutputChannel(`SSH相关命令执行失败，日志：\n${error}`, 'error');
                 reject(error)
             };
             resolve('success');
@@ -49,6 +49,31 @@ function readSShKeyPubFile(fpath) {
     });
 };
 
+/**
+ * @description 编辑.ssh/config文件
+ * @param {String} file
+ */
+function edit_ssh_config_file(ssh_config_file, file_content) {
+    let success_msg = `新生产的SSH密钥信息到 ${ssh_config_file} 文件成功`;
+    let fail_msg = `新生产的SSH密钥信息到 ${ssh_config_file}  文件失败，请手动编辑。`;
+
+    if (fs.existsSync(ssh_config_file)) {
+        fs.appendFile(ssh_config_file, file_content , (error)  => {
+            if (error) {
+                return createOutputChannel(fail_msg, 'fail');
+            };
+            createOutputChannel(success_msg, 'success');
+        });
+    } else {
+        fs.writeFile(ssh_config_file, file_content, function (err) {
+            if (err) {
+               return createOutputChannel(fail_msg, 'fail');
+            };
+            createOutputChannel(success_msg, 'success');
+        });
+    };
+};
+
 
 /**
  * @description 执行ssh-kengen
@@ -57,11 +82,15 @@ async function generating_ssh_keys(webviewDialog, data) {
     // 清除上次错误提示
     webviewDialog.displayError('');
 
-    let {encryption_algorithm, keyfile, usage, passphrase} = data;
+    let {encryption_algorithm, keyfile, usage, passphrase, git_host} = data;
 
     let USERHOME = process.env.HOME;
+    let SSHDIR = path.join(USERHOME, '.ssh');
+    let ssh_config_file = path.join(SSHDIR, 'config');
     let ssh_fpath = path.join(USERHOME, '.ssh', keyfile);
-    if (fs.existsSync(ssh_fpath) || fs.existsSync(`${ssh_fpath}.pub`)) {
+    let ssh_pubfile = ssh_fpath + '.pub';
+
+    if (fs.existsSync(ssh_fpath) || fs.existsSync(ssh_pubfile)) {
         webviewDialog.displayError(`${USERHOME}目录下，已存在文件${keyfile}，请重新取个名字吧`);
         return;
     };
@@ -71,24 +100,37 @@ async function generating_ssh_keys(webviewDialog, data) {
     };
 
     let cmd = `ssh-keygen -t ${encryption_algorithm} -f ${ssh_fpath} -q -N '${passphrase}'`;
-    console.log('----', cmd)
     let result = await runCmd(cmd).catch( error => { return 'fail' });
-    if (fs.existsSync(ssh_fpath)) {
-        webviewDialog.close();
 
-        let pubfile = ssh_fpath + '.pub';
-        let msg = `SSH密钥生成成功，请选择接下来的操作...\n\n 复制：复制${keyfile}.pub文件内容到剪贴板。\n\n打开：在编辑器中打开${keyfile}.pub文件`
-        let btnText = await hxShowMessageBox('SSH', msg, ['复制', '打开', '关闭']).then( btn => {
-            return btn;
-        });
+    if (!fs.existsSync(ssh_fpath)) {
+        return;
+    };
+    createOutputChannel(`SSH KEY生成成功。文件所在目录：${SSHDIR}\n`, 'success');
 
-        if (btnText == '复制') {
-            readSShKeyPubFile(pubfile);
-        };
-        if (btnText == '打开') {
-            hx.workspace.openTextDocument(pubfile);
+    // 关闭webviewdialog
+    webviewDialog.close();
+
+    // ssh-add
+    let add_cmd = `ssh-add ${ssh_fpath}`;
+    if (passphrase.length) {
+        createOutputChannel('鉴于您给SSH密钥设置了密码，强烈建议您将SSH密钥添加到ssh-agent的高速缓存中。添加后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。', 'warning');
+        createOutputChannel(`请打开终端，手动在终端如下命令：ssh-add ${ssh_fpath} \n`, 'info');
+    } else {
+        let add_result = await runCmd(add_cmd).catch( error => { return 'fail' });
+        if (add_result != 'fail') {
+            createOutputChannel('已自动将SSH密钥添加到ssh-agent的高速缓存中。此后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。\n', 'success');
         };
     };
+
+    // .ssh/config
+    let file_content = `Host ${git_host}\n\tHostName ${git_host}\n\tPreferredAuthentications publickey\n\tIdentityFile ${ssh_fpath}`
+    edit_ssh_config_file(ssh_config_file, file_content);
+
+    hx.window.showInformationMessage(`SSH密钥生成成功。`, ['复制公钥内容', '关闭']).then( btn => {
+        if (btn == '复制公钥内容') {
+            readSShKeyPubFile(ssh_pubfile);
+        };
+    });
 };
 
 
@@ -185,9 +227,9 @@ async function sshKeygen() {
                     <div id="ssh_encryption_algorithm" class="form-group row m-0">
                         <label for="u-p" class="col-sm-2 px-0">加密算法</label>
                         <div class="col-sm-10 d-inline">
-                            <input name="encryption_algorithm" type="radio" class="mr-1" value="dsa" v-model="encryption_algorithm"/>dsa
+                            <input name="encryption_algorithm" type="radio" class="mr-1" value="ed25519" v-model="encryption_algorithm"/>ed25519
+                            <input name="encryption_algorithm" type="radio" class="mr-1 ml-3" value="dsa" v-model="encryption_algorithm"/>dsa
                             <input name="encryption_algorithm" type="radio" class="mr-1 ml-3" value="ecdsa" v-model="encryption_algorithm"/>ecdsa
-                            <input name="encryption_algorithm" type="radio" class="mr-1 ml-3" value="ed25519" v-model="encryption_algorithm"/>ed25519
                             <input name="encryption_algorithm" type="radio" class="mr-1 ml-3" value="rsa" v-model="encryption_algorithm"/>rsa
                         </div>
                     </div>
@@ -211,12 +253,18 @@ async function sshKeygen() {
                             <input id="passphrase" type="text" class="form-control outline-none mr-2" v-model="ssh.passphrase" placeholder="密码可选，设置后Git克隆操作，如是SSH，每次都需要输入密码"/>
                         </div>
                     </div>
-                    <div id=""ssh_usage class="form-group row m-0 mt-4">
+                    <div id="ssh_usage" class="form-group row m-0 mt-4">
                         <label for="usage" class="col-sm-2 px-0">SSH密钥用途</label>
                         <div class="col-sm-10">
                             <input id="usage" type="checkbox" class="mr-2" v-model="ssh.usage" />
                             <label class="d-inline">用于Github等git托管服务器SSH认证</label>
-                            <p class="form-text text-muted">勾选后，会将生成的信息添加到~/.ssh/config文件；如果您有多个git服务器账号，这将十分有用。</p>
+                            <p class="form-text text-muted mb-0">勾选会将生成的KEY添加到~/.ssh/config；如您用到多个Git服务器，这将十分有用。</p>
+                        </div>
+                    </div>
+                    <div id="git_hosts" class="form-group row m-0 mt-3" v-if="ssh.usage">
+                        <label for="passphrase" class="col-sm-2 px-0 pt-3">Git服务器主机</label>
+                        <div class="col-sm-10">
+                            <input id="host" type="text" class="form-control outline-none mr-2" v-model="ssh.git_host" placeholder="Git托管服务器域名或ip，如github.com"/>
                         </div>
                     </div>
                 </form>
@@ -234,8 +282,9 @@ async function sshKeygen() {
                         ssh: {
                             encryption_algorithm: 'ed25519',
                             keyfile: 'ed25519',
-                            usage: '',
-                            passphrase: ''
+                            usage: false,
+                            passphrase: '',
+                            git_host: ''
                         }
                     },
                      watch:{
