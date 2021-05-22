@@ -242,6 +242,9 @@ function showClone(clone_url="") {
                 let q = msg.data;
                 openGithubSearch(q, webviewDialog, webview);
                 break;
+            case 'sshKeygen':
+                hx.commands.executeCommand('EasyGit.sshKeygen');
+                break;
             default:
                 break;
         };
@@ -293,8 +296,15 @@ function generateLogHtml(hxData) {
                     display: none;
                 }
                 .clone-help {
-                    font-size: 0.9rem;
+                    font-size: 13px;
                     color: #8f8f8f;
+                    margin-bottom: 5px;
+                }
+                .clone-help a {
+                    color: #8f8f8f !important;
+                }
+                .link-no-style {
+                    color: #6c757d!important;
                 }
                 .link-text {
                     color: #007bff;
@@ -349,9 +359,9 @@ function generateLogHtml(hxData) {
                                 </span>
                             </div>
                             <p class="form-text text-muted mb-0">
-                                授权访问github、gitee，<a href="https://easy-git.github.io/oauth">详情，
-                                </a>自动加载您所有的仓库URL，克隆更方便。
-                                <span class="link-text" @click="goAuthorize();">授权</span>
+                                授权github、gitee等，自动加载您所有的仓库，克隆更方便。
+                                <a href="https://easy-git.github.io/oauth" class="link-no-style" title="点击查看详情">查看详情</a>
+                                <span class="link-text" @click="goAuthorize();" title="点击进行授权">授权</span>
                             </p>
                             <ul class="ul-list"
                                 style="margin-top: -22px;width: 485px;"
@@ -410,12 +420,14 @@ function generateLogHtml(hxData) {
                             <p class="form-text text-muted">如果是私有仓库，HTTP协议，克隆，需要提供账号密码</p>
                         </div>
                     </div>
-                    <div class="form-group row m-0 mt-3">
-                        <div class="col px-0">
-                            <p class="clone-help">
-                                如遇到问题，请<a href="https://easy-git.github.io/connecting/">参考文档</a>，
-                                或<a href="https://ext.dcloud.net.cn/plugin?id=2475">反馈给作者</a>。
-                                使用SSH克隆，需配置SSH，<a href="https://easy-git.github.io/auth/ssh-generate">配置SSH</a>
+                    <div class="form-group row m-0 mt-4">
+                        <label for="git-url" class="col-sm-2 px-0">帮助文档</label>
+                        <div class="col-sm-10">
+                            <p class="clone-help"> 1. 如遇到问题，请<a href="https://easy-git.github.io/connecting/" title="点击查看文档">参考文档</a>，
+                                或<a href="https://ext.dcloud.net.cn/plugin?id=2475" title="点击反馈">反馈给作者</a><br />
+                            </p>
+                            <p class="clone-help"> 2. 使用SSH克隆，需配置SSH，<a href="https://easy-git.github.io/auth/ssh-generate" title="点击查看教程">查看配置SSH教程</a>。
+                                <span title="点击打开SSH KEY一键生成工具" class="link-text ml-0" @click="openSshKeygen();">一键生成SSH KEY</span>
                             </p>
                         </div>
                     </div>
@@ -574,6 +586,11 @@ function generateLogHtml(hxData) {
                             hbuilderx.postMessage({
                                 command: 'GithubSearch',
                                 data: this.repo
+                            });
+                        },
+                        openSshKeygen() {
+                            hbuilderx.postMessage({
+                                command: 'sshKeygen'
                             });
                         },
                         getCloneResult() {

@@ -109,7 +109,6 @@ class Api {
                     gitSetForWebDialog(setInfo);
                 };
             }catch(e){
-                console.log(e)
                 let emsg = isRemoteAdd ? '，因此中断【本地关联远程仓库】操作，请自行处理' : '';
                 hx.window.showErrorMessage(`警告：远程仓库创建成功后，解析返回值失败${emsg}。`, ['我知道了']);
             }

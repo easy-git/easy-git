@@ -3,7 +3,6 @@ const path = require('path');
 
 const Main = require("./index.js");
 const file = require('./common/file.js');
-const git = require('./commands/index.js');
 const cmp_hx_version = require('./common/cmp.js');
 const upgrade = require('./common/upgrade.js');
 
@@ -11,7 +10,10 @@ const { getThemeColor } = require('./common/utils.js');
 const { openOAuthBox } = require('./common/oauth.js');
 const { Gitee, onUriForResponse } = require('./common/oauth.js');
 const { goSetEncoding } = require('./commands/base.js');
+
+const git = require('./commands/index.js');
 const { gitRepositoryCreate } = require('./commands/repository.js');
+const sshKeygen = require('./commands/ssh_keygen.js');
 
 let showCommandPanel = require('./commands/commandPanel.js');
 
@@ -505,6 +507,12 @@ function activate(context) {
         openOAuthBox();
     });
     context.subscriptions.push(gitOAuth);
+
+    // ssh
+    let ssh = hx.commands.registerCommand('EasyGit.sshKeygen', () => {
+        sshKeygen();
+    });
+    context.subscriptions.push(ssh);
 };
 
 

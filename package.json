@@ -80,6 +80,7 @@
         "onCommand:EasyGit.showConfigAll",
         "onCommand:EasyGit.help",
         "onCommand:EasyGit.keyboard",
+        "onCommand:EasyGit.sshKeygen",
         "onView:EasyGitSourceCodeView",
         "onView:EasyGitCommonView",
         "onCustomEditor:EasyGit - 日志",
@@ -190,6 +191,10 @@
             {
                 "command": "EasyGit.CreateRemoteRepository",
                 "title": "easy-git: create git repository - 创建远程仓库"
+            },
+            {
+                "command": "EasyGit.sshKeygen",
+                "title": "easy-git: ssh-keygen ssh密钥生成"
             },
             {
                 "command": "EasyGit.clone",
