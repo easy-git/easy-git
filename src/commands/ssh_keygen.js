@@ -7,7 +7,7 @@ const {exec} = require('child_process');
 const hx = require('hbuilderx');
 const chokidar = require('chokidar');
 
-
+const count = require('../common/count.js');
 const cmp_hx_version = require('../common/cmp.js');
 const { hxShowMessageBox, createOutputChannel } = require('../common/utils.js');
 
@@ -230,6 +230,10 @@ async function sshKeygen() {
 
     let promi = webviewDialog.show();
     promi.then(function (data) {});
+
+    try{
+        count('ssh-keygen').catch( error=> {});
+    }catch(e){};
 
     webview.html = `<!DOCTYPE html>
     <html lang="en">
