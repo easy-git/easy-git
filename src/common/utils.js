@@ -279,28 +279,26 @@ function importProjectToExplorer(projectPaht) {
  * @description 检查项目是否Git项目
  */
 function checkIsGitProject(projectPath) {
+    process.chdir(projectPath);
     return new Promise((resolve, reject) => {
         try{
-            process.chdir(projectPath);
             exec('git rev-parse --git-dir', function(error, stdout, stderr) {
                 if (error) {
-                    reject('No')
+                    reject(error)
                 };
                 if (stderr.includes('not a git repository')) {
                     reject('No');
                 };
                 let tmp = stdout.trim();
-                if (tmp.length == '.git') {
-                    resolve(projectPath);
-                } else if (tmp.length > 5) {
+                if (tmp.length > 5) {
                     let ppath = path.dirname(tmp);
                     resolve(ppath);
                 } else {
-                    resolve('No');
+                    resolve(projectPath);
                 };
             });
         }catch(e){
-            reject('No');
+            reject(e);
         };
     }).catch((error) => {
         throw new Error(error);

@@ -21,6 +21,7 @@ const gitAnnotate = require('./annotate.js');
  * @description 失焦操作
  */
 async function unfocusedAction() {
+    hx.window.setStatusBarMessage('EasyGit: 如果出现错误、或没有任何提示，请将焦点置于项目管理器或在编辑器中打开文件。');
     // 将焦点置于编辑器
     try{
         await hx.commands.executeCommand('workbench.action.focusEditor');
@@ -30,6 +31,8 @@ async function unfocusedAction() {
     // 获取激活的项目信息
     let activeEditor = await hx.window.getActiveTextEditor().then(function(editor){
         return editor;
+    }).catch( error => {
+        return null;
     });
     return activeEditor;
 };
@@ -37,17 +40,17 @@ async function unfocusedAction() {
 /**
  * @description 提供webview视图外Git的操作
  */
-async function action(param,action_name) {
+async function action(param, action_name) {
     if (param == null) {
-        param = await unfocusedAction();
-        if (param == null) {
+        let unfocusedResult = await unfocusedAction();
+        if (unfocusedResult == null) {
             return hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试。', ['我知道了']);
         };
     };
 
-    let projectName, projectPath, selectedFile, easyGitInner, isFromGitView;
+    let projectName, projectPath, selectedFile, isFromGitView;
+    let { easyGitInner } = param;
     try{
-        let {easyGitInner} = param;
         if (easyGitInner != undefined) {
             projectName = param.projectName;
             projectPath = param.projectPath;
@@ -76,10 +79,12 @@ async function action(param,action_name) {
         'isFromGitView': isFromGitView
     };
 
-    let isGit = await utils.checkIsGitProject(projectPath).catch( error => { return 'No' });
-    if (isGit == 'No') {
-        hx.window.showErrorMessage("EasyGit: 请将焦点置于项目管理器Git项目、或在编辑器打开Git项目下的文件后，再进行操作。", ["我知道了"]);
-        return;
+    if (easyGitInner != true) {
+        let isGit = await utils.checkIsGitProject(projectPath).catch( error => { return 'No' });
+        if (isGit == 'No') {
+            hx.window.showErrorMessage("EasyGit: 请将焦点置于项目管理器Git项目、或在编辑器打开Git项目下的文件后，再进行操作。", ["我知道了"]);
+            return;
+        };
     };
 
     // git tag: 标签相关操作
