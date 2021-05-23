@@ -4,6 +4,8 @@
     "displayName": "【easy-git】Git源代码管理工具",
     "version": "1.4.5",
     "publisher": "oneone",
+    "git_url": "https://github.com/easy-git/easy-git.git",
+    "doc_url": "https://easy-git.github.io/",
     "engines": {
         "HBuilderX": "^2.8.3"
     },
@@ -194,7 +196,7 @@
             },
             {
                 "command": "EasyGit.sshKeygen",
-                "title": "easy-git: ssh-keygen ssh密钥生成"
+                "title": "easy-git: ssh-keygen 生成SSH KEY"
             },
             {
                 "command": "EasyGit.clone",
@@ -603,13 +605,13 @@
             ],
             "menubar/tool": [
                 {
-                    "command": "EasyGit.clone",
-                    "title": "Git: 克隆仓库",
+                    "command": "EasyGit.CommandPanel",
+                    "title": "Git: 命令面板",
                     "group": "ext_settings"
                 },
                 {
-                    "command": "EasyGit.CommandPanel",
-                    "title": "Git: 命令面板",
+                    "command": "EasyGit.clone",
+                    "title": "Git: 克隆仓库",
                     "group": "ext_settings"
                 },
                 {
@@ -634,53 +636,61 @@
                     "group": "easygit@1"
                 },
                 {
+                    "command": "EasyGit.sshKeygen",
+                    "title": "一键生成SSH KEY",
+                    "group": "easygit@2"
+                },
+                {
+                    "group": "easygit@2"
+                },
+                {
                     "command": "EasyGit.setUserName",
                     "title": "设置user.name",
-                    "group": "easygit@1"
+                    "group": "easygit@3"
                 },
                 {
                     "command": "EasyGit.setEmail",
                     "title": "设置user.email",
-                    "group": "easygit@1"
+                    "group": "easygit@3"
                 },
                 {
-                    "group": "easygit@2"
+                    "group": "easygit@4"
                 },
                 {
                     "command": "EasyGit.setGitingore",
                     "title": "设置.gitignore",
-                    "group": "easygit@2"
+                    "group": "easygit@4"
                 },
                 {
                     "command": "EasyGit.setGitattributes",
                     "title": "设置.gitattributes",
-                    "group": "easygit@2"
+                    "group": "easygit@4"
                 },
                 {
-                    "group": "easygit@3"
+                    "group": "easygit@5"
                 },
                 {
                     "command": "EasyGit.keyboard",
                     "title": "设置快捷键",
-                    "group": "easygit@3"
+                    "group": "easygit@5"
                 },
                 {
                     "command": "EasyGit.help",
                     "title": "帮助文档",
-                    "group": "easygit@3"
+                    "group": "easygit@5"
                 },
                 {
-                    "group": "easygit@4"
+                    "group": "easygit@6"
                 },
                 {
                     "command": "EasyGit.checkUpdate",
                     "title": "检查更新",
-                    "group": "easygit@4"
+                    "group": "easygit@6"
                 },
                 {
                     "command": "EasyGit.about",
                     "title": "关于/评价easy-git",
-                    "group": "easygit@4"
+                    "group": "easygit@6"
                 },
                 {
                     "group": "ext_settings"
