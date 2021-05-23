@@ -1,9 +1,12 @@
-const path = require('path');
 const fs = require('fs');
-const hx = require('hbuilderx');
-const chokidar = require('chokidar');
+const os = require('os');
+const path = require('path');
 const process = require('process');
 const {exec} = require('child_process');
+
+const hx = require('hbuilderx');
+const chokidar = require('chokidar');
+
 
 const cmp_hx_version = require('../common/cmp.js');
 const { hxShowMessageBox, createOutputChannel } = require('../common/utils.js');
@@ -16,6 +19,8 @@ const customCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static',
 let hxVersion = hx.env.appVersion;
 hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
 let cmp = cmp_hx_version(hxVersion, '3.1.2');
+
+const osName = os.platform();
 
 /**
  * @description 执行cmd命令
@@ -34,6 +39,27 @@ function runCmd(cmd) {
     });
 };
 
+/**
+ * @description 获取windows ssh相关命令安装目录
+ */
+function getWindowSSHCmdDir() {
+    return new Promise((resolve, reject) => {
+        exec('where git', function(error, stdout, stderr) {
+            if (error) {
+                createOutputChannel(`查找git、ssh相关命令路径失败。请确保电脑已安装git bash。`, 'error');
+                reject(error)
+            };
+            let tmp = stdout.trim().replace('cmd\\git.exe', '');
+            let bin_dir = path.join(tmp, 'usr', 'bin');
+            if (fs.existsSync(bin_dir)) {
+                resolve(bin_dir)
+            };
+            resolve('error');
+        });
+    }).catch((error) => {
+        throw new Error(error);
+    });
+};
 
 /**
  * @description 读取xxx.pub文件内容到剪贴板
@@ -54,24 +80,15 @@ function readSShKeyPubFile(fpath) {
  * @param {String} file
  */
 function edit_ssh_config_file(ssh_config_file, file_content) {
-    let success_msg = `新生产的SSH密钥信息到 ${ssh_config_file} 文件成功`;
-    let fail_msg = `新生产的SSH密钥信息到 ${ssh_config_file}  文件失败，请手动编辑。`;
-
-    if (fs.existsSync(ssh_config_file)) {
-        fs.appendFile(ssh_config_file, file_content , (error)  => {
-            if (error) {
-                return createOutputChannel(fail_msg, 'fail');
-            };
-            createOutputChannel(success_msg, 'success');
-        });
-    } else {
-        fs.writeFile(ssh_config_file, file_content, function (err) {
-            if (err) {
-               return createOutputChannel(fail_msg, 'fail');
-            };
-            createOutputChannel(success_msg, 'success');
-        });
-    };
+    let success_msg = `新生产的SSH KEY信息, 向 ${ssh_config_file} 文件添加成功`;
+    let fail_msg = `新生产的SSH KEY信息，向 ${ssh_config_file}  文件添加失败，请手动编辑。`;
+    
+    fs.appendFile(ssh_config_file, file_content , (error)  => {
+        if (error) {
+            return createOutputChannel(fail_msg, 'fail');
+        };
+        createOutputChannel(success_msg, 'success');
+    });
 };
 
 
@@ -84,13 +101,21 @@ async function generating_ssh_keys(webviewDialog, data) {
 
     let {encryption_algorithm, keyfile, usage, passphrase, git_host} = data;
 
-    let USERHOME = process.env.HOME;
+    let USERHOME = "";
+    if (osName == 'darwin') {
+        USERHOME = process.env.HOME;
+    };
+    if (osName == 'win32') {
+        USERHOME = path.join(process.env.HOMEDRIVE, process.env.HOMEPATH);
+    };
+
     let SSHDIR = path.join(USERHOME, '.ssh');
     let ssh_config_file = path.join(SSHDIR, 'config');
-    let ssh_fpath = path.join(USERHOME, '.ssh', keyfile);
-    let ssh_pubfile = ssh_fpath + '.pub';
 
-    if (fs.existsSync(ssh_fpath) || fs.existsSync(ssh_pubfile)) {
+    let ssh_private_path = path.join(USERHOME, '.ssh', keyfile);
+    let ssh_public_file = ssh_private_path + '.pub';
+
+    if (fs.existsSync(ssh_private_path) || fs.existsSync(ssh_public_file)) {
         webviewDialog.displayError(`${USERHOME}目录下，已存在文件${keyfile}，请重新取个名字吧`);
         return;
     };
@@ -106,10 +131,21 @@ async function generating_ssh_keys(webviewDialog, data) {
         passphrase = '';
     };
 
-    let cmd = `ssh-keygen -t ${encryption_algorithm} -f ${ssh_fpath} -q -N '${passphrase}'`;
+    let sshkeygen_tool = 'ssh-keygen';
+    let sshadd_tool = 'ssh-add';
+
+    if (osName == 'win32') {
+        let win_ssh_keygen = await getWindowSSHCmdDir().catch( error => { return 'error'});
+        if (win_ssh_keygen != 'error') {
+            sshkeygen_tool = path.join(win_ssh_keygen, 'ssh-keygen.exe');
+            sshadd_tool = path.join(win_ssh_keygen, 'ssh-add.exe');
+        };
+    };
+
+    let cmd = `${sshkeygen_tool} -t ${encryption_algorithm} -f ${ssh_private_path} -q -N '${passphrase}'`;
     let result = await runCmd(cmd).catch( error => { return 'fail' });
 
-    if (!fs.existsSync(ssh_fpath)) {
+    if (!fs.existsSync(ssh_private_path)) {
         return;
     };
     createOutputChannel(`SSH KEY生成成功。文件所在目录：${SSHDIR}\n`, 'success');
@@ -118,26 +154,26 @@ async function generating_ssh_keys(webviewDialog, data) {
     webviewDialog.close();
 
     // ssh-add
-    let add_cmd = `ssh-add ${ssh_fpath}`;
+    let add_cmd = `${sshadd_tool} ${ssh_private_path}`;
     if (passphrase.length) {
-        createOutputChannel('鉴于您给SSH密钥设置了密码，强烈建议您将SSH密钥添加到ssh-agent的高速缓存中。添加后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。', 'warning');
-        createOutputChannel(`请打开终端，手动在终端如下命令：ssh-add ${ssh_fpath} \n`, 'info');
+        createOutputChannel('鉴于您给SSH KEY设置了密码，强烈建议您将SSH KEY添加到ssh-agent的高速缓存中。添加后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。', 'warning');
+        createOutputChannel(`请打开终端，手动在终端SHELL如下命令：ssh-add ${ssh_private_path} \n`, 'info');
     } else {
         let add_result = await runCmd(add_cmd).catch( error => { return 'fail' });
         if (add_result != 'fail') {
-            createOutputChannel('已自动将SSH密钥添加到ssh-agent的高速缓存中。此后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。\n', 'success');
+            createOutputChannel('已自动将SSH KEY添加到ssh-agent的高速缓存中。此后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。\n', 'success');
         };
     };
 
     // .ssh/config
     if (usage) {
-        const file_content = `\n\n#-------- easy-git ---------\nHost ${git_host}\n\tHostName ${git_host}\n\tPreferredAuthentications publickey\n\tIdentityFile ${ssh_fpath}`
+        const file_content = `\n\n#-------- easy-git ---------\nHost ${git_host}\n\tHostName ${git_host}\n\tPreferredAuthentications publickey\n\tIdentityFile ${ssh_private_path}`
         edit_ssh_config_file(ssh_config_file, file_content);
     };
 
     hx.window.showInformationMessage(`SSH密钥生成成功。`, ['复制公钥内容', '关闭']).then( btn => {
         if (btn == '复制公钥内容') {
-            readSShKeyPubFile(ssh_pubfile);
+            readSShKeyPubFile(ssh_public_file);
         };
     });
 };
@@ -257,13 +293,13 @@ async function sshKeygen() {
                         </div>
                     </div>
                     <div id="ssh_passwd" class="form-group row m-0 mt-3">
-                        <label for="passphrase" class="col-sm-2 px-0 pt-3">SSH密钥密码</label>
+                        <label for="passphrase" class="col-sm-2 px-0 pt-3">SSH Key密码</label>
                         <div class="col-sm-10">
                             <input id="passphrase" type="text" class="form-control outline-none mr-2" v-model="ssh.passphrase" placeholder="密码可选，设置后Git克隆操作，如是SSH，每次都需要输入密码"/>
                         </div>
                     </div>
                     <div id="ssh_usage" class="form-group row m-0 mt-4">
-                        <label for="usage" class="col-sm-2 px-0">SSH密钥用途</label>
+                        <label for="usage" class="col-sm-2 px-0">SSH Key用途</label>
                         <div class="col-sm-10">
                             <input id="usage" type="checkbox" class="mr-2" v-model="ssh.usage" />
                             <label class="d-inline">用于Github等git托管服务器SSH认证</label>
