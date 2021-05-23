@@ -80,14 +80,20 @@ function readSShKeyPubFile(fpath) {
  * @param {String} file
  */
 function edit_ssh_config_file(ssh_config_file, file_content) {
-    let success_msg = `新生产的SSH KEY信息, 向 ${ssh_config_file} 文件添加成功`;
-    let fail_msg = `新生产的SSH KEY信息，向 ${ssh_config_file}  文件添加失败，请手动编辑。`;
-    
-    fs.appendFile(ssh_config_file, file_content , (error)  => {
-        if (error) {
-            return createOutputChannel(fail_msg, 'fail');
-        };
-        createOutputChannel(success_msg, 'success');
+    let success_msg = `新生成的SSH KEY信息, 向 ${ssh_config_file} 文件添加成功。\n`;
+    let fail_msg = `新生成的SSH KEY信息，向 ${ssh_config_file}  文件添加失败，请手动编辑。\n`;
+
+    return new Promise((resolve, reject) => {
+        fs.appendFile(ssh_config_file, file_content , (error)  => {
+            if (error) {
+                createOutputChannel(fail_msg, 'fail');
+                reject(error)
+            };
+            createOutputChannel(success_msg, 'success');
+            resolve('success')
+        });
+    }).catch((error) => {
+        throw new Error(error);
     });
 };
 
@@ -101,7 +107,7 @@ async function generating_ssh_keys(webviewDialog, data) {
 
     let {encryption_algorithm, keyfile, usage, passphrase, git_host} = data;
 
-    let USERHOME = "";
+    let USERHOME = '';
     if (osName == 'darwin') {
         USERHOME = process.env.HOME;
     };
@@ -142,7 +148,8 @@ async function generating_ssh_keys(webviewDialog, data) {
         };
     };
 
-    let cmd = `${sshkeygen_tool} -t ${encryption_algorithm} -f ${ssh_private_path} -q -N '${passphrase}'`;
+    // 双引号的作用，是为了解决windows上路径带有空格的问题
+    let cmd = `"${sshkeygen_tool}" -t ${encryption_algorithm} -f "${ssh_private_path}" -q -N "${passphrase}"`;
     let result = await runCmd(cmd).catch( error => { return 'fail' });
 
     if (!fs.existsSync(ssh_private_path)) {
@@ -153,22 +160,22 @@ async function generating_ssh_keys(webviewDialog, data) {
     // 关闭webviewdialog
     webviewDialog.close();
 
+    // .ssh/config
+    if (usage) {
+        const file_content = `\n\n#-------- easy-git ---------\nHost ${git_host}\n\tHostName ${git_host}\n\tPreferredAuthentications publickey\n\tIdentityFile ${ssh_private_path}`
+        await edit_ssh_config_file(ssh_config_file, file_content).catch( error => {return error });
+    };
+
     // ssh-add
-    let add_cmd = `${sshadd_tool} ${ssh_private_path}`;
-    if (passphrase.length) {
-        createOutputChannel('鉴于您给SSH KEY设置了密码，强烈建议您将SSH KEY添加到ssh-agent的高速缓存中。添加后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。', 'warning');
-        createOutputChannel(`请打开终端，手动在终端SHELL如下命令：ssh-add ${ssh_private_path} \n`, 'info');
-    } else {
+    if (osName == 'darwin' && passphrase.length == 0) {
+        let add_cmd = `"${sshadd_tool}" "${ssh_private_path}"`;
         let add_result = await runCmd(add_cmd).catch( error => { return 'fail' });
         if (add_result != 'fail') {
             createOutputChannel('已自动将SSH KEY添加到ssh-agent的高速缓存中。此后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。\n', 'success');
         };
-    };
-
-    // .ssh/config
-    if (usage) {
-        const file_content = `\n\n#-------- easy-git ---------\nHost ${git_host}\n\tHostName ${git_host}\n\tPreferredAuthentications publickey\n\tIdentityFile ${ssh_private_path}`
-        edit_ssh_config_file(ssh_config_file, file_content);
+    } else {
+        createOutputChannel('强烈建议您将SSH KEY添加到ssh-agent的高速缓存中。添加后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。', 'warning');
+        createOutputChannel(`请打开终端，手动在终端SHELL如下命令：ssh-add ${ssh_private_path} \n`, 'info');
     };
 
     hx.window.showInformationMessage(`SSH密钥生成成功。`, ['复制公钥内容', '关闭']).then( btn => {
