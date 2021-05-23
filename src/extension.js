@@ -152,8 +152,13 @@ function activate(context) {
 
     // 菜单【工具】【关于】
     let about = hx.commands.registerCommand('EasyGit.about', () => {
-        let url = "https://ext.dcloud.net.cn/plugin?name=easy-git";
-        hx.env.openExternal(url);
+        const { version } = require('../package.json');
+        hx.window.showInformationMessage(`Easy-git：当前版本号是 ${version}`, ["评价/寻求帮助", "关闭"]).then( btn => {
+            if (btn == '评价/寻求帮助') {
+                let url = "https://ext.dcloud.net.cn/plugin?name=easy-git";
+                hx.env.openExternal(url);
+            };
+        });
     });
     context.subscriptions.push(about);
 
