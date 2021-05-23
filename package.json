@@ -1,8 +1,8 @@
 {
     "name": "easy-git",
-    "description": "1.4.5重大更新。支持连接Github、gitee账号，克隆视图支持搜索github获取仓库URL，克隆更便捷。",
+    "description": "vscode源代码管理工具风格，支持连接Github、gitee账号，支持搜索github，支持命令面板，支持克隆、提交/更新/拉取、分支/tag管理、日志、文件对比、储藏等操作。",
     "displayName": "【easy-git】Git源代码管理工具",
-    "version": "1.4.5",
+    "version": "1.4.6",
     "publisher": "oneone",
     "git_url": "https://github.com/easy-git/easy-git.git",
     "doc_url": "https://easy-git.github.io/",
@@ -11,6 +11,12 @@
     },
     "categories": [
         "Other"
+    ],
+    "keywords": [
+        "github/gitee码云/gitlab/code/svn/sourceTree",
+        "源代码管理/版本控制",
+        "easygit/easy-git/vscode",
+        "SSH Key"
     ],
     "main": "./src/extension",
     "activationEvents": [

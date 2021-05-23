@@ -5,6 +5,8 @@
 
 easy-git, 是基于HBuilderX API开发的可视化图形Git插件，界面参考vscode源代码管理器。
 
+easy-git, 支持连接Github、gitee账号，支持搜索github，支持命令面板，支持克隆、提交/更新/拉取、分支/tag管理、日志、文件对比、储藏等操作。
+
 ## 安装
 
 [HBuilderX easy-git插件下载地址: https://ext.dcloud.net.cn/plugin?name=easy-git](https://ext.dcloud.net.cn/plugin?name=easy-git)
@@ -17,8 +19,8 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 
 ![插件预览.jpg](https://easy-git.github.io/static/intro.gif)
 
-在项目管理器，选中`Git`项目，右键菜单，点击【easy-git】【源代码管理】即可打开`git视图`
-
+1. 在项目管理器，选中`Git`项目，右键菜单，点击【easy-git】【源代码管理】即可打开`git视图`
+2. 点击顶部菜单【工具】，即可看到easy-git相关操作菜单。
 
 ## 数据统计
 
@@ -91,9 +93,15 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
  - [用提交信息标注文件中的每一行](https://easy-git.github.io/docs/annotate)
  - [查看文件的某个历史版本内容](https://easy-git.github.io/docs/fileHistory)
 12. 身份认证
- - [检查现有 SSH 密钥](https://easy-git.github.io/auth/ssh-check)
  - [生成新的 SSH 密钥](https://easy-git.github.io/auth/ssh-generate)
+ - [检查现有 SSH 密钥](https://easy-git.github.io/auth/ssh-check)
  - [Git配置多个SSH-Key](https://easy-git.github.io/auth/ssh-more)
  - [windows: 记住Git凭据](https://easy-git.github.io/auth/http)
 13. 问题
  - [Q1: 中文乱码问题](https://easy-git.github.io/question/quote)
+
+## 赞助
+
+如果您觉得easy-git帮到了您，请小小的打个赏赞助一下，让我们全力以赴，做更好的工具！
+
+![](https://easy-git.github.io/static/pay.png)

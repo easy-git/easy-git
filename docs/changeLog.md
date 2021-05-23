@@ -1,6 +1,7 @@
 # Change Log
 
 ## 1.4.6
+* 新增 SSH Key一键生成功能 （菜单【工具 - easy-git - SSH一键生成】）[详情](https://easy-git.github.io/auth/ssh-generate)
 * 新增 源代码管理器视图 合并更改 增加 git checkout --ours|--thereis功能
 * 修复 源代码管理器视图 消息输入框 高度没有自适应的Bug
 * 修复 源代码、日志、文件对比、分支视图，某些点击事件，鼠标悬停样式不对的Bug
