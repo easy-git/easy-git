@@ -89,7 +89,7 @@ function edit_ssh_config_file(ssh_config_file, file_content) {
                 createOutputChannel(fail_msg, 'fail');
                 reject(error)
             };
-            createOutputChannel(success_msg, 'success');
+            createOutputChannel(success_msg, 'info');
             resolve('success')
         });
     }).catch((error) => {
@@ -167,16 +167,23 @@ async function generating_ssh_keys(webviewDialog, data) {
     };
 
     // ssh-add
-    if (osName == 'darwin' && passphrase.length == 0) {
-        let add_cmd = `"${sshadd_tool}" "${ssh_private_path}"`;
-        let add_result = await runCmd(add_cmd).catch( error => { return 'fail' });
-        if (add_result != 'fail') {
-            createOutputChannel('已自动将SSH KEY添加到ssh-agent的高速缓存中。此后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。\n', 'success');
+    if (osName == 'darwin') {
+        if (passphrase.length == 0) {
+            let add_cmd = `"${sshadd_tool}" "${ssh_private_path}"`;
+            let add_result = await runCmd(add_cmd).catch( error => { return 'fail' });
+            if (add_result != 'fail') {
+                createOutputChannel('已自动将SSH KEY添加到ssh-agent的高速缓存中。此后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。\n', 'info');
+            };
+        } else {
+            createOutputChannel('强烈建议您将SSH KEY添加到ssh-agent的高速缓存中。添加后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。', 'warning');
+            createOutputChannel(`请打开操作系统终端，运行如下命令：ssh-add ${ssh_private_path} \n`, 'info');
         };
-    } else {
-        createOutputChannel('强烈建议您将SSH KEY添加到ssh-agent的高速缓存中。添加后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。', 'warning');
-        createOutputChannel(`请打开终端，手动在终端SHELL如下命令：ssh-add ${ssh_private_path} \n`, 'info');
     };
+
+    if (usage) {
+        createOutputChannel(`注意事项：SSH KEY创建成功成功后，同时也需要添加到Git托管服务器。设置教程：https://easy-git.github.io/auth/ssh-generate#Git服务器设置SSH公钥`, 'warning');
+    };
+
 
     hx.window.showInformationMessage(`SSH密钥生成成功。`, ['复制公钥内容', '关闭']).then( btn => {
         if (btn == '复制公钥内容') {

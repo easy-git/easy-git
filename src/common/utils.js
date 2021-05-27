@@ -710,7 +710,7 @@ async function gitClone(info) {
             createOutputChannel(`克隆成功。本地路径: ${localPath}`, 'success');
             count(`clone_${cloneWay}_success`);
         } else {
-            createOutputChannel('Git: 克隆失败，请参考: https://ext.dcloud.net.cn/plugin?id=2475', 'error');
+            createOutputChannel('Git: 克隆失败，请参考: https://easy-git.github.io/connecting/clone', 'error');
             count(`clone_${cloneWay}_${status}`);
         };
         return status
