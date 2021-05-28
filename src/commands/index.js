@@ -44,7 +44,8 @@ async function action(param, action_name) {
     if (param == null) {
         let unfocusedResult = await unfocusedAction();
         if (unfocusedResult == null) {
-            return hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试。', ['我知道了']);
+            hx.window.showErrorMessage('EasyGit: 请将焦点置于项目管理器Git项目上、或在编辑器中打开Git项目下文件，再进行操作。', ["我知道了"]);
+            return
         };
     };
 
