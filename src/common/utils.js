@@ -1066,12 +1066,14 @@ async function gitPush(workingDir, options=[]) {
 /**
  * @description git: pull
  * @param {String} projectPath 项目路径
+ * @param {Object} options git-pull参数
  */
-async function gitPull(workingDir,options) {
+async function gitPull(workingDir, options) {
     let args = [];
     let msg = 'Git: git pull 正在从服务器拉取代码...';
 
-    if (options) {
+    // 为了兼容老功能
+    if (Object.prototype.toString.call(options) === "[object Object]") {
         let {rebase, BranchTracking} = options;
         if (rebase) {
             args.push('--rebase')
@@ -1086,6 +1088,15 @@ async function gitPull(workingDir,options) {
             } catch(e){
                 console.log(e)
             };
+        };
+    };
+
+    // 2021-6-5 增加
+    if (Object.prototype.toString.call(options) === "[object Array]") {
+        args = options;
+        if (options.length) {
+            let pullOptions = options.join(' ');
+            msg = `Git: git pull ${pullOptions} 正在从服务器拉取代码...`;
         };
     };
 

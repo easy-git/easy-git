@@ -159,11 +159,17 @@ async function action(param, action_name) {
             let t2 = new gitRestore();
             t2.restore(ProjectInfo, 'restoreChanged');
             break;
+        case 'openPullOptions':
+            // 使用quickpick样式打开pull多个选项
+            break;
         case 'pull':
             utils.gitPull(projectPath);
             break;
         case 'pullRebase':
-            utils.gitPull(projectPath, {'rebase': true});
+            utils.gitPull(projectPath, ["--rebase"]);
+            break;
+        case 'pullRebaseAutostash':
+            utils.gitPull(projectPath, ["--rebase", "--autostash"])
             break;
         case 'fetch':
             utils.gitFetch(projectPath);

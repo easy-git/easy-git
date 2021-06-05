@@ -216,7 +216,7 @@ function activate(context) {
     });
     context.subscriptions.push(addRemoteOrigin);
 
-    // Git rem remote origin
+    // Git rm remote origin
     let RemoteRmOrigin = hx.commands.registerCommand('EasyGit.RemoteRmOrigin',(param) => {
         git.action(param, 'RemoteRmOrigin');
     });
@@ -299,6 +299,12 @@ function activate(context) {
         git.action(param, 'pullRebase');
     });
     context.subscriptions.push(pullRebase);
+
+    // Git pull --rebase --autostash
+    let pullRebaseAutostash = hx.commands.registerCommand('EasyGit.pullRebaseAutostash', (param)=> {
+        git.action(param, 'pullRebaseAutostash');
+    });
+    context.subscriptions.push(pullRebaseAutostash);
 
     // Git fetch
     let fetch = hx.commands.registerCommand('EasyGit.fetch', (param)=> {

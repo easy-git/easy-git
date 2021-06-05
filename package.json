@@ -44,6 +44,7 @@
         "onCommand:EasyGit.revert",
         "onCommand:EasyGit.pull",
         "onCommand:EasyGit.pullRebase",
+        "onCommand:EasyGit.pullRebaseAutostash",
         "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
         "onCommand:EasyGit.pushSetUpstream",
@@ -243,6 +244,10 @@
             {
                 "command": "EasyGit.pullRebase",
                 "title": "easy-git: pull --rebase - 拉取"
+            },
+            {
+                "command": "EasyGit.pullRebaseAutostash",
+                "title": "easy-git: pull --rebase --autostash"
             },
             {
                 "command": "EasyGit.fetch",
@@ -503,16 +508,28 @@
                     "group": "easygit@1"
                 },
                 {
-                    "command": "EasyGit.log",
-                    "title": "查看日志",
+                    "command": "EasyGit.pull",
+                    "title": "拉取 - pull",
                     "when": "isGit && explorerResourceCount == 1",
-                    "group": "easygit@1"
+                    "group": "easygit@2"
+                },
+                {
+                    "command": "EasyGit.push",
+                    "title": "推送 - push",
+                    "when": "isGit && explorerResourceCount == 1",
+                    "group": "easygit@2"
+                },
+                {
+                    "command": "EasyGit.log",
+                    "title": "查看日志 - log",
+                    "when": "isGit && explorerResourceCount == 1",
+                    "group": "easygit@3"
                 },
                 {
                     "command": "EasyGit.branch",
                     "title": "分支/标签管理",
                     "when": "isGit",
-                    "group": "easygit@2"
+                    "group": "easygit@3"
                 },
                 {
                     "group": "easygit@3"
@@ -524,12 +541,18 @@
                     "group": "easygit@4"
                 },
                 {
+                    "command": "EasyGit.openGitRepositoryInBrowser",
+                    "title": "在浏览器访问仓库地址",
+                    "when": "isGit",
+                    "group": "easygit@4"
+                },
+                {
                     "group": "easygit@4"
                 },
                 {
                     "command": "EasyGit.oauth",
                     "title": "OAuth授权",
-                    "group": "easygit@4"
+                    "group": "easygit@5"
                 },
                 {
                     "group": "z_commands"
