@@ -17,6 +17,7 @@ function showCommandPanel(param) {
     let tmp = [];
     for (let s of commands) {
         if (s.command != 'EasyGit.CommandPanel') {
+            // s["title"] = s["title"].replace('easy-git:', 'git ')
             tmp.push(s);
         }
     };

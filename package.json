@@ -47,6 +47,9 @@
         "onCommand:EasyGit.pullRebaseAutostash",
         "onCommand:EasyGit.fetch",
         "onCommand:EasyGit.push",
+        "onCommand:EasyGit.pushForce",
+        "onCommand:EasyGit.pushForceWithLease",
+        "onCommand:EasyGit.pushNoVerify",
         "onCommand:EasyGit.pushSetUpstream",
         "onCommand:EasyGit.BranchSwitch",
         "onCommand:EasyGit.BranchDelete",
@@ -258,6 +261,18 @@
                 "title": "easy-git: push - 推送"
             },
             {
+                "command": "EasyGit.pushForce",
+                "title": "easy-git: push --force - 强制推送"
+            },
+            {
+                "command": "EasyGit.pushForceWithLease",
+                "title": "easy-git: push --force-with-lease - 安全性的强制推送"
+            },
+            {
+                "command": "EasyGit.pushNoVerify",
+                "title": "easy-git: push --no-verify - 绕过验证推送"
+            },
+            {
                 "command": "EasyGit.add",
                 "title": "easy-git: add - 添加文件到暂存区"
             },
@@ -451,23 +466,23 @@
             },
             {
                 "command": "EasyGit.set",
-                "title": "easy-git: 设置easy-git"
-            },
-            {
-                "command": "EasyGit.help",
-                "title": "easy-git: 帮助文档"
+                "title": "easy-git插件设置"
             },
             {
                 "command": "EasyGit.keyboard",
-                "title": "easy-git: 打开快捷键帮助文档"
+                "title": "easy-git打开快捷键帮助文档"
+            },
+            {
+                "command": "EasyGit.help",
+                "title": "easy-git帮助文档"
             },
             {
                 "command": "EasyGit.checkUpdate",
-                "title": "easy-git: 检查更新"
+                "title": "easy-git检查更新"
             },
             {
                 "command": "EasyGit.about",
-                "title": "easy-git: 关于"
+                "title": "关于easy-git"
             }
         ],
         "expressions": {

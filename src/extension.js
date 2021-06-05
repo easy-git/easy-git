@@ -318,6 +318,24 @@ function activate(context) {
     });
     context.subscriptions.push(push);
 
+    // Git push --force
+    let pushForce = hx.commands.registerCommand('EasyGit.pushForce', (param)=> {
+        git.action(param, 'pushForce');
+    });
+    context.subscriptions.push(pushForce);
+
+    // Git push --force-with-lease
+    let pushForceWithLease = hx.commands.registerCommand('EasyGit.pushForceWithLease', (param)=> {
+        git.action(param, 'pushForceWithLease');
+    });
+    context.subscriptions.push(pushForceWithLease);
+
+    // Git push --no-verify
+    let pushNoVerify = hx.commands.registerCommand('EasyGit.pushNoVerify', (param)=> {
+        git.action(param, 'pushNoVerify');
+    });
+    context.subscriptions.push(pushNoVerify);
+
     // Git push --set-upstream origin master
     let pushSetUpstream = hx.commands.registerCommand('EasyGit.pushSetUpstream', (param)=> {
         git.action(param, 'push --set-upstream');

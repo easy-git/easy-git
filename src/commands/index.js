@@ -177,6 +177,15 @@ async function action(param, action_name) {
         case 'push':
             utils.gitPush(projectPath);
             break;
+        case 'pushForce':
+            utils.gitPush(projectPath, ['--force']);
+            break;
+        case 'pushForceWithLease':
+            utils.gitPush(projectPath, ['--force-with-lease']);
+            break;
+        case 'pushNoVerify':
+            bch.LocalBranchToRemote(ProjectInfo, ['--no-verify'])
+            break;
         case 'push --set-upstream':
             bch.LocalBranchToRemote(ProjectInfo)
             break;

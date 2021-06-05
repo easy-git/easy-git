@@ -1026,7 +1026,12 @@ async function gitAddCommit(workingDir,commitComment) {
  */
 async function gitPush(workingDir, options=[]) {
     // status bar show message
-    hx.window.setStatusBarMessage(`Git: 正在向远端推送.....`, 30000, 'info');
+    let msg = `Git: 正在向远端推送.....`;
+    if (options.length) {
+        let tmsg = options.join(' ');
+        msg = `Git: git push ${tmsg} 正在向远端推送.....`;
+    };
+    hx.window.setStatusBarMessage(msg, 30000, 'info');
     try {
         let checkResult = await checkGitCredentials(workingDir);
         let status = await git(workingDir)
