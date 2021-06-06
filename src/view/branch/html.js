@@ -416,6 +416,12 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                     </span>
                                     <span
                                         class="ml-1"
+                                        @click="TagDelete(v3);"
+                                        title="删除此tag">
+                                        ${XIcon}
+                                    </span>
+                                    <span
+                                        class="ml-1"
                                         @click="getTagDetails(v3);"
                                         title="查看标签详情">
                                         ${ShowIcon}
@@ -744,6 +750,12 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         } else {
                             this.isShowTag = true;
                         }
+                    },
+                    TagDelete(tagName) {
+                        hbuilderx.postMessage({
+                            command: 'TagDelete',
+                            name: tagName
+                        });
                     },
                     CreateTag() {
                         hbuilderx.postMessage({

@@ -535,6 +535,9 @@
                     "group": "easygit@2"
                 },
                 {
+                    "group": "easygit@2"
+                },
+                {
                     "command": "EasyGit.log",
                     "title": "查看日志 - log",
                     "when": "isGit && explorerResourceCount == 1",

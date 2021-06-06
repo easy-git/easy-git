@@ -145,29 +145,28 @@ class Tag {
      * @param {Object} param
      */
     async delete(tagName) {
-        let tag;
         // 当tag=undefined, 显示所有tag列表，以便用户选择
         if (tagName == undefined) {
             let selectedTag = await this.showTagsList();
             if (selectedTag) {
                 let { label } = selectedTag;
-                tag = label;
+                tagName = label;
             };
         };
 
-        if (tag == undefined) return;
+        if (tagName == undefined) return;
 
         let msg = `注意: 删除远端标签后，无法恢复。`;
         let btns = ['删除本地', '同时删除本地和远端', '关闭'];
-        let selectedBtn = await hxShowMessageBox(`Git 删除标签 ${tag}`, msg , btns).then(btnText => {
+        let selectedBtn = await hxShowMessageBox(`Git 删除标签 ${tagName}`, msg , btns).then(btnText => {
             return btnText;
         });
 
         if (selectedBtn == '删除本地') {
-            gitTagDelete(this.projectPath, tag);
+            gitTagDelete(this.projectPath, tagName);
         };
         if (selectedBtn == '同时删除本地和远端') {
-            await gitTagDelete(this.projectPath, tag, true);
+            await gitTagDelete(this.projectPath, tagName, true);
         };
     };
 

@@ -260,10 +260,10 @@ async function action(param, action_name) {
             tag.create(hash, param);
             break;
         case 'tagDelete':
-            tag.delete();
+            tag.delete(param.tagName);
             break;
         case 'tagDetails':
-            let { tagName } = param;
+            const { tagName } = param;
             tag.showDetails(tagName);
             break;
         case 'archive':

@@ -291,6 +291,17 @@ class GitBranch {
         hx.commands.executeCommand('EasyGit.tagCreate', param);
     };
 
+    // Git tag: delete
+    async TagDelete(tagName) {
+        let param = {
+            "tagName": tagName,
+            "projectPath": this.projectPath,
+            "projectName": this.projectName,
+            "easyGitInner": true
+        };
+        hx.commands.executeCommand('EasyGit.tagDelete', param);
+    };
+
     // Git tag: Detail
     async TagDetails(tagName) {
         let param = {
@@ -436,6 +447,9 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
                 break;
             case 'TagDetails':
                 Branch.TagDetails(msg.name);
+                break;
+            case 'TagDelete':
+                Branch.TagDelete(msg.name);
                 break;
             case 'TagList':
                 Branch.TagList();

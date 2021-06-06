@@ -1716,9 +1716,9 @@ async function gitTagDelete(workingDir, tagName, isDeleteRemote=false) {
         let commands = ['push', '--delete', 'origin', tagName];
         let delResult = await gitRaw(workingDir, commands);
         if (delResult == 'success') {
-            hx.window.showInformationMessage(`远程标签 ${tagName} 删除成功。`, ['我知道了']);
+            hx.window.showInformationMessage(`Git：远程标签 ${tagName} 删除成功。`, ['我知道了']);
         } else {
-            hx.window.showErrorMessage(`远程标签 ${tagName} 删除失败。`, ['我知道了'])
+            hx.window.showErrorMessage(`Git: 远程标签 ${tagName} 删除失败。`, ['我知道了'])
             return;
         };
     };
@@ -1728,9 +1728,7 @@ async function gitTagDelete(workingDir, tagName, isDeleteRemote=false) {
         let status = await git(workingDir)
             .tag(options)
             .then(() => {
-                if (isDeleteRemote) {
-                    hx.window.setStatusBarMessage(`Git: 本地标签 ${tagName} 删除成功。`, 5000, 'info');
-                };
+                hx.window.setStatusBarMessage(`Git: 本地标签 ${tagName} 删除成功。`, 5000, 'info');
                 return 'success';
             })
             .catch((err) => {
