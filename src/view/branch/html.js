@@ -278,14 +278,14 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                     v-model.trim="inputBranch"/>
                             </div>
                             <ul class="pl-0 mb-0" style="list-style-type:none;">
-                                <li class="lif cursor-default">
-                                   <span @click="gitCreateBranch();" :title="'在当前工作区上创建分支, 即基于当前'+currentBranch+'分支创建'">从现有来源创建新分支</span>
+                                <li class="lif cursor-default" @click="gitCreateBranch();">
+                                   <span :title="'在当前工作区上创建分支, 即基于当前'+currentBranch+'分支创建'">从现有来源创建新分支</span>
                                 </li>
-                                <li class="lif cursor-default">
-                                    <span @click="gitCreatePushBranch();" :title="'在当前工作区上创建分支, 即基于当前'+currentBranch+'分支创建'">从现有来源创建新分支并push</span>
+                                <li class="lif cursor-default" @click="gitCreatePushBranch();">
+                                    <span :title="'在当前工作区上创建分支, 即基于当前'+currentBranch+'分支创建'">从现有来源创建新分支并push</span>
                                 </li>
-                                <li class="lif cursor-default">
-                                    <span @click="openModelBox('none');">从...创建分支</span>
+                                <li class="lif cursor-default" @click="openModelBox('none');">
+                                    <span>从...创建分支</span>
                                 </li>
                             </ul>
                         </div>
