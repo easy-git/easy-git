@@ -565,14 +565,6 @@
                     "group": "easygit@4"
                 },
                 {
-                    "group": "easygit@4"
-                },
-                {
-                    "command": "EasyGit.oauth",
-                    "title": "OAuth授权",
-                    "group": "easygit@5"
-                },
-                {
                     "group": "z_commands"
                 }
             ],
