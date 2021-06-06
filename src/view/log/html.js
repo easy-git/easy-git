@@ -72,6 +72,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     overflow-y: scroll;
                 }
                 ::-webkit-scrollbar {
+                    z-index: 1;
                     width: 9px;
                 }
                 ::-webkit-scrollbar-thumb {
@@ -178,18 +179,18 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     font-weight: 400;
                     color: ${fontColor};
                     width:100%;
-                    height:60px;
+                    height:35px;
+                    line-height: 35px;
                     white-space:nowrap;
                     text-overflow:ellipsis;
                     overflow: hidden;
-                    border-bottom: 1px solid ${lineColor};
                 }
                 .li-log:last-child {
                     border-bottom:none;
                 }
                 .li-log p {
                     margin-bottom: 0;
-                    line-height: 1.4rem;
+                    line-height: 35px;
                 }
                 .li-log:hover {
                     cursor: pointer;
@@ -198,17 +199,20 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                 .li-log-selected {
                     background-color: ${liHoverBackground} !important;
                 }
+                .md-screen {}
+                @media screen and (max-width: 750px) {
+                    .md-screen {
+                        display: none;
+                    }
+                }
                 .htext {
                     white-space:nowrap !important;
                     text-overflow:ellipsis !important;
                     overflow: hidden !important;
                 }
                 .li-log .hash {
-                    font-size: 12px;
                     position: absolute;
                     right: 16px;
-                    margin-top: 2px;
-                    windth: 50px;
                 }
                 @media screen and (max-width: 300px) {
                     .hash {
@@ -529,25 +533,25 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                     @contextmenu.prevent.stop="openMenu($event,item)"
                                     @mouseover="hoverLogID = 'msg_'+idx"
                                     @mouseleave="mouseleaveLogItem()">
-                                    <div class="d-flex pt-2 pb-1" @click.stop="viewDetails(item);">
-                                        <div class="mr-auto htext" title="点击查看变更的文件列表">
-                                            {{ item.message }}
-                                        </div>
-                                        <div class="pl-2" v-show="item.refs != ''">
-                                            <span class="gtag" v-for="(v2,i2) in (item.refs).split(',')" :key="i2">
+                                    <div class="row">
+                                        <div class="col-9 col-md-7 col-lg-8 htext" @click.stop="viewDetails(item);">
+                                            <span class="gtag" v-show="item.refs != ''" v-for="(v2,i2) in (item.refs).split(',')" :key="i2">
                                                 {{ v2 }}
                                             </span>
+                                            <span title="点击查看变更的文件列表">{{ item.message }}</span>
                                         </div>
-                                    </div>
-                                    <div class="d-block">
-                                        <div class="text">
-                                            <span class="f11" :title="item.author_email + '点击搜索此用户提交记录'" @click.stop="goSearchAuthor('author',item.author_name);">
+                                        <div class="col-3 col-md-1 col-lg-1 htext" @click.stop="goSearchAuthor('author',item.author_name);">
+                                            <span :title="item.author_email + '点击搜索此用户提交记录'">
                                                 {{ item.author_name }}
                                             </span>
-                                            <span class="f11 pl-2">
+                                        </div>
+                                        <div class="col-md-2 col-lg-2 htext md-screen">
+                                            <span>
                                                 {{ item.date | FormatDate }}
                                             </span>
-                                            <span class="hash" title="双击复制commit id" @dblclick="copyLogMsg(item, 'commit_id');">
+                                        </div>
+                                        <div class="col-md-2 col-lg-1 htext md-screen" @dblclick="copyLogMsg(item, 'commit_id');">
+                                            <span class="hash" title="双击复制commit id">
                                                 {{ (item.hash).slice(0,9) }}
                                             </span>
                                         </div>
