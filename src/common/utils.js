@@ -256,22 +256,35 @@ function getHBuilderXiniConfig(v) {
 
 /**
  * @description 导入项目到项目管理
+ * @param {String} projectPath 目录路径
  */
-function importProjectToExplorer(projectPaht) {
+function importProjectToExplorer(projectPath) {
     try{
+        let cmd_args = [projectPath];
         let hxExecutableProgram;
         let appRoot = hx.env.appRoot;
-        if (osName == 'darwin') {
-            hxExecutableProgram = path.join(path.dirname(appRoot),'MacOS/HBuilderX');
+        let appVersion = hx.env.appVersion;
+
+        const tmp1 = cmp_hx_version(appVersion, '3.1.13');
+        if (tmp1 <= 0) {
+            if (osName == 'darwin') {
+                hxExecutableProgram = path.join(path.dirname(appRoot),'MacOS/cli');
+            } else {
+                hxExecutableProgram = path.join(appRoot,'cli.exe');
+            };
+            cmd_args = [ "project", "open", "--path", projectPath];
         } else {
-            hxExecutableProgram = path.join(appRoot,'HBuilderX.exe');
+            if (osName == 'darwin') {
+                hxExecutableProgram = path.join(path.dirname(appRoot),'MacOS/HBuilderX');
+            } else {
+                hxExecutableProgram = path.join(appRoot,'HBuilderX.exe');
+            };
         };
-        const command = spawn.sync(hxExecutableProgram, [projectPaht], {
+        const command = spawn.sync(hxExecutableProgram, cmd_args, {
           stdio: 'ignore'
         });
     }catch(e){
-        console.error(e)
-        //TODO handle the exception
+        console.error(e);
     }
 };
 
@@ -708,12 +721,13 @@ async function gitClone(info) {
         let status = await runGitClone(options)
         if (status == 'success') {
             createOutputChannel(`克隆成功。本地路径: ${localPath}`, 'success');
+            createOutputChannel(`如果克隆项目没有自动导入HBuilderX，请手动将项目导入或拖入到HBuilderX。`, 'info');
             count(`clone_${cloneWay}_success`);
         } else {
             createOutputChannel('Git: 克隆失败，请参考: https://easy-git.github.io/connecting/clone', 'error');
             count(`clone_${cloneWay}_${status}`);
         };
-        return status
+        return status;
     } catch(e) {
         if (e == 'ssh publickey error') {
             createOutputChannel('- SSH publickey无效，克隆失败。', 'error');
@@ -1035,6 +1049,9 @@ async function gitPush(workingDir, options=[]) {
     try {
         let checkResult = await checkGitCredentials(workingDir);
         let status = await git(workingDir)
+            .outputHandler((bin, stdout, stderr, args) => {
+                console.error('----', bin, stdout, stderr, args)
+            })
             .push(options)
             .then((result) => {
                 hx.window.clearStatusBarMessage();
@@ -1052,10 +1069,10 @@ async function gitPush(workingDir, options=[]) {
                 if (errMsg.includes('Authentication failed') || errMsg.includes('could not read Username')) {
                     checkGitCredentials(workingDir, true);
                     let osErrorMsg = osName == 'darwin'
-                        ? "方法2：Mac, 打开钥匙串，清除此Git仓库的账号密码信息。"
+                        ? "方法2：Mac, 打开钥匙串，清除此Git仓库的账号密码信息，如没有请忽略。\n\n"
                         : "方法2：windows, 打开控制面板 -> 用户账户 -> 管理windows凭据，在【普通凭据】列表中，删除此Git仓库的账号密码信息。";
-                    errMsg = errMsg + "\n" + "原因：账号密码错误，如是使用账号密码方式（非SSH KEY）登录Git，可通过以下方法解决。\n"
-                        + "方法1：打开终端，进入此项目，执行git push，此时输入正确的账号密码。\n"
+                    errMsg = errMsg + "\n" + "原因：账号密码错误，如是使用账号密码方式（非SSH KEY）登录Git，可通过以下方法解决。\n\n"
+                        + "方法1：打开操作系统终端，进入此项目，执行git push，此时输入正确的账号密码。\n"
                         + osErrorMsg;
                 };
                 createOutputChannel(`${title} \n ${errMsg}`, 'error');
@@ -1172,7 +1189,7 @@ async function gitFetch(workingDir, isShowMsg=true) {
                     createOutputChannel(`Git: fetch失败 \n\n ${errMsg}`, 'error');
                 };
 
-                createOutputChannel("fetch操作说明：\n1. 当您打开Git源代码管理器时，easy-git插件会自动进行git fetch操作。\n2. git fetch 并没更改本地仓库的代码，只是拉取了远程 commit 等数据。\n3. fetch操作，错误说明: https://easy-git.github.io/docs/file/fetch\n", "info");
+                createOutputChannel("fetch操作说明：\n1. 当您打开Git源代码管理器时，easy-git插件会自动进行git fetch操作；git fetch 并没更改本地仓库的代码，只是拉取了远程 commit 等数据。\n2. fetch操作，错误说明及解决方法: https://easy-git.github.io/docs/file/fetch\n", "info");
                 return 'fail';
             });
         return status
