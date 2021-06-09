@@ -523,8 +523,8 @@
                     "group": "easygit@1"
                 },
                 {
-                    "command": "EasyGit.pull",
-                    "title": "拉取 - pull",
+                    "command": "EasyGit.pullRebase",
+                    "title": "拉取 - pull --rebase",
                     "when": "isGit && explorerResourceCount == 1",
                     "group": "easygit@2"
                 },
