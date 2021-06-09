@@ -149,7 +149,7 @@ class Diff {
 
         let {diff_options, titleLeft, titleRight, isConflicted} = init;
 
-        let result = await utils.gitRaw(this.projectPath, diff_options, undefined, 'result');
+        let result = await utils.gitRaw(this.projectPath, diff_options, 'Git文件对比', 'result');
         if (result == 'success' || result == 'fail' || result == 'error') {
             return;
         };
