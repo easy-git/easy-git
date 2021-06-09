@@ -32,8 +32,11 @@ async function unfocusedAction() {
     let activeEditor = await hx.window.getActiveTextEditor().then(function(editor){
         return editor;
     }).catch( error => {
-        return null;
+        return "fouceEditorFail";
     });
+    if (activeEditor == 'fouceEditorFail') {
+        await hx.commands.executeCommand('workbench.view.explorer');
+    };
     return activeEditor;
 };
 
@@ -49,9 +52,11 @@ async function action(param, action_name) {
         };
     };
 
-    let projectName, projectPath, selectedFile, isFromGitView;
-    let { easyGitInner } = param;
+    let easyGitInner, projectName, projectPath, selectedFile, isFromGitView;
     try{
+        if (param != null) {
+            easyGitInner = param.easyGitInner;
+        };
         if (easyGitInner != undefined) {
             projectName = param.projectName;
             projectPath = param.projectPath;
