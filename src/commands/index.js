@@ -17,41 +17,12 @@ const openBranchDiffView = require('./branch_diff.js');
 const gitBlameForLineChange = require('./blame.js');
 const gitAnnotate = require('./annotate.js');
 
-/**
- * @description 失焦操作
- */
-async function unfocusedAction() {
-    hx.window.setStatusBarMessage('EasyGit: 如果出现错误、或没有任何提示，请将焦点置于项目管理器或在编辑器中打开文件。');
-    // 将焦点置于编辑器
-    try{
-        await hx.commands.executeCommand('workbench.action.focusEditor');
-    }catch(e){
-        return null;
-    };
-    // 获取激活的项目信息
-    let activeEditor = await hx.window.getActiveTextEditor().then(function(editor){
-        return editor;
-    }).catch( error => {
-        return "fouceEditorFail";
-    });
-    if (activeEditor == 'fouceEditorFail') {
-        await hx.commands.executeCommand('workbench.view.explorer');
-    };
-    return activeEditor;
-};
+
 
 /**
  * @description 提供webview视图外Git的操作
  */
 async function action(param, action_name) {
-    if (param == null) {
-        let unfocusedResult = await unfocusedAction();
-        if (unfocusedResult == null) {
-            hx.window.showErrorMessage('EasyGit: 请将焦点置于项目管理器Git项目上、或在编辑器中打开Git项目下文件，再进行操作。', ["我知道了"]);
-            return
-        };
-    };
-
     let easyGitInner, projectName, projectPath, selectedFile, isFromGitView;
     try{
         if (param != null) {
