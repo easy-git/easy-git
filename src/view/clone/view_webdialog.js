@@ -128,12 +128,6 @@ async function getUserAllGitRepos(webview) {
  */
 var isDisplayError;
 async function clone(webviewDialog, webview, info) {
-    let {localPath} = info;
-    let projectName = localPath.split('/').pop();
-    info = Object.assign(info,{
-        'projectName': projectName
-    });
-
     // 记录仓库地址
     GitRepoUrl = info.repo;
 
@@ -144,11 +138,23 @@ async function clone(webviewDialog, webview, info) {
         return;
     };
 
+    // 仓库名称
+    let gitRepoName = a.split('/').pop()
+    if (gitRepoName.substring(gitRepoName - 4) === '.git') {
+        gitRepoName = gitRepoNamereplace('.git', '');
+    };
+
+    let { localPath } = info;
+    let projectName = path.basename(localPath);
+    info = Object.assign(info,{
+        'projectName': projectName
+    });
+
     if (fs.existsSync(localPath)) {
         let isEmpty = await isDirEmpty(localPath);
         if (isEmpty > 0) {
             isDisplayError = true;
-            webviewDialog.displayError(`目录 ${localPath} 已存在!`);
+            webviewDialog.displayError(`目录 ${localPath} 已存在，请输入一个空目录。`);
             return;
         };
     };

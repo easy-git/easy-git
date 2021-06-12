@@ -714,7 +714,11 @@ async function gitClone(info) {
         options.push(repo);
         options.push(localPath);
 
-        createOutputChannel(`开始克隆 ${projectName}！\n`, 'success');
+        let clone_cmd = options.join(' ');
+
+        createOutputChannel(`开始克隆 ${projectName}！`, 'success');
+        createOutputChannel(`执行的git命令如下: git clone ${clone_cmd}\n`, 'info');
+
         createOutputChannel(`备注1：克隆进度跟项目大小、网络有关，需要一定时间，请不要重复点击【克隆】按钮。`, 'info');
         createOutputChannel(`备注2：克隆成功后，会自动将克隆项目，加入到HBuilderX项目管理器。如未显示在项目管理器，请手动导入或拖入。\n`, 'info');
 
