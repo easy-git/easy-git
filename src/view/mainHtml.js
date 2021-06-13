@@ -609,8 +609,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     };
 
                     document.querySelector('#commitMsg').addEventListener('input', function () {
-                      this.style.height = 'auto';
-                      this.style.height = this.scrollHeight + 'px';
+                        this.style.height = 'auto';
+                        this.style.height = this.scrollHeight + 'px';
                     })
                 },
                 methods: {
@@ -807,6 +807,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
 
                         // 清空输入框消息
                         this.commitMessage = '';
+                        document.getElementById('commitMsg').style.height = "31px";
                     },
                     gitPush() {
                         hbuilderx.postMessage({
