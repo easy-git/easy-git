@@ -228,7 +228,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     color: rgb(245,108,108);
                 }
                 .view-log-details {
-                    z-index: 9999;
+                    z-index: 9999 !important;
                     border-top: 1px solid ${lineColor};
                     background-color: ${background};
                     -webkit-box-shadow:2px 2px 5px 3px ${background};
@@ -245,7 +245,17 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                 }
                 .view-log-details .close {
                     font-size: 1.5rem !important;
+                    outline: none;
+                    box-shadow: none !important;
                 }
+                .close:focus {
+                    webkit-box-shadow:none;
+                    outline: none;
+                    box-shadow: none !important;
+                    -webkit-transform: rotate(0.9);
+                    transform: scale(0.9);
+                }
+                
                 .change-files {
                     height: 270px;
                     overflow-y: auto;
