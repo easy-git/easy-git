@@ -1067,9 +1067,6 @@ async function gitPush(workingDir, options=[]) {
     try {
         let checkResult = await checkGitCredentials(workingDir);
         let status = await git(workingDir)
-            .outputHandler((bin, stdout, stderr, args) => {
-                console.error('----', bin, stdout, stderr, args)
-            })
             .push(options)
             .then((result) => {
                 hx.window.clearStatusBarMessage();
