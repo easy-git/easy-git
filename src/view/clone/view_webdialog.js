@@ -12,6 +12,7 @@ const {
     isDirEmpty,
     getDirFileList,
     gitClone,
+    updateHBuilderXConfig,
     importProjectToExplorer } = require('../../common/utils.js');
 const { axiosGet } = require('../../common/axios.js');
 const { Gitee, Github, openOAuthBox } = require('../../common/oauth.js');
@@ -27,16 +28,24 @@ const SyncIcon = getSyncIcon('#d4d4d4');
 // Git仓库地址，用于数据填充
 var GitRepoUrl = '';
 
+// 克隆目录
+var ProjectWizard = '';
+
 /**
- * @description 读取HBuilderX.ini, 获取ProjectWizard
+ * @description 设置初始克隆目录
  */
 function getProjectWizard() {
     try{
+        let config = hx.workspace.getConfiguration();
+        let LastCloneDir = config.get('EasyGit.LastCloneDir');
+        if (LastCloneDir && LastCloneDir != '') {
+            return LastCloneDir;
+        };
         if (osName == 'darwin') {
             return path.join(process.env.HOME, 'Documents')
         } else {
             return path.join("C:", process.env.HOMEPATH, 'Documents')
-        }
+        };
     }catch(e){
         return '';
     };
@@ -63,6 +72,12 @@ async function checkSSH(webviewDialog, webview) {
     return publicKey;
 };
 
+/**
+ * @description 搜索Github
+ * @param {Object} word 搜索关键字
+ * @param {Object} webviewDialog
+ * @param {Object} webview
+ */
 async function openGithubSearch(word, webviewDialog, webview) {
     let data = {"ssh":[],"https":[]};
 
@@ -139,13 +154,14 @@ async function clone(webviewDialog, webview, info) {
     };
 
     // 仓库名称
-    let gitRepoName = a.split('/').pop()
+    let gitRepoName = GitRepoUrl.split('/').pop()
     if (gitRepoName.substring(gitRepoName - 4) === '.git') {
         gitRepoName = gitRepoNamereplace('.git', '');
     };
 
     let { localPath } = info;
     let projectName = path.basename(localPath);
+    let currentCloneDir = path.dirname(localPath);
     info = Object.assign(info,{
         'projectName': projectName
     });
@@ -188,6 +204,11 @@ async function clone(webviewDialog, webview, info) {
         isDisplayError = true;
         webviewDialog.displayError('Git: 克隆失败, 请在底部控制台查看失败原因!');
     };
+
+    // 记忆上次位置
+    if (ProjectWizard != currentCloneDir) {
+        updateHBuilderXConfig('EasyGit.LastCloneDir', currentCloneDir);
+    };
 };
 
 /**
@@ -196,8 +217,8 @@ async function clone(webviewDialog, webview, info) {
  */
 function showClone(clone_url="") {
 
-    // HBuilderX数据
-    let ProjectWizard = getProjectWizard();
+    // 获取克隆目录
+    ProjectWizard = getProjectWizard();
     let hxData = { 'ProjectWizard': ProjectWizard };
 
     if (clone_url != "") {
