@@ -235,6 +235,20 @@ function applyEdit(text) {
 };
 
 /**
+ * @description 更新或写入HBuilderX配置
+ * @param {String} key
+ * @param {String} value
+ * @param {String} desc 消息，用于显示到状态栏
+ */
+function updateHBuilderXConfig(key, value, desc=undefined) {
+    let config = hx.workspace.getConfiguration();
+    config.update(key, value).then((data) => {
+        let msg = desc ?  desc : `EasyGit: 更新 ${key} 成功。`;
+        hx.window.setStatusBarMessage(msg, 5000, 'info');
+    });
+};
+
+/**
  * @description 读取HBuilderX.ini, 获取ProjectWizard
  */
 function getHBuilderXiniConfig(v) {
@@ -2465,6 +2479,7 @@ function mkdirsSync(dirname) {
 module.exports = {
     hxShowMessageBox,
     applyEdit,
+    updateHBuilderXConfig,
     isDirEmpty,
     checkIsGitProject,
     getDirFileList,
