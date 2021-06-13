@@ -1071,9 +1071,13 @@ async function gitPush(workingDir, options=[]) {
             .then((result) => {
                 hx.window.clearStatusBarMessage();
                 let pushResult = result.pushed;
-                if (JSON.stringify(pushResult) === '[]' || JSON.stringify(pushResult)) {
+                let updateResult = result.update;
+                if (JSON.stringify(pushResult) === '[]' || updateResult != undefined) {
                     hx.window.setStatusBarMessage('Git: push操作成功', 30000, 'info');
                     voiceSay('push.success')
+                };
+                if (updateResult == undefined) {
+                    hx.window.setStatusBarMessage('Git: push操作成功, Everything up-to-date。', 30000, 'info');
                 };
                 return 'success';
             })
