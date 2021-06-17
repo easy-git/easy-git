@@ -70,9 +70,6 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                 body::-webkit-scrollbar {
                     overflow-x: hidden !important;
                     overflow-y: scroll;
-                }
-                ::-webkit-scrollbar {
-                    z-index: 1;
                     width: 9px;
                 }
                 ::-webkit-scrollbar-thumb {
@@ -855,7 +852,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         },
                         viewDetailsMouseenter() {
                             // 解决背景层滚动的问题
-                            document.body.style.overflow = 'hidden';
+                            // document.body.style.overflow = 'hidden';
                         },
                         viewDetailsMouseleave() {
                             // 解决背景层滚动的问题
