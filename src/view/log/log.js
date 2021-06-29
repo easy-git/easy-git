@@ -36,6 +36,7 @@ class GitLogAction {
         this.webviewPanel = webView;
         this.projectPath = gitBasicData.projectPath;
         this.projectName = gitBasicData.projectName;
+        this.projectGitRootDir = gitBasicData.gitRootDir;
         this.userConfig = userConfig;
         this.gitData = gitBasicData;
         this.currentProjectInfoForFlush = {
@@ -184,7 +185,7 @@ class GitLogAction {
             return hx.window.showErrorMessage("Git: 操作失败。备注：Merge消息暂不支持获取文件修改列表、及修改详情。", ["我知道了"]);
         };
         let options = [commitId, filePath];
-        let result = await utils.gitShowCommitFileChange(this.projectPath, options);
+        let result = await utils.gitShowCommitFileChange(this.projectGitRootDir, options);
         result.filePath = filePath;
         if ((result.data).length) {
             let diffHtml = Diff2Html.html(result.data, {
@@ -354,6 +355,16 @@ class GitLogAction {
 
         if (selected == undefined) { return; };
         this.setView('branch', '', selected.label);
+    }
+
+    // 日志视图点击打开文件
+    async inLogOpenFile(filename) {
+        let furi = path.join(this.projectGitRootDir, filename);
+        hx.workspace.openTextDocument(furi).then((res) => {
+            if (res == null) {
+                hx.window.showErrorMessage('Git: 打开文件失败，文件不存在，可能被删除！', ['我知道了']);
+            };
+        });
     }
 };
 

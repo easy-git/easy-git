@@ -304,6 +304,7 @@ function importProjectToExplorer(projectPath) {
 
 /**
  * @description 检查项目是否Git项目
+ * @return {String} git-dir
  */
 function checkIsGitProject(projectPath) {
     process.chdir(projectPath);

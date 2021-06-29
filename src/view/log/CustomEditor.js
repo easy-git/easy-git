@@ -1,6 +1,7 @@
 const hx = require('hbuilderx');
 const fs = require('fs');
 const path = require('path');
+const { checkIsGitProject } = require('../../common/utils.js');
 
 const chokidar = require('chokidar');
 const { debounce } = require('throttle-debounce');
@@ -111,7 +112,7 @@ function history(gitData) {
  */
 let watcher;
 let watchProjectPath;
-function watchProjectDir(projectDir, func) {
+async function watchProjectDir(projectDir, func) {
     const watchOpt = {
         persistent: true,
         recursive: true
@@ -121,8 +122,12 @@ function watchProjectDir(projectDir, func) {
             func.setView('branch', '');
         });
 
-        let GitDir = path.join(projectDir, '.git');
-        let ignoredDir = path.join(projectDir, '.git', 'objects');
+        let GitDir;
+        GitDir = await checkIsGitProject(projectDir);
+        if (GitDir == 'error') return;
+        GitDir = path.join(GitDir, '.git');
+
+        let ignoredDir = path.join(GitDir, 'objects');
         watcher = chokidar.watch(GitDir, {
             ignored: ignoredDir,
             ignoreInitial: true
@@ -143,7 +148,7 @@ function watchProjectDir(projectDir, func) {
  * @param {Object} gitData
  * @param {Object} userConfig
  */
-function GitLogCustomEditorRenderHtml(gitData, userConfig) {
+async function GitLogCustomEditorRenderHtml(gitData, userConfig) {
     let {projectPath, projectName, selectedFile, currentBranch} = gitData;
     isSelectedFile = selectedFile;
 
@@ -164,7 +169,14 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
     // 仅首次运行
     history(gitData);
 
-    let Log = new GitLogAction(gitData, userConfig, GitLogCustomWebViewPanal, 'customEditor');
+    // 获取git-dir来解决，hx项目管理器内项目为git项目子目录的情况
+    let gitRootDir = await checkIsGitProject(projectPath).catch( error => { return error });
+    if (gitRootDir == 'error') {
+        gitRootDir = projectPath;
+    };
+
+    let LastGitData = Object.assign(gitData, {"gitRootDir": gitRootDir});
+    let Log = new GitLogAction(LastGitData, userConfig, GitLogCustomWebViewPanal, 'customEditor');
 
     // 默认在当前分支搜索，当搜索全部时，此值为all
     let searchType = 'branch';
@@ -213,12 +225,7 @@ function GitLogCustomEditorRenderHtml(gitData, userConfig) {
                 Log.setView(searchType, '', msg.refname);
                 break;
             case 'openFile':
-                let furi = path.join(projectPath,msg.filename);
-                hx.workspace.openTextDocument(furi).then((res) => {
-                    if (res == null) {
-                        hx.window.showErrorMessage('Git: 打开文件失败，文件不存在，可能被删除！', ['我知道了']);
-                    };
-                });
+                Log.inLogOpenFile(msg.filename)
                 break;
             case 'copy':
                 hx.env.clipboard.writeText(msg.text);
