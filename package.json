@@ -94,7 +94,6 @@
         "onCommand:EasyGit.keyboard",
         "onCommand:EasyGit.sshKeygen",
         "onView:EasyGitSourceCodeView",
-        "onView:EasyGitCommonView",
         "onCustomEditor:EasyGit - 日志",
         "onCustomEditor:EasyGit - 对比差异"
     ],
@@ -154,12 +153,6 @@
                     "id": "EasyGitSourceCodeView",
                     "title": "easy-git"
                 }
-            ],
-            "rightside": [
-                {
-                    "id": "EasyGitCommonView",
-                    "title": "easy-git-log"
-                }
             ]
         },
         "views": {
@@ -167,12 +160,6 @@
                 {
                     "id": "EasyGitSourceCodeView",
                     "title": "easy-git"
-                }
-            ],
-            "EasyGitCommonView": [
-                {
-                    "id": "EasyGitCommonView",
-                    "title": "easy-git-log"
                 }
             ]
         },

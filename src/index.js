@@ -24,7 +24,7 @@ const MainView = require('./view/main.js');
 const GitBranchView = require('./view/branch/branch.js');
 const initView = require('./view/init/init.js');
 const openCloneView = require('./view/clone/clone.js');
-const openLogView = require('./view/log/index.js');
+const { openLogView } = require('./view/log/index.js');
 const openDiffFileView = require('./view/diff/index.js');
 
 // 用户本地是否安装Git
@@ -205,7 +205,7 @@ class Main extends Common {
                         GitBranchView(this.webviewPanel, this.userConfig, gitData);
                         break;
                     case 'log':
-                        openLogView(this.userConfig, gitData, this.webviewPanel);
+                        openLogView(this.userConfig, gitData);
                         break;
                     default:
                         break;
@@ -287,7 +287,7 @@ class Main extends Common {
                 GitBranchView(this.webviewPanel, this.userConfig, gitData);
                 break;
             case 'log':
-                openLogView(this.userConfig, gitData, this.webviewPanel);
+                openLogView(this.userConfig, gitData);
                 break;
             default:
                 break;

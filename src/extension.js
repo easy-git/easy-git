@@ -31,10 +31,6 @@ let FileView = hx.window.createWebView("EasyGitSourceCodeView", {
 let {background} = getThemeColor('siderBar');
 FileView.webView.html = `<body style="background-color: ${background};"><p style='margin-top: 2rem;font-size: 13px;'>请从项目管理器，选中项目，通过右键菜单打开源代码管理器。</p></body>`;
 
-let CommonView = hx.window.createWebView("EasyGitCommonView", {
-    enableScritps: true
-});
-
 
 function activate(context) {
     context.source = 'viewMenu';
@@ -43,7 +39,7 @@ function activate(context) {
     const cmp = cmp_hx_version(hxVersion, '2.9.2');
     if (cmp <= 0) {
         // git log customEditor view
-        var { CatCustomEditorProvider, GitLogCustomWebViewPanal } = require('./view/log/CustomEditor.js');
+        var { CatCustomEditorProvider, GitLogCustomWebViewPanal } = require('./view/log/index.js');
         let provider = new CatCustomEditorProvider({}, {}, {});
         hx.window.registerCustomEditorProvider("EasyGit - 日志", provider);
 
@@ -110,9 +106,12 @@ function activate(context) {
         if (cmp <=0) {
             let LogCscratFile = path.join(__dirname, 'view',  'log', 'cscrat', 'EasyGit - 日志');
             hx.workspace.openTextDocument(LogCscratFile);
+        } else {
+            hx.window.showErrorMessage("EasyGit: 日志视图仅支持HBuilderX 2.9.2+版本，请升级HBuilderX。", ["我知道了"])
+            return;
         };
         context.source = 'filesExplorer';
-        let view_log = new Main('log', param, CommonView, context);
+        let view_log = new Main('log', param, {}, context);
         view_log.run();
     });
     context.subscriptions.push(view_log_manage);
