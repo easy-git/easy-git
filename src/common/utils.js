@@ -1104,6 +1104,21 @@ async function gitPush(workingDir, options=[]) {
     }
 };
 
+/**
+ * @description 处理git pull --rebase失败的情况
+ */
+async function gitPullRebaseForFail(title, msg, workingDir) {
+    let btns = ["git pull","git pull --rebase --autostash","关闭"];
+    let btnText = await hxShowMessageBox(title, msg, btns).then( btnText => {
+        return btnText;
+    });
+    if (btnText == 'git pull') {
+        gitPull(workingDir);
+    };
+    if (btnText == 'git pull --rebase --autostash') {
+        gitPull(workingDir, ["--rebase", "--autostash"]);
+    };
+};
 
 /**
  * @description git: pull
@@ -1162,11 +1177,10 @@ async function gitPull(workingDir, options) {
                 let pullMsg = "提醒：如需执行其它pull选项操作，将焦点置于当前要查看的项目上；然后打开命令面板，输入pull，即可看到其它相关的git pull选项。"
                 let errMsg = (err).toString();
                 if (errMsg.includes('cannot pull with rebase')) {
-                    let msg1 = "\n说明：项目下存在未提交的文件，git pull --rebase执行失败。如果需要执行其它git pull操作, 可通过以下步骤操作。"
-                        + "\n1. 源代码管理器视图，顶部【更多】，点击【pull - 拉取】，即执行git pull"
-                        + `\n2. ${pullMsg}`;
+                    let msg1 = "\n原因：项目下存在未提交的文件，请处理后再操作。\n\n如需执行其它pull命令, 请点击下列按钮。"
                     errMsg = errMsg + msg1;
-                    createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
+                    let title = `Git pull ${cmd_details} 执行失败。`;
+                    gitPullRebaseForFail(title, errMsg, workingDir);
                 } else if (errMsg.includes('could not read Username')) {
                     createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
                     createOutputChannel('关于身份认证信息的解决方法: https://easy-git.github.io/question/username', 'info')
