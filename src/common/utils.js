@@ -1464,7 +1464,7 @@ async function gitBranchSwitch(workingDir,branchName) {
             })
             .catch((err) => {
                 let errMsg = (err).toString();
-                if ("error: pathspec '-'" in errMsg) {
+                if (errMsg.includes("error: pathspec '-'")) {
                     hx.window.setStatusBarMessage('Git: 当前您本地只存在一个分支，无法切换到上一个分支。', 20000, 'error');
                 } else {
                     createOutputChannel(`Git: 分支${branchName}切换失败! \n ${errMsg}`, 'error');
