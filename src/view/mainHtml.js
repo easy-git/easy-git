@@ -6,6 +6,7 @@ const osName = os.platform();
 
 const vueFile = path.join(__dirname, 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
+const mainCssFile = path.join(__dirname, 'static', 'main.css');
 
 
 /**
@@ -81,261 +82,26 @@ function getWebviewContent(userConfig, uiData, gitData) {
         <link rel="stylesheet" href="${bootstrapCssFile}">
         <script src="${vueFile}"></script>
         <style type="text/css">
-            body {
-                color: ${fontColor};
-                font-size: 0.92rem;
-                font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-            }
-            [v-cloak] {
-                display: none;
-            }
-            * {
-                moz-user-select: -moz-none;
-                -moz-user-select: none;
-                -o-user-select:none;
-                -khtml-user-select:none;
-                -webkit-user-select:none;
-                -ms-user-select:none;
-                user-select:none;
-            }
-            body::-webkit-scrollbar {
-                overflow-x: hidden !important;
-                overflow-y: scroll;
-            }
-            ::-webkit-scrollbar {
-                width: 8px;
-            }
-            ::-webkit-scrollbar-thumb {
-                background-color: ${scrollbarColor};
-            }
-            @media screen and (max-width: 132px) {
-                body {
-                    display: none;
-                }
-            }
-            #refresh-progress {
-                width:20px;
-                height:2px;
-                background:${inputLineColor};
-                position:absolute;
-                animation-name:pulse;
-                animation-duration:5s;
-                animation-timing-function:linear;
-                animation-iteration-count:infinite;
-                animation-direction:alternate;
-                animation-play-state:running;
-                -webkit-animation-name:pulse;
-                -webkit-animation-duration:5s;
-                -webkit-animation-timing-function:linear;
-                -webkit-animation-iteration-count:infinite;
-                -webkit-animation-direction:alternate;
-                -webkit-animation-play-state:running;
-            }
-            @-webkit-keyframes pulse {
-                0%   {background:${inputLineColor} !important; left:0px; top:0px;}
-                50%  {background:${inputLineColor} !important; left:50%; top:0px;}
-                100% {background:${inputLineColor} !important; left:100%; top:0px;}
-            }
-            .cactive {
-                -webkit-user-select:text;
-                user-select: text;
-            }
-            .cactive:active {
-                -webkit-transform: rotate(0.9);
-                transform: scale(0.9);
-            }
-            .pl18 {
-                padding-left:18px;
-            }
-            .h30 {
-                height: 30px;
-            }
-            .fred {
-                color: red !important;
-            }
-            .fgreen {
-                color: green;
-            }
-            .f111 {
-                color: rgb(182,151,103);
-            }
-            #page-top {
-                background-color:${background} !important;
-            }
-            .project-name {
-                width: 120px;
-                overflow:hidden;
-                white-space: nowrap;
-                text-overflow:ellipsis;
-            }
-            @media screen and (max-width: 249px) {
-                .project-name {
-                    width: calc(100% - 129px);
-                }
-            }
-            .text-hidden {
-                text-overflow:ellipsis;
-                overflow:hidden;
-                white-space: nowrap;
-            }
-            .outline-none {
-                box-shadow: none !important;
-            }
-            .form-control::-webkit-input-placeholder {
-                font-size: 0.9rem !important;
-                font-weight: 200 !important;
-                color: #c0c4cc !important;
-            }
-            .form-control {
-                border-radius: 2px !important;
-                font-size: 14px !important;
-                border: 1px solid ${lineColor};
-                transition: none !important;
-                caret-color: ${cursorColor};
-                color: ${fontColor};
-            }
-            .form-control:focus  {
-                border-radius: 2px !important;
-                border: 1px solid ${liHoverBackground};
-                transition: none !important;
-                color: ${fontColor};
-            }
-            .textarea {
-                background: ${background} !important;
-                overflow: hidden;
-                resize: none;
-                max-height: 98px !important;
-                color: ${fontColor};
-            }
-            .textarea::-webkit-input-placeholder {
-                font-size: 13px !important;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-            }
-            .add-title {
-                font-size: 14px;
-                padding-left:18px;
-                line-height: 2rem;
-                margin-bottom: 3px;
-            }
-            .add-title:hover .stash-all{
-                display: inline;
-            }
-            .add-title > .a-icon {
-                margin-left: -5px;
-                margin-right: 5px;
-            }
-            .stash-all {
-                display: none;
-                float: right;
-                padding-right: 13px;
-            }
-            .top {
-                font-size: 0.95rem;
-                height: 30px;
-                color: ${fontColor};
-            }
-            .icon:active {
-                -webkit-transform: rotate(0.9);
-                transform: scale(0.9);
-            }
-            .gitfile:hover .hideicon {
-                opacity: 1;
-            }
-
-            .lif {
-                margin: 0;
-                padding: 3px 10px 3px 18px;
-                height:25px;
-                font-size: 0.9rem;
-                color: ${fontColor};
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                align-items: flex-end;
-            }
-            .lif:hover {
-                background-color: ${liHoverBackground} !important;
-            }
-            .lif .file-label {
-                font-weight: 500;
-            }
-            .fixedBottom {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                width: 100%;
-                height: 2rem;
-                line-height: 2rem;
-                color: ${fontColor} !important;
-                border-top: 1px solid ${lineColor};
-                z-index: 1000;
-                opacity: 1;
-                background-color: ${background} !important;
-            }
-            .push-pull > div {
-                display:inline-block;
-            }
-            .push-pull > div > .num {
-                right: -6px;
-                position: relative;
-                top: 1px;
-            }
-            .line-through {
-                text-decoration: line-through;
-            }
-
-            .menu {
-                background-color: ${menuBackground} !important;
-                display: flex;
-                position: absolute;
-                z-index: 1000;
-                border: 1px solid ${lineColor};
-                border-radius: 4px;
-                width: 188px;
-                top: 2rem;
-                right: 10px;
-                box-shadow: 0px 0px 6px 1px rgba(0,0,0,0.2);
-            }
-            .menu ul {
-                list-style:none;
-                padding-left: 0px;
-                width: 100%;
-                margin:10px 0;
-            }
-            .menu ul>li {
-                line-height: 1.6rem;
-                padding-left: 20px;
-                font-size:0.83rem !important;
-                cursor:default;
-            }
-            .menu ul>li:hover {
-                background-color: ${liHoverBackground};
-            }
-            .divider {
-                height: 0;
-                margin: .2rem 0;
-                overflow: hidden;
-                border-top: 1px solid ${lineColor};
-            }
-            .gtag {
-                border: 1px solid ${liHoverBackground};
-                border-radius: 5px;
-                margin: 0 6px;
-                padding: 1px 6px;
-                font-size: 0.6rem;
-                top: -1px;
-                position: relative;
-                color: ${fontColor};
-            }
-            .cursor-default {
-                cursor:default;
+            :root {
+              --background: ${background};
+              --fontColor: ${fontColor};
+              --lineColor: ${lineColor};
+              --inputLineColor: ${inputLineColor};
+              --scrollbarColor: ${scrollbarColor};
+              --background: ${background};
+              --menuBackground: ${menuBackground};
+              --liHoverBackground: ${liHoverBackground};
+              --inputColor: ${inputColor};
+              --inputLineColor: ${inputLineColor};
+              --cursorColor: ${cursorColor};
+              --fontColor: ${fontColor};
+              --lineColor: ${lineColor};
+              --scrollbarColor: ${scrollbarColor};
             }
         </style>
+        <link rel="stylesheet" href="${mainCssFile}">
     </head>
-    <body style="background-color:${background};">
+    <body>
         <div id="app" v-cloak>
             <div id="filelist" class="container-fluid pb-5">
                 <div id="page-top" class="fixed-top">
@@ -599,7 +365,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     that = this;
                     window.onload = function() {
                         setTimeout(function() {
-                            that.updateProjectStatusInfo();
+                            that.receiveInfo();
                         }, 500);
                         setTimeout(function() {
                             that.runSync();
@@ -619,8 +385,16 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             command: 'sync'
                         });
                     },
-                    updateProjectStatusInfo() {
+                    receiveInfo() {
                         hbuilderx.onDidReceiveMessage((msg) => {
+                            if (msg.command == 'themeColor') {
+                                let themedata = msg.data;
+                                let colors = Object.keys(themedata);
+                                for (let i of colors) {
+                                    document.documentElement.style.setProperty('--' + i, themedata[i]);
+                                };
+                                return;
+                            };
                             if (msg.command == 'sync') {
                                 this.behind = msg.behind;
                                 return;

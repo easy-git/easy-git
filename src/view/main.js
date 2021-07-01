@@ -910,6 +910,15 @@ function active(webviewPanel, userConfig, gitData) {
         }, 1500);
     });
 
+    let configurationChangeDisplose = hx.workspace.onDidChangeConfiguration(function(event){
+        if(event.affectsConfiguration("editor.colorScheme")){
+            let ThemeColor = utils.getThemeColor();
+            webviewPanel.webView.postMessage({
+                "command": "themeColor",
+                "data": ThemeColor
+            });
+        }
+    });
 };
 
 

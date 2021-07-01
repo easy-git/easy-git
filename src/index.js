@@ -62,10 +62,6 @@ class Common {
         let ColorScheme = config.get('editor.colorScheme');
         if ( hxColorScheme == undefined ) {
             hxColorScheme = ColorScheme;
-        } else {
-            if (hxColorScheme != ColorScheme) {
-                hx.window.showErrorMessage("EasyGit: 检测到当前HBuilderX主题已更改，如发现easygit窗口颜色异常，请重启HBuilderX。", ["我知道了"]);
-            };
         };
 
         return {
