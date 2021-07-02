@@ -5,6 +5,7 @@ const path = require('path');
 const vueFile = path.join(path.resolve(__dirname, '..'), 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
 const inputCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'input.css');
+const branchCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'branch.css');
 
 
 /**
@@ -73,186 +74,20 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
         <link rel="stylesheet" href="${inputCssFile}">
         <script src="${vueFile}"></script>
         <style type="text/css">
-            body {
-                color: ${fontColor};
-                font-size: 0.92rem;
-            }
-            body::-webkit-scrollbar {
-                display: none;
-            }
-            [v-cloak] {
-                display: none;
-            }
-            label,input,button {
-                font-size: 0.9rem !important;
-            }
-            .pl18 {
-                padding-left:18px;
-            }
-            .h30 {
-                height: 30px;
-            }
-            #page-top {
-                background-color:${background} !important;
-                z-index: 999;
-            }
-            #refresh-progress {
-                width:20px;
-                height:2px;
-                background:${inputLineColor};
-                position:absolute;
-                animation-name:pulse;
-                animation-duration:5s;
-                animation-timing-function:linear;
-                animation-iteration-count:infinite;
-                animation-direction:alternate;
-                animation-play-state:running;
-                -webkit-animation-name:pulse;
-                -webkit-animation-duration:5s;
-                -webkit-animation-timing-function:linear;
-                -webkit-animation-iteration-count:infinite;
-                -webkit-animation-direction:alternate;
-                -webkit-animation-play-state:running;
-            }
-            @-webkit-keyframes pulse {
-                0%   {background:${inputLineColor} !important; left:0px; top:0px;}
-                50%  {background:${inputLineColor} !important; left:50%; top:0px;}
-                100% {background:${inputLineColor} !important; left:100%; top:0px;}
-            }
-            .project-name {
-                width:150px;
-                overflow:hidden;
-                white-space: nowrap;
-                text-overflow:ellipsis;
-            }
-            .outline-none {
-                box-shadow: none !important;
-            }
-            .form-group .form-control::-webkit-input-placeholder, .form-control::-webkit-input-placeholder {
-                font-size: 0.9rem !important;
-                font-weight: 200 !important;
-                color: #c0c4cc !important;
-            }
-            .form-control {
-                border-radius: 2px !important;
-                font-size: 0.9rem !important;
-                border: 1px solid ${lineColor};
-                background-color: ${inputBgColor} !important;
-            }
-            .form-control:focus {
-                border-radius: 2px !important;
-                border: 1px solid ${inputLineColor} !important;
-            }
-            .top {
-                font-size: 0.95rem;
-                color: ${fontColor};
-            }
-            .icon:active {
-                -webkit-transform: rotate(0.9);
-                transform: scale(0.9);
-            }
-            .gitfile:hover .hideicon {
-                opacity: 1;
-            }
-            .gitfile:hover .ci {
-                display:none;
-            }
-            .lif {
-                margin: 0;
-                padding: 4px 10px 4px 18px;
-                font-size: 14px;
-                font-weight: 400;
-                color: ${fontColor};
-                width:100%;
-                height:30px;
-                white-space:nowrap;
-                text-overflow:ellipsis;
-                overflow: hidden
-            }
-            .lif > .hideicon {
-                position: relative;
-                float: right;
-                z-index: 1000;
-            }
-            .lif:hover {
-                background-color: ${liHoverBackground} !important;
-            }
-            .hideicon {
-                overflow: hidden;
-                opacity: 0;
-                transition: all 0.3s;
-                /*transform: translateY(100%);*/
-            }
-            .fixedBottom {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                width: 100%;
-                height: 2rem;
-                line-height: 2rem;
-                font-size: 0.9rem;
-                color: ${fontColor} !important;
-                border-top: 1px solid ${lineColor};
-                background-color: ${background} !important;
-                z-index: 1000;
-            }
-            .push-pull > div {
-                display:inline-block;
-            }
-            .push-pull > div > .num {
-                right: -6px;
-                position: relative;
-                top: 1px;
-            }
-            .ci {
-                font-size:0.8rem;
-                margin-top:3px;
-            }
-            .btnd {
-                border: 1px solid ${lineColor};
-                border-radius: 3px;
-                color: ${fontColor};
-                font-size: 0.87rem !important;
-                padding: 3px 10px;
-                background-color: ${background};
-                margin-right: 1rem;
-                outline:none !important;
-            }
-            .btnd:active {
-                -webkit-transform: rotate(0.95);
-                transform: scale(0.95);
-            }
-            .major-title > span {
-                font-size: 14px;
-            }
-            .major-title:hover .is-show{
-                display: inline;
-            }
-            .is-show {
-                display: none;
-                float: right;
-                font-size: 14px;
-            }
-            .count-num {
-                border: 1px solid ${lineColor};
-                border-radius: 4px;
-                font-size: 12px !important;
-                margin-left: 6px;
-                margin-bottom: 0px;
-                padding: 0px 4px;
-            }
-            .cursor-default {
-                cursor:default;
-            }
-            input[type=radio]:checked,
-            input[type=checkbox]:checked {
-                background-color: ${inputLineColor} !important;
-                border-color: ${inputLineColor} !important;
+            :root {
+                --background:${background};
+                --liHoverBackground:${liHoverBackground};
+                --inputColor:${inputColor};
+                --inputLineColor:${inputLineColor};
+                --inputBgColor:${inputBgColor};
+                --cursorColor:${cursorColor};
+                --fontColor:${fontColor};
+                --lineColor:${lineColor};
             }
         </style>
+        <link rel="stylesheet" href="${branchCssFile}">
     </head>
-    <body style="background-color:${background};">
+    <body>
         <div id="app" v-cloak>
             <div class="container-fluid pb-5" v-if="!isShowModel">
                 <div id="page-top" class="fixed-top">
@@ -274,7 +109,6 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                     class="form-control outline-none"
                                     placeholder="分支名称"
                                     autofocus="autofocus"
-                                    style="background: ${background};"
                                     v-model.trim="inputBranch"/>
                             </div>
                             <ul class="pl-0 mb-0" style="list-style-type:none;">
@@ -608,6 +442,13 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                 setTimeout(function() {
                                     that.refreshProgress = false;
                                 }, 1000);
+                            };
+                            if (msg.command == 'themeColor') {
+                                let themedata = msg.data;
+                                let colors = Object.keys(themedata);
+                                for (let i of colors) {
+                                    document.documentElement.style.setProperty('--' + i, themedata[i]);
+                                };
                             };
                             if (msg.command == 'reLoding') {
                                 this.isShowModel = false;

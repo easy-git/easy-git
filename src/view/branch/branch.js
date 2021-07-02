@@ -479,6 +479,16 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
         };
     };
 
+    let configurationChangeDisplose = hx.workspace.onDidChangeConfiguration(function(event){
+        if(event.affectsConfiguration("editor.colorScheme")){
+            let ThemeColor = utils.getThemeColor();
+            view.postMessage({
+                "command": "themeColor",
+                "data": ThemeColor
+            });
+        }
+    });
+
 };
 
 
