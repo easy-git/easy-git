@@ -9,6 +9,7 @@ let utils = require('../../common/utils.js');
 const vueFile = path.join(path.resolve(__dirname, '..'), 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
 const diff2htmlCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'diff2html.min.css');
+const gitDiffCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'git-diff.css');
 
 
 /**
@@ -68,14 +69,6 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
 
     let { titleLeft, titleRight, isDiffHtml, diffResult, isConflicted } = diffData;
 
-    // .d2h-code-linenumber .d2h-code-line .d2h-cntx
-    // let d2hCodeLinenumber = "width: 7.5em !important;";
-    // let d2hCodeLine = "padding: 0 8em;";
-    // if (isConflicted) {
-    //     d2hCodeLinenumber = "width: 3.75em !important;";
-    //     d2hCodeLine = "padding: 0 4em;";
-    // };
-
     return `<!DOCTYPE html>
 <html lang="en">
     <head>
@@ -84,107 +77,27 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
         <link rel="stylesheet" href="${diff2htmlCssFile}">
         <script src="${vueFile}"></script>
         <style type="text/css">
-            body {
-                color: ${fontColor};
-                font-size: 0.92rem;
-                background-color: ${background} !important;
-                overflow-x: hidden;
-            }
-            body::-webkit-scrollbar {
-                overflow-x: hidden;
-                overflow-y: scroll;
-            }
-            ::-webkit-scrollbar {
-                width: 9px;
-            }
-            ::-webkit-scrollbar-thumb {
-                background-color: ${diff_scrollbar_color};
-            }
-            [v-cloak] {
-                display: none;
-            }
-            .diff-head {
-                height: 50px;
-                background-color: ${background} !important;
-                z-index: 100;
-            }
-            .diff-head .file-title {
-                display: inline-block;
-                font-size: 16px;
-                width: 80%;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-            }
-            .diff-head .file-label {
-                display: inline-block;
-                padding-left: 1.5rem;
-                font-size: 15px;
-                font-style: oblique;
-                color: ${fontColor} !important;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-            }
-            .diff-body {
-                margin-top: 50px !important;
-            }
-            .d2h-file-wrapper {
-                border: none !important;
-                margin-bottom: 0px !important;
-            }
-            .d2h-files-diff .d2h-file-side-diff:last-child {
-                border-left: 1px solid ${lineColor} !important;
-            }
-            .d2h-file-side-diff::-webkit-scrollbar {
-                height: 9px !important
-            }
-            .d2h-file-side-diff {
-                min-height: calc(100vh - 50px);
-                position: relative;
-            }
-            .d2h-file-header {
-                display: none !important;
-            }
-            .d2h-code-side-linenumber {
-               background-color: ${background} !important;
-               border: 1px solid ${background} !important;
-               color: ${d2h_linenum_color} !important;
-            }
-            .d2h-code-side-linenumber::after {
-                background-color: ${background} !important;
-            }
-            .d2h-info {
-                border-color: ${background} !important;
-                background-color: ${background} !important;
-            }
-            .d2h-ins {
-                background-color: ${d2h_ins_bg} !important;
-                border-color: ${d2h_ins_bg} !important;
-            }
-            .d2h-del {
-                background-color: ${d2h_del_bg} !important;
-                border-color: ${d2h_del_bg} !important;
-            }
-            .d2h-code-side-line ins {
-                background-color: ${d2h_code_side_line_ins_bg} !important;
-            }
-            .d2h-code-side-line del {
-                background-color: ${d2h_code_side_line_del_bg} !important;
-            }
-            .d2h-code-side-emptyplaceholder, .d2h-emptyplaceholder {
-                border-color: ${d2h_emptyplaceholder_bg} !important;
-                background-color: ${d2h_emptyplaceholder_bg} !important;
-            }
-            .f-custom-line {
-                color: ${fontColor};
-                margin: 3px 12px;
-                font-size: 14px !important;
-            }
-            .cursor-default {
-                cursor: default;
+            :root {
+                --background: ${background};
+                --liHoverBackground: ${liHoverBackground};
+                --inputColor: ${inputColor};
+                --inputLineColor: ${inputLineColor};
+                --cursorColor: ${cursorColor};
+                --fontColor: ${fontColor};
+                --lineColor: ${lineColor};
+                --d2h_ins_bg: ${d2h_ins_bg};
+                --d2h_ins_border: ${d2h_ins_border};
+                --d2h_del_bg: ${d2h_del_bg};
+                --d2h_del_border: ${d2h_del_border};
+                --d2h_code_side_line_del_bg: ${d2h_code_side_line_del_bg};
+                --d2h_code_side_line_ins_bg: ${d2h_code_side_line_ins_bg};
+                --d2h_emptyplaceholder_bg: ${d2h_emptyplaceholder_bg};
+                --d2h_emptyplaceholder_border: ${d2h_emptyplaceholder_border};
+                --d2h_linenum_color: ${d2h_linenum_color};
+                --diff_scrollbar_color: ${diff_scrollbar_color};
             }
         </style>
+        <link rel="stylesheet" href="${gitDiffCssFile}">
     </head>
     <body>
         <div id="app" v-cloak>
@@ -261,7 +174,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                     that = this;
                     window.onload = function() {
                         setTimeout(function() {
-                            that.forUpdate();
+                            that.Receive();
                         }, 800);
                     };
                 },
@@ -269,15 +182,23 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                     forInit() {
                         this.gitDiffResult = \`${diffResult}\`
                     },
-                    forUpdate() {
+                    Receive() {
                         hbuilderx.onDidReceiveMessage((msg) => {
-                            this.gitDiffResult = '';
-                            if (msg.command != 'update') {return};
-                            let data = msg.result;
-                            this.isDiffHtml = data.isDiffHtml;
-                            this.gitDiffResult = data.diffResult;
-                            this.titleLeft = '';
-                            this.titleRight = '';
+                            if (msg.command == 'themeColor') {
+                                let themedata = msg.data;
+                                let colors = Object.keys(themedata);
+                                for (let i of colors) {
+                                    document.documentElement.style.setProperty('--' + i, themedata[i]);
+                                };
+                            };
+                            if (msg.command == 'update') {
+                                this.gitDiffResult = '';
+                                let data = msg.result;
+                                this.isDiffHtml = data.isDiffHtml;
+                                this.gitDiffResult = data.diffResult;
+                                this.titleLeft = '';
+                                this.titleRight = '';
+                            };
                         });
                     },
                     openFile() {
@@ -316,7 +237,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                 window.oncontextmenu = function() {
                     event.preventDefault();
                     return false;
-                }
+                };
             };
         </script>
     </body>
@@ -348,10 +269,14 @@ function getDefaultContent(fname='') {
         <link rel="stylesheet" href="${bootstrapCssFile}">
         <script src="${vueFile}"></script>
         <style type="text/css">
+            :root {
+                --background: ${background};
+                --fontColor: ${fontColor};
+            }
             body {
-                color: ${fontColor};
+                color: var(--fontColor);
                 font-size: 0.92rem;
-                background-color: ${background} !important;
+                background-color: var(--background) !important;
             }
             body::-webkit-scrollbar {
                 display: none;
@@ -388,14 +313,35 @@ function getDefaultContent(fname='') {
                     } else {
                         this.msg = tmp + ' 没有要对比的文件内容, 请直接关闭当前标签卡。'
                     };
+                },
+                mounted() {
+                    that = this;
+                    window.onload = function() {
+                        setTimeout(function() {
+                            that.Receive();
+                        }, 800);
+                    };
+                },
+                methods: {
+                    Receive() {
+                        hbuilderx.onDidReceiveMessage((msg) => {
+                            if (msg.command == 'themeColor') {
+                                let themedata = msg.data;
+                                let colors = Object.keys(themedata);
+                                for (let i of colors) {
+                                    document.documentElement.style.setProperty('--' + i, themedata[i]);
+                                };
+                            };
+                        });
+                    },
                 }
             })
         </script>
         <script>
-            window.oncontextmenu = function() {
-                event.preventDefault();
-                return false;
-            };
+            // window.oncontextmenu = function() {
+            //     event.preventDefault();
+            //     return false;
+            // };
         </script>
     </body>
 </html>

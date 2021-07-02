@@ -10,6 +10,7 @@ const chokidar = require('chokidar');
 const { Diff } = require('./diff.js');
 const { getDefaultContent, getWebviewDiffContent } = require('./html.js');
 
+let { getThemeColor } = require('../../common/utils.js');
 
 let isSelectedFile;
 let isCustomFirstOpen = false;
@@ -80,6 +81,17 @@ class CatDiffCustomEditorProvider extends CustomEditorProvider {
             // 移除文件监听
             if (watchListener != undefined) {
                 watchListener.close();
+            };
+        });
+        
+        // 监听主题切换
+        let configurationChangeDisplose = hx.workspace.onDidChangeConfiguration(function(event){
+            if(event.affectsConfiguration("editor.colorScheme")){
+                let ThemeColor = getThemeColor();
+                GitDiffCustomWebViewPanal.webView.postMessage({
+                    "command": "themeColor",
+                    "data": ThemeColor
+                });
             };
         });
     };
@@ -188,7 +200,6 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
         setTimeout(function() {
             GitHBuilderXInnerTrigger = false;
         }, 1200);
-
     });
 }
 

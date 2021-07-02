@@ -1,0 +1,124 @@
+body {
+    color: var(--fontColor);
+    font-size: 0.92rem;
+    background-color: var(--background) !important;
+    overflow-x: hidden;
+}
+
+body::-webkit-scrollbar {
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+::-webkit-scrollbar {
+    width: 9px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--diff_scrollbar_color);
+}
+
+[v-cloak] {
+    display: none;
+}
+
+.diff-head {
+    height: 50px;
+    background-color: var(--background) !important;
+    z-index: 100;
+}
+
+.diff-head .file-title {
+    display: inline-block;
+    font-size: 16px;
+    width: 80%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.diff-head .file-label {
+    display: inline-block;
+    padding-left: 1.5rem;
+    font-size: 15px;
+    font-style: oblique;
+    color: var(--fontColor) !important;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.diff-body {
+    margin-top: 50px !important;
+}
+
+.d2h-file-wrapper {
+    border: none !important;
+    margin-bottom: 0px !important;
+}
+
+.d2h-files-diff .d2h-file-side-diff:last-child {
+    border-left: 1px solid var(--lineColor) !important;
+}
+
+.d2h-file-side-diff::-webkit-scrollbar {
+    height: 9px !important
+}
+
+.d2h-file-side-diff {
+    min-height: calc(100vh - 50px);
+    position: relative;
+}
+
+.d2h-file-header {
+    display: none !important;
+}
+
+.d2h-code-side-linenumber {
+    background-color: var(--background) !important;
+    border: 1px solid var(--background) !important;
+    color: var(--d2h_linenum_color) !important;
+}
+
+.d2h-code-side-linenumber::after {
+    background-color: var(--background) !important;
+}
+
+.d2h-info {
+    border-color: var(--background) !important;
+    background-color: var(--background) !important;
+}
+
+.d2h-ins {
+    background-color: var(--d2h_ins_bg) !important;
+    border-color: var(--d2h_ins_bg) !important;
+}
+
+.d2h-del {
+    background-color: var(--d2h_del_bg) !important;
+    border-color: var(--d2h_del_bg) !important;
+}
+
+.d2h-code-side-line ins {
+    background-color: var(--d2h_code_side_line_ins_bg) !important;
+}
+
+.d2h-code-side-line del {
+    background-color: var(--d2h_code_side_line_del_bg) !important;
+}
+
+.d2h-code-side-emptyplaceholder,
+.d2h-emptyplaceholder {
+    border-color: var(--d2h_emptyplaceholder_bg) !important;
+    background-color: var(--d2h_emptyplaceholder_bg) !important;
+}
+
+.f-custom-line {
+    color: var(--fontColor);
+    margin: 3px 12px;
+    font-size: 14px !important;
+}
+
+.cursor-default {
+    cursor: default;
+}
