@@ -1,7 +1,7 @@
 const hx = require('hbuilderx');
 const fs = require('fs');
 const path = require('path');
-const { checkIsGitProject } = require('../../common/utils.js');
+const { checkIsGitProject, getThemeColor } = require('../../common/utils.js');
 
 const chokidar = require('chokidar');
 const { debounce } = require('throttle-debounce');
@@ -276,7 +276,17 @@ async function GitLogCustomEditorRenderHtml(gitData, userConfig) {
             GitHBuilderXInnerTrigger = false;
         }, 1000);
     });
-}
+
+    let configurationChangeDisplose = hx.workspace.onDidChangeConfiguration(function(event){
+        if(event.affectsConfiguration("editor.colorScheme")){
+            let ThemeColor = getThemeColor();
+            GitLogCustomWebViewPanal.webView.postMessage({
+                "command": "themeColor",
+                "data": ThemeColor
+            });
+        }
+    });
+};
 
 // CustomEditor 首次启动缓慢，因此在状态栏增加提示
 let isShowLogMessage = false;

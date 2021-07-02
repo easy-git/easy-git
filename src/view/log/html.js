@@ -116,7 +116,6 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                             class="form-control outline-none pl-0"
                                             title="支持git log所有参数，多个条件以逗号分隔。如--author=name,-n 5。默认返回50条结果，如需要更多条数，请输入: -n 数量。"
                                             placeholder="支持git log所有参数，多个条件以逗号分隔。如--grep=xxx,--author=name,-n 5"
-                                            style="background: ${background};"
                                             autofocus="autofocus"
                                             v-model.trim="searchText"
                                             v-on:keyup.enter="searchLog();" />
@@ -339,7 +338,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         that = this;
                         window.onload = function() {
                             setTimeout(function() {
-                                that.forUpdate();
+                                that.forReceiveInfo();
                                 that.forShowCommitFileChange()
                             }, 1000)
                         };
@@ -400,27 +399,36 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             }
                             this.searchLog();
                         },
-                        forUpdate() {
+                        forReceiveInfo() {
                             hbuilderx.onDidReceiveMessage((msg) => {
-                                if (msg.command != 'search') {return};
-                                this.loading = false;
-                                if (this.isShowViewDetails) {
-                                    this.isShowViewDetails = false;
+                                if (msg.command == 'themeColor') {
+                                    let themedata = msg.data;
+                                    let colors = Object.keys(themedata);
+                                    for (let i of colors) {
+                                        document.documentElement.style.setProperty('--' + i, themedata[i]);
+                                    };
+                                    return;
                                 };
-                                if (msg.gitData) {
-                                    let gitData = msg.gitData;
-                                    this.gitLogInfoList = gitData.logData;
-                                    this.currentBranch = gitData.currentBranch;
-                                    this.LogErrorMsg = gitData.LogErrorMsg;
-                                    this.CommitTotal = gitData.CommitTotal;
-                                    this.logNum = (gitData.logData).length;
-                                    this.searchType = msg.searchType;
-                                    this.searchText = msg.searchText;
-                                    this.projectName = msg.projectName;
-                                    this.viewRefName = msg.refname;
-                                    this.closeMenu();
-                                }
-                            });
+                                if (msg.command == 'search') {
+                                    this.loading = false;
+                                    if (this.isShowViewDetails) {
+                                        this.isShowViewDetails = false;
+                                    };
+                                    if (msg.gitData) {
+                                        let gitData = msg.gitData;
+                                        this.gitLogInfoList = gitData.logData;
+                                        this.currentBranch = gitData.currentBranch;
+                                        this.LogErrorMsg = gitData.LogErrorMsg;
+                                        this.CommitTotal = gitData.CommitTotal;
+                                        this.logNum = (gitData.logData).length;
+                                        this.searchType = msg.searchType;
+                                        this.searchText = msg.searchText;
+                                        this.projectName = msg.projectName;
+                                        this.viewRefName = msg.refname;
+                                        this.closeMenu();
+                                    }
+                                };
+                            })
                         },
                         switchSearchType(type) {
                             this.loading = true;

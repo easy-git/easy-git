@@ -97,6 +97,7 @@ button {
     border-radius: 2px !important;
     font-size: 0.9rem !important;
     border: none;
+    background-color: var(--background);
     color: var(--inputLineColor) !important;
     font-weight: 500 !important;
     font-size: 0.9rem !important;
@@ -109,6 +110,7 @@ button {
     padding-left: 16px;
     border-bottom: 1px solid var(--inputLineColor);
     color: var(--inputLineColor);
+    background-color: var(--background);
     font-weight: 500;
     font-size: 0.9rem;
     caret-color: var(--cursorColor);
@@ -204,7 +206,8 @@ button {
     z-index: 9999 !important;
     border-top: 1px solid var(--lineColor);
     background-color: var(--background);
-    -webkit-box-shadow: 2px 2px 5px 3px var(--background);
+    box-shadow:-2px -2px 5px -1px var(--background) !important;
+    -webkit-box-shadow:-2px -2px 5px -1px var(--background) !important;
 }
 
 .view-log-details .fname:hover {
