@@ -339,7 +339,7 @@ button {
 }
 
 .spinner {
-    margin: 100px auto;
+    margin: 30% auto;
     width: 50px;
     height: 60px;
     text-align: center;
@@ -349,7 +349,7 @@ button {
 .spinner>div {
     background-color: #67CF22;
     height: 100%;
-    width: 6px;
+    width: 3px;
     display: inline-block;
     -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
     animation: stretchdelay 1.2s infinite ease-in-out;

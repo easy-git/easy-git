@@ -5,40 +5,17 @@ const hx = require('hbuilderx');
 const Diff2Html = require('diff2html');
 
 const utils = require('../../common/utils.js');
-const icon = require('../static/icon.js');
 const generateLogHtml = require('./html.js');
 
 
-/**
- * @description 获取图标、各种颜色
- * @return {Object} UIData
- */
-function getUIData() {
-    // 根据主题适配颜色
-    let colorData = utils.getThemeColor('right');
-    let {fontColor,lineColor} = colorData;
-
-    // svg icon
-    let helpIcon = icon.getHelpIcon(fontColor);
-    let refreshIcon = icon.getRefreshIcon(fontColor);
-    let searchIcon = icon.getSearchIcon(fontColor);
-    let noIcon = icon.getNoIcon(lineColor);
-    let OpenFileIconSvg = icon.getOpenFileIcon(fontColor);
-
-    let iconData = {helpIcon, refreshIcon, searchIcon, noIcon, OpenFileIconSvg};
-    return Object.assign(iconData,colorData);
-};
-
-
 class GitLogAction {
-    constructor(gitBasicData, userConfig, webView, renderType) {
-        this.renderType = renderType;
+    constructor(gitBasicData, userConfig, webView) {
         this.webviewPanel = webView;
+        this.gitData = gitBasicData;
         this.projectPath = gitBasicData.projectPath;
         this.projectName = gitBasicData.projectName;
         this.projectGitRootDir = gitBasicData.gitRootDir;
         this.userConfig = userConfig;
-        this.gitData = gitBasicData;
         this.currentProjectInfoForFlush = {
             'projectPath': gitBasicData.projectPath,
             'projectName': gitBasicData.projectName,
@@ -108,6 +85,14 @@ class GitLogAction {
                 condition = '--grep=' + condition;
             };
         };
+        
+        // 获取当前分支名称, 避免在某些情况下，在外部改变分支，此处未刷新的问题。
+        try{
+            let currentBranchName = await utils.gitCurrentBranchName(this.projectPath);
+            if (currentBranchName && currentBranchName != '') {
+                this.gitData.currentBranch = currentBranchName;
+            };
+        }catch(e){};
 
         // 搜索，并获取搜索结果
         let gitLogInfo = await utils.gitLog(this.projectPath, searchType, condition, refname);
@@ -139,34 +124,18 @@ class GitLogAction {
             delete this.gitData.searchText;
         };
 
-        // 获取当前分支名称, 避免在某些情况下，在外部改变分支，此处未刷新的问题。
-        try{
-            let currentBranchName = await utils.gitCurrentBranchName(this.projectPath);
-            if (currentBranchName && currentBranchName != '') {
-                this.gitData.currentBranch = currentBranchName;
-            };
-        }catch(e){};
-
-        // UI: color and svg icon
-        let uiData = getUIData();
-
         // set webview
         try{
-            let isHtml = this.webviewPanel.webView._html;
-            if (isHtml == '') {
-                this.webviewPanel.webView.html = generateLogHtml(this.userConfig, uiData, this.gitData, this.renderType);
-            } else {
-                this.webviewPanel.webView.postMessage({
-                    projectName: this.projectName,
-                    refname: refname,
-                    command: "search",
-                    searchType: searchType,
-                    searchText: condition,
-                    gitData: this.gitData
-                });
-            };
+            this.webviewPanel.webView.postMessage({
+                projectName: this.projectName,
+                refname: refname,
+                command: "search",
+                searchType: searchType,
+                searchText: condition,
+                gitData: this.gitData
+            });
         }catch(e){
-            this.webviewPanel.webView.html = generateLogHtml(this.userConfig, uiData, this.gitData, this.renderType);
+            this.webviewPanel.webView.html = generateLogHtml(this.userConfig, this.gitData);
         }
     }
 
@@ -176,7 +145,7 @@ class GitLogAction {
         setTimeout(function() {
             that.setView('branch', '');
         }, 1500);
-    }
+    };
 
     // 显示commit 文件具体修改
     async showCommitFileChange(msg) {

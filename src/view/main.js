@@ -17,7 +17,6 @@ const osName = os.platform();
 
 // 主题
 let hxConfig = hx.workspace.getConfiguration();
-let hxColorScheme = hxConfig.get('editor.colorScheme')
 
 // Git触发途径：HBuilderX内触发、外部Git命令（或其它工具）触发
 let GitHBuilderXInnerTrigger = false;
@@ -123,7 +122,7 @@ class GitConfig {
 
 
 /**
- * @description Git文件
+ * @description Git操作
  */
 class GitFile {
     constructor(webviewPanel, projectPath, projectName, uiData, userConfig) {
@@ -134,12 +133,6 @@ class GitFile {
         this.userConfig = userConfig;
         this.BranchTracking = false;
         this.ProjectCurrentBranch = '';
-    }
-
-    init(BranchTracking) {
-        if (BranchTracking) {
-            this.BranchTracking = BranchTracking;
-        }
     }
 
     // refresh webview git 分支信息
@@ -161,7 +154,7 @@ class GitFile {
     }
 
     // refresh webview git filelist
-    async refreshFileList(isManualRefresh=false) {
+    async refreshFileList() {
         if (this.webviewPanel) {
             this.webviewPanel.webView.postMessage({
                 command: "animation"
@@ -180,7 +173,7 @@ class GitFile {
             });
             this.ProjectCurrentBranch = gitData.currentBranch;
 
-            if (isManualRefresh == false && this.webviewPanel) {
+            if (this.webviewPanel) {
                 let { originurl, BranchTracking, behind, ahead } = gitData;
                 ahead = ahead == 0 ? '' : ahead;
                 behind = behind == 0 ? '' : behind;
@@ -204,6 +197,12 @@ class GitFile {
                 const vhtml = html.getWebviewContent(this.userConfig, this.uiData, gitData);
                 this.webviewPanel.webView.html = vhtml;
             };
+
+            // Git文件视图：检查git项目是否包含node_modules
+            let gitignore = path.join(this.projectPath, '.gitignore');
+            if (!fs.existsSync(gitignore)) {
+                utils.checkNodeModulesFileList(this.projectPath, this.projectName, gitInfo);
+            };
         }catch(e){};
     };
 
@@ -213,7 +212,6 @@ class GitFile {
         let activeEditorName = await hx.window.getActiveTextEditor().then(function(editor){
             return editor.document.fileName;
         });
-        console.log(activeEditorName)
     };
 
 
@@ -624,8 +622,8 @@ class GitFile {
         };
     };
 
-    // Git: sync
-    async sync() {
+    // Git: sync git behind and git ahead
+    async syncBehindAhead() {
         let fetchStatus = await utils.gitFetch(this.projectPath, false);
         if (fetchStatus == 'success') {
             let gitInfo = await utils.gitStatus(this.projectPath, false);
@@ -633,9 +631,9 @@ class GitFile {
             ahead = ahead == 0 ? '' : ahead;
             behind = behind == 0 ? '' : behind;
 
-            if (behind != 0 && ahead != 0) {
+            if (behind != 0 || ahead != 0) {
                 this.webviewPanel.webView.postMessage({
-                    command: "sync",
+                    command: "syncBehindAhead",
                     behind: behind,
                     ahead: ahead
                 });
@@ -739,9 +737,9 @@ function watchUserPrompt() {
  * @description 显示webview
  * @param {Object} userConfig 用户配置
  * @param {Object} webviewPanel
- * @param {Object} gitData
+ * @param {Object} ProjectData
  */
-function active(webviewPanel, userConfig, gitData) {
+function active(webviewPanel, userConfig, ProjectData) {
     const view = webviewPanel.webView;
     hx.window.showView({
         viewid: 'EasyGitSourceCodeView',
@@ -749,27 +747,16 @@ function active(webviewPanel, userConfig, gitData) {
     });
 
     // get project info , and git info
-    const { projectPath, projectName, currentBranch, originurl } = gitData;
-    let { BranchTracking } = gitData;
+    const { projectPath, projectName } = ProjectData;
 
-    // 当主题发生变化时，重新获取
-    let currentTheme = hxConfig.get('editor.colorScheme');
-    if (currentTheme != hxColorScheme) {
-        uiData = getUIData();
-    };
+    // get webview html content, go set
+    view.html = html.getWebviewContent(userConfig, uiData, ProjectData);
 
     // Git: 文件
     let File = new GitFile(webviewPanel, projectPath, projectName, uiData, userConfig);
-    File.init(BranchTracking);
 
     // Git: Config配置
     let GitCfg = new GitConfig(projectPath);
-
-    // get webview html content
-    const viewContent = html.getWebviewContent(userConfig, uiData, gitData);
-
-    // set html
-    view.html = viewContent;
 
     let EasyGitInnerParams = {
         'projectPath': projectPath,
@@ -799,8 +786,9 @@ function active(webviewPanel, userConfig, gitData) {
         GitHBuilderXInnerTrigger = true;
         let action = msg.command;
         switch (action) {
-            case 'refresh':
-                File.refreshFileList(true);
+            case 'syncProjectGitInfo':
+                // 获取变更的文件列表、当前分支、behind、ahead等信息
+                File.refreshFileList();
                 break;
             case 'diff':
                 File.openDiff(msg);
@@ -862,8 +850,9 @@ function active(webviewPanel, userConfig, gitData) {
                 File.fetch(msg.text);
                 break;
             case 'BranchInfo':
-                if (msg.text == 'branch') {
-                    if (originurl == undefined) {
+                let { originurl, text } = msg;
+                if (text == 'branch') {
+                    if (originurl == undefined && !originurl) {
                         hx.window.showErrorMessage('请发布此项目到远程到后再进行操作。', ['我知道了']);
                     } else {
                         hx.commands.executeCommand('EasyGit.branch',EasyGitInnerParams);
@@ -899,8 +888,8 @@ function active(webviewPanel, userConfig, gitData) {
             case 'openCommandPanel':
                 hx.commands.executeCommand('EasyGit.CommandPanel', EasyGitInnerParams);
                 break;
-            case 'sync':
-                File.sync();
+            case 'syncBehindAhead':
+                File.syncBehindAhead();
                 break;
             default:
                 break;

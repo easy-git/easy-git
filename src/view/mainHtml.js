@@ -13,9 +13,9 @@ const mainCssFile = path.join(__dirname, 'static', 'main.css');
  * @description 获取webview内容
  * @param {Object} userConfig
  * @param {Object} uiData
- * @param {Object} gitData
+ * @param {Object} ProjectData
  */
-function getWebviewContent(userConfig, uiData, gitData) {
+function getWebviewContent(userConfig, uiData, ProjectData) {
     // 是否启用开发者工具
     let { DisableDevTools, GitAlwaysAutoCommitPush } = userConfig;
 
@@ -48,26 +48,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
         ChevronRightIcon,
         HandleIcon
     } = uiData;
+
     let {
         projectPath,
         projectName,
-        FileResult,
-        currentBranch,
-        tracking,
-        ahead,
-        behind,
-        originurl,
-        BranchTracking
-    } = gitData;
-
-    if (!BranchTracking) {
-        GitAlwaysAutoCommitPush = false;
-    };
-
-    let gitFileResult = JSON.stringify(FileResult);
-    let originurlBoolean = originurl != undefined ? true : false;
-    ahead = ahead == 0 ? '' : ahead;
-    behind = behind == 0 ? '': behind;
+    } = ProjectData;
 
     let ctrl = 'ctrl';
     if (osName == 'darwin') {
@@ -111,7 +96,7 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             <span class="top">{{projectName}}</span>
                         </div>
                         <div class="col-auto p-0">
-                            <span class="top" @click="refresh();" title="刷新">${iconRefresh}</span>
+                            <span class="top" @click="getProjectGitInfo();" title="刷新">${iconRefresh}</span>
                             <span class="top" @click="gitCommit();" :title="GitAlwaysAutoCommitPush && gitStagedFileList.length ? 'commit & push' : 'commit'">${CheckMarkIcon}</span>
                             <span class="top" @click="gitLog();" title="查看日志">${HistoryIcon}</span>
                             <span class="top" @click.stop="clickMenu();">
@@ -293,12 +278,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
                 data: {
                     refreshProgress: true,
                     projectName: "${projectName}",
-                    currentBranch: "${currentBranch}",
-                    behind: "${behind}",
-                    ahead: "${ahead}",
-                    tracking: "${tracking}",
-                    originurl: "${originurl}",
-                    originurlBoolean: ${originurlBoolean},
+                    currentBranch: "",
+                    behind: "",
+                    ahead: "",
+                    tracking: "",
+                    originurlBoolean: true,
                     commitMessage: '',
                     gitFileResult: {},
                     isShowMenu: false,
@@ -347,31 +331,27 @@ function getWebviewContent(userConfig, uiData, gitData) {
                         this.ctrl = '⌘';
                     };
 
-                    this.gitFileResult = ${gitFileResult};
-                    this.getGitFileList();
-
                     // 用户是否设置自动commit -> push
                     let GitAlwaysAutoCommitPush =  ${GitAlwaysAutoCommitPush};
                     if (GitAlwaysAutoCommitPush != undefined && GitAlwaysAutoCommitPush) {
                         this.GitAlwaysAutoCommitPush = GitAlwaysAutoCommitPush;
                     };
-
-                    let that = this;
-                    setTimeout(function() {
-                        that.refreshProgress = false;
-                    },2000);
                 },
                 mounted() {
                     that = this;
                     window.onload = function() {
                         setTimeout(function() {
                             that.receiveInfo();
-                        }, 500);
+                        }, 200);
                         setTimeout(function() {
-                            that.runSync();
+                            that.getProjectGitInfo();
+                        }, 600);
+                        setTimeout(function() {
                             that.getCommitMessage();
-                            that.forUpdateCommitMessage();
-                        }, 1000);
+                        }, 1500);
+                        setTimeout(function() {
+                            that.runSyncForGitBehindAhead();
+                        }, 12000);
                     };
 
                     document.querySelector('#commitMsg').addEventListener('input', function () {
@@ -380,9 +360,9 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     })
                 },
                 methods: {
-                    runSync() {
+                    runSyncForGitBehindAhead() {
                         hbuilderx.postMessage({
-                            command: 'sync'
+                            command: 'syncBehindAhead'
                         });
                     },
                     receiveInfo() {
@@ -395,18 +375,14 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 };
                                 return;
                             };
-                            if (msg.command == 'sync') {
+                            if (msg.command == 'syncBehindAhead') {
                                 this.behind = msg.behind;
+                                this.ahead = msg.ahead;
                                 return;
                             };
 
                             if (msg.command == 'animation') {
                                 this.refreshProgress = true;
-                                let that = this;
-                                setTimeout(function() {
-                                    that.refreshProgress = false;
-                                }, 3000);
-                                return;
                             };
 
                             if (msg.command == 'HEAD') {
@@ -414,7 +390,11 @@ function getWebviewContent(userConfig, uiData, gitData) {
                                 this.behind = msg.behind;
                                 this.currentBranch = msg.currentBranch;
                                 this.originurlBoolean = msg.originurlBoolean;
-                            }
+                            };
+
+                            if (msg.command == 'CommitMessage') {
+                                this.commitMessage = msg.commitMessage;
+                            };
 
                             if (msg.command == 'autoRefresh') {
                                 this.gitFileResult = msg.gitFileResult;
@@ -487,10 +467,10 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             this.isShowMenu = true
                         }
                     },
-                    refresh() {
+                    getProjectGitInfo() {
+                        // 获取变更的文件列表、当前分支、behind、ahead等信息
                         hbuilderx.postMessage({
-                            command: 'refresh',
-                            text: ''
+                            command: 'syncProjectGitInfo'
                         });
                     },
                     gitLog() {
@@ -546,16 +526,6 @@ function getWebviewContent(userConfig, uiData, gitData) {
                             command: 'add',
                             text: fileUri,
                             tag: tag
-                        });
-                    },
-                    forUpdateCommitMessage() {
-                        hbuilderx.onDidReceiveMessage((msg) => {
-                            if (msg.command != 'CommitMessage') {
-                                return;
-                            };
-                            if (msg.commitMessage) {
-                                this.commitMessage = msg.commitMessage;
-                            }
                         });
                     },
                     getCommitMessage() {
@@ -631,7 +601,8 @@ function getWebviewContent(userConfig, uiData, gitData) {
                     showBranchWindow() {
                         hbuilderx.postMessage({
                             command: 'BranchInfo',
-                            text: 'branch'
+                            text: 'branch',
+                            originurl: this.originurlBoolean
                         });
                     },
                     clean() {

@@ -7,6 +7,7 @@ const chokidar = require('chokidar');
 const { debounce } = require('throttle-debounce');
 
 const { GitLogAction } = require('./log.js');
+const generateLogHtml = require('./html.js');
 
 // 解决hx启动后，已打开的自定义编辑器空白的问题
 let HistoryProjectPath;
@@ -68,9 +69,9 @@ class CatCustomEditorProvider extends CustomEditorProvider {
                                 GitLogCustomEditorRenderHtml({},{});
                             };
                         }catch(e){};
-                    }, 2000);
+                    }, 1000);
                 };
-            }, 3000);
+            }, 1000);
         };
 
         // close customEditor
@@ -145,14 +146,14 @@ async function watchProjectDir(projectDir, func) {
 
 /**
  * @description 日志视图
- * @param {Object} gitData
+ * @param {Object} projectData - {projectName, projectPath}
  * @param {Object} userConfig
  */
-async function GitLogCustomEditorRenderHtml(gitData, userConfig) {
-    let {projectPath, projectName, selectedFile, currentBranch} = gitData;
+async function GitLogCustomEditorRenderHtml(projectData, userConfig) {
+    let {projectPath, projectName, selectedFile} = projectData;
     isSelectedFile = selectedFile;
 
-    if (JSON.stringify(gitData) == '{}' && isCustomFirstOpen == false) {
+    if (JSON.stringify(projectData) == '{}' && isCustomFirstOpen == false) {
         isCustomFirstOpen = true;
         let config = hx.workspace.getConfiguration();
         projectPath = config.get("EasyGit.HistoryProjectPath");
@@ -160,14 +161,14 @@ async function GitLogCustomEditorRenderHtml(gitData, userConfig) {
 
         if (projectPath == undefined || projectName == undefined) {return;};
 
-        gitData.projectPath = projectPath;
-        gitData.projectName = projectName;
+        projectData.projectPath = projectPath;
+        projectData.projectName = projectName;
     } else {
         isCustomFirstOpen = true;
     };
 
     // 仅首次运行
-    history(gitData);
+    history(projectData);
 
     // 获取git-dir来解决，hx项目管理器内项目为git项目子目录的情况
     let gitRootDir = await checkIsGitProject(projectPath).catch( error => { return error });
@@ -175,8 +176,8 @@ async function GitLogCustomEditorRenderHtml(gitData, userConfig) {
         gitRootDir = projectPath;
     };
 
-    let LastGitData = Object.assign(gitData, {"gitRootDir": gitRootDir});
-    let Log = new GitLogAction(LastGitData, userConfig, GitLogCustomWebViewPanal, 'customEditor');
+    let LastGitData = Object.assign(projectData, {"gitRootDir": gitRootDir});
+    let Log = new GitLogAction(LastGitData, userConfig, GitLogCustomWebViewPanal);
 
     // 默认在当前分支搜索，当搜索全部时，此值为all
     let searchType = 'branch';
@@ -197,19 +198,20 @@ async function GitLogCustomEditorRenderHtml(gitData, userConfig) {
     };
 
     // 选中文件或目录，则查看此文件的log记录
+    let searchText = '';
     if (selectedFile != '' && selectedFile != undefined) {
         let sfile = selectedFile.replace(projectPath, '');
         if (sfile.slice(0,1) == '/') {
             sfile = sfile.slice(1);
         };
         if (selectedFile != projectPath) {
-            Log.setView(searchType, sfile);
-        } else {
-            Log.setView(searchType, '');
+            searchText = sfile;
         };
-    } else {
-        Log.setView(searchType, '');
     };
+
+    // 渲染html
+    let initData = Object.assign({"searchText": searchText},projectData);
+    GitLogCustomWebViewPanal.webView.html = generateLogHtml(userConfig, initData);
 
     let easyGitInnerParams = {
         'projectPath': projectPath,
@@ -221,6 +223,9 @@ async function GitLogCustomEditorRenderHtml(gitData, userConfig) {
         GitHBuilderXInnerTrigger = true;
         let action = msg.command;
         switch (action) {
+            case 'gitLog':
+                Log.setView(searchType, '', msg.refname);
+                break;
             case 'refresh':
                 Log.setView(searchType, '', msg.refname);
                 break;
@@ -277,6 +282,7 @@ async function GitLogCustomEditorRenderHtml(gitData, userConfig) {
         }, 1000);
     });
 
+    // 监听主题切换
     let configurationChangeDisplose = hx.workspace.onDidChangeConfiguration(function(event){
         if(event.affectsConfiguration("editor.colorScheme")){
             let ThemeColor = getThemeColor();
@@ -294,18 +300,18 @@ let isShowLogMessage = false;
 /**
  * @description 打开日志视图
  * @param {Object} userConfig
- * @param {Object} gitData
+ * @param {Object} projectData - {projectName, projectPath}
  */
-function openLogView(userConfig, gitData) {
+function openLogView(userConfig, projectData) {
     if (isShowLogMessage == false) {
         hx.window.setStatusBarMessage('EasyGit: 正在加载Git日志，首次加载较慢，请耐心等待......', 5000, 'info');
         isShowLogMessage = true;
         setTimeout(function() {
-            GitLogCustomEditorRenderHtml(gitData, userConfig);
+            GitLogCustomEditorRenderHtml(projectData, userConfig);
         }, 800);
     } else {
         setTimeout(function() {
-            GitLogCustomEditorRenderHtml(gitData, userConfig);
+            GitLogCustomEditorRenderHtml(projectData, userConfig);
         }, 300);
     };
 };

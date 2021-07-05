@@ -1,5 +1,8 @@
 const path = require('path');
 
+const icon = require('../static/icon.js');
+const {getThemeColor} = require('../../common/utils.js');
+
 const vueFile = path.join(path.resolve(__dirname, '..'), 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
 const diff2htmlCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'diff2html.min.css');
@@ -7,13 +10,33 @@ const logCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'log.css')
 
 
 /**
+ * @description 获取图标、各种颜色
+ * @return {Object} UIData
+ */
+function getUIData() {
+    // 根据主题适配颜色
+    let colorData = getThemeColor('right');
+    let {fontColor,lineColor} = colorData;
+
+    // svg icon
+    let helpIcon = icon.getHelpIcon(fontColor);
+    let refreshIcon = icon.getRefreshIcon(fontColor);
+    let searchIcon = icon.getSearchIcon(fontColor);
+    let noIcon = icon.getNoIcon(lineColor);
+    let OpenFileIconSvg = icon.getOpenFileIcon(fontColor);
+
+    let iconData = {helpIcon, refreshIcon, searchIcon, noIcon, OpenFileIconSvg};
+    return Object.assign(iconData,colorData);
+};
+
+let uiData = getUIData();
+
+/**
  * @description generationhtml
  * @param {Object} userConfig
- * @param {Object} uiData
- * @param {Object} gitData
- * @param {String} renderType = [customEditor|webView]
+ * @param {Object} initData
  */
-function generateLogHtml(userConfig, uiData, gitData, renderType) {
+function generateLogHtml(userConfig, initData) {
     // 是否启用开发者工具
     let {DisableDevTools} = userConfig;
 
@@ -43,8 +66,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
     } = uiData;
 
     // 获取git日志列表
-    let {projectName, projectPath, currentBranch, logData, searchText, CommitTotal} = gitData;
-    logData = JSON.stringify(logData);
+    let {projectName, projectPath, searchText} = initData;
     if (!searchText) {
         searchText = '';
     };
@@ -138,7 +160,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         <div class="rect5"></div>
                     </div>
                     <div id="git-log-body" class="row mx-0 mb-5"  style="margin-top:80px;" v-else :class="{ 'tmp-log-body' :isShowViewDetails }">
-                        <div class="col px-0 mt-2" v-if="gitLogInfoList.length == 0">
+                        <div class="col px-0 mt-2" v-if="gitLogInfoList.length == 0 && isReviceLog">
                             <div class="text-center" style="margin-top: 12%;">
                                 <span>${noIcon}</span>
                                 <p class="no-result">没有结果, 请检查查询条件...</p>
@@ -206,16 +228,11 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     </div>
                     <p class="intro">
                         {{ logDetails.author_name }} {{ logDetails.date  | FormatDate}}
-                        <span v-if="renderType != 'webView'">
+                        <span>
                             ; {{ logDetails.diff.changed }} file changed,
                             {{ logDetails.diff.insertions }} insertions(+),
                             {{ logDetails.diff.deletions }} deletions(-)
                         </span>
-                    </p>
-                    <p class="intro" v-if="renderType == 'webView'">
-                        {{ logDetails.diff.changed }} file changed,
-                        {{ logDetails.diff.insertions }} insertions(+),
-                        {{ logDetails.diff.deletions }} deletions(-)
                     </p>
                     <div class="mt-3">
                         <div class="d-flex flex-row">
@@ -281,6 +298,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                 var app = new Vue({
                     el: '#app',
                     data: {
+                        isReviceLog: false,
                         visibleRightMenu: false,
                         top: 0,
                         left: 0,
@@ -296,10 +314,9 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                         isShowViewDetails: false,
                         logDetails: {},
                         logDetailsFiles: [],
-                        loading: false,
+                        loading: true,
                         ShowCommitFilePath: '',
                         CommitFileChangeDetails: '',
-                        renderType: 'webView',
                         viewRefName: '',
                         LogErrorMsg: ''
                     },
@@ -326,21 +343,18 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                     },
                     created() {
                         this.projectName = '${projectName}';
-                        this.gitLogInfoList = ${logData};
-                        this.currentBranch = '${currentBranch}';
                         this.searchText = '${searchText}';
-                        this.CommitTotal = ${CommitTotal};
-                        this.logNum = (this.gitLogInfoList).length;
-                        this.renderType = '${renderType}'
                     },
                     mounted() {
-                        this.loading = false;
                         that = this;
                         window.onload = function() {
                             setTimeout(function() {
                                 that.forReceiveInfo();
                                 that.forShowCommitFileChange()
-                            }, 1000)
+                            }, 200)
+                            setTimeout(function() {
+                                that.getGitLog();
+                            }, 500);
                         };
                     },
                     methods: {
@@ -373,6 +387,14 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                             this.loading = true;
                             hbuilderx.postMessage({
                                 command: 'refresh',
+                                searchType: this.searchType,
+                                condition: this.searchText,
+                                refname: this.viewRefName
+                            });
+                        },
+                        getGitLog() {
+                            hbuilderx.postMessage({
+                                command: 'gitLog',
                                 searchType: this.searchType,
                                 condition: this.searchText,
                                 refname: this.viewRefName
@@ -411,6 +433,7 @@ function generateLogHtml(userConfig, uiData, gitData, renderType) {
                                 };
                                 if (msg.command == 'search') {
                                     this.loading = false;
+                                    this.isReviceLog = true;
                                     if (this.isShowViewDetails) {
                                         this.isShowViewDetails = false;
                                     };

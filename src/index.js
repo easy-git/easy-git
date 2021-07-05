@@ -188,20 +188,16 @@ class Main extends Common {
 
             // 如果是git项目，直接打开
             if (isGitProject) {
-                let gitInfo = await utils.gitStatus(FolderPath);
-                let gitData = Object.assign(gitInfo, {
-                    'projectName': FolderName,
-                    'projectPath': FolderPath
-                });
+                let projectInfo = { 'projectName': FolderName, 'projectPath': FolderPath }
                 switch (this.viewType){
                     case 'main':
-                        MainView.active(this.webviewPanel, this.userConfig, gitData);
+                        MainView.active(this.webviewPanel, this.userConfig, projectInfo);
                         break;
                     case 'branch':
-                        GitBranchView(this.webviewPanel, this.userConfig, gitData);
+                        GitBranchView(this.webviewPanel, this.userConfig, projectInfo);
                         break;
                     case 'log':
-                        openLogView(this.userConfig, gitData);
+                        openLogView(this.userConfig, projectInfo);
                         break;
                     default:
                         break;
@@ -229,10 +225,8 @@ class Main extends Common {
         let { projectName, projectPath, selectedFile, GitAssignAction, easyGitInner } = this.ProjectData;
 
         // git project status
-        let gitInfo = await utils.gitStatus(projectPath);
-        let isGitProject = gitInfo.isGit;
+        let isGitProject = await utils.checkIsGitProject(projectPath).catch( error => { return false });
         let gitData = Object.assign(
-            gitInfo,
             this.ProjectData,
             {'GitAssignAction': GitAssignAction},
         );
@@ -242,11 +236,6 @@ class Main extends Common {
             if (!easyGitInner) {
                 await utils.checkGitUsernameEmail(projectPath, projectName, this.userConfig);
             };
-
-            // Git文件视图：检查git项目是否包含node_modules
-            setTimeout(function() {
-                utils.checkNodeModulesFileList(projectPath, projectName, gitInfo);
-            }, 10000);
         };
 
         // 如果在项目管理器，当前选择的项目不是git项目

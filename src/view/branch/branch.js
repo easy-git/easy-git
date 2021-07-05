@@ -357,17 +357,17 @@ function watchProjectDir(projectDir, func) {
  * @description 显示webview
  * @param {Object} userConfig 用户配置
  * @param {Object} webviewPanel
- * @param {Object} gitData
+ * @param {Object} projectData - {projectPath, projectName}
  */
-function GitBranchView(webviewPanel, userConfig, gitData) {
+async function GitBranchView(webviewPanel, userConfig, projectData) {
     const view = webviewPanel.webView;
     hx.window.showView({
         viewid: 'EasyGitSourceCodeView',
         containerid: 'EasyGitSourceCodeView'
     });
 
-    // get project info , and git info
-    const { projectPath, projectName, currentBranch, originurl } = gitData;
+    // get project name and project path
+    const { projectPath, projectName } = projectData;
 
     let currentProjectData = {
         'projectPath': projectPath,
@@ -379,7 +379,8 @@ function GitBranchView(webviewPanel, userConfig, gitData) {
     let uiData = getUIData();
 
     // Git: 分支
-    let {...ProjectGitInfo} = gitData;
+    let GitData = await utils.gitStatus(projectPath);
+    let ProjectGitInfo = {"projectPath":projectPath, "projectName":projectName, ...GitData}
     let Branch = new GitBranch(webviewPanel, ProjectGitInfo, uiData, userConfig);
     Branch.LoadingBranchView();
 

@@ -122,6 +122,9 @@ function activate(context) {
         if (cmp <=0) {
             let DiffCscratFile = path.join(__dirname, 'view',  'diff', 'cscrat', 'EasyGit - 对比差异');
             hx.workspace.openTextDocument(DiffCscratFile);
+        } else {
+            hx.window.showErrorMessage("EasyGit: 文件对比视图仅支持HBuilderX 2.9.2+版本，请升级HBuilderX。", ["我知道了"])
+            return;
         };
         context.source = 'filesExplorer';
         let view_diff = new Main('diff', param, {}, context);
