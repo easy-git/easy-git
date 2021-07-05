@@ -234,7 +234,7 @@ async function GitLogCustomEditorRenderHtml(projectData, userConfig) {
                 break;
             case 'copy':
                 hx.env.clipboard.writeText(msg.text);
-                hx.window.setStatusBarMessage(`EasyGit: ${msg.text} 已成功复制到剪切板。`, 5000, 'info');
+                hx.window.setStatusBarMessage('EasyGit: 消息已成功复制到剪切板。', 5000, 'info');
                 break;
             case 'search':
                 Log.setView(msg.searchType, msg.condition, msg.refname);

@@ -183,11 +183,11 @@ function generateLogHtml(userConfig, initData) {
                                     @mouseover="hoverLogID = 'msg_'+idx"
                                     @mouseleave="mouseleaveLogItem()">
                                     <div class="row">
-                                        <div class="col-9 col-md-7 col-lg-8 htext" @click.stop="viewDetails(item);">
+                                        <div class="col-9 col-md-7 col-lg-8 htext" @click.stop="viewDetails(item);" @click.middle="copyLogMsg(item, 'msg');">
                                             <span class="gtag" v-show="item.refs != ''" v-for="(v2,i2) in (item.refs).split(',')" :key="i2">
                                                 {{ v2 }}
                                             </span>
-                                            <span title="点击查看变更的文件列表">{{ item.message }}</span>
+                                            <span title="点击查看变更的文件列表; 鼠标中键点击即可复制消息到剪贴板">{{ item.message }}</span>
                                         </div>
                                         <div class="col-3 col-md-1 col-lg-1 htext" @click.stop="goSearchAuthor('author',item.author_name);">
                                             <span :title="item.author_email + '点击搜索此用户提交记录'">
@@ -217,8 +217,8 @@ function generateLogHtml(userConfig, initData) {
                 </div>
                 <div id="log-view-file" class="fixed-bottom p-3 view-log-details" v-if="isShowViewDetails" @mouseenter="viewDetailsMouseenter();" @mouseleave="viewDetailsMouseleave();">
                     <div class="d-flex">
-                        <div class="flex-grow-1">
-                            <h6>{{ logDetails.message }}</h6>
+                        <div class="flex-grow-1" @dblclick="copyLogMsg(logDetails.message, 'onlyMsg');">
+                            <h6 title="双击复制消息到剪切板">{{ logDetails.message }}</h6>
                         </div>
                         <div>
                             <button type="button" class="close" aria-label="Close" @click="closeViewDetails();">
@@ -489,10 +489,13 @@ function generateLogHtml(userConfig, initData) {
                             let content = '';
                             if (type == 'commit_id') {
                                 content = data.hash
-                            }
+                            };
                             if (type == 'msg') {
-                                content = data.message + ' ' + data.hash + ' ' + data.author_name + ' ' + data.date;
-                            }
+                                content = data.hash + '\\n'+ data.message + '\\n' + data.author_name + '\\n' + data.date;
+                            };
+                            if (type == 'onlyMsg') {
+                                content = data;
+                            };
                             if (content == '') {return;};
                             hbuilderx.postMessage({
                                 command: 'copy',
