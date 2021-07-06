@@ -473,8 +473,35 @@
             }
         ],
         "expressions": {
-            "isGitignore": "!(file.exists <- '${workspaceFolder}/.gitignore')"
+            "isGitignore": "!(file.exists <- '${workspaceFolder}/.gitignore')",
+            "isShowSourceCode": "isGit"
         },
+        "keybindings":[
+            {
+                "command":"EasyGit.main",
+                "key":"Ctrl+Shift+G",
+                "when":"expression.isShowSourceCode",
+                "macosx":"Ctrl+Shift+G"
+            },
+            {
+                "command":"EasyGit.log",
+                "key":"Ctrl+Shift+H",
+                "when":"expression.isShowSourceCode",
+                "macosx":"Ctrl+Shift+H"
+            },
+            {
+                "command":"EasyGit.branch",
+                "key":"Ctrl+Shift+B",
+                "when":"expression.isShowSourceCode",
+                "macosx":"Ctrl+Shift+B"
+            },
+            {
+                "command":"EasyGit.CommandPanel",
+                "key":"Ctrl+Shift+p",
+                "when":"expression.isShowSourceCode",
+                "macosx":"command+Shift+p"
+            }
+        ],
         "menus": {
             "explorer/context": [
                 {
