@@ -224,7 +224,7 @@ async function GitLogCustomEditorRenderHtml(projectData, userConfig) {
         let action = msg.command;
         switch (action) {
             case 'gitLog':
-                Log.setView(searchType, '', msg.refname);
+                Log.setView(msg.searchType, msg.condition, msg.refname);
                 break;
             case 'refresh':
                 Log.setView(searchType, '', msg.refname);
