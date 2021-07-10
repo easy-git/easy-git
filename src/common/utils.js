@@ -30,9 +30,40 @@ let ignoreGitHooksForCommit = config.get('EasyGit.ignoreGitHooksForCommit');
 let noVerify = ignoreGitHooksForCommit ? '--no-verify' : false;
 
 /**
- * @description 背景颜色、输入框颜色、字体颜色、线条颜色
+ * @description 判断是否是object
+ * @param {Object} object
+ */
+function isObj(object){
+    return object && typeof (object) == 'object' && Object.prototype.toString.call(object).toLowerCase() == "[object object]";
+};
+
+/**
+ * @description 获取跟主题相匹配的颜色
+ *   - fontFamily           字体
+ *   - fontSize             字号
+ *   - background           背景色
+ *   - fontColor            字体颜色
+ *   - liHoverBackground    li类元素，悬停背景色
+ *   - inputBgColor         输入框背景色
+ *   - inputLineColor       输入框线条颜色
+ *   - lineColor            其它线条颜色
+ *   - scrollbarColor       滚动条颜色
+ *   - cursorColor          光标颜色
+ * @param {String} area - HBuilderX区域，当area=undefinded，返回编辑器区域的背景色；当area=siderBar时，返回项目管理器背景色
+ * @return {Object}
  */
 function getThemeColor(area) {
+    let fontColor;
+    let background;
+    let liHoverBackground;
+    let inputColor;
+    let inputBgColor;
+    let inputLineColor;
+    let cursorColor;
+    let lineColor;
+    let menuBackground;
+    let scrollbarColor;
+
     let config = hx.workspace.getConfiguration();
     let colorScheme = config.get('editor.colorScheme');
     let colorCustomizations = config.get('workbench.colorCustomizations');
@@ -41,92 +72,80 @@ function getThemeColor(area) {
         colorScheme = 'Default';
     };
 
-    // 背景颜色、输入框颜色、字体颜色、线条颜色
-    let background, liHoverBackground, inputColor, inputBgColor, inputLineColor, cursorColor, fontColor, lineColor, menuBackground, scrollbarColor;
+    // 获取HBuilderX编辑器字体大小
+    let fontSize = config.get('editor.fontSize');
+    if (fontSize == undefined) {
+        fontSize = 14;
+    };
 
-    // 修复 0.1版本引出的Bug （当未定义自定义主题时异常的Bug）
+    // 获取HBuilderX编辑器字体
+    let fontFamily = config.get("editor.fontFamily");
+    if (fontFamily) {
+        fontFamily = "Monaco"
+    };
+
     let custom = {};
     try{
-        custom = colorCustomizations[`[${colorScheme}]`];
-    }catch(e){
-        custom = {}
-    };
+        customColors = colorCustomizations[`[${colorScheme}]`];
+        if (!isObj(customColors)) {
+            customColors = {};
+        };
+    } catch (e) {};
 
     let viewBackgroundOptionName = area == 'siderBar' ? 'sideBar.background' : 'editor.background';
     let viewFontOptionName = area == 'siderBar' ? 'list.foreground' : undefined;
     let viewLiHoverBgOptionName = area == 'siderBar' ? 'list.hoverBackground' : 'list.hoverBackground';
 
-    if (colorScheme == 'Monokai') {
-        if (custom != undefined && custom[viewBackgroundOptionName] && viewBackgroundOptionName in custom) {
-            background = custom[viewBackgroundOptionName];
-            menuBackground = custom[viewBackgroundOptionName];
-        } else {
+    switch (colorScheme){
+        case 'Monokai':
+            fontColor = 'rgb(179,182,166)';
             background = 'rgb(39,40,34)';
             menuBackground = 'rgb(83,83,83)';
-        };
-        if (custom != undefined && custom[viewFontOptionName] && viewFontOptionName in custom) {
-            fontColor = custom[viewFontOptionName];
-        } else {
-            fontColor = 'rgb(179,182,166)';
-        };
-        if (custom != undefined && custom[viewLiHoverBgOptionName] && viewLiHoverBgOptionName in custom) {
-            liHoverBackground = custom[viewLiHoverBgOptionName];
-        } else {
             liHoverBackground = 'rgb(78,80,73)';
-        };
-        inputColor = 'rgb(255,254,250)';
-        inputBgColor = '#2E2E2E';
-        inputLineColor = 'rgb(81,140,255)';
-        cursorColor = 'rgb(255,255,255)';
-        lineColor = 'rgb(23,23,23)';
-        scrollbarColor = '#6F6F6F';
-    } else if (colorScheme == 'Atom One Dark') {
-        if (custom != undefined && custom[viewBackgroundOptionName] && viewBackgroundOptionName in custom) {
-            background = custom[viewBackgroundOptionName];
-            menuBackground = custom[viewBackgroundOptionName];
-        } else {
+            inputColor = 'rgb(255,254,250)';
+            inputBgColor = '#2E2E2E';
+            inputLineColor = 'rgb(81,140,255)';
+            cursorColor = 'rgb(255,255,255)';
+            lineColor = 'rgb(23,23,23)';
+            scrollbarColor = '#6F6F6F';
+            break;
+        case 'Atom One Dark':
+            fontColor = 'rgb(171,178,191)';
             background = 'rgb(40,44,53)';
             menuBackground = 'rgb(50,56,66)';
-        };
-        if (custom != undefined && custom[viewFontOptionName] && viewFontOptionName in custom) {
-            fontColor = custom[viewFontOptionName];
-        } else {
-            fontColor = 'rgb(171,178,191)';
-        };
-        if (custom != undefined && custom[viewLiHoverBgOptionName] && viewLiHoverBgOptionName in custom) {
-            liHoverBackground = custom[viewLiHoverBgOptionName];
-        } else {
             liHoverBackground = 'rgb(44,47,55)';
-        };
-        inputColor = 'rgb(255,254,250)';
-        inputBgColor = '#2E2E2E';
-        inputLineColor = 'rgb(81,140,255)';
-        cursorColor = 'rgb(255,255,255)';
-        lineColor = 'rgb(33,37,43)';
-        scrollbarColor = '#6F6F6F';
-    } else {
-        if (custom != undefined && custom[viewBackgroundOptionName] && viewBackgroundOptionName in custom) {
-            background = custom[viewBackgroundOptionName];
-            menuBackground = custom[viewBackgroundOptionName];
-        } else {
+            inputColor = 'rgb(255,254,250)';
+            inputBgColor = '#2E2E2E';
+            inputLineColor = 'rgb(81,140,255)';
+            cursorColor = 'rgb(255,255,255)';
+            lineColor = 'rgb(33,37,43)';
+            scrollbarColor = '#6F6F6F';
+            break;
+        default:
+            fontColor = 'rgb(51, 51, 51)';
             background = 'rgb(255,250,232)';
             menuBackground = 'rgb(255,252,243)';
-        };
-        if (custom != undefined && custom[viewFontOptionName] && viewFontOptionName in custom) {
-            fontColor = custom[viewFontOptionName];
-        } else {
-            fontColor = '#333';
-        };
-        if (custom != undefined && custom[viewLiHoverBgOptionName] && viewLiHoverBgOptionName in custom) {
-            liHoverBackground = custom[viewLiHoverBgOptionName];
-        } else {
             liHoverBackground = 'rgb(224,237,211)';
+            inputColor = 'rgb(255,252,243)';
+            inputBgColor = '#2E2E2E';
+            inputLineColor = 'rgb(65,168,99)';
+            cursorColor = 'rgb(0,0,0)';
+            lineColor = 'rgb(225,212,178)';
+            scrollbarColor = 'rgb(207,181,106)';
+            break;
+    };
+
+    if (customColors != undefined && JSON.stringify(customColors) != '{}') {
+        if (customColors[viewBackgroundOptionName] && viewBackgroundOptionName in customColors) {
+            background = customColors[viewBackgroundOptionName];
+            menuBackground = custom[viewBackgroundOptionName];
         };
-        inputColor = 'rgb(255,252,243)';
-        inputLineColor = 'rgb(65,168,99)';
-        cursorColor = 'rgb(0,0,0)';
-        lineColor = 'rgb(225,212,178)';
-        scrollbarColor = 'rgb(207,181,106)';
+        if (customColors[viewFontOptionName] && viewFontOptionName in customColors) {
+            fontColor = customColors[viewFontOptionName];
+        };
+        if (customColors[viewLiHoverBgOptionName] && viewLiHoverBgOptionName in customColors) {
+            liHoverBackground = custom[viewLiHoverBgOptionName];
+        };
     };
 
     // 文件对比相关颜色
@@ -145,7 +164,7 @@ function getThemeColor(area) {
         d2h_linenum_color = fontColor;
         diff_scrollbar_color = '#6F6F6F';
     } else {
-        d2h_ins_bg = '#dfd';
+        d2h_ins_bg = '#DDFFDD';
         d2h_ins_border = '#b4e2b4'
         d2h_del_bg = '#fee8e9';
         d2h_del_border = '#e9aeae';
@@ -154,10 +173,12 @@ function getThemeColor(area) {
         d2h_emptyplaceholder_bg = '#f1f1f1';
         d2h_emptyplaceholder_border = '#e1e1e1';
         d2h_linenum_color = fontColor;
-        diff_scrollbar_color = 'rgb(207,181,106)';
+        diff_scrollbar_color = '#CFB56A';
     };
 
     return {
+        fontSize,
+        fontFamily,
         background,
         menuBackground,
         liHoverBackground,
