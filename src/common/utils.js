@@ -431,6 +431,46 @@ function createOutputChannel(msg, msgLevel=undefined) {
 };
 
 /**
+ * @description 创建输出控制台, 支持文件链接跳转
+ * @param {String} msg
+ * @param {String} msgLevel (warning | success | error | info), 控制文本颜色
+ * @param {String} linkText 链接文本
+ */
+function createOutputView(msg, msgLevel='info', linkText) {
+    let outputView = hx.window.createOutputView({"id":"easy-git","title":"Git控制台"});
+    outputView.show();
+
+    if (linkText == undefined || linkText == '') {
+        outputView.appendLine({
+            line: msg,
+            level: msgLevel,
+        });
+        return;
+    };
+
+    let start;
+    if (msg.includes(linkText) && linkText != undefined) {
+        start = msg.length - linkText.length - 1;
+    };
+
+    outputView.appendLine({
+        line: msg,
+        level: msgLevel,
+        hyperlinks:[
+            {
+                linkPosition: {
+                    start: start,
+                    end: msg.length
+                },
+                onOpen: function() {
+                    hx.workspace.openTextDocument(linkText);
+                }
+            }
+        ]
+    });
+};
+
+/**
  * @description 创建输出控制台
  */
 function createOutputChannelForClone(msg, newline=true) {
@@ -2521,6 +2561,7 @@ module.exports = {
     getDirFileList,
     FileWriteAndOpen,
     createOutputChannel,
+    createOutputView,
     isGitInstalled,
     getGitVersion,
     getHBuilderXiniConfig,
