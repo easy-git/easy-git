@@ -84,7 +84,7 @@ function getThemeColor(area) {
         fontFamily = "Monaco"
     };
 
-    let custom = {};
+    let customColors = {};
     try{
         customColors = colorCustomizations[`[${colorScheme}]`];
         if (!isObj(customColors)) {
