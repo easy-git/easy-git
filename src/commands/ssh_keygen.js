@@ -9,7 +9,7 @@ const chokidar = require('chokidar');
 
 const count = require('../common/count.js');
 const cmp_hx_version = require('../common/cmp.js');
-const { hxShowMessageBox, createOutputChannel } = require('../common/utils.js');
+const { hxShowMessageBox, createOutputView } = require('../common/utils.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'bootstrap.min.css');
@@ -29,7 +29,7 @@ function runCmd(cmd) {
     return new Promise((resolve, reject) => {
         exec(cmd, function(error, stdout, stderr) {
             if (error) {
-                createOutputChannel(`SSH相关命令执行失败，日志：\n${error}`, 'error');
+                createOutputView(`SSH相关命令执行失败，日志：\n${error}`, 'error');
                 reject(error)
             };
             resolve('success');
@@ -46,7 +46,7 @@ function getWindowSSHCmdDir() {
     return new Promise((resolve, reject) => {
         exec('where git', function(error, stdout, stderr) {
             if (error) {
-                createOutputChannel(`查找git、ssh相关命令路径失败。请确保电脑已安装git bash。`, 'error');
+                createOutputView(`查找git、ssh相关命令路径失败。请确保电脑已安装git bash。`, 'error');
                 reject(error)
             };
             let tmp = stdout.trim().replace('cmd\\git.exe', '');
@@ -86,10 +86,10 @@ function edit_ssh_config_file(ssh_config_file, file_content) {
     return new Promise((resolve, reject) => {
         fs.appendFile(ssh_config_file, file_content , (error)  => {
             if (error) {
-                createOutputChannel(fail_msg, 'fail');
+                createOutputView(fail_msg, 'fail');
                 reject(error)
             };
-            createOutputChannel(success_msg, 'info');
+            createOutputView(success_msg, 'info');
             resolve('success')
         });
     }).catch((error) => {
@@ -155,7 +155,7 @@ async function generating_ssh_keys(webviewDialog, data) {
     if (!fs.existsSync(ssh_private_path)) {
         return;
     };
-    createOutputChannel(`SSH KEY生成成功。文件所在目录：${SSHDIR}\n`, 'success');
+    createOutputView(`SSH KEY生成成功。文件所在目录：${SSHDIR}\n`, 'success', SSHDIR);
 
     // 关闭webviewdialog
     webviewDialog.close();
@@ -172,16 +172,16 @@ async function generating_ssh_keys(webviewDialog, data) {
             let add_cmd = `"${sshadd_tool}" "${ssh_private_path}"`;
             let add_result = await runCmd(add_cmd).catch( error => { return 'fail' });
             if (add_result != 'fail') {
-                createOutputChannel('已自动将SSH KEY添加到ssh-agent的高速缓存中。此后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。\n', 'info');
+                createOutputView('已自动将SSH KEY添加到ssh-agent的高速缓存中。此后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。\n', 'info');
             };
         } else {
-            createOutputChannel('强烈建议您将SSH KEY添加到ssh-agent的高速缓存中。添加后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。', 'warning');
-            createOutputChannel(`请打开操作系统终端，运行如下命令：ssh-add ${ssh_private_path} \n`, 'info');
+            createOutputView('强烈建议您将SSH KEY添加到ssh-agent的高速缓存中。添加后, 当使用SSH公钥跟服务器通信时, 不再提示相关信息。', 'warning');
+            createOutputView(`请打开操作系统终端，运行如下命令：ssh-add ${ssh_private_path} \n`, 'info');
         };
     };
 
     if (usage) {
-        createOutputChannel(`注意事项：SSH KEY创建成功成功后，同时也需要添加到Git托管服务器。设置教程：https://easy-git.github.io/auth/ssh-generate#Git服务器设置SSH公钥`, 'warning');
+        createOutputView(`注意事项：SSH KEY创建成功成功后，同时也需要添加到Git托管服务器。设置教程：https://easy-git.github.io/auth/ssh-generate#Git服务器设置SSH公钥`, 'warning');
     };
 
 
