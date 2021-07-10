@@ -1241,7 +1241,7 @@ async function gitPull(workingDir, options) {
             })
             .catch((err) => {
                 let cmd_details = args.join(' ');
-                let pullMsg = "提醒：如需执行其它pull选项操作，将焦点置于当前要查看的项目上；然后打开命令面板，输入pull，即可看到其它相关的git pull选项。"
+                let msgForPullOther = "提醒：如需执行其它pull选项操作，将焦点置于当前要查看的项目上；然后打开命令面板，输入pull，即可看到其它相关的git pull选项。"
                 let errMsg = (err).toString();
                 if (errMsg.includes('cannot pull with rebase')) {
                     let msg1 = "\n原因：项目下存在未提交的文件，请处理后再操作。\n\n如需执行其它pull命令, 请点击下列按钮。"
@@ -1251,12 +1251,15 @@ async function gitPull(workingDir, options) {
                 } else if (errMsg.includes('could not read Username')) {
                     createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
                     createOutputChannel('关于身份认证信息的解决方法: https://easy-git.github.io/question/username', 'info')
+                } else if (errMsg.includes('Permission denied (publickey)')) {
+                    createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
+                    createOutputChannel('关于Permission denied (publickey)的解决方法: https://easy-git.github.io/question/Permission_denied_publickey', 'info')
                 } else if (errMsg.includes("local changes")) {
                     createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
-                    createOutputChannel(pullMsg, 'info');
+                    createOutputChannel(msgForPullOther, 'info');
                 } else {
                     createOutputChannel(`Git: pull ${cmd_details}失败。 \n ${errMsg}`, 'error');
-                    createOutputChannel(pullMsg, 'info');
+                    createOutputChannel(msgForPullOther, 'info');
                 };
                 return 'fail';
             });
