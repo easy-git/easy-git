@@ -164,6 +164,8 @@ async function generating_ssh_keys(webviewDialog, data) {
     if (usage) {
         const file_content = `\n\n#-------- easy-git ---------\nHost ${git_host}\n\tHostName ${git_host}\n\tPreferredAuthentications publickey\n\tIdentityFile ${ssh_private_path}`
         await edit_ssh_config_file(ssh_config_file, file_content).catch( error => {return error });
+    } else {
+        createOutputView(`如果您是用于git托管，强烈建议将生成的KEY添加到 ${ssh_config_file}；如您用到多个Git服务器，这将十分有用。可以解决后续Git SSH访问遇到的大部分问题。\n`, 'warning', ssh_config_file);
     };
 
     // ssh-add
@@ -321,7 +323,7 @@ async function sshKeygen() {
                         <div class="col-sm-10">
                             <input id="usage" type="checkbox" class="mr-2" v-model="ssh.usage" />
                             <label class="d-inline">用于Github等git托管服务器SSH认证</label>
-                            <p class="form-text text-muted mb-0">勾选会将生成的KEY添加到~/.ssh/config；如您用到多个Git服务器，这将十分有用。</p>
+                            <p class="form-text text-muted mb-0">如果您是用于git托管，强烈建议您勾选。勾选会将生成的KEY添加到~/.ssh/config；如您用到多个Git服务器，这将十分有用。</p>
                         </div>
                     </div>
                     <div id="git_hosts" class="form-group row m-0 mt-3" v-if="ssh.usage">

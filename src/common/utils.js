@@ -450,7 +450,7 @@ function createOutputView(msg, msgLevel='info', linkText) {
 
     let start;
     if (msg.includes(linkText) && linkText != undefined) {
-        start = msg.length - linkText.length - 1;
+        start = msg.indexOf(linkText);
     };
 
     outputView.appendLine({
@@ -460,10 +460,17 @@ function createOutputView(msg, msgLevel='info', linkText) {
             {
                 linkPosition: {
                     start: start,
-                    end: msg.length
+                    end: start + linkText.length
                 },
                 onOpen: function() {
-                    hx.workspace.openTextDocument(linkText);
+                    if (fs.existsSync(linkText)) {
+                        return hx.workspace.openTextDocument(linkText);
+                    };
+                    const file_content = linkText.includes('.ssh/config') ? `#Host github\n#\tHostName github.com\n#\tPreferredAuthentications publickey\n#\tIdentityFile ~/.ssh/<private-key-filename>` : '';
+                    fs.appendFile(linkText, file_content , (error)  => {
+                        if (error) {return};
+                        hx.workspace.openTextDocument(linkText);
+                    });
                 }
             }
         ]
