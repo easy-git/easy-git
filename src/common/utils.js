@@ -1098,6 +1098,10 @@ async function gitCommit(workingDir, comment) {
  * @param {String} commnet 注释
  */
 async function gitAddCommit(workingDir,commitComment) {
+    if ((commitComment.trim()).length == 0) {
+        hx.window.showErrorMessage("EasyGit: Git commit消息不能为空。", ["我知道了"]);
+        return 'fail';
+    };
     // status bar show message
     hx.window.setStatusBarMessage('Git: commit...');
     try {
@@ -2464,7 +2468,6 @@ function hxShowMessageBox(title, text, buttons = ['关闭']) {
                 if (osName == 'darwin') {
                     buttons = buttons.reverse();
                 };
-                escape = -1;
             };
             if (cmpVersionResult <= 0) {
                 hx.window.showMessageBox({

@@ -170,6 +170,33 @@ class GitFile {
             });
             this.ProjectCurrentBranch = gitData.currentBranch;
 
+            // 文件数量太多，可能会导致EasyGit插件视图失去响应
+            if (gitData.FileResult) {
+                try{
+                    let gitViewFileList = gitData.FileResult;
+                    let totalFile = gitViewFileList.conflicted.length + gitViewFileList.notStaged.length + gitViewFileList.conflicted.length;
+                    if (totalFile > 300) {
+                        let userBtn = await utils.hxShowMessageBox('EasyGit',
+                            `当前项目下变更的文件数量超过300个，文件数量太多，继续加载，可能会导致EasyGit插件视图失去响应，建议直接提交。\n\n 直接提交：git add + git commit`, ["继续加载","直接提交", "关闭"],
+                        ).then( (result) => { return result; });
+                        if (userBtn == "直接提交") {
+                            let ciMsg = await hx.window.showInputBox({
+                                prompt:"Git Commit消息",
+                                placeHolder: "必填"
+                            }).then((result)=>{
+                                return result;
+                            });
+                            await utils.gitAddCommit(this.projectPath, ciMsg);
+                            return;
+                        } else if (userBtn == "继续加载") {
+                            console.log('EasyGit:...........继续加载');
+                        } else {
+                            return;
+                        };
+                    };
+                }catch(e){};
+            };
+
             if (this.webviewPanel) {
                 let { originurl, BranchTracking, behind, ahead } = gitData;
                 ahead = ahead == 0 ? '' : ahead;
@@ -748,7 +775,7 @@ function active(webviewPanel, userConfig, ProjectData) {
 
     // UI: color and svg icon
     var uiData = getUIData();
-    
+
     // get webview html content, go set
     view.html = html.getWebviewContent(userConfig, uiData, ProjectData);
 
