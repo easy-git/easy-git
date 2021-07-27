@@ -29,8 +29,6 @@ function getUIData() {
     return Object.assign(iconData,colorData);
 };
 
-let uiData = getUIData();
-
 /**
  * @description generationhtml
  * @param {Object} userConfig
@@ -40,6 +38,8 @@ function generateLogHtml(userConfig, initData) {
     // 是否启用开发者工具
     let {DisableDevTools} = userConfig;
 
+    let uiData = getUIData();
+    
     // ui、color、font
     let {
         background,

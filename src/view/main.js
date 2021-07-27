@@ -82,9 +82,6 @@ function getUIData() {
     return Object.assign(iconData,colorData);
 };
 
-// UI: color and svg icon
-var uiData = getUIData();
-
 /**
  * @description  set .gitignore and .gitattributes
  * @param {Object} filename
@@ -749,6 +746,9 @@ function active(webviewPanel, userConfig, ProjectData) {
     // get project info , and git info
     const { projectPath, projectName } = ProjectData;
 
+    // UI: color and svg icon
+    var uiData = getUIData();
+    
     // get webview html content, go set
     view.html = html.getWebviewContent(userConfig, uiData, ProjectData);
 

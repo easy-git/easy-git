@@ -138,13 +138,13 @@ function getThemeColor(area) {
     if (customColors != undefined && JSON.stringify(customColors) != '{}') {
         if (customColors[viewBackgroundOptionName] && viewBackgroundOptionName in customColors) {
             background = customColors[viewBackgroundOptionName];
-            menuBackground = custom[viewBackgroundOptionName];
+            menuBackground = customColors[viewBackgroundOptionName];
         };
         if (customColors[viewFontOptionName] && viewFontOptionName in customColors) {
             fontColor = customColors[viewFontOptionName];
         };
         if (customColors[viewLiHoverBgOptionName] && viewLiHoverBgOptionName in customColors) {
-            liHoverBackground = custom[viewLiHoverBgOptionName];
+            liHoverBackground = customColors[viewLiHoverBgOptionName];
         };
     };
 
