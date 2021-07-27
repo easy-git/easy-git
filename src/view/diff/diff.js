@@ -11,6 +11,8 @@ let utils = require('../../common/utils.js');
 const icon = require('../static/icon.js');
 const {getWebviewDiffContent, getDefaultContent} = require('./html.js')
 
+// 全文对比、x行对比。只弹窗一次
+let isGitDiffPrompt = false;
 
 class Diff {
     constructor(ProjectData, userConfig, webviewPanel) {
@@ -61,7 +63,7 @@ class Diff {
 
         let msg = `EasyGit: 目前文件对比使用 ${this.isFullTextDiffFile} 行上下文生成差异, 是否修改？修改后，下次生效。`;
         setTimeout(function() {
-            if (isFullTextDiffFile == undefined) {
+            if (isFullTextDiffFile == undefined && isGitDiffPrompt == false) {
                 hx.window.showInformationMessage(msg, ['使用全文对比', '保持默认']).then( (res)=> {
                     if (res == '保持默认') {
                         config.update("EasyGit.isFullTextDiffFile", "3").then(() => {});
@@ -71,6 +73,7 @@ class Diff {
                         config.update("EasyGit.isFullTextDiffFile", "full").then(() => {});
                     };
                 });
+                isGitDiffPrompt = true;
             };
         }, 3500);
     }
