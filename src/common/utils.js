@@ -14,6 +14,8 @@ const git = require('simple-git');
 const count = require('./count.js');
 const voiceSay = require('./voice.js');
 
+const fileIO= require('./file.js');
+
 const osName = os.platform();
 
 // hbuilderx version
@@ -636,7 +638,7 @@ function checkNodeModulesFileList(projectPath, projectName, GitStatusResult) {
             '检测到当前git项目下，包含node_modules，且未设置.gitignore, 是否设置?',['设置.gitignore','以后再说'],
         ).then((result) => {
             if (result == '设置.gitignore') {
-                file.gitignore({'projectPath': projectPath});
+                fileIO.gitignore({'projectPath': projectPath});
             } else {
                 gitignorePrompt = true;
             }
@@ -669,13 +671,12 @@ async function gitInit(projectPath, projectName) {
 
         try {
             // 创建.gitignore文件
-            const { create } = require('./file.js');
             let createInfo = {
                 "filename": ".gitignore",
                 "projectPath": projectPath,
                 "isOpenFile": false
             };
-            let createStatus = await create(createInfo);
+            let createStatus = await fileIO.create(createInfo);
             if (createStatus == 'success') {
                 let createMsg = `已自动创建.gitignore文件。如不需要，请自行删除。`;
                 createOutputChannel(createMsg);
