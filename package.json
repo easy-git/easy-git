@@ -151,7 +151,12 @@
             "activitybar": [
                 {
                     "id": "EasyGitSourceCodeView",
-                    "title": "easy-git"
+                    "title": "easy-git",
+                    "icon": {
+                        "Default": "static/icon/default.svg",
+                        "Monokai": "static/icon/Monokai.svg",
+                        "Atom One Dark": "static/icon/atom.svg"
+                    }
                 }
             ]
         },
