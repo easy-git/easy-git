@@ -170,17 +170,11 @@ function activate(context) {
     });
     context.subscriptions.push(setting);
 
-    // 设置 git user.name
-    let setUserName = hx.commands.registerCommand('EasyGit.setUserName', (param)=> {
-        git.action(param, 'setUserName');
+    // 设置 git user.name 和 user.email
+    let setUserName = hx.commands.registerCommand('EasyGit.setUserNameUserEmail', (param)=> {
+        git.action(param, 'set-username-useremail');
     });
     context.subscriptions.push(setUserName);
-
-    // 设置 git user.name
-    let setEmail = hx.commands.registerCommand('EasyGit.setEmail', (param)=> {
-        git.action(param, 'setEmail');
-    });
-    context.subscriptions.push(setEmail);
 
     // 设置 git config --global core.quotepath false
     let setEncodingForQuote = hx.commands.registerCommand('EasyGit.setEncodingForQuote', (param)=> {

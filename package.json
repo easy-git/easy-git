@@ -68,8 +68,7 @@
         "onCommand:EasyGit.stashShow",
         "onCommand:EasyGit.about",
         "onCommand:EasyGit.set",
-        "onCommand:EasyGit.setUserName",
-        "onCommand:EasyGit.setEmail",
+        "onCommand:EasyGit.setUserNameUserEmail",
         "onCommand:EasyGit.setGitingore",
         "onCommand:EasyGit.setGitattributes",
         "onCommand:EasyGit.setEncodingForQuote",
@@ -437,12 +436,8 @@
                 "title": "easy-git: 设置.gitattributes"
             },
             {
-                "command": "EasyGit.setUserName",
-                "title": "easy-git: config user.name - 设置user.name"
-            },
-            {
-                "command": "EasyGit.setEmail",
-                "title": "easy-git: config user.email - 设置user.email"
+                "command": "EasyGit.setUserNameUserEmail",
+                "title": "easy-git: config - 设置user.name和user.email"
             },
             {
                 "command": "EasyGit.setEncodingForQuote",
@@ -702,13 +697,8 @@
                     "group": "easygit@2"
                 },
                 {
-                    "command": "EasyGit.setUserName",
-                    "title": "设置user.name",
-                    "group": "easygit@3"
-                },
-                {
-                    "command": "EasyGit.setEmail",
-                    "title": "设置user.email",
+                    "command": "EasyGit.setUserNameUserEmail",
+                    "title": "设置user.name和user.email",
                     "group": "easygit@3"
                 },
                 {

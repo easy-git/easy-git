@@ -17,7 +17,7 @@ const openBranchDiffView = require('./branch_diff.js');
 const gitBlameForLineChange = require('./blame.js');
 const gitAnnotate = require('./annotate.js');
 
-
+const gitConfig = require('./gitConfig.js');
 
 /**
  * @description 提供webview视图外Git的操作
@@ -222,8 +222,8 @@ async function action(param, action_name) {
             let stashShow = new goStashShow(ProjectInfo);
             stashShow.main();
             break;
-        case 'setUserName':
-            goSetConfig(projectPath, action_name);
+        case 'set-username-useremail':
+            gitConfig(projectPath);
             break;
         case 'setEmail':
             goSetConfig(projectPath, action_name);
