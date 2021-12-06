@@ -9,7 +9,8 @@ const {
     gitFileStatus,
     getGitVersion,
     gitClean,
-    gitRaw
+    gitRaw,
+    gitPush
 } = require('../common/utils.js');
 
 const cmp_hx_version = require('../common/cmp.js');
@@ -73,6 +74,18 @@ async function goCleanFile(ProjectInfo) {
     };
 };
 
+/**
+ * @description 验证用户填写数据
+ * @param {Object} formData
+ */
+ async function goValidateCommitMsg(formData, that) {
+    let {commit_msg} = formData;
+    if (commit_msg.replace(/(^\s*)|(\s*$)/g,"") == '') {
+        that.showError(`git commit消息不能为空`);
+        return false;
+    };
+    return true;
+};
 
 /**
  * @description commit 或 commit --amend
@@ -95,30 +108,47 @@ async function goCommit(ProjectInfo, amend=false) {
         };
     };
 
-    let prompt = amend ? 'Git commit - 修改最后提交的commit消息' : `Git commit - 请输入commit消息 <p style="font-size: 12px;">注意: 当前暂存区已暂存 ${stageFileNum} 个文件。</p>`;
-    let inputResult = await hx.window.showInputBox({
-        prompt: prompt,
-        placeHolder: '消息必填'
-    }).then((result)=>{
-        return result
-    });
-    if (inputResult.trim() == '' && inputResult.length <= 3) {
-        hx.window.showErrorMessage('EasyGit: 请输入有效的信息！', ['我知道了']);
-        return;
-    };
+    let msc = stageFileNum ? `当前暂存区已暂存 ${stageFileNum} 个文件。`: '';
+    let subtitle = amend ? '修改最后提交的commit消息内容' : '';
 
-    let options = ['commit', '-m', inputResult];
+    var formItems = [];
+    let userItems = [
+        {type: "label",name: "add_msg","text": msc},
+        {type: "input",name: "commit_msg",label: "消息",placeholder: "请输入commit消息" },
+        {type: "label",name: "blank","text": ""},
+        {type: "checkBox",name: "isPush",label: "是否立即推送到远端", value: false}
+    ];
+
+    let Info = await hx.window.showFormDialog({
+        formItems: userItems,
+        title: "Git提交",
+        subtitle: subtitle,
+        width: 480,
+        height: 230,
+        submitButtonText: "确定(&S)",
+        cancelButtonText: "取消(&C)",
+        validate: function(formData) {
+            let checkResult = goValidateCommitMsg(formData, this);
+            return checkResult;
+        }
+    }).then((res) => {
+        return res;
+    }).catch(error => {
+        console.log(error);
+    });
+
+    if (Info == undefined) return;
+    let {commit_msg, isPush} = Info;
+
+    let options = ['commit', '-m', commit_msg];
     if (amend) {
-        options = ['commit', '--amend', '-m', inputResult];
+        options = ['commit', '--amend', '-m', commit_msg];
     };
 
     let msg = amend ? 'commit --amend' : 'commit';
     let commitResult = await gitRaw(projectPath, options, msg);
-    if (commitResult == 'success') {
-        // 2021-03-26 命令面板commit操作，不再打开日志视图
-        // setTimeout(function() {
-        //     hx.commands.executeCommand('EasyGit.log', ProjectInfo);
-        // }, 1500);
+    if (commitResult == 'success' && isPush) {
+        gitPush(projectPath)
     };
 };
 
