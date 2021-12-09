@@ -84,7 +84,7 @@ async function openGithubSearch(word, webviewDialog, webview) {
     if (word.length < 2) {return};
     webviewDialog.displayError('');
 
-    hx.window.setStatusBarMessage(`easy-git: 正在github搜索 ${word} ....`, 20000, 'info');
+    hx.window.setStatusBarMessage(`easy-git: 正在github搜索 ${word} ...., 这取决于您的网络状况`, 500000, 'info');
 
     let url = `https://api.github.com/search/repositories?q=${word}`
     let headers = {"Accept": "application/vnd.github.v3+json"};
@@ -234,8 +234,8 @@ function showClone(clone_url="") {
         title: "Git克隆",
         dialogButtons: ["开始克隆", "关闭"],
         size: {
-            width: 700,
-            height: 480
+            width: 730,
+            height: 500
         }
     }, {
         enableScripts: true
@@ -342,8 +342,8 @@ function generateLogHtml(hxData) {
         <body>
             <div id="app" v-cloak>
                 <form>
-                    <div class="form-group row m-0 mt-3">
-                        <label for="repo-type" class="col-sm-2 px-0">克隆协议</label>
+                    <div class="form-group row m-0">
+                        <label for="repo-type" class="col-sm-2 px-0 text-center">克隆协议</label>
                         <div class="col-sm-10 d-inline">
                             <input name="Protocol" type="radio" class="mr-2" value="http"
                                 v-model="cloneProtocol"
@@ -353,13 +353,21 @@ function generateLogHtml(hxData) {
                                 @click="isManualSelectedProtocol='ssh'"/>SSH
                         </div>
                     </div>
-                    <div class="form-group row m-0 mt-3">
-                        <label for="git-url" class="col-sm-2 pt-2 px-0">
-                            <span @click="switchType(false);" :class="{ 'text-underline': !isSearch }" title="提供Git存储库URL">Git仓库</span> /
-                            <span @click="switchType(true);" :class="{ 'text-underline': isSearch }" title="在Github搜索">搜索</span>
+                    <div class="form-group row m-0 mt-2">
+                        <label for="repo-type" class="col-sm-2 px-0 text-center">仓库来源</label>
+                        <div class="col-sm-10 d-inline">
+                            <input name="repoSource" type="radio" class="mr-2" value="0"
+                                v-model="isSearchGitHub" />手动输入仓库地址
+                            <input name="repoSource" type="radio" class="ml-3 mr-2" value="1"
+                                v-model="isSearchGitHub" />搜索Github仓库
+                        </div>
+                    </div>
+                    <div class="form-group row m-0 mt-2">
+                        <label for="git-url" class="col-sm-2 pt-3 px-0 text-center">
+                            <span title="Git存储库URL">Git仓库</span>
                         </label>
                         <div class="col-sm-10" @mouseleave="isShowRecommend=false">
-                            <div v-if="isSearch">
+                            <div v-if="isSearchGitHub == 1">
                                 <input type="text"
                                     class="form-control outline-none" id="git-url"
                                     placeholder="从Github克隆，输入关键字，回车搜索Github，仅返回前10条结果..."
@@ -412,23 +420,23 @@ function generateLogHtml(hxData) {
                             </ul>
                         </div>
                     </div>
-                    <div class="form-group row m-0 mt-3">
-                        <label for="git-url" class="col-sm-2 pt-2 px-0">Git分支</label>
+                    <div class="form-group row m-0 mt-2">
+                        <label for="git-url" class="col-sm-2 pt-3 px-0 text-center">Git分支</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control outline-none" id="git-url"
                                 placeholder="Git分支, 选填，如不填写，则默认拉取master分支"
                                 v-model="cloneInfo.branch" />
                         </div>
                     </div>
-                    <div class="form-group row mx-0 mt-3">
-                        <label for="local-path" class="col-sm-2 pt-2 px-0">本地路径</label>
+                    <div class="form-group row m-0 mt-2">
+                        <label for="local-path" class="col-sm-2 pt-3 px-0 text-center">本地路径</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control outline-none" placeholder="本地存储路径"
                                 v-model="cloneInfo.localPath" />
                         </div>
                     </div>
-                    <div class="form-group row m-0 mt-3" v-show="isShowUserPasswd">
-                        <label for="u-p" class="col-sm-2 pt-2 px-0">账号密码</label>
+                    <div class="form-group row m-0 mt-2" v-show="isShowUserPasswd">
+                        <label for="u-p" class="col-sm-2 pt-3 px-0 text-center">账号密码</label>
                         <div class="col-sm-10">
                             <div class="row">
                                 <div class="col">
@@ -447,8 +455,8 @@ function generateLogHtml(hxData) {
                             <p class="form-text text-muted">如果是私有仓库，HTTP协议，克隆，需要提供账号密码</p>
                         </div>
                     </div>
-                    <div class="form-group row m-0 mt-4">
-                        <label for="git-url" class="col-sm-2 px-0">帮助文档</label>
+                    <div class="form-group row m-0 mt-2">
+                        <label for="git-url" class="col-sm-2 pt-2 px-0 text-center">帮助文档</label>
                         <div class="col-sm-10">
                             <p class="clone-help"> 1. 如遇到问题，请<a href="https://easy-git.github.io/connecting/" title="点击查看文档">参考文档</a>，
                                 或<a href="https://ext.dcloud.net.cn/plugin?id=2475" title="点击反馈">反馈给作者</a><br />
@@ -485,6 +493,7 @@ function generateLogHtml(hxData) {
                             password: '',
                             branch: ''
                         },
+                        isSearchGitHub: 0,
                         isSearch: false,
                         githubSearchResult: {}
                     },
