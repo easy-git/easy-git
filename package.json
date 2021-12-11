@@ -52,6 +52,7 @@
         "onCommand:EasyGit.pushNoVerify",
         "onCommand:EasyGit.pushSetUpstream",
         "onCommand:EasyGit.BranchSwitch",
+        "onCommand:EasyGit.BranchCreate",
         "onCommand:EasyGit.BranchDelete",
         "onCommand:EasyGit.BranchRename",
         "onCommand:EasyGit.BranchDiff",
@@ -326,6 +327,10 @@
             {
                 "command": "EasyGit.BranchRename",
                 "title": "easy-git: branch -m - 重命名当前分支"
+            },
+            {
+                "command": "EasyGit.BranchCreate",
+                "title": "easy-git: branch create - 创建分支"
             },
             {
                 "command": "EasyGit.merge",

@@ -107,9 +107,10 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                     id="inputBranch"
                                     type="text"
                                     class="form-control outline-none"
-                                    placeholder="分支名称"
+                                    :placeholder="inputBranchPlaceholder"
                                     autofocus="autofocus"
-                                    v-model.trim="inputBranch"/>
+                                    v-model.trim="inputBranch"
+                                    ref="BranchInput" />
                             </div>
                             <ul class="pl-0 mb-0" style="list-style-type:none;">
                                 <li class="lif cursor-default" @click="gitCreateBranch();">
@@ -298,7 +299,9 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                 autofocus="autofocus"
                                 placeholder="新的分支名称"
                                 style="height: 30px !important;background: ${background};"
-                                v-model.trim="fromToCreate.newBranchName" />
+                                v-model.trim="fromToCreate.newBranchName"
+                                ref="GitBranchName"
+                                />
                           </div>
                           <div class="form-group">
                             <label for="ref">选择 ref 以便创建新分支</label>
@@ -338,6 +341,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     originurlBoolean: '',
                     isShowModel: false,
                     inputBranch: '',
+                    inputBranchPlaceholder: '分支名称',
                     isShowLocalBranch: true,
                     isShowOrigin: false,
                     rawOriginBranchList: [],
@@ -518,6 +522,12 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         });
                     },
                     gitCreateBranch() {
+                        let t = this.inputBranch;
+                        if (!t || t == '' || t.length == 0) {
+                            this.inputBranchPlaceholder = "请输入要创建的分支名称";
+                            this.$refs.BranchInput.focus();
+                            return;
+                        };
                         hbuilderx.postMessage({
                             command: 'BranchCreate',
                             newBranchName: this.inputBranch
@@ -529,6 +539,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             this.fromToCreate.ref = source;
                             this.inputDisabled = true;
                         };
+                        this.$refs.GitBranchName.focus();
                     },
                     gitCreateBranchFromRef() {
                         let {newBranchName,ref,isPush} = this.fromToCreate;
@@ -559,6 +570,12 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         });
                     },
                     gitCreatePushBranch() {
+                        let t = this.inputBranch;
+                        if (!t || t == '' || t.length == 0) {
+                            this.inputBranchPlaceholder = "请输入要创建的分支名称";
+                            this.$refs.BranchInput.focus();
+                            return;
+                        };
                         hbuilderx.postMessage({
                             command: 'BranchCreatePush',
                             text: this.inputBranch

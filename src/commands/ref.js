@@ -12,6 +12,7 @@ const {
     gitBranchMerge,
     gitBranchSwitch,
     gitBranchRename,
+    gitBranchCreate,
     gitCurrentBranchName,
     gitLocalBranchToRemote,
     gitDeleteRemoteBranch,
@@ -440,9 +441,106 @@ class Branch {
             applyEdit(fileDetails);
         };
     };
-
 };
 
+
+class BranchCreate {
+    constructor(arg) {
+        this.DefaultFormData = [
+            {
+                type: "radioGroup",name: "action",value: "ref",
+                items: [
+                    {label: "从当前分支创建",id: "current"},{label: "从...创建分支",id: "ref"}
+                ]
+            },
+            {type: "input",name: "StartPoint",label: "ref",placeholder: "commitID，其它本地分支名称，或远程分支名称(如origin/dev)", value: ""},
+            {type: "input",name: "BranchName",label: "branch",placeholder: "输入您要创建的新分支名称", value: ""},
+            {type: "label", name: "desc1", label: "desc1" ,text: ""},
+            {type: "checkBox",name: "isPush",label: "是否推送到远端", value: true},
+            {type: "label", name: "desc2", label: "desc2" ,text: ""},
+        ];
+    }
+
+    async goValidate(formData, that) {
+        // 检查：所有项不能为空
+        let { action, StartPoint, BranchName } = formData;
+        that.showError('');
+        if (BranchName.trim() == "" || !BranchName) {
+            that.showError(`branch: 分支名称不能为空或填写错误`);
+            return false;
+        };
+
+        if (action == "ref" && StartPoint.trim() == '') {
+            that.showError(`ref: 不能为空或填写错误`);
+            return false;
+        };
+        return true;
+    };
+
+    /**
+     * @description 分支创建
+     * @param {type} data 项目路径
+     */
+    async main(ProjectInfo) {
+        let that = this;
+        let { projectPath } = ProjectInfo;
+
+        function getFormItems(action='ref') {
+            let refName = action == 'current' ? '' : '';
+            var formData = [...that.DefaultFormData]
+            if (action == "current") {
+                formData.splice(1,1);
+            };
+            return {
+                title: "Git - 创建分支",
+                width: 500,
+                height: 240,
+                formItems: formData,
+            }
+        };
+
+        let BranchInfo = await hx.window.showFormDialog({
+            submitButtonText: "创建(&S)",
+            cancelButtonText: "取消(&C)",
+            ...getFormItems('ref'),
+            validate: function(formData) {
+                let checkResult = that.goValidate(formData, this);
+                return checkResult;
+            },
+            onChanged: function (field, value, formData) {
+                if (field == "action") {
+                  this.updateForm(getFormItems(value,that));
+                };
+                return formData;
+            }
+        }).then((res) => {
+            return res;
+        }).catch(error => {
+            console.log(error);
+        });
+
+        if (BranchInfo == undefined) return;
+
+        let { action, StartPoint, BranchName, isPush } = BranchInfo;
+        let LastInfo = {
+            "projectPath" : projectPath,
+            "newBranchName" : BranchName,
+            "ref": undefined,
+            "isPush": isPush
+        };
+        if (action == 'ref') {
+            LastInfo["ref"] = StartPoint;
+        };
+        let status = await gitBranchCreate(LastInfo);
+
+        let msg1 = isPush ? `${BranchName} 分支创建、并推送，` : `${BranchName} 分支创建，`;
+        if (status == "success") {
+            hx.window.showInformationMessage(msg1 + "成功。", ['我知道了']);
+        } else {
+            hx.window.showErrorMessage(msg1 + "失败。", ['我知道了']);
+        };
+    };
+}
 
 /**
  * @description Git Revert
@@ -752,6 +850,7 @@ async function showHashFileContent(ProjectInfo) {
 module.exports = {
     Tag,
     Branch,
+    BranchCreate,
     Revert,
     Reset,
     Archive,

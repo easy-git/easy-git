@@ -308,7 +308,7 @@ function importProjectToExplorer(projectPath) {
             hxExecutableProgram = path.join(appRoot,'cli.exe');
         };
         cmd_args = [ "project", "open", "--path", projectPath];
-        
+
         const command = spawn.sync(hxExecutableProgram, cmd_args, {
           stdio: 'ignore'
         });
@@ -1639,7 +1639,6 @@ async function gitBranchCreate(data) {
 
     // status bar show message
     hx.window.setStatusBarMessage(`Git: 正在创建${newBranchName}, 创建成功后会自动刷新当前页面，请勿进行其它操作。`, 5000, 'info');
-
     if (isPush) {
         try {
             let HEAD = "HEAD:" + newBranchName;
@@ -1647,7 +1646,7 @@ async function gitBranchCreate(data) {
                 .checkout(args)
                 .push(["--set-upstream","origin",newBranchName])
                 .then(() => {
-                    hx.window.setStatusBarMessage(`Git: ${newBranchName} 新分支创建成功`, 30000, 'info');
+                    hx.window.setStatusBarMessage(`Git: ${newBranchName} 新分支，创建、并推送分支到远端成功。`, 30000, 'info');
                     return 'success';
                 })
                 .catch((err) => {

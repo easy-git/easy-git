@@ -6,8 +6,8 @@ const file = require('./common/file.js');
 const upgrade = require('./common/upgrade.js');
 
 const { getThemeColor } = require('./common/utils.js');
-const { openOAuthBox } = require('./common/oauth.js');
-const { Gitee, onUriForResponse } = require('./common/oauth.js');
+// const { openOAuthBox } = require('./common/oauth.js');
+const { openOAuthBox, Gitee, onUriForResponse } = require('./common/oauth.js');
 const { goSetEncoding } = require('./commands/base.js');
 
 const git = require('./commands/index.js');
@@ -119,6 +119,12 @@ function activate(context) {
         git.action(param, 'twoBranchSpecificFileDiff');
     });
     context.subscriptions.push(two_branch_specific_file_diff);
+
+    // 创建分支
+    let BranchCreate = hx.commands.registerCommand('EasyGit.BranchCreate', (param) => {
+        git.action(param, 'BranchCreate');
+    });
+    context.subscriptions.push(BranchCreate);
 
     // 菜单【工具】【克隆存储库】
     let clone = hx.commands.registerCommand('EasyGit.clone',(param) => {

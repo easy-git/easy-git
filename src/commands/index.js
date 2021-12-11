@@ -11,7 +11,7 @@ const { gitInitProject } = require('./repository_init.js');
 const { gitAddFile, gitRestore, goCleanFile, goCommit } = require('./file.js');
 const { goSetConfig, goShowConfig } = require('./base.js');
 
-const { Tag, Branch, Revert, Reset, Archive, reflog, showHashFileContent } = require('./ref.js');
+const { Tag, Branch, BranchCreate, Revert, Reset, Archive, reflog, showHashFileContent } = require('./ref.js');
 const openBranchDiffView = require('./branch_diff.js');
 
 const gitBlameForLineChange = require('./blame.js');
@@ -167,6 +167,10 @@ async function action(param, action_name) {
             break;
         case 'BranchSwitch':
             bch.switchBranch(ProjectInfo);
+            break;
+        case 'BranchCreate':
+            let bc = new BranchCreate();
+            bc.main(ProjectInfo);
             break;
         case 'BranchDelete':
             bch.del(ProjectInfo);
