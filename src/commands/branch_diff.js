@@ -9,7 +9,6 @@ let {
     FileWriteAndOpen,
     gitRaw
 } = require('../common/utils.js');
-const cmp_hx_version = require('../common/cmp.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'bootstrap.min.css');
@@ -17,21 +16,12 @@ const customCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static',
 
 // get hbuilderx version
 let hxVersion = hx.env.appVersion;
-hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
-let cmp = cmp_hx_version(hxVersion, '3.1.2');
 
 /**
  *@description 打开分支比较视图
  */
 var isDisplayError;
 async function openBranchDiffView(ProjectInfo, isSpecificFile=false) {
-    try{
-        if (cmp > 0) {
-            hx.window.showInformationMessage("此功能仅支持HBuilderX 3.1.2+以上版本，请升级。", ["我知道了"]);
-        };
-    }catch(e){
-        hx.window.showInformationMessage("警告：此功能仅支持HBuilderX 3.1.2+以上版本，请升级。", ["我知道了"]);
-    };
 
     // 获取项目信息
     let { projectName, projectPath } = ProjectInfo;

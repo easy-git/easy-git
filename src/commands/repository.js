@@ -6,7 +6,6 @@ const chokidar = require('chokidar');
 const { goSetEncoding } = require('./base.js');
 const { gitSetForWebDialog } = require('./repository_init.js');
 
-const cmp_hx_version = require('../common/cmp.js');
 const { axiosPost, axiosGet } = require('../common/axios.js');
 const { Gitee, Github, gitRepoCreate } = require('../common/oauth.js');
 const { gitRaw, createOutputChannel } = require('../common/utils.js');
@@ -14,11 +13,6 @@ const { gitRaw, createOutputChannel } = require('../common/utils.js');
 const vueFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'bootstrap.min.css');
 const customCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'custom.css');
-
-// get hbuilderx version
-let hxVersion = hx.env.appVersion;
-hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
-let cmp = cmp_hx_version(hxVersion, '3.1.2');
 
 let giteeOAuth = new Gitee();
 let githubOAuth = new Github();
@@ -128,15 +122,7 @@ async function gitRepositoryCreate(FromData={}) {
         fromProjectPath = '';
         fromProjectName = '';
     };
-
-    try{
-        if (cmp > 0) {
-            hx.window.showInformationMessage("此功能仅支持HBuilderX 3.1.2+以上版本，请升级。", ["我知道了"]);
-        };
-    }catch(e){
-        hx.window.showInformationMessage("警告：此功能仅支持HBuilderX 3.1.2+以上版本，请升级。", ["我知道了"]);
-    };
-
+    
     let giteeOAuthInfo = await giteeOAuth.readLocalToken();
     let githubOAuthInfo = await githubOAuth.readLocalToken();
 

@@ -16,7 +16,6 @@ const git = require('simple-git');
 const utils = require('./common/utils.js');
 const file = require('./common/file.js');
 
-const cmp_hx_version = require('./common/cmp.js');
 const upgrade = require('./common/upgrade.js');
 const count = require('./common/count.js');
 

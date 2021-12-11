@@ -19,12 +19,12 @@ const fileIO= require('./file.js');
 const osName = os.platform();
 
 // hbuilderx version
-const cmp_hx_version = require('./cmp.js');
-let hxVersion = hx.env.appVersion;
-hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
+// const cmp_hx_version = require('./cmp.js');
+// let hxVersion = hx.env.appVersion;
+// hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
 
-const cmpVersionResult = cmp_hx_version(hxVersion, '2.9.12');
-const cmpVersionResult_for_outputChannel = cmp_hx_version(hxVersion, '3.1.1');
+// const cmpVersionResult = cmp_hx_version(hxVersion, '2.9.12');
+// const cmpVersionResult_for_outputChannel = cmp_hx_version(hxVersion, '3.1.1');
 
 // 2021-4-16: 是否忽略Git钩子
 let config = hx.workspace.getConfiguration();
@@ -302,21 +302,13 @@ function importProjectToExplorer(projectPath) {
         let appRoot = hx.env.appRoot;
         let appVersion = hx.env.appVersion;
 
-        const tmp1 = cmp_hx_version(appVersion, '3.1.13');
-        if (tmp1 <= 0) {
-            if (osName == 'darwin') {
-                hxExecutableProgram = path.join(path.dirname(appRoot),'MacOS/cli');
-            } else {
-                hxExecutableProgram = path.join(appRoot,'cli.exe');
-            };
-            cmd_args = [ "project", "open", "--path", projectPath];
+        if (osName == 'darwin') {
+            hxExecutableProgram = path.join(path.dirname(appRoot),'MacOS/cli');
         } else {
-            if (osName == 'darwin') {
-                hxExecutableProgram = path.join(path.dirname(appRoot),'MacOS/HBuilderX');
-            } else {
-                hxExecutableProgram = path.join(appRoot,'HBuilderX.exe');
-            };
+            hxExecutableProgram = path.join(appRoot,'cli.exe');
         };
+        cmd_args = [ "project", "open", "--path", projectPath];
+        
         const command = spawn.sync(hxExecutableProgram, cmd_args, {
           stdio: 'ignore'
         });
@@ -421,11 +413,7 @@ function createOutputChannel(msg, msgLevel=undefined) {
 
     // 采用try{} catch{} 写法的原因：颜色输出在3.1.0才支持，为了兼容老版本
     try {
-        if (['warning', 'success', 'error', 'info'].includes(msgLevel) && (cmpVersionResult_for_outputChannel <= 0)) {
-            outputChannel.appendLine({ line: msg, level: msgLevel });
-        } else {
-            outputChannel.appendLine(msg);
-        };
+        outputChannel.appendLine({ line: msg, level: msgLevel });
     } catch (e) {
         console.log(e)
         outputChannel.appendLine(msg);
@@ -2470,22 +2458,16 @@ function hxShowMessageBox(title, text, buttons = ['关闭']) {
                     buttons = buttons.reverse();
                 };
             };
-            if (cmpVersionResult <= 0) {
-                hx.window.showMessageBox({
-                    type: 'info',
-                    title: title,
-                    text: text,
-                    buttons: buttons,
-                    defaultButton: 0,
-                    escapeButton: escape
-                }).then(button => {
-                    resolve(button);
-                })
-            } else {
-                hx.window.showInformationMessage(text, buttons).then((result) => {
-                    resolve(result);
-                });
-            };
+            hx.window.showMessageBox({
+                type: 'info',
+                title: title,
+                text: text,
+                buttons: buttons,
+                defaultButton: 0,
+                escapeButton: escape
+            }).then(button => {
+                resolve(button);
+            });
         } catch (e) {
             hx.window.showInformationMessage(text, buttons).then((result) => {
                 resolve(result);

@@ -7,7 +7,7 @@
     "git_url": "https://github.com/easy-git/easy-git.git",
     "doc_url": "https://easy-git.github.io/",
     "engines": {
-        "HBuilderX": "^2.8.3"
+        "HBuilderX": "^3.2.6"
     },
     "categories": [
         "Other"

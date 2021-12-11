@@ -3,7 +3,6 @@ const path = require('path');
 
 const Main = require("./index.js");
 const file = require('./common/file.js');
-const cmp_hx_version = require('./common/cmp.js');
 const upgrade = require('./common/upgrade.js');
 
 const { getThemeColor } = require('./common/utils.js');
@@ -35,39 +34,22 @@ FileView.webView.html = `<body style="background-color: ${background};"><p style
 function activate(context) {
     context.source = 'viewMenu';
 
-    // hbuilderx version 2.9.2+ , git log view, use customEditor
-    const cmp = cmp_hx_version(hxVersion, '2.9.2');
-    if (cmp <= 0) {
-        // git log customEditor view
-        var { CatCustomEditorProvider, GitLogCustomWebViewPanal } = require('./view/log/index.js');
-        let provider = new CatCustomEditorProvider({}, {}, {});
-        hx.window.registerCustomEditorProvider("EasyGit - 日志", provider);
+    // git log customEditor view
+    var { CatCustomEditorProvider, GitLogCustomWebViewPanal } = require('./view/log/index.js');
+    let provider = new CatCustomEditorProvider({}, {}, {});
+    hx.window.registerCustomEditorProvider("EasyGit - 日志", provider);
 
-        // git file diff cusomtEditor view
-        var { CatDiffCustomEditorProvider, GitDiffCustomWebViewPanal } = require('./view/diff/CustomEditor.js');
-        let providerForDiff = new CatDiffCustomEditorProvider({}, {}, {});
-        hx.window.registerCustomEditorProvider("EasyGit - 对比差异", providerForDiff);
-    };
+    // git file diff cusomtEditor view
+    var { CatDiffCustomEditorProvider, GitDiffCustomWebViewPanal } = require('./view/diff/CustomEditor.js');
+    let providerForDiff = new CatDiffCustomEditorProvider({}, {}, {});
+    hx.window.registerCustomEditorProvider("EasyGit - 对比差异", providerForDiff);
 
-    try {
-        // 解决某些hx版本上，registerUriHandler拼写错误的Bug
-        let cmpUri = cmp_hx_version(hxVersion, '2.8.12');
-        if (cmpUri > 0) {
-            hx.window.registerUriHanlder({
-                handleUri: function(uri) {
-                    onUriForResponse(uri);
-                }
-            }, context);
-        } else {
-            hx.window.registerUriHandler({
-                handleUri: function(uri) {
-                    onUriForResponse(uri);
-                }
-            }, context);
-        };
-    } catch (e) {
-        console.error(e);
-    };
+    // 用于Github/Gitee Oauth授权认证
+    hx.window.registerUriHandler({
+        handleUri: function(uri) {
+            onUriForResponse(uri);
+        }
+    }, context);
 
     // 命令面板
     let CommandPanel = hx.commands.registerCommand('EasyGit.CommandPanel', (param) => {
@@ -103,13 +85,10 @@ function activate(context) {
     // 菜单【日志】, 打开日志视图
     let view_log_manage = hx.commands.registerCommand('EasyGit.log', (param) => {
         if (param == undefined) {return};
-        if (cmp <=0) {
-            let LogCscratFile = path.join(__dirname, 'view',  'log', 'cscrat', 'EasyGit - 日志');
-            hx.workspace.openTextDocument(LogCscratFile);
-        } else {
-            hx.window.showErrorMessage("EasyGit: 日志视图仅支持HBuilderX 2.9.2+版本，请升级HBuilderX。", ["我知道了"])
-            return;
-        };
+
+        let LogCscratFile = path.join(__dirname, 'view',  'log', 'cscrat', 'EasyGit - 日志');
+        hx.workspace.openTextDocument(LogCscratFile);
+
         context.source = 'filesExplorer';
         let view_log = new Main('log', param, {}, context);
         view_log.run();
@@ -119,13 +98,10 @@ function activate(context) {
     // git diff view
     let view_diff_file = hx.commands.registerCommand('EasyGit.diffFile', (param)=> {
         if (param == undefined) {return};
-        if (cmp <=0) {
-            let DiffCscratFile = path.join(__dirname, 'view',  'diff', 'cscrat', 'EasyGit - 对比差异');
-            hx.workspace.openTextDocument(DiffCscratFile);
-        } else {
-            hx.window.showErrorMessage("EasyGit: 文件对比视图仅支持HBuilderX 2.9.2+版本，请升级HBuilderX。", ["我知道了"])
-            return;
-        };
+
+        let DiffCscratFile = path.join(__dirname, 'view',  'diff', 'cscrat', 'EasyGit - 对比差异');
+        hx.workspace.openTextDocument(DiffCscratFile);
+
         context.source = 'filesExplorer';
         let view_diff = new Main('diff', param, {}, context);
         view_diff.run();
@@ -442,16 +418,7 @@ function activate(context) {
 
     // git blame: show line last change info
     let ForLineChange = hx.commands.registerCommand('EasyGit.gitBlameForLineChange', (param)=> {
-        const cmp3 = cmp_hx_version(hxVersion, '2.9.5');
-        if (cmp3 <= 0) {
-            git.action(param, 'BlameForLineChange')
-        } else {
-            hx.window.showErrorMessage('Git: 此功能适用于HBuilderX 2.9.5+版本。', ['升级HBuilderX', '关闭']).then( (res) => {
-                if (res == '升级HBuilderX') {
-                    hx.commands.executeCommand('update.checkForUpdate');
-                }
-            })
-        }
+        git.action(param, 'BlameForLineChange')
     });
     context.subscriptions.push(ForLineChange);
 

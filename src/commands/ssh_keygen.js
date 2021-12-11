@@ -8,17 +8,11 @@ const hx = require('hbuilderx');
 const chokidar = require('chokidar');
 
 const count = require('../common/count.js');
-const cmp_hx_version = require('../common/cmp.js');
 const { hxShowMessageBox, createOutputView } = require('../common/utils.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'bootstrap.min.css');
 const customCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'custom.css');
-
-// get hbuilderx version
-let hxVersion = hx.env.appVersion;
-hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
-let cmp = cmp_hx_version(hxVersion, '3.1.2');
 
 const osName = os.platform();
 
@@ -200,14 +194,6 @@ async function generating_ssh_keys(webviewDialog, data) {
  * @param {Object} FromData 用于处理从初始化过来的数据
  */
 async function sshKeygen() {
-    try{
-        if (cmp > 0) {
-            hx.window.showInformationMessage("此功能仅支持HBuilderX 3.1.2+以上版本，请升级。", ["我知道了"]);
-        };
-    }catch(e){
-        hx.window.showInformationMessage("警告：此功能仅支持HBuilderX 3.1.2+以上版本，请升级。", ["我知道了"]);
-    };
-
     // 创建webviewdialog
     let webviewDialog = hx.window.createWebViewDialog({
         modal: true,
