@@ -54,6 +54,7 @@ function getUIData() {
     let ChevronDownIcon = icon.getChevronDown(fontColor);
     let ChevronRightIcon = icon.getChevronRight(fontColor);
     let HandleIcon = icon.getHandleIcon(fontColor);
+    let CommandPanelIcon = icon.getCommandPanelIcon(fontColor);
 
     let iconData = {
         CancelIconSvg,
@@ -77,7 +78,8 @@ function getUIData() {
         uploadIcon,
         ChevronRightIcon,
         ChevronDownIcon,
-        HandleIcon
+        HandleIcon,
+        CommandPanelIcon
     };
     return Object.assign(iconData,colorData);
 };

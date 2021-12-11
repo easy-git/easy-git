@@ -46,7 +46,8 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
         uploadIcon,
         ChevronDownIcon,
         ChevronRightIcon,
-        HandleIcon
+        HandleIcon,
+        CommandPanelIcon
     } = uiData;
 
     let {
@@ -96,7 +97,8 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             <span class="top">{{projectName}}</span>
                         </div>
                         <div class="col-auto p-0">
-                            <span class="top" @click="getProjectGitInfo();" title="刷新">${iconRefresh}</span>
+                            <span class="top" @click="openCommandPanel();" title="打开命令面板">${CommandPanelIcon}</span>
+                            <span class="top" @click="getProjectGitInfo();" title="刷新当前视图">${iconRefresh}</span>
                             <span class="top" @click="gitCommit();" :title="GitAlwaysAutoCommitPush && gitStagedFileList.length ? 'commit & push' : 'commit'">${CheckMarkIcon}</span>
                             <span class="top" @click="gitLog();" title="查看日志">${HistoryIcon}</span>
                             <span class="top" @click.stop="clickMenu();">
