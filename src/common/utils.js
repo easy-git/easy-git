@@ -1071,7 +1071,13 @@ async function gitCommit(workingDir, comment) {
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: commit操作失败。\n${errMsg}`);
+                if (errMsg.includes('user.email') || errMsg.includes('user.name')) {
+                    createOutputChannel(`Git: commit操作失败。原因：未设置user.name或user.email。`, 'error');
+                    createOutputChannel(`备注：user.name和user.email用于标识身份，Git提交会用到这些信息。`, 'info');
+                    createOutputChannel(`解决方法: 点击顶部菜单【工具 -> easy-git】，设置user.name和user.email。`, 'info');
+                } else {
+                    createOutputChannel(`Git: commit操作失败。\n${errMsg}`);
+                };
                 return 'fail';
             });
         return status
@@ -1103,7 +1109,13 @@ async function gitAddCommit(workingDir,commitComment) {
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: add and commit失败 ${errMsg}`);
+                if (errMsg.includes('user.email') || errMsg.includes('user.name')) {
+                    createOutputChannel(`Git: commit操作失败。原因：未设置user.name或user.email。`, 'error');
+                    createOutputChannel(`备注：user.name和user.email用于标识身份，Git提交会用到这些信息。`, 'info');
+                    createOutputChannel(`解决方法: 点击顶部菜单【工具 -> easy-git】，设置user.name和user.email。`, 'info');
+                } else {
+                    createOutputChannel(`Git: add and commit失败 ${errMsg}`);
+                };
                 return 'fail';
             });
         return status
