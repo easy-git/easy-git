@@ -169,8 +169,9 @@ async function action(param, action_name) {
             bch.switchBranch(ProjectInfo);
             break;
         case 'BranchCreate':
+            let bc_info = Object.assign({ 'refStartPoint': param.ref }, ProjectInfo);
             let bc = new BranchCreate();
-            bc.main(ProjectInfo);
+            bc.main(bc_info);
             break;
         case 'BranchDelete':
             bch.del(ProjectInfo);

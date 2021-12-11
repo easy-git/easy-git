@@ -255,7 +255,8 @@ async function GitLogCustomEditorRenderHtml(projectData, userConfig) {
                 Log.checkoutCommit(msg.hash);
                 break;
             case 'checkout-commit-for-create-branch':
-                Log.checkoutCommitForCreateBranch(msg.hash);
+                let BcParams = Object.assign({'ref': msg.hash}, easyGitInnerParams);
+                hx.commands.executeCommand('EasyGit.BranchCreate', BcParams)
                 break;
             case 'create-tag':
                 GitHBuilderXInnerTrigger = false;

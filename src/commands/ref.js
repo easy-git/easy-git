@@ -483,13 +483,16 @@ class BranchCreate {
      */
     async main(ProjectInfo) {
         let that = this;
-        let { projectPath } = ProjectInfo;
+        let { projectPath, refStartPoint } = ProjectInfo;
 
         function getFormItems(action='ref') {
             let refName = action == 'current' ? '' : '';
             var formData = [...that.DefaultFormData]
             if (action == "current") {
                 formData.splice(1,1);
+            };
+            if (refStartPoint != undefined && refStartPoint != '' && refStartPoint && action=='ref') {
+                formData[1]["value"] = refStartPoint;
             };
             return {
                 title: "Git - 创建分支",

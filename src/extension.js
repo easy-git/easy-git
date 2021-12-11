@@ -6,7 +6,6 @@ const file = require('./common/file.js');
 const upgrade = require('./common/upgrade.js');
 
 const { getThemeColor } = require('./common/utils.js');
-// const { openOAuthBox } = require('./common/oauth.js');
 const { openOAuthBox, Gitee, onUriForResponse } = require('./common/oauth.js');
 const { goSetEncoding } = require('./commands/base.js');
 
