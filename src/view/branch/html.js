@@ -119,7 +119,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                 <li class="lif cursor-default" @click="gitCreatePushBranch();">
                                     <span :title="'在当前工作区上创建分支, 即基于当前'+currentBranch+'分支创建'">从现有来源创建新分支并push</span>
                                 </li>
-                                <li class="lif cursor-default" @click="openModelBox('none');">
+                                <li class="lif cursor-default" @click="gitCreateBranchForExecuteCommand(undefined);">
                                     <span>从...创建分支</span>
                                 </li>
                             </ul>
@@ -158,7 +158,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                     </span>
                                     <span class="ml-1"
                                         title="从此分支上创建新分支"
-                                        @click="openModelBox(item.name);">
+                                        @click="gitCreateBranchForExecuteCommand(item.name);">
                                         ${AddIconSvg}
                                     </span>
                                     <span
@@ -206,7 +206,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                 <div id="branch_action_origin" class="d-inline float-right" v-if="hoverStampID == 'origin_'+idx">
                                     <span class="ml-1"
                                         title="从此分支上创建新分支"
-                                        @click="openModelBox(item.name);"
+                                        @click="gitCreateBranchForExecuteCommand(item.name);"
                                         v-if="(item.name).includes('origin/')">
                                         ${AddIconSvg}
                                     </span>
@@ -246,7 +246,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                 <div id="tag_action" class="d-inline float-right" v-if="hoverTagId == 'tag_'+i3">
                                     <span class="ml-1"
                                         title="从此tag上签出新分支"
-                                        @click="openModelBox(v3);">
+                                        @click="gitCreateBranchForExecuteCommand(v3);">
                                         ${AddIconSvg}
                                     </span>
                                     <span
@@ -286,46 +286,6 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     </div>
                 </div>
             </div>
-            <div id="is-model" class="container-fluid" v-if="isShowModel">
-                <div class="row mt-3">
-                    <div class="col">
-                        <form>
-                          <div class="form-group">
-                            <label for="newBranchName">新的分支名称</label>
-                            <input
-                                id="newBranchName"
-                                type="text"
-                                class="form-control outline-none"
-                                autofocus="autofocus"
-                                placeholder="新的分支名称"
-                                style="height: 30px !important;background: ${background};"
-                                v-model.trim="fromToCreate.newBranchName"
-                                ref="GitBranchName"
-                                />
-                          </div>
-                          <div class="form-group">
-                            <label for="ref">选择 ref 以便创建新分支</label>
-                            <input
-                                type="text"
-                                class="form-control outline-none"
-                                id="ref"
-                                style="height: 30px !important;background: ${background};"
-                                placeholder="commitID或其它分支名称，如origin/master"
-                                :disabled="inputDisabled"
-                                v-model.trim="fromToCreate.ref" />
-                          </div>
-                          <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="isPush" v-model='fromToCreate.isPush'>
-                            <label class="form-check-label" for="isPush">推送</label>
-                          </div>
-                          <div class="mt-3">
-                            <button type="submit" class="btnd" @click="gitCreateBranchFromRef();">创建</button>
-                            <button type="submit" class="btnd" @click='isShowModel=false'>关闭</button>
-                          </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
         </div>
         <script>
             var app = new Vue({
@@ -351,11 +311,6 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     BranchList: [],
                     rawTagsList: [],
                     TagsList: [],
-                    fromToCreate: {
-                        newBranchName: '',
-                        ref: '',
-                        isPush: true
-                    },
                     AssignAction: {},
                     inputDisabled: false,
                     hoverStampID: false,
@@ -424,18 +379,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         }, 1500);
                     };
 
-                    // 日志视图：选中log，右键菜单，【检出并创建新分支】
-                    if (this.AssignAction && JSON.stringify(this.AssignAction) != '{}') {
-                        let {name,value} = this.AssignAction;
-                        if (name == 'create-branch') {
-                            this.isShowModel = true;
-                            if (value != undefined && value) {
-                                this.fromToCreate.ref = value;
-                            };
-                        };
-                    } else {
-                        document.getElementById('inputBranch').focus();
-                    };
+                    document.getElementById('inputBranch').focus();
                 },
                 methods: {
                     receiveInfo() {
@@ -521,10 +465,16 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             text: 'branch'
                         });
                     },
+                    gitCreateBranchForExecuteCommand(refName) {
+                        hbuilderx.postMessage({
+                            command: 'BranchCreateForExecuteCommand',
+                            refName: refName
+                        });
+                    },
                     gitCreateBranch() {
                         let t = this.inputBranch;
                         if (!t || t == '' || t.length == 0) {
-                            this.inputBranchPlaceholder = "请输入要创建的分支名称";
+                            // this.inputBranchPlaceholder = "请输入要创建的分支名称";
                             this.$refs.BranchInput.focus();
                             return;
                         };
@@ -532,24 +482,6 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             command: 'BranchCreate',
                             newBranchName: this.inputBranch
                         });
-                    },
-                    openModelBox(source) {
-                        this.isShowModel = true;
-                        if (source != 'none') {
-                            this.fromToCreate.ref = source;
-                            this.inputDisabled = true;
-                        };
-                        this.$refs.GitBranchName.focus();
-                    },
-                    gitCreateBranchFromRef() {
-                        let {newBranchName,ref,isPush} = this.fromToCreate;
-                        hbuilderx.postMessage({
-                            command: 'BranchCreate',
-                            newBranchName: newBranchName,
-                            ref: ref,
-                            isPush: isPush
-                        });
-                        this.isShowModel = false;
                     },
                     switchBranch(branch) {
                         hbuilderx.postMessage({
@@ -572,7 +504,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     gitCreatePushBranch() {
                         let t = this.inputBranch;
                         if (!t || t == '' || t.length == 0) {
-                            this.inputBranchPlaceholder = "请输入要创建的分支名称";
+                            // this.inputBranchPlaceholder = "请输入要创建的分支名称";
                             this.$refs.BranchInput.focus();
                             return;
                         };

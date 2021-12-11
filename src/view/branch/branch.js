@@ -430,6 +430,10 @@ async function GitBranchView(webviewPanel, userConfig, projectData) {
             case 'BranchCreate':
                 Branch.create(msg);
                 break;
+            case 'BranchCreateForExecuteCommand':
+                let BcParams = Object.assign({'ref': msg.refName}, currentProjectData);
+                hx.commands.executeCommand('EasyGit.BranchCreate', BcParams);
+                break;
             case 'pushBranchToRemote':
                 Branch.LocalToRemote(msg.text);
                 break;
