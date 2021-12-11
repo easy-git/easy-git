@@ -1,5 +1,19 @@
 # Change Log
 
+# 1.5.2.20211211
+* 【重要】优化 插件最低需要HBuilderX 3.2.6版本，不再兼容低版本HBuilderX，如需使用低版本，请下载[历史版本](https://ext-resource-aliyun.dcloud.net.cn/marketplace/6dd3ab20-d963-11ea-bde4-b179a75bf332/1.5.1/plugin.zip?v=1627393994)
+* 新增 Command: EasyGit.BranchCreate 用于单独打开新窗口创建分支
+* 优化 Command: EasyGit.commit 提交窗口UI
+* 新增 源代码管理器视图、分支视图 增加`命令面板`入口
+* 优化 分支视图 增加分支对比功能入口
+* 优化 克隆视图 突出Github搜索功能 [详情](https://easy-git.github.io/connecting/github-search)
+* 优化 Github、Gitee oAuth授权窗口UI [详情](https://easy-git.github.io/oauth)
+* 优化 Git用户设置UI 菜单【工具 - easy-git】，设置user.name和user.email
+* 修复 某些情况下，创建.gitignore文件失败的Bug
+* 新增 HBuilderX 顶部菜单 文件 增加Git克隆菜单
+* 调整 编辑器 easy-git右键菜单内容
+* 调整 创建远程仓库窗口UI高度
+
 ## 1.5.1.20210727
 * 修复 分支视图 输入框颜色异常 的Bug
 * 修复 切换主题 某些情况下，git视图背景没有变化的Bug

@@ -49,3 +49,7 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 如果您觉得easy-git帮到了您，请小小的打个赏赞助一下，让我们全力以赴，做更好的工具！
 
 ![](https://easy-git.github.io/static/pay.png)
+
+## easy-git历史版本
+
+easy-git [1.5.1](https://ext-resource-aliyun.dcloud.net.cn/marketplace/6dd3ab20-d963-11ea-bde4-b179a75bf332/1.5.1/plugin.zip?v=1627393994), 可用于在HBuilderX 3.2.6以下版本使用。
