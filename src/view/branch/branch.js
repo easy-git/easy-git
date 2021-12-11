@@ -40,6 +40,7 @@ function getUIData() {
     let uploadIcon = icon.getUploadIcon(fontColor);
     let cloudIcon = icon.getCloudIcon(fontColor);
     let ShowIcon = icon.getShowIcon(fontColor);
+    let CommandPanelIcon = icon.getCommandPanelIcon(fontColor);
 
     let iconData = {
         AddIconSvg,
@@ -55,7 +56,8 @@ function getUIData() {
         TagIcon,
         uploadIcon,
         cloudIcon,
-        ShowIcon
+        ShowIcon,
+        CommandPanelIcon
     };
 
     let uiData = Object.assign(iconData,colorData);
@@ -447,6 +449,9 @@ async function GitBranchView(webviewPanel, userConfig, projectData) {
                 break;
             case 'TagList':
                 Branch.TagList();
+                break;
+            case 'openCommandPanel':
+                hx.commands.executeCommand('EasyGit.CommandPanel', currentProjectData);
                 break;
             default:
                 break;

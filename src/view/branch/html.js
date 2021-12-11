@@ -39,7 +39,8 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
         TagIcon,
         uploadIcon,
         cloudIcon,
-        ShowIcon
+        ShowIcon,
+        CommandPanelIcon
     } = uiData;
 
     let {
@@ -97,6 +98,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             <span class="top">{{ projectName }}</span>
                         </div>
                         <div class="col-auto pl-0">
+                            <span class="top" @click="openCommandPanel();" title="打开命令面板">${CommandPanelIcon}</span>
                             <span class="top" @click="back();" title="跳转到源代码管理器">${BackIcon}</span>
                         </div>
                     </div>
@@ -539,6 +541,11 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         hbuilderx.postMessage({
                             command: 'TagDetails',
                             name: tagName
+                        });
+                    },
+                    openCommandPanel() {
+                        hbuilderx.postMessage({
+                            command: 'openCommandPanel'
                         });
                     }
                 }
