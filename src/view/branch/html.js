@@ -113,11 +113,8 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                     ref="BranchInput" />
                             </div>
                             <ul class="pl-0 mb-0" style="list-style-type:none;">
-                                <li class="lif cursor-default" @click="gitCreateBranch();">
+                                <li class="lif cursor-default" @click="gitCreateBranchForExecuteCommand(currentBranch, 'current');">
                                    <span :title="'在当前工作区上创建分支, 即基于当前'+currentBranch+'分支创建'">从现有来源创建新分支</span>
-                                </li>
-                                <li class="lif cursor-default" @click="gitCreatePushBranch();">
-                                    <span :title="'在当前工作区上创建分支, 即基于当前'+currentBranch+'分支创建'">从现有来源创建新分支并push</span>
                                 </li>
                                 <li class="lif cursor-default" @click="gitCreateBranchForExecuteCommand(undefined);">
                                     <span>从...创建分支</span>
@@ -129,7 +126,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         </div>
                     </div>
                 </div>
-                <div id="gather-local-branchs" class="row"  style="margin-top:230px;">
+                <div id="gather-local-branchs" class="row"  style="margin-top:198px;">
                     <div class="col-12 mt-2 px-0">
                         <p class="mx-3 mb-1 major-title cursor-default">
                             <span @click="isShowLocalBranchList()">
@@ -468,22 +465,11 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             text: 'branch'
                         });
                     },
-                    gitCreateBranchForExecuteCommand(refName) {
+                    gitCreateBranchForExecuteCommand(refName, action='ref') {
                         hbuilderx.postMessage({
                             command: 'BranchCreateForExecuteCommand',
+                            action: action,
                             refName: refName
-                        });
-                    },
-                    gitCreateBranch() {
-                        let t = this.inputBranch;
-                        if (!t || t == '' || t.length == 0) {
-                            // this.inputBranchPlaceholder = "请输入要创建的分支名称";
-                            this.$refs.BranchInput.focus();
-                            return;
-                        };
-                        hbuilderx.postMessage({
-                            command: 'BranchCreate',
-                            newBranchName: this.inputBranch
                         });
                     },
                     switchBranch(branch) {
@@ -502,18 +488,6 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         hbuilderx.postMessage({
                             command: 'pushBranchToRemote',
                             text: branchName
-                        });
-                    },
-                    gitCreatePushBranch() {
-                        let t = this.inputBranch;
-                        if (!t || t == '' || t.length == 0) {
-                            // this.inputBranchPlaceholder = "请输入要创建的分支名称";
-                            this.$refs.BranchInput.focus();
-                            return;
-                        };
-                        hbuilderx.postMessage({
-                            command: 'BranchCreatePush',
-                            text: this.inputBranch
                         });
                     },
                     gitDiffBranch() {

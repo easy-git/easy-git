@@ -175,17 +175,6 @@ class GitBranch {
         };
     };
 
-    // Git branch: 从当前分支分支直接创建新分支，并推送
-    async FromCurrentBranchCreatePush(branchName) {
-        if (branchName == '') {
-            return hx.window.showErrorMessage('Git: 在输入框输入分支名称后，再点击创建。',['关闭']);
-        };
-        let cpStatus = await utils.gitBranchCreatePush(this.projectPath,branchName);
-        if (cpStatus == 'success') {
-            this.LoadingBranchView();
-        };
-    };
-
     // Git branch: 推送本地的分支到远端
     async LocalToRemote(branchName) {
         let toStatus = await utils.gitLocalBranchToRemote(this.projectPath,branchName);
@@ -431,14 +420,11 @@ async function GitBranchView(webviewPanel, userConfig, projectData) {
                 Branch.create(msg);
                 break;
             case 'BranchCreateForExecuteCommand':
-                let BcParams = Object.assign({'ref': msg.refName}, currentProjectData);
+                let BcParams = Object.assign({'ref': msg.refName, 'action': msg.action}, currentProjectData);
                 hx.commands.executeCommand('EasyGit.BranchCreate', BcParams);
                 break;
             case 'pushBranchToRemote':
                 Branch.LocalToRemote(msg.text);
-                break;
-            case 'BranchCreatePush':
-                Branch.FromCurrentBranchCreatePush(msg.text);
                 break;
             case 'BranchMerge':
                 Branch.merge(msg.from,msg.to);

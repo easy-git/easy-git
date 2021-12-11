@@ -454,9 +454,9 @@ class BranchCreate {
                 ]
             },
             {type: "input",name: "StartPoint",label: "ref",placeholder: "commitID，其它本地分支名称，或远程分支名称(如origin/dev)", value: ""},
-            {type: "input",name: "BranchName",label: "branch",placeholder: "输入您要创建的新分支名称", value: ""},
+            {type: "input",name: "BranchName",label: "名称",placeholder: "输入您要创建的新分支名称", value: ""},
             {type: "label", name: "desc1", label: "desc1" ,text: ""},
-            {type: "checkBox",name: "isPush",label: "是否推送到远端", value: true},
+            {type: "checkBox",name: "isPush",label: "是否推送到远端", value: false},
             {type: "label", name: "desc2", label: "desc2" ,text: ""},
         ];
     }
@@ -483,12 +483,18 @@ class BranchCreate {
      */
     async main(ProjectInfo) {
         let that = this;
-        let { projectPath, refStartPoint } = ProjectInfo;
+
+        // actionType和refStartPoint, 是从分支视图或log视图传入的参数
+        let { projectPath, refStartPoint, actionType } = ProjectInfo;
+        if (actionType == undefined || !['ref', 'current'].includes(actionType)) {
+            actionType = 'ref';
+        };
 
         function getFormItems(action='ref') {
             let refName = action == 'current' ? '' : '';
             var formData = [...that.DefaultFormData]
             if (action == "current") {
+                formData[0]["value"] = 'current';
                 formData.splice(1,1);
             };
             if (refStartPoint != undefined && refStartPoint != '' && refStartPoint && action=='ref') {
@@ -505,7 +511,7 @@ class BranchCreate {
         let BranchInfo = await hx.window.showFormDialog({
             submitButtonText: "创建(&S)",
             cancelButtonText: "取消(&C)",
-            ...getFormItems('ref'),
+            ...getFormItems(actionType),
             validate: function(formData) {
                 let checkResult = that.goValidate(formData, this);
                 return checkResult;
