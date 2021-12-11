@@ -133,7 +133,7 @@ async function gitRepositoryCreate(FromData={}) {
         dialogButtons: ["开始创建", "关闭"],
         size: {
             width: 730,
-            height: 430
+            height: 480
         }
     }, {
         enableScripts: true
