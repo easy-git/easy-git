@@ -370,7 +370,7 @@ function generateLogHtml(hxData) {
                             <div v-if="isSearchGitHub == 1">
                                 <input type="text"
                                     class="form-control outline-none" id="git-url"
-                                    placeholder="从Github克隆，输入关键字，回车搜索Github，仅返回前10条结果..."
+                                    placeholder="输入关键字后，按下回车，在Github全部仓库中搜索......"
                                     v-focus
                                     v-model="repo"
                                     @keyup.enter="GithubSearch()"
@@ -394,9 +394,12 @@ function generateLogHtml(hxData) {
                                 </span>
                             </div>
                             <p class="form-text text-muted mb-0">
-                                授权github、gitee等，自动加载您所有的仓库，克隆更方便。
-                                <a href="https://easy-git.github.io/oauth" class="link-no-style" title="点击查看详情">查看详情</a>
-                                <span class="link-text" @click="goAuthorize();" title="点击进行授权">授权</span>
+                                <span v-if="isSearchGitHub != 1">
+                                    授权github、gitee等，自动加载您所有的仓库，克隆更方便。
+                                    <a href="https://easy-git.github.io/oauth" class="link-no-style" title="点击查看详情">查看详情</a>
+                                    <span class="link-text" @click="goAuthorize();" title="点击进行授权">授权</span>
+                                </span>
+                                <span v-else>Github是否搜索成功，取决于您网络，目前仅返回前10条结果...</span>
                             </p>
                             <ul class="ul-list"
                                 style="margin-top: -22px;width: 485px;"
