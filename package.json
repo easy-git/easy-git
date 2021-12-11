@@ -503,6 +503,16 @@
             }
         ],
         "menus": {
+            "menubar/file": [
+                {
+                    "command": "EasyGit.clone",
+                    "title": "Git克隆仓库",
+                    "group": "tab"
+                },
+                {
+                    "group": "tab"
+                }
+            ],
             "explorer/context": [
                 {
                     "command": "EasyGit.clone",
