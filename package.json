@@ -515,6 +515,9 @@
             ],
             "explorer/context": [
                 {
+                    "group": "z_commands"
+                },
+                {
                     "command": "EasyGit.clone",
                     "title": "Git克隆",
                     "when": "explorerResourceCount == 0"
@@ -594,6 +597,9 @@
             ],
             "editor/context": [
                 {
+                    "group": "z_commands"
+                },
+                {
                     "command": "EasyGit.CommandPanel",
                     "title": "easy-git: 命令面板",
                     "when": "isGit",
@@ -667,6 +673,9 @@
                 }
             ],
             "menubar/tool": [
+                {
+                    "group": "ext_settings"
+                },
                 {
                     "command": "EasyGit.CommandPanel",
                     "title": "Git: 命令面板",
