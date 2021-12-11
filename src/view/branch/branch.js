@@ -443,6 +443,9 @@ async function GitBranchView(webviewPanel, userConfig, projectData) {
             case 'BranchMerge':
                 Branch.merge(msg.from,msg.to);
                 break;
+            case 'BranchDiff':
+                hx.commands.executeCommand('EasyGit.BranchDiff', currentProjectData);
+                break;
             case 'BranchDelete':
                 let branch = msg.text;
                 Branch.delete(branch);

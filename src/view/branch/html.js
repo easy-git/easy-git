@@ -122,11 +122,14 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                 <li class="lif cursor-default" @click="gitCreateBranchForExecuteCommand(undefined);">
                                     <span>从...创建分支</span>
                                 </li>
+                                <li class="lif cursor-default" @click="gitDiffBranch();">
+                                    <span>分支对比</span>
+                                </li>
                             </ul>
                         </div>
                     </div>
                 </div>
-                <div id="gather-local-branchs" class="row"  style="margin-top:198px;">
+                <div id="gather-local-branchs" class="row"  style="margin-top:230px;">
                     <div class="col-12 mt-2 px-0">
                         <p class="mx-3 mb-1 major-title cursor-default">
                             <span @click="isShowLocalBranchList()">
@@ -511,6 +514,11 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         hbuilderx.postMessage({
                             command: 'BranchCreatePush',
                             text: this.inputBranch
+                        });
+                    },
+                    gitDiffBranch() {
+                        hbuilderx.postMessage({
+                            command: 'BranchDiff'
                         });
                     },
                     gitMergeBranch(select) {
