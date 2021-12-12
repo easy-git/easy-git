@@ -302,7 +302,7 @@ function showClone(clone_url="") {
     let webviewDialog = hx.window.createWebViewDialog({
         modal: true,
         title: "Git Clone",
-        description: "克隆现有的Git仓库 <a href='https://easy-git.github.io/connecting/clone'>教程</a>",
+        description: '克隆现有的Git仓库 <a href="https://easy-git.github.io/connecting/clone">教程</a>',
         dialogButtons: ["开始克隆", "关闭"],
         size: {
             width: 730,
@@ -405,8 +405,11 @@ function generateLogHtml(hxData) {
                     color: #6c757d!important;
                 }
                 .link-text {
-                    color: #007bff;
+                    color: rgb(65,168,99);
                     margin-left: 10px;
+                }
+                .link-text:hover {
+                    text-decoration:underline;
                 }
             </style>
         </head>
@@ -536,8 +539,8 @@ function generateLogHtml(hxData) {
                         <div class="col-sm-10">
                             <p class="clone-help"> 1. 如遇到无法解决的问题，请<a href="https://ext.dcloud.net.cn/plugin?id=2475" title="点击反馈">反馈给作者</a><br />
                             </p>
-                            <p class="clone-help"> 2. 使用SSH克隆，需配置SSH。
-                                <span title="点击打开SSH KEY一键生成工具" class="link-text ml-0" @click="openSshKeygen();">生成或配置SSH KEY</span>
+                            <p class="clone-help"> 2. 基于 SSH 协议的 Git服务，在使用 SSH 协议访问仓库仓库之前，需要先配置好账户/仓库的SSH公钥。
+                                <span title="点击打开SSH KEY一键生成工具" class="link-text ml-0" @click="openSshKeygen();">一键生成配置SSH KEY</span>
                             </p>
                         </div>
                     </div>
