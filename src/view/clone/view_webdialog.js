@@ -25,6 +25,8 @@ const customCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'custom
 const osName = os.platform();
 const SyncIcon = getSyncIcon('#d4d4d4');
 
+const appDataDir = hx.env.appData;
+
 // Git仓库地址，用于数据填充
 var GitRepoUrl = '';
 
@@ -110,10 +112,71 @@ async function openGithubSearch(word, webviewDialog, webview) {
 };
 
 /**
+ * @description 保存github缓存数据到本地
+ * @param {Object} Data - Github仓库URL列表
+ */
+function saveGithupReposCacheData(data) {
+    try{
+        let {ssh, https} = data;
+        if (ssh.length) {
+            let cacheFile = path.join(GithubReposCacheDir, '.cache_github_repos');
+            fs.writeFile(cacheFile, JSON.stringify(data), function (err) {
+               if (err) throw err;
+            });
+        };
+    }catch(e){
+        console.log(e)
+    };
+};
+
+/**
+ * @description github缓存数据
+ */
+class GithubCache {
+    constructor() {
+        this.cacheFile = path.join(appDataDir, 'easy-git', 'oauth', '.cache_github_repos');
+    };
+
+    async save(data) {
+        try{
+            let {ssh, https} = data;
+            if (ssh.length) {
+                fs.writeFile(this.cacheFile, JSON.stringify(data), function (err) {
+                   if (err) throw err;
+                });
+            };
+        }catch(e){};
+    };
+
+    async read() {
+        try{
+            let fileRawContent = fs.readFileSync(this.cacheFile, 'utf-8');
+            let fileLastContent = JSON.parse(fileRawContent);
+            let check = fileLastContent instanceof Object;
+            if (!check) {return false;};
+            let {ssh, https} = fileLastContent;
+            if (ssh.length && https.length) {
+                return fileLastContent;
+            };
+        }catch(e){
+            return false;
+        };
+    };
+}
+
+/**
  * @description 获取用户仓库列表
  */
 async function getUserAllGitRepos(webview) {
     let allRepos = {"ssh":[],"https":[]};
+
+    let ghCache = new GithubCache();
+    try{
+        // 读取本地的Github缓存数据
+        let ghCacheData = await ghCache.read()
+        allRepos.ssh = [ ...allRepos["ssh"], ...ghCacheData["ssh"] ];
+        allRepos.https = [ ...allRepos["https"], ...ghCacheData["https"] ];
+    }catch(e){};
 
     let ge = new Gitee();
     let giteeRepos = await ge.getUserRepos();
@@ -131,11 +194,13 @@ async function getUserAllGitRepos(webview) {
     let githubRepos = await gtb.getUserRepos();
 
     if (githubRepos == 'fail-authorize') {
-        return webview.postMessage({command: 'authResult',data: false});
+        return;
     };
     if (githubRepos != 'fail-authorize') {
-        allRepos.ssh = [ ...allRepos["ssh"], ...githubRepos["ssh"] ]
-        allRepos.https = [ ...allRepos["https"], ...githubRepos["https"] ]
+        ghCache.save(githubRepos);
+
+        allRepos.ssh = [ ...allRepos["ssh"], ...githubRepos["ssh"] ];
+        allRepos.https = [ ...allRepos["https"], ...githubRepos["https"] ];
     };
     if (allRepos) {
         webview.postMessage({command: 'authResult',data: true});
@@ -236,11 +301,12 @@ function showClone(clone_url="") {
 
     let webviewDialog = hx.window.createWebViewDialog({
         modal: true,
-        title: "Git克隆",
+        title: "Git Clone",
+        description: "克隆现有的Git仓库 <a href='https://easy-git.github.io/connecting/clone'>教程</a>",
         dialogButtons: ["开始克隆", "关闭"],
         size: {
             width: 730,
-            height: 500
+            height: 520
         }
     }, {
         enableScripts: true
@@ -346,7 +412,7 @@ function generateLogHtml(hxData) {
         </head>
         <body>
             <div id="app" v-cloak>
-                <form>
+                <form class="mt-3">
                     <div class="form-group row m-0">
                         <label for="repo-type" class="col-sm-2 px-0 text-center">克隆协议</label>
                         <div class="col-sm-10 d-inline">
@@ -362,7 +428,7 @@ function generateLogHtml(hxData) {
                         <label for="repo-type" class="col-sm-2 px-0 text-center">仓库来源</label>
                         <div class="col-sm-10 d-inline">
                             <input name="repoSource" type="radio" class="mr-2" value="0"
-                                v-model="isSearchGitHub" />手动输入仓库地址
+                                v-model="isSearchGitHub" />输入仓库地址
                             <input name="repoSource" type="radio" class="ml-3 mr-2" value="1"
                                 v-model="isSearchGitHub" />搜索Github仓库
                         </div>
@@ -468,11 +534,10 @@ function generateLogHtml(hxData) {
                     <div class="form-group row m-0 mt-2">
                         <label for="git-url" class="col-sm-2 pt-2 px-0 text-center">帮助文档</label>
                         <div class="col-sm-10">
-                            <p class="clone-help"> 1. 如遇到问题，请<a href="https://easy-git.github.io/connecting/" title="点击查看文档">参考文档</a>，
-                                或<a href="https://ext.dcloud.net.cn/plugin?id=2475" title="点击反馈">反馈给作者</a><br />
+                            <p class="clone-help"> 1. 如遇到无法解决的问题，请<a href="https://ext.dcloud.net.cn/plugin?id=2475" title="点击反馈">反馈给作者</a><br />
                             </p>
-                            <p class="clone-help"> 2. 使用SSH克隆，需配置SSH，<a href="https://easy-git.github.io/auth/ssh-generate" title="点击查看教程">查看配置SSH教程</a>。
-                                <span title="点击打开SSH KEY一键生成工具" class="link-text ml-0" @click="openSshKeygen();">一键生成SSH KEY</span>
+                            <p class="clone-help"> 2. 使用SSH克隆，需配置SSH。
+                                <span title="点击打开SSH KEY一键生成工具" class="link-text ml-0" @click="openSshKeygen();">生成或配置SSH KEY</span>
                             </p>
                         </div>
                     </div>
