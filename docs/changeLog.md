@@ -1,6 +1,6 @@
 # Change Log
 
-# 1.5.2.20211211
+## 1.5.2.20211211
 * 【重要】优化 插件最低需要HBuilderX 3.2.6版本，不再兼容低版本HBuilderX，如需使用低版本，请下载[历史版本](https://ext-resource-aliyun.dcloud.net.cn/marketplace/6dd3ab20-d963-11ea-bde4-b179a75bf332/1.5.1/plugin.zip?v=1627393994)
 * 新增 Command: EasyGit.BranchCreate 用于单独打开新窗口创建分支
 * 优化 Command: EasyGit.commit 提交窗口UI
