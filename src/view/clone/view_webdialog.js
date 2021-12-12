@@ -118,19 +118,24 @@ async function getUserAllGitRepos(webview) {
     let ge = new Gitee();
     let giteeRepos = await ge.getUserRepos();
 
+    // 先返回gitee
+    if (giteeRepos != 'fail-authorize') {
+        let {ssh, https} = giteeRepos;
+        allRepos.ssh = [ ...allRepos["ssh"], ...ssh ];
+        allRepos.https = [ ...allRepos["https"], ...https ];
+        webview.postMessage({command: 'authResult',data: true});
+        webview.postMessage({command: 'repos',data: allRepos});
+    };
+
     let gtb = new Github();
     let githubRepos = await gtb.getUserRepos();
 
-    if (githubRepos == 'fail-authorize' && giteeRepos == 'fail-authorize') {
+    if (githubRepos == 'fail-authorize') {
         return webview.postMessage({command: 'authResult',data: false});
     };
     if (githubRepos != 'fail-authorize') {
-        allRepos = githubRepos;
-    };
-    if (giteeRepos != 'fail-authorize') {
-        let {ssh, https} = giteeRepos;
-        allRepos.ssh = [ ...allRepos["ssh"], ...ssh ]
-        allRepos.https = [ ...allRepos["https"], ...https ]
+        allRepos.ssh = [ ...allRepos["ssh"], ...githubRepos["ssh"] ]
+        allRepos.https = [ ...allRepos["https"], ...githubRepos["https"] ]
     };
     if (allRepos) {
         webview.postMessage({command: 'authResult',data: true});
@@ -376,7 +381,8 @@ function generateLogHtml(hxData) {
                                     @keyup.enter="GithubSearch()"
                                     @mouseover="isShowRecommend=true"
                                     @onblur="isShowRecommend=false "
-                                    @onfocus="isShowRecommend=true">
+                                    @onfocus="isShowRecommend=true"
+                                    ref="RepoUrl">
                             </div>
                             <div v-else>
                                 <input type="text"
@@ -385,7 +391,8 @@ function generateLogHtml(hxData) {
                                     v-focus v-model="repo"
                                     @mouseover="isShowRecommend=true"
                                     @onblur="isShowRecommend=false "
-                                    @onfocus="isShowRecommend=true">
+                                    @onfocus="isShowRecommend=true"
+                                    ref="RepoUrl">
                                 <span
                                     class="input-icon"
                                     title="当您授权Github等托管服务器后，可点此处刷新我的Git仓库列表"
@@ -401,18 +408,18 @@ function generateLogHtml(hxData) {
                                 </span>
                                 <span v-else>Github是否搜索成功，取决于您网络，目前仅返回前10条结果...</span>
                             </p>
-                            <ul class="ul-list"
+                            <ul id="githubReposList" class="ul-list"
                                 style="margin-top: -22px;width: 485px;"
                                 v-show="githubReposList.length && isShowRecommend"
                                 @mouseleave="isShowRecommend=false"
-                                v-if="isSearch">
+                                v-if="isSearchGitHub == 1">
                                 <li
                                     v-for="(item,idx) in githubReposList" :key="idx"
                                     @click="selectMyRepos(item);">
                                     {{item}}
                                 </li>
                             </ul>
-                            <ul class="ul-list"
+                            <ul id="myReposList" class="ul-list"
                                 style="margin-top: -22px;width: 485px;"
                                 v-show="myReposList.length && isShowRecommend"
                                 @mouseleave="isShowRecommend=false"
@@ -543,9 +550,9 @@ function generateLogHtml(hxData) {
                                 Protocol = 'https';
                             };
                             let result = this.githubSearchResult[Protocol];
-                            if (result && searchWord) {
-                                result = result.filter( x => x.includes(searchWord));
-                            };
+                            // if (result && searchWord) {
+                            //     result = result.filter( x => x.includes(searchWord));
+                            // };
                             return result == undefined ? [] : result;
                         }
                     },
@@ -567,7 +574,11 @@ function generateLogHtml(hxData) {
                             } else {
                                 this.clearDisplayError();
                             }
-                        }
+                        },
+                        isSearchGitHub: function (newVal, oldVal) {
+                            this.isShowRecommend = true;
+                            this.$refs.RepoUrl.focus();
+                        },
                     },
                     created() {
                         this.ProjectWizard = '${ProjectWizard}';
@@ -583,7 +594,7 @@ function generateLogHtml(hxData) {
                         this.$nextTick(() => {
                             window.addEventListener('hbuilderxReady', () => {
                                 this.gitClone();
-                                this.getCloneResult();
+                                this.getHBuilderXRceiveResult();
                                 this.getUserAllGitRepos();
                             })
                         });
@@ -632,7 +643,7 @@ function generateLogHtml(hxData) {
                                 command: 'sshKeygen'
                             });
                         },
-                        getCloneResult() {
+                        getHBuilderXRceiveResult() {
                             hbuilderx.onDidReceiveMessage((msg) => {
                                 if (msg.command == 'cloneResult') {
                                     let {status} = msg;
