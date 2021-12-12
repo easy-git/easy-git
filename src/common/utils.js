@@ -18,8 +18,7 @@ const fileIO= require('./file.js');
 
 const osName = os.platform();
 
-// hbuilderx version
-// const cmp_hx_version = require('./cmp.js');
+const cmp_hx_version = require('./cmp.js');
 // let hxVersion = hx.env.appVersion;
 // hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
 
@@ -562,13 +561,29 @@ async function checkGitUsernameEmail(projectPath, projectName, userConfig) {
 };
 
 /**
+ * @description git version比较： 不同的Git版本，windows credential.helper值不一样。
+ */
+async function JudgeGitVersion() {
+    try{
+        let version = await getGitVersion();
+        cmp_git = cmp_hx_version('2.29.0', version);
+        if (cmp_git >= 0 ) {
+            return true;
+        };
+        return false;
+    }catch(e){
+        return true;
+    };
+};
+
+/**
  * @description 检查用户凭证
  */
 async function checkGitCredentials(projectPath, unset=false) {
     if (unset == true) {
         await gitRaw(projectPath, ['config', '--global', '--unset', 'credential.helper']);
         await gitRaw(projectPath, ['config', '--local', '--unset', 'credential.helper']);
-        await gitRaw(projectPath, ['config', '--system', '--unset', 'credential.helper']);
+        // await gitRaw(projectPath, ['config', '--system', '--unset', 'credential.helper']);
         return;
     };
     let configData = await gitConfigShow(projectPath, false);
@@ -576,9 +591,11 @@ async function checkGitCredentials(projectPath, unset=false) {
     if (remoteOriginUrl.slice(0,4) == 'git@') { return 'ssh'; };
 
     let credential = configData['credential.helper'];
-    if (osName == 'win32' && credential != 'manager') {
+    if (osName == 'win32' && !['manager', 'manager-core'].includes(credential) ) {
         hx.window.setStatusBarMessage(`Git: 正在校验身份，如弹出授权，请同意或输入凭证信息！`, 30000, 'info');
-        let winCredentialResult = await gitRaw(projectPath, ['config', '--global', 'credential.helper', 'manager']);
+        let versionCheck = await JudgeGitVersion();
+        let credentialValue = versionCheck >= 0 ? 'manager-core' : 'manager';
+        let winCredentialResult = await gitRaw(projectPath, ['config', '--global', 'credential.helper', credentialValue]);
         return wincredentialResult;
     };
     if (osName == 'darwin' && credential != 'osxkeychain') {
@@ -1262,10 +1279,7 @@ async function gitPull(workingDir, options) {
                 } else if (errMsg.includes("local changes")) {
                     createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
                     createOutputChannel(msgForPullOther, 'info');
-                } else {
-                    createOutputChannel(`Git: pull ${cmd_details}失败。 \n ${errMsg}`, 'error');
-                    createOutputChannel(msgForPullOther, 'info');
-                };
+                }  else if (errMsg.includes("git --help")){                    createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');                } else {                    createOutputChannel(`Git: pull ${cmd_details}失败。 \n ${errMsg}`, 'error');                    createOutputChannel(msgForPullOther, 'info');                }
                 return 'fail';
             });
         return status
