@@ -177,7 +177,7 @@ async function generating_ssh_keys(webviewDialog, data) {
     };
 
     if (usage) {
-        createOutputView(`注意事项：SSH KEY创建成功成功后，同时也需要添加到Git托管服务器。设置教程：https://easy-git.github.io/auth/ssh-generate#Git服务器设置SSH公钥`, 'warning');
+        createOutputView(`注意事项：SSH KEY创建成功成功后，同时也需要添加到Git托管服务器（如Github、Gitee等）。设置教程：https://easy-git.github.io/auth/ssh-generate#Git服务器设置SSH公钥`, 'warning');
     };
 
 
@@ -197,8 +197,9 @@ async function sshKeygen() {
     // 创建webviewdialog
     let webviewDialog = hx.window.createWebViewDialog({
         modal: true,
-        title: "SSH key生成工具",
+        title: "SSH KEY一键生成工具",
         dialogButtons: ["创建", "关闭"],
+        description: '<a href="https://easy-git.github.io/auth/ssh-generate" title="点击查看教程">查看配置SSH教程</a>',
         size: {
             width: 740,
             height: 490
