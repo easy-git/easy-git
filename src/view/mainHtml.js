@@ -93,10 +93,10 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                 <div id="page-top" class="fixed-top">
                     <div id="refresh-progress" v-show="refreshProgress"></div>
                     <div class="row m-3">
-                        <div class="col-auto mr-auto p-0 project-name" :title="projectName">
+                        <div class="col-auto p-0 project-name" :title="'项目名称:'+projectName">
                             <span class="top">{{projectName}}</span>
                         </div>
-                        <div class="col-auto p-0">
+                        <div class="col-auto ml-auto p-0 top-function-icon">
                             <span class="top" @click="openCommandPanel();" title="打开命令面板">${CommandPanelIcon}</span>
                             <span class="top" @click="getProjectGitInfo();" title="刷新当前视图">${iconRefresh}</span>
                             <span class="top" @click="gitCommit();" :title="GitAlwaysAutoCommitPush && gitStagedFileList.length ? 'commit & push' : 'commit'">${CheckMarkIcon}</span>

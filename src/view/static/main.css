@@ -113,7 +113,7 @@ body::-webkit-scrollbar {
 }
 
 .project-name {
-    width: 120px;
+    width: 80px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -121,8 +121,20 @@ body::-webkit-scrollbar {
 
 @media screen and (max-width: 249px) {
     .project-name {
-        width: calc(100% - 129px);
+        width: 35px;
     }
+}
+
+@media screen and (max-width: 183px) {
+    .project-name {
+        width: 0px;
+    }
+}
+
+.top-function-icon {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis
 }
 
 .text-hidden {
