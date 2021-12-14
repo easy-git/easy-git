@@ -160,7 +160,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                 @mouseover="hoverConflictedFileID = 'conflicted_'+i1"
                                 @mouseleave="hoverConflictedFileID = false">
                                 <div class="flex-grow-1 text-hidden cursor-default" :title="v1.path" >
-                                    <span :class="[v1.tag == 'D' ? 'line-through' : '']" @click="gitDiff(v1.path, v1.tag, true);">{{ v1.path }}</span>
+                                    <span :class="[v1.tag == 'D' ? 'line-through' : '']" @click="gitDiff('MergeChanges', v1.path, v1.tag, true);">{{ v1.path }}</span>
                                 </div>
                                 <div class="d-inline float-right" :id="'conflicted_'+i1">
                                     <div class="d-inline" v-if="hoverConflictedFileID == 'conflicted_'+i1">
@@ -192,7 +192,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                 @mouseover="hoverStashFileID = 'stash_'+ii"
                                 @mouseleave="hoverStashFileID = false">
                                 <div class="flex-grow-1 text-hidden cursor-default" :title="vv.path">
-                                    <span :class="[vv.tag == 'D' ? 'line-through' : '']" @click="gitDiff(vv.path, vv.tag);">{{ vv.path }}</span>
+                                    <span :class="[vv.tag == 'D' ? 'line-through' : '']" @click="gitDiff('StagedChanges', vv.path, vv.tag);">{{ vv.path }}</span>
                                 </div>
                                 <div class="d-inline float-right">
                                     <div class="d-inline" v-if="hoverStashFileID == 'stash_'+ii">
@@ -229,7 +229,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                 @mouseover="hoverChangeFileID = 'change_'+i"
                                 @mouseleave="hoverChangeFileID = false">
                                 <div class="flex-grow-1 text-hidden cursor-default" :title="v.path">
-                                    <span :class="[v.tag == 'D' || v.tag == 'R' ? 'line-through' : '']" @click="gitDiff(v.path, v.tag);">{{ v.path }}</span>
+                                    <span :class="[v.tag == 'D' || v.tag == 'R' ? 'line-through' : '']" @click="gitDiff('Changes', v.path, v.tag);">{{ v.path }}</span>
                                 </div>
                                 <div class="d-inline float-right" :id="'change_'+i">
                                     <div class="d-inline"  v-if="hoverChangeFileID == 'change_'+i">
@@ -497,11 +497,12 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             text: filename
                         });
                     },
-                    gitDiff(fileUri, tag, isConflicted=false) {
+                    gitDiff(objStatus, fileUri, tag, isConflicted=false) {
                         hbuilderx.postMessage({
                             command: 'diff',
                             filename: fileUri,
                             tag: tag,
+                            objStatus: objStatus,
                             isConflicted: isConflicted
                         });
                     },

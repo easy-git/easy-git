@@ -155,8 +155,8 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
         };
     }catch(e){};
 
-    let GitDiff = new Diff(ProjectData, userConfig, GitDiffCustomWebViewPanal);
-    GitDiff.SetView(selectedFile);
+    let GitDiff = new Diff(userConfig, GitDiffCustomWebViewPanal);
+    GitDiff.SetView(ProjectData);
 
     // 记录监听的项目路径, 避免重复监听
     if (watchFilePathName != undefined && watchFilePathName != absolutePath) {

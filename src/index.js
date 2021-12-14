@@ -94,6 +94,12 @@ class Common {
         // easyGitInner: 用于标记外部点击还是插件内部点击
         // GitAssignAction: 特定操作
         let {easyGitInner, GitAssignAction} = param;
+
+        // 假如easyGitInner=true, 直接返回param
+        if (easyGitInner) {
+            return param;
+        };
+
         if (easyGitInner != undefined || easyGitInner) {
             try{
                 projectName = param.projectName;

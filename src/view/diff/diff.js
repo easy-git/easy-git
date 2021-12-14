@@ -15,9 +15,9 @@ const {getWebviewDiffContent, getDefaultContent} = require('./html.js')
 let isGitDiffPrompt = false;
 
 class Diff {
-    constructor(ProjectData, userConfig, webviewPanel) {
+    constructor(userConfig, webviewPanel) {
         this.webviewPanel = webviewPanel;
-        this.projectPath = ProjectData.projectPath;
+        this.projectPath = '';
         this.userConfig = userConfig;
         this.isFullTextDiffFile = 3;
         this.gitDiffFilePath = '';
@@ -82,7 +82,7 @@ class Diff {
      * @description 组织Git文件对比命令
      * @param {Object} selectedFile
      */
-    async getDiffOptions(selectedFile) {
+    async getDiffOptions(selectedFile, objStatus=undefined) {
         // 是否全文显示对比
         await this.getFileDiffConfig();
 
@@ -108,15 +108,15 @@ class Diff {
         let titleLeft, titleRight;
 
         // git diff --color-words，可显示颜色
-        switch (gitIndex){
-            case 'M':
-                options = ['diff', lineOption, '--staged', selectedFile];
+        switch (objStatus){
+            case 'Changes':
+                options = ['diff', lineOption, selectedFile];
                 titleRight = 'Working Tree';
                 break;
-            case 'A':
-                options = ['diff', lineOption, '--cached', selectedFile];
+            case 'StagedChanges':
+                options = ['diff', lineOption, '--staged', selectedFile];
                 break;
-            case 'U':
+            case 'MergeChanges':
                 if (gitWorking_dir == 'U') {
                     options = ['diff',  lineOption, selectedFile];
                 } else {
@@ -127,6 +127,7 @@ class Diff {
             default:
                 break;
         };
+        
         let data = {
             "diff_options": options,
             "titleLeft": titleLeft,
@@ -138,11 +139,14 @@ class Diff {
 
     /**
      * @description 设置文件对比视图
-     * @param {String} selectedFile
+     * @param {Object} ProjectData
      */
-    async SetView(selectedFile) {
+    async SetView(ProjectData) {
+        let {selectedFile, projectPath, objStatus} = ProjectData;
+
+        this.projectPath = projectPath;
         this.gitDiffFilePath = selectedFile;
-        let init = await this.getDiffOptions(selectedFile);
+        let init = await this.getDiffOptions(selectedFile, objStatus);
 
         // 设置html默认内容
         if (init == 'error') {

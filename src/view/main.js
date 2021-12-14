@@ -281,7 +281,7 @@ class GitFile {
 
     // open diff
     async openDiff(msg) {
-        let { filename, tag, isConflicted } = msg;
+        let { filename, tag, isConflicted, objStatus } = msg;
         let fpath = path.join(this.projectPath, filename);
 
         if ( tag == 'D') {
@@ -311,6 +311,7 @@ class GitFile {
             "projectPath": this.projectPath,
             "projectName": this.projectName,
             "selectedFile": filename,
+            "objStatus": objStatus
         };
         hx.commands.executeCommand('EasyGit.diffFile', diff_parms);
     };
