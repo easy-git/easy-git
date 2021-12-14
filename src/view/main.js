@@ -294,17 +294,18 @@ class GitFile {
                 return hx.workspace.openTextDocument(fpath);
             };
         }catch(e){};
-
+        
         if ( tag == '?' || tag == '??') {
             hx.workspace.openTextDocument(fpath);
             return;
         };
+
         if (isConflicted) {
             let result = await this.ManageConflict(filename, 'diff');
             if ( ['暂存', '去解决冲突', '关闭'].includes(result) ) { return; };
-            if (result == 'noConflict') {
-                return hx.workspace.openTextDocument(fpath);
-            };
+            // if (result == 'noConflict') {
+            //     return hx.workspace.openTextDocument(fpath);
+            // };
         };
         let diff_parms = {
             "easyGitInner": true,

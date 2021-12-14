@@ -83,7 +83,7 @@ class CatDiffCustomEditorProvider extends CustomEditorProvider {
                 watchListener.close();
             };
         });
-        
+
         // 监听主题切换
         let configurationChangeDisplose = hx.workspace.onDidChangeConfiguration(function(event){
             if(event.affectsConfiguration("editor.colorScheme")){
@@ -155,8 +155,8 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
         };
     }catch(e){};
 
-    let GitDiff = new Diff(userConfig, GitDiffCustomWebViewPanal);
-    GitDiff.SetView(ProjectData);
+    let GitDiff = new Diff(ProjectData, userConfig, GitDiffCustomWebViewPanal);
+    GitDiff.SetView();
 
     // 记录监听的项目路径, 避免重复监听
     if (watchFilePathName != undefined && watchFilePathName != absolutePath) {

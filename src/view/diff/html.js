@@ -67,7 +67,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
         DiffFullTextIcon
     } = uiData;
 
-    let { titleLeft, titleRight, isDiffHtml, diffResult, isConflicted } = diffData;
+    let { titleLeft, titleRight, isDiffHtml, diffResult, isConflicted, isDisplayPrompt } = diffData;
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -132,6 +132,11 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                             <span class="file-label" v-show="titleRight != 'undefined' ">{{ titleRight }}</span>
                         </div>
                     </div>
+                    <div class="row" v-if="isDisplayPrompt == 'N'">
+                        <div class="col text-center">
+                            <p class="mt-5">没有Git对比结果</p>
+                        </div>
+                    </div>
                 </div>
                 <div id="diff-body" class="row diff-body">
                     <div class="col p-0">
@@ -150,6 +155,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
             var app = new Vue({
                 el: '#app',
                 data: {
+                    isDisplayPrompt: '${isDisplayPrompt}',
                     isDiffHtml: ${isDiffHtml},
                     titleLeft: '${titleLeft}',
                     titleRight: '${titleRight}',

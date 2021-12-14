@@ -15,9 +15,10 @@ const {getWebviewDiffContent, getDefaultContent} = require('./html.js')
 let isGitDiffPrompt = false;
 
 class Diff {
-    constructor(userConfig, webviewPanel) {
+    constructor(ProjectData, userConfig, webviewPanel) {
         this.webviewPanel = webviewPanel;
         this.projectPath = '';
+        this.ProjectData = ProjectData;
         this.userConfig = userConfig;
         this.isFullTextDiffFile = 3;
         this.gitDiffFilePath = '';
@@ -87,7 +88,7 @@ class Diff {
         await this.getFileDiffConfig();
 
         let resut = await utils.gitFileStatus(this.projectPath, selectedFile, ['-s', selectedFile]);
-
+        console.log('------', resut, objStatus)
         // 目前仅支持对比本地有更改的文件
         if (resut == undefined || resut == 'error') {
             return 'error';
@@ -117,17 +118,21 @@ class Diff {
                 options = ['diff', lineOption, '--staged', selectedFile];
                 break;
             case 'MergeChanges':
-                if (gitWorking_dir == 'U') {
-                    options = ['diff',  lineOption, selectedFile];
-                } else {
+                if (gitWorking_dir == "U" && gitIndex == 'U') {
                     options = ['diff', lineOption, 'HEAD', selectedFile];
+                } else {
+                    options = ['diff',  lineOption, selectedFile];
                 };
                 titleRight = 'HEAD';
                 break;
             default:
                 break;
         };
-        
+
+        if (objStatus == undefined && gitWorking_dir == "U" && gitIndex == 'U') {
+            options = ['diff', lineOption, 'HEAD', selectedFile];
+        };
+
         let data = {
             "diff_options": options,
             "titleLeft": titleLeft,
@@ -139,10 +144,9 @@ class Diff {
 
     /**
      * @description 设置文件对比视图
-     * @param {Object} ProjectData
      */
-    async SetView(ProjectData) {
-        let {selectedFile, projectPath, objStatus} = ProjectData;
+    async SetView() {
+        let {selectedFile, projectPath, objStatus} = this.ProjectData;
 
         this.projectPath = projectPath;
         this.gitDiffFilePath = selectedFile;
@@ -174,14 +178,16 @@ class Diff {
         // 替换特殊字符
         diffResult = diffResult.replace(new RegExp("`","gm"), '&#x60;').replace(new RegExp("{","gm"), '&#123;').replace(new RegExp("}","gm"), '&#125;');
 
+        let isDisplayPrompt = result == '' ? 'N' : 'Y';
         let diffData = {
+            "isDisplayPrompt": isDisplayPrompt,
             "isDiffHtml": true,
             "diffResult": diffResult,
             "titleLeft": titleLeft,
             "titleRight": titleRight,
             "isConflicted": isConflicted
         };
-
+        
         let selectedFilePath = path.normalize(path.join(this.projectPath, selectedFile));
         this.webviewPanel.webView.html = getWebviewDiffContent(
             selectedFilePath,
@@ -242,7 +248,7 @@ class Diff {
     async handleConflict(selectedFile, options) {
         let result = await utils.gitRaw(this.projectPath, options, '处理冲突');
         if (result == 'success') {
-            this.setConflictedView(selectedFile);
+            this.SetView();
             let msg = options[1] == '--ours' ? 'EasyGit：保留当前分支文件，操作成功。' : 'EasyGit：采用传入的文件，操作成功。'
             hx.window.setStatusBarMessage(msg);
         };
