@@ -877,6 +877,7 @@ async function gitFileStatus(workingDir, selectedFile, options) {
  * @param {String} workingDir Git工作目录
  */
 async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
+    var reg = /^['|"](.*)['|"]$/;
     try {
         let data = {
             'msg': 'success',
@@ -892,6 +893,9 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
                     if (s != '') {
                         let tag = s.slice(0,2);
                         let fpath = s.slice(3);
+                        if (reg.test(fpath) && fpath.indexOf(" ") != -1) {
+                            fpath = fpath.replace(reg, "$1");
+                        };
                         if (['DD','AU','UD','UA','DU','AA','UU'].includes(tag)) {
                             if (['DD','UD','DU'].includes(tag)) {
                                 data.conflicted.push({'tag': 'D', 'path': fpath});
@@ -1279,7 +1283,12 @@ async function gitPull(workingDir, options) {
                 } else if (errMsg.includes("local changes")) {
                     createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
                     createOutputChannel(msgForPullOther, 'info');
-                }  else if (errMsg.includes("git --help")){                    createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');                } else {                    createOutputChannel(`Git: pull ${cmd_details}失败。 \n ${errMsg}`, 'error');                    createOutputChannel(msgForPullOther, 'info');                }
+                }  else if (errMsg.includes("git --help")){
+                    createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
+                } else {
+                    createOutputChannel(`Git: pull ${cmd_details}失败。 \n ${errMsg}`, 'error');
+                    createOutputChannel(msgForPullOther, 'info');
+                }
                 return 'fail';
             });
         return status
