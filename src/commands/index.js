@@ -8,7 +8,7 @@ const count = require('../common/count.js');
 
 const { goStash, goStashPop, goStashClear, goStashShow } = require('./stash.js');
 const { gitInitProject } = require('./repository_init.js');
-const { gitAddFile, gitRestore, goCleanFile, goCommit } = require('./file.js');
+const { gitAddFile, goCleanFile, goCommit } = require('./file.js');
 const { goSetConfig, goShowConfig } = require('./base.js');
 
 const { Tag, Branch, BranchCreate, Revert, Reset, Archive, reflog, showHashFileContent } = require('./ref.js');
@@ -123,7 +123,7 @@ async function action(param, action_name) {
             rt2.resetHardCommitID(ProjectInfo);
             break;
         case 'restoreStaged':
-            let t1 = new gitRestore();
+            let t1 = new utils.gitRestore();
             t1.restore(ProjectInfo, 'restoreStaged');
             break;
         case 'revert':
@@ -132,7 +132,7 @@ async function action(param, action_name) {
             r.run(rinfo);
             break;
         case 'restoreChanged':
-            let t2 = new gitRestore();
+            let t2 = new utils.gitRestore();
             t2.restore(ProjectInfo, 'restoreChanged');
             break;
         case 'openPullOptions':

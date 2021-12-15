@@ -2582,6 +2582,133 @@ function mkdirsSync(dirname) {
     };
 };
 
+
+/**
+ * @description git 取消暂存
+ *  - resotre git 2.23.0版本的命令
+ *  - 高版本的git 废弃了checkout，采用了restore命令， 因此easy-git采用restore
+ */
+class gitRestore {
+    constructor() {
+        this.isUseRestore = undefined
+    }
+
+    // 提示框
+    showGitVersionPrompt() {
+        hx.window.showInformationMessage('Git提醒:  此操作，用到了restore命令。\n本机Git命令行版本太低, 没有restore命令，将使用旧版命令。建议升级电脑的Git命令行工具！', ['安装高版本Git工具', '关闭']).then( (res)=> {
+            if (res == '安装高版本Git工具') {
+                hx.env.openExternal('https://git-scm.com/downloads');
+            };
+        });
+    };
+
+    // Git: resotre git 2.23.0版本的命令
+    async JudgeGitRestore() {
+        try{
+            if (cmp_git == undefined) {
+                let version = await getGitVersion();
+                cmp_git = cmp_hx_version(version, '2.23.0');
+                if (cmp_git > 0 ) {
+                    this.showGitVersionPrompt();
+                    return false;
+                };
+                return true;
+            } else {
+                if (cmp_git > 0 ) {
+                    this.showGitVersionPrompt();
+                    return false;
+                }
+                return true;
+            };
+        }catch(e){
+            return true;
+        };
+    };
+
+    // get option
+    getRestoreOptions(projectPath, selectedFile) {
+        let options = selectedFile;
+
+        projectPath = path.normalize(projectPath);
+        selectedFile = path.normalize(selectedFile);
+
+        // 选择：整个项目
+        if (projectPath == selectedFile || selectedFile == '*') {
+          options = '*';
+        } else {
+          let state = fs.statSync(selectedFile);
+          if (state.isFile()) {
+              options = selectedFile;
+          };
+          if (state.isDirectory()) {
+              let dirName = selectedFile.replace(projectPath, '');
+              options = path.join('.', path.sep, dirName.slice(1), path.sep, '*');
+          };
+        };
+        return options;
+    };
+
+    /**
+     * @param {Object} projectInfo
+     * @param {Object} actionName  restoreChanged | restoreChanged
+     */
+    async restore(projectInfo, actionName) {
+        let {projectPath, selectedFile} = projectInfo;
+        if (this.isUseRestore == undefined) {
+            this.isUseRestore = await this.JudgeGitRestore();
+        };
+
+        let options = selectedFile;
+        if (selectedFile != '*') {
+            options = this.getRestoreOptions(projectPath, selectedFile);
+        };
+
+        if (selectedFile != '*') {
+            // 检查是否是否修改
+            let checkResult = await gitFileStatus(projectPath, selectedFile, ['s', selectedFile]);
+            if (checkResult == undefined || checkResult == 'error') {
+                let { index, working_dir } = checkResult;
+                if (actionName == 'restoreStaged') {
+                    hx.window.setStatusBarMessage('EasyGit: 操作中止，当前文件没有暂存。', 30000, 'error')
+                };
+                if (actionName == 'restoreChanged') {
+                    hx.window.setStatusBarMessage('EasyGit: 操作中止，当前文件没有修改。', 30000, 'error')
+                };
+                return;
+            };
+        };
+
+        if (this.isUseRestore == false) {
+            let cmd, msg;
+            if (actionName == 'restoreStaged') {
+                cmd = ['reset', 'HEAD', '--', options];
+                msg = '文件取消暂存，';
+            };
+            if (actionName == 'restoreChanged') {
+                cmd = ['checkout', '--', options];
+                msg = '撤消对文件的修改，';
+            };
+
+            let cancelStatus = await gitRaw(projectPath, cmd, msg);
+            return cancelStatus;
+        };
+
+        if (this.isUseRestore == true) {
+            let cmd1, msg1;
+            if (actionName == 'restoreStaged') {
+                cmd1 = ['restore', '--staged', options];
+                msg1 = '文件取消暂存，';
+            };
+            if (actionName == 'restoreChanged') {
+                cmd1 = ['restore', options];
+                msg1 = '撤消对文件的修改，';
+            };
+            let cancelStatus = await gitRaw(projectPath, cmd1, msg1);
+            return cancelStatus;
+        };
+    };
+}
+
 module.exports = {
     hxShowMessageBox,
     applyEdit,
@@ -2651,5 +2778,6 @@ module.exports = {
     gitRemoveFile,
     gitRepositoryUrl,
     gitCheckoutConflicted,
-    mkdirsSync
+    mkdirsSync,
+    gitRestore
 }

@@ -515,7 +515,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                     cancelStaged(fileUri, tag) {
                         hbuilderx.postMessage({
                             command: 'cancelStaged',
-                            text: fileUri,
+                            fileUri: fileUri,
                             tag: tag
                         });
                     },

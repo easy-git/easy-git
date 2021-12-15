@@ -294,7 +294,7 @@ class GitFile {
                 return hx.workspace.openTextDocument(fpath);
             };
         }catch(e){};
-        
+
         if ( tag == '?' || tag == '??') {
             hx.workspace.openTextDocument(fpath);
             return;
@@ -458,33 +458,27 @@ class GitFile {
         };
     };
 
-    // Git: cancel add
+    /**
+     * @description Git: cancel add，即取消指定暂存文件
+     * @param {Object} fileUri - 特定文件路径，*代表所有
+     * @param {Object} tag
+     */
     async cancelStaged(fileUri, tag) {
         if (!fileUri) {return;};
         if (tag == 'R') {
             let tmp = (fileUri.split('->')[1]).trim();
             fileUri = path.join(this.projectPath, tmp);
-        } else {
-            fileUri = path.join(this.projectPath, fileUri);
-        }
-        let data = {
-            'projectPath': this.projectPath,
-            'projectName': this.projectName,
-            'selectedFile': fileUri,
-            'easyGitInner': true
         };
-        hx.commands.executeCommand('EasyGit.restoreStaged', data);
-    };
-
-    // Git: cancel all add
-    async cancelAllStaged() {
-        let data = {
-            'projectPath': this.projectPath,
-            'projectName': this.projectName,
-            'selectedFile': this.projectPath,
-            'easyGitInner': true
+        
+        let projectInfo = {
+            "projectPath": this.projectPath,
+            "selectedFile": fileUri,
         };
-        hx.commands.executeCommand('EasyGit.restoreStaged', data);
+        let rt = new utils.gitRestore();
+        let cancelStatus = await rt.restore(projectInfo, 'restoreStaged');
+        if (cancelStatus == 'success') {
+            this.refreshFileList();
+        };
     };
 
     // Git: clean
@@ -868,11 +862,11 @@ function active(webviewPanel, userConfig, ProjectData) {
                 break;
             case 'cancelStaged':
                 // 取消暂存
-                File.cancelStaged(msg.text, msg.tag);
+                File.cancelStaged(msg.fileUri, msg.tag);
                 break;
             case 'cancelAllStaged':
                 // 取消全部暂存
-                File.cancelAllStaged();
+                File.cancelStaged('*');
                 break;
             case 'pull':
                 File.pull(msg);
