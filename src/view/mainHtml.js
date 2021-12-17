@@ -213,7 +213,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                 @mouseleave="hoverConflictedFileID = false">
                                 <div class="flex-grow-1 text-hidden cursor-default" :title="v1.path" >
                                     <span class="before_ficon" :class="v1.icon"></span>
-                                    <span :class="[v1.tag == 'D' ? 'line-through' : '']" @click="gitDiff('MergeChanges', v1.path, v1.tag, true);">{{ v1.path }}</span>
+                                    <span :class="setStyleForLineThrough(v1.tag)" @click="gitDiff('MergeChanges', v1.path, v1.tag, true);">{{ v1.path }}</span>
                                 </div>
                                 <div class="d-inline float-right">
                                     <div class="d-inline" v-if="hoverConflictedFileID == 'conflicted_'+i1">
@@ -245,7 +245,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                 @mouseleave="hoverStashFileID = false">
                                 <div class="flex-grow-1 text-hidden cursor-default" :title="vv.path">
                                     <span class="before_ficon" :class="vv.icon"></span>
-                                    <span :class="[vv.tag == 'D' ? 'line-through' : '']" @click="gitDiff('StagedChanges', vv.path, vv.tag);">{{ vv.path }}</span>
+                                    <span :class="setStyleForLineThrough(vv.tag)" @click="gitDiff('StagedChanges', vv.path, vv.tag);">{{ vv.path }}</span>
                                 </div>
                                 <div class="d-inline float-right">
                                     <div class="d-inline" v-if="hoverStashFileID == 'stash_'+ii">
@@ -257,7 +257,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                         </span>
                                     </div>
                                     <div class="d-inline ml-1 pt-2">
-                                        <span class="file-label" :class="[vv.tag == 'D' ? 'fred' : vv.tag == 'U' ? 'fgreen':'f111']">{{ vv.tag }}</span>
+                                        <span class="file-label" :class="gitStatusStyle(vv.tag)">{{ vv.tag }}</span>
                                     </div>
                                 </div>
                             </li>
@@ -282,7 +282,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                 @mouseleave="hoverChangeFileID = false">
                                 <div class="flex-grow-1 text-hidden cursor-default" :title="v.path">
                                     <span class="before_ficon" :class="v.icon"></span>
-                                    <span :class="[v.tag == 'D' || v.tag == 'R' ? 'line-through' : '']" @click="gitDiff('Changes', v.path, v.tag);">{{ v.path }}</span>
+                                    <span :class="setStyleForLineThrough(v.tag)" @click="gitDiff('Changes', v.path, v.tag);">{{ v.path }}</span>
                                 </div>
                                 <div class="d-inline float-right">
                                     <div class="d-inline"  v-if="hoverChangeFileID == 'change_'+i">
@@ -291,7 +291,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                         <span title="放弃、撤销对文件的修改 (git restore)" @click="gitCheckout(v);">${checkoutIconSvg}</span>
                                     </div>
                                     <div class="d-inline ml-1 pt-2">
-                                        <span class="file-label" :class="[v.tag == 'D' ? 'fred' : v.tag == 'U' ? 'fgreen':'f111']"> {{ v.tag }} </span>
+                                        <span class="file-label" :class="gitStatusStyle(v.tag)"> {{ v.tag }} </span>
                                     </div>
                                 </div>
                             </li>
@@ -361,6 +361,20 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                     ctrl: ''
                 },
                 computed: {
+                    gitStatusStyle() {
+                        return function(t) {
+                            let color = "f111";
+                            if (t == 'D') { color = "fred"};
+                            if (t == 'U') { color = "fgreen"};
+                            return color;
+                        }
+                    },
+                    // 用于给文本设置下划线
+                    setStyleForLineThrough() {
+                        return function(t) {
+                            return t == "D" || t == 'R' ? "line-through" : "";
+                        }
+                    },
                     GitAssociationRemote() {
                         return this.originurlBoolean;
                     },
