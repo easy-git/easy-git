@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.5.3.20211216
+* 修复 restore --staged操作，导致源代码管理器整个视图被刷新的Bug
+* 修复 某些情况下，修改的文件，对比内容错误的Bug
+* 修复 带有空格文件，无法add成功的Bug（感谢Github用户`mapull`的反馈）[详情](https://github.com/easy-git/easy-git/issues/1)
+* 修复 源代码管理器视图 某些情况下，输入框被遮挡的Bug (感谢QQ用户`苏陌`的反馈)
+
 ## 1.5.3.20211212
 * 修复 克隆视图 某些情况下，无法显示Github搜索结果的Bug
 * 优化 git commit操作因未设置user.name和user.email失败时，控制台给出解决方法
