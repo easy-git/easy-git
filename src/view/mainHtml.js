@@ -467,7 +467,14 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             this.isShowMenu = false
                         } else {
                             this.isShowMenu = true
-                        }
+                        };
+                        if (document.body.clientWidth < 200) {
+                            hbuilderx.postMessage({
+                                command: 'send_msg',
+                                text: 'EasyGit: 视图区域，宽度太窄，请拉宽后再试。',
+                                level: 'error'
+                            });
+                        };
                     },
                     getProjectGitInfo() {
                         // 获取变更的文件列表、当前分支、behind、ahead等信息

@@ -916,6 +916,9 @@ function active(webviewPanel, userConfig, ProjectData) {
             case 'syncBehindAhead':
                 File.syncBehindAhead();
                 break;
+            case 'send_msg':
+                hx.window.setStatusBarMessage(msg.text, 10000, msg.level);
+                break;
             default:
                 break;
         };

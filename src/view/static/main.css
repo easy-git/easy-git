@@ -125,16 +125,18 @@ body::-webkit-scrollbar {
     }
 }
 
+@media screen and (max-width: 200px) {
+    .top-function-icon {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis
+    }
+}
+
 @media screen and (max-width: 183px) {
     .project-name {
         width: 0px;
     }
-}
-
-.top-function-icon {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis
 }
 
 .text-hidden {
