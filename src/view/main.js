@@ -29,7 +29,25 @@ function getUIData() {
 
     // 根据主题适配颜色
     let colorData = utils.getThemeColor('siderBar');
-    let {fontColor} = colorData;
+    let {fontColor, explorerIconTheme, explorerIconScheme} = colorData;
+    
+    // 文件图标
+    let ttfFile = path.join(__dirname, 'static', 'file-icon', `${explorerIconTheme}.ttf`);
+    let ttfJSONFile = path.join(__dirname, 'static', 'file-icon', `${explorerIconTheme}.json`);
+    let ttfContent = require(ttfJSONFile);
+
+    let fListIcon = {"explorerIconTheme": explorerIconTheme};
+    let flist = [
+        "",
+        "html", "js", "ts", "vue", "md",
+        "css", "less", "scss", "sass", "styl",
+        "py", "java", "php", "c", "cpp", "go", "sql",
+        "img", "zip", "json", 
+        "xml", "sh",
+        "csv", "xls", "xlsx", "doc", "docx" ];
+    for (let s of flist) {
+        fListIcon[`${s}_ficon`] = ttfContent[`${s}_${explorerIconScheme}`] ? ttfContent[`${s}_${explorerIconScheme}`] : ttfContent[`_${explorerIconScheme}`];
+    };
 
     // svg icon
     let CancelIconSvg = icon.getDelIcon(fontColor);
@@ -57,6 +75,7 @@ function getUIData() {
     let CommandPanelIcon = icon.getCommandPanelIcon(fontColor);
 
     let iconData = {
+        ttfFile,
         CancelIconSvg,
         OpenFileIconSvg,
         AddIconSvg,
@@ -81,7 +100,7 @@ function getUIData() {
         HandleIcon,
         CommandPanelIcon
     };
-    return Object.assign(iconData,colorData);
+    return Object.assign(iconData,colorData, fListIcon);
 };
 
 /**
@@ -209,7 +228,6 @@ class GitFile {
                 if (BranchTracking == null) {
                     GitAlwaysAutoCommitPush = false;
                 };
-
                 this.webviewPanel.webView.postMessage({
                     command: "autoRefresh",
                     gitFileResult: gitData.FileResult,
@@ -469,7 +487,7 @@ class GitFile {
             let tmp = (fileUri.split('->')[1]).trim();
             fileUri = path.join(this.projectPath, tmp);
         };
-        
+
         let projectInfo = {
             "projectPath": this.projectPath,
             "selectedFile": fileUri,

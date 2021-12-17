@@ -68,9 +68,26 @@ function getThemeColor(area) {
     let config = hx.workspace.getConfiguration();
     let colorScheme = config.get('editor.colorScheme');
     let colorCustomizations = config.get('workbench.colorCustomizations');
+    let explorerIconTheme = config.get('explorer.iconTheme');
 
     if (colorScheme == undefined) {
         colorScheme = 'Default';
+    };
+
+    if (explorerIconTheme == '') {
+        explorerIconTheme = "vs-seti"
+    };
+    if (explorerIconTheme == undefined) {
+        explorerIconTheme = "hx-file-icons"
+    };
+    if (!["hx-file-icons", "vs-seti", "hx-file-icons-colorful"].includes(explorerIconTheme)) {
+        explorerIconTheme = "vs-seti"
+    };
+
+    // 用于确定图标颜色 light | dark
+    let explorerIconScheme = 'light';
+    if (colorScheme == 'Monokai' || colorScheme == 'Atom One Dark') {
+        explorerIconScheme = "dark";
     };
 
     // 获取HBuilderX编辑器字体大小
@@ -180,6 +197,8 @@ function getThemeColor(area) {
     return {
         fontSize,
         fontFamily,
+        explorerIconScheme,
+        explorerIconTheme,
         background,
         menuBackground,
         liHoverBackground,
@@ -265,7 +284,7 @@ function applyEdit(text) {
 function updateHBuilderXConfig(key, value, desc=undefined) {
     let config = hx.workspace.getConfiguration();
     config.update(key, value).then((data) => {
-        let msg = desc ?  desc : `EasyGit: 更新 ${key} 成功。`;
+        let msg = desc ? desc : `EasyGit: 更新 ${key} 成功。`;
         hx.window.setStatusBarMessage(msg, 5000, 'info');
     });
 };
@@ -456,7 +475,7 @@ function createOutputView(msg, msgLevel='info', linkText) {
                         return hx.workspace.openTextDocument(linkText);
                     };
                     const file_content = linkText.includes('.ssh/config') ? `#Host github\n#\tHostName github.com\n#\tPreferredAuthentications publickey\n#\tIdentityFile ~/.ssh/<private-key-filename>` : '';
-                    fs.appendFile(linkText, file_content , (error)  => {
+                    fs.appendFile(linkText, file_content , (error) => {
                         if (error) {return};
                         hx.workspace.openTextDocument(linkText);
                     });
@@ -878,6 +897,18 @@ async function gitFileStatus(workingDir, selectedFile, options) {
  */
 async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
     var reg = /^['|"](.*)['|"]$/;
+
+    // 文件后缀，作用：用于Git源代码管理器，显示文件图标
+    let file_suffix = "";
+    let fsuffix_list = [
+        "html", "js", "ts", "vue", "md",
+        "css", "less", "scss", "sass", "styl",
+        "py", "java", "php", "c", "cpp", "go", "sql",
+        "img", "zip", "json", 
+        "xml", "sh",
+        "csv", "xls", "xlsx", "doc", "docx"];
+    let img_suffix_list = ["png", "jpg", "jpeg", "gif", "bmp", "webp", "svg", "ico"];
+
     try {
         let data = {
             'msg': 'success',
@@ -886,6 +917,7 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
             'notStaged': []
         };
         let errorList = [];
+
         await git(workingDir).raw(options)
             .then((res) => {
                 let files = res.split('\n');
@@ -893,28 +925,44 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
                     if (s != '') {
                         let tag = s.slice(0,2);
                         let fpath = s.slice(3);
+                        // 处理带有空格的文件
                         if (reg.test(fpath) && fpath.indexOf(" ") != -1) {
                             fpath = fpath.replace(reg, "$1");
                         };
+                        file_suffix = s.split('.').pop().toLowerCase();
+                        if (img_suffix_list.includes(file_suffix)) {
+                            file_suffix = "img";
+                        };
+                        if (!fsuffix_list.includes(file_suffix) && !img_suffix_list.includes(file_suffix)) {
+                            file_suffix = '';
+                        };
+                        if (file_suffix == 'markdown') {
+                            file_suffix = "md";
+                        };
+                        if (file_suffix == 'htm') {
+                            file_suffix = "html";
+                        };
+                        let f_icon = file_suffix + "_icon";
+
                         if (['DD','AU','UD','UA','DU','AA','UU'].includes(tag)) {
                             if (['DD','UD','DU'].includes(tag)) {
-                                data.conflicted.push({'tag': 'D', 'path': fpath});
+                                data.conflicted.push({'tag': 'D', 'path': fpath, 'icon': f_icon});
                             } else {
-                                data.conflicted.push({'tag': 'C', 'path': fpath});
+                                data.conflicted.push({'tag': 'C', 'path': fpath, 'icon': f_icon});
                             };
                         } else if (tag == 'MM' || tag == 'AM') {
-                            data.staged.push({'tag': 'M', 'path': fpath});
-                            data.notStaged.push({'tag': 'M', 'path': fpath});
+                            data.staged.push({'tag': 'M', 'path': fpath, 'icon': f_icon});
+                            data.notStaged.push({'tag': 'M', 'path': fpath, 'icon': f_icon});
                         } else if (tag == 'AD' || tag == 'MD') {
-                            data.staged.push({'tag': 'D', 'path': fpath});
-                            data.notStaged.push({'tag': 'D', 'path': fpath});
+                            data.staged.push({'tag': 'D', 'path': fpath, 'icon': f_icon});
+                            data.notStaged.push({'tag': 'D', 'path': fpath, 'icon': f_icon});
                         } else if (tag == 'RD') {
-                            data.staged.push({'tag': 'R', 'path': fpath});
-                            data.notStaged.push({'tag': 'R', 'path': fpath});
+                            data.staged.push({'tag': 'R', 'path': fpath, 'icon': f_icon});
+                            data.notStaged.push({'tag': 'R', 'path': fpath, 'icon': f_icon});
                         } else if (tag.slice(0,1) == ' ' || tag == '??') {
-                            data.notStaged.push({'tag': tag.trim(), 'path': fpath});
+                            data.notStaged.push({'tag': tag.trim(), 'path': fpath, 'icon': f_icon});
                         } else if (tag.slice(1,2) == ' ') {
-                            data.staged.push({'tag': tag.trim(), 'path': fpath});
+                            data.staged.push({'tag': tag.trim(), 'path': fpath, 'icon': f_icon});
                         } else {
                             errorList.push(s);
                         };
@@ -1283,7 +1331,7 @@ async function gitPull(workingDir, options) {
                 } else if (errMsg.includes("local changes")) {
                     createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
                     createOutputChannel(msgForPullOther, 'info');
-                }  else if (errMsg.includes("git --help")){
+                } else if (errMsg.includes("git --help")){
                     createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
                 } else {
                     createOutputChannel(`Git: pull ${cmd_details}失败。 \n ${errMsg}`, 'error');
@@ -2487,7 +2535,7 @@ function hxShowMessageBox(title, text, buttons = ['关闭']) {
     return new Promise((resolve, reject) => {
         try {
             let escape = -10;
-            if ( buttons.length > 1  && (buttons.includes('关闭') || buttons.includes('取消')) ) {
+            if ( buttons.length > 1 && (buttons.includes('关闭') || buttons.includes('取消')) ) {
                 if (osName == 'darwin') {
                     buttons = buttons.reverse();
                 };

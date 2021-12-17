@@ -47,8 +47,23 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
         ChevronDownIcon,
         ChevronRightIcon,
         HandleIcon,
-        CommandPanelIcon
+        CommandPanelIcon,
+        ttfFile,
+        _ficon,
+        html_ficon, js_ficon,ts_ficon,vue_ficon,md_ficon,css_ficon,
+        less_ficon,scss_ficon, sass_ficon,styl_ficon,xml_ficon,
+        py_ficon,php_ficon,java_ficon,c_ficon,cpp_ficon,sh_ficon, go_ficon, sql_ficon,
+        img_ficon, zip_ficon,json_ficon,
+        docx_ficon, doc_ficon, xls_ficon, xlsx_ficon, csv_ficon,
+        explorerIconTheme
     } = uiData;
+
+    let iconSize = "14px";
+    let iconTop = "2px";
+    if (explorerIconTheme == "vs-seti") {
+        iconSize = "18px";
+        iconTop = "4px";
+    };
 
     let {
         projectPath,
@@ -84,6 +99,44 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
               --lineColor: ${lineColor};
               --scrollbarColor: ${scrollbarColor};
             }
+            @font-face {
+                font-family: 'ficon';
+                src: url('${ttfFile}');
+            }
+            .before_ficon::before {
+                position: relative;
+                top: ${iconTop};
+                font-size: ${iconSize};
+                font-weight: 500;
+            }
+            ._icon::before { ${_ficon} }
+            .js_icon::before { ${js_ficon} }
+            .ts_icon::before { ${ts_ficon} }
+            .vue_icon::before { ${vue_ficon} }
+            .md_icon::before { ${md_ficon} }
+            .css_icon::before { ${css_ficon} }
+            .less_icon::before { ${less_ficon} }
+            .scss_icon::before { ${scss_ficon} }
+            .sass_icon::before { ${sass_ficon} }
+            .html_icon::before { ${html_ficon} }
+            .py_icon::before { ${py_ficon} }
+            .java_icon::before { ${java_ficon} }
+            .php_icon::before { ${php_ficon} }
+            .img_icon::before { ${img_ficon} }
+            .zip_icon::before { ${zip_ficon} }
+            .json_icon::before { ${json_ficon} }
+            .c_icon::before { ${c_ficon} }
+            .cpp_icon::before { ${cpp_ficon} }
+            .sh_icon::before { ${sh_ficon} }
+            .styl_icon::before { ${styl_ficon} }
+            .xml_icon::before { ${xml_ficon} }
+            .go_icon::before { ${go_ficon} }
+            .sql_icon::before { ${sql_ficon} }
+            .csv_icon::before { ${csv_ficon} }
+            .xls_icon::before { ${xls_ficon} }
+            .xlsx_icon::before { ${xlsx_ficon} }
+            .doc_icon::before { ${doc_ficon} }
+            .docx_icon::before { ${docx_ficon} }
         </style>
         <link rel="stylesheet" href="${mainCssFile}">
     </head>
@@ -148,21 +201,21 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                         </div>
                     </div>
                 </div>
-                <div class="row mt-3" id="git_add" style="visibility: hidden;" :style="{visibility: 'visible'}">
+                <div class="row mt-3" id="git_merge" style="visibility: hidden;" :style="{visibility: 'visible'}">
                     <div class="col px-0" v-if="gitConflictedFileListLength != 0">
-                        <p class="add-title" id="git_add_title">
+                        <p class="add-title" id="git_merge_title">
                             <span class="a-icon" v-html="ConflictedIcon" @click="isShowConflictedList();"></span>合并更改:
                             <span class="gtag">{{ gitConflictedFileListLength }}</span>
                         </p>
-                        <ul style="list-style-type:none;padding-left:0;" id="git_add_data" v-show="isShowConflicted">
+                        <ul style="list-style-type:none;padding-left:0;" id="git_merge_data" v-show="isShowConflicted">
                             <li class="d-flex px-3 lif gitfile" v-for="(v1,i1) in gitConflictedFileList" :key="i1"
-                                :id="'conflicted_'+i1"
                                 @mouseover="hoverConflictedFileID = 'conflicted_'+i1"
                                 @mouseleave="hoverConflictedFileID = false">
                                 <div class="flex-grow-1 text-hidden cursor-default" :title="v1.path" >
+                                    <span class="before_ficon" :class="v1.icon"></span>
                                     <span :class="[v1.tag == 'D' ? 'line-through' : '']" @click="gitDiff('MergeChanges', v1.path, v1.tag, true);">{{ v1.path }}</span>
                                 </div>
-                                <div class="d-inline float-right" :id="'conflicted_'+i1">
+                                <div class="d-inline float-right">
                                     <div class="d-inline" v-if="hoverConflictedFileID == 'conflicted_'+i1">
                                         <span title="解决冲突" @click="mergeConflicted(v1.path);">${HandleIcon}</span>
                                         <span title="打开文件" @click="openFile(v1.path);">${OpenFileIconSvg}</span>
@@ -178,20 +231,20 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                 </div>
                 <div class="row mt-0" id="git_stash" style="visibility: hidden;" :style="{visibility: 'visible'}">
                     <div class="col px-0" v-show="gitStagedFileListLength != 0">
-                        <p class="add-title" id="git_add_title">
+                        <p class="add-title" id="git_stash_title">
                             <span class="a-icon" v-html="StagedIcon" @click="isShowStagedList();"></span>暂存的更改:
                             <span class="gtag">{{ gitStagedFileListLength }}</span>
                             <span title="取消所有暂存" class="stash-all" @click="cancelAllStaged('all');">
                                 ${CancelIconSvg}
                             </span>
                         </p>
-                        <ul style="list-style-type:none;padding-left:0;" id="git_stash_list" v-if="isShowStaged">
+                        <ul style="list-style-type:none;padding-left:0;" id="git_stash_list" v-show="isShowStaged">
                             <li class="d-flex px-3 lif gitfile"
                                 v-for="(vv,ii) in gitStagedFileList" :key="ii"
-                                :id="'stash'+ii"
                                 @mouseover="hoverStashFileID = 'stash_'+ii"
                                 @mouseleave="hoverStashFileID = false">
                                 <div class="flex-grow-1 text-hidden cursor-default" :title="vv.path">
+                                    <span class="before_ficon" :class="vv.icon"></span>
                                     <span :class="[vv.tag == 'D' ? 'line-through' : '']" @click="gitDiff('StagedChanges', vv.path, vv.tag);">{{ vv.path }}</span>
                                 </div>
                                 <div class="d-inline float-right">
@@ -213,7 +266,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                 </div>
                 <div class="row mt-0" id="git_add" style="visibility: hidden;" :style="{visibility: 'visible'}">
                     <div class="col px-0" v-show="gitNotStagedileListLength != 0">
-                        <p class="add-title" id="git_add_title">
+                        <p class="add-title" id="git_change_title">
                             <span class="a-icon" v-html="ChangeIcon" @click="isShowChangeList();"></span>更改:
                             <span class="gtag">{{ gitNotStagedileListLength }}</span>
                             <span title="暂存所有文件" class="stash-all" @click="gitAdd('all', '');">
@@ -223,15 +276,15 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                 ${checkoutIconSvg}
                             </span>
                         </p>
-                        <ul style="list-style-type:none;padding-left:0;" id="git_add_data" v-if="isShowChange">
+                        <ul style="list-style-type:none;padding-left:0;" id="git_change_data" v-show="isShowChange">
                             <li class="d-flex px-3 lif gitfile" v-for="(v,i) in gitNotStagedileList" :key="i"
-                                :id="'change_'+i"
                                 @mouseover="hoverChangeFileID = 'change_'+i"
                                 @mouseleave="hoverChangeFileID = false">
                                 <div class="flex-grow-1 text-hidden cursor-default" :title="v.path">
+                                    <span class="before_ficon" :class="v.icon"></span>
                                     <span :class="[v.tag == 'D' || v.tag == 'R' ? 'line-through' : '']" @click="gitDiff('Changes', v.path, v.tag);">{{ v.path }}</span>
                                 </div>
-                                <div class="d-inline float-right" :id="'change_'+i">
+                                <div class="d-inline float-right">
                                     <div class="d-inline"  v-if="hoverChangeFileID == 'change_'+i">
                                         <span title="打开文件" @click="openFile(v.path);">${OpenFileIconSvg}</span>
                                         <span title="加入暂存 (git add)" @click="gitAdd(v.path, v.tag);">${AddIconSvg}</span>
@@ -645,13 +698,13 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
             });
         </script>
         <script>
-            let devStatus = ${DisableDevTools};
-            if (devStatus) {
-                window.oncontextmenu = function() {
-                    event.preventDefault();
-                    return false;
-                };
-            };
+            // let devStatus = ${DisableDevTools};
+            // if (devStatus) {
+            //     window.oncontextmenu = function() {
+            //         event.preventDefault();
+            //         return false;
+            //     };
+            // };
         </script>
     </body>
 </html>
