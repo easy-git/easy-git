@@ -28,6 +28,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
         inputLineColor,
         cursorColor,
         fontColor,
+        remarkTextColor,
         lineColor,
         scrollbarColor,
         iconRefresh,
@@ -85,19 +86,15 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
         <style type="text/css">
             :root {
               --background: ${background};
+              --remarkTextColor: ${remarkTextColor};
               --fontColor: ${fontColor};
               --lineColor: ${lineColor};
               --inputLineColor: ${inputLineColor};
               --scrollbarColor: ${scrollbarColor};
-              --background: ${background};
               --menuBackground: ${menuBackground};
               --liHoverBackground: ${liHoverBackground};
               --inputColor: ${inputColor};
-              --inputLineColor: ${inputLineColor};
               --cursorColor: ${cursorColor};
-              --fontColor: ${fontColor};
-              --lineColor: ${lineColor};
-              --scrollbarColor: ${scrollbarColor};
             }
             @font-face {
                 font-family: 'ficon';
@@ -213,7 +210,8 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                 @mouseleave="hoverConflictedFileID = false">
                                 <div class="flex-grow-1 text-hidden cursor-default" :title="v1.path" >
                                     <span class="before_ficon" :class="v1.icon"></span>
-                                    <span :class="setStyleForLineThrough(v1.tag)" @click="gitDiff('MergeChanges', v1.path, v1.tag, true);">{{ v1.path }}</span>
+                                    <span :class="setStyleForLineThrough(v1.tag)" @click="gitDiff('MergeChanges', v1.path, v1.tag, true);">{{ v1.name }}</span>
+                                    <span class="dirname">{{ v1.dir }}</span>
                                 </div>
                                 <div class="d-inline float-right">
                                     <div class="d-inline" v-if="hoverConflictedFileID == 'conflicted_'+i1">
@@ -245,7 +243,8 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                 @mouseleave="hoverStashFileID = false">
                                 <div class="flex-grow-1 text-hidden cursor-default" :title="vv.path">
                                     <span class="before_ficon" :class="vv.icon"></span>
-                                    <span :class="setStyleForLineThrough(vv.tag)" @click="gitDiff('StagedChanges', vv.path, vv.tag);">{{ vv.path }}</span>
+                                    <span :class="setStyleForLineThrough(vv.tag)" @click="gitDiff('StagedChanges', vv.path, vv.tag);">{{ vv.name }}</span>
+                                    <span class="dirname">{{ vv.dir }}</span>
                                 </div>
                                 <div class="d-inline float-right">
                                     <div class="d-inline" v-if="hoverStashFileID == 'stash_'+ii">
@@ -282,7 +281,8 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                 @mouseleave="hoverChangeFileID = false">
                                 <div class="flex-grow-1 text-hidden cursor-default" :title="v.path">
                                     <span class="before_ficon" :class="v.icon"></span>
-                                    <span :class="setStyleForLineThrough(v.tag)" @click="gitDiff('Changes', v.path, v.tag);">{{ v.path }}</span>
+                                    <span :class="setStyleForLineThrough(v.tag)" @click="gitDiff('Changes', v.path, v.tag);">{{ v.name }}</span>
+                                    <span class="dirname">{{ v.dir }}</span>
                                 </div>
                                 <div class="d-inline float-right">
                                     <div class="d-inline"  v-if="hoverChangeFileID == 'change_'+i">

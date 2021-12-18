@@ -64,6 +64,7 @@ function getThemeColor(area) {
     let lineColor;
     let menuBackground;
     let scrollbarColor;
+    let remarkTextColor;
 
     let config = hx.workspace.getConfiguration();
     let colorScheme = config.get('editor.colorScheme');
@@ -117,6 +118,7 @@ function getThemeColor(area) {
     switch (colorScheme){
         case 'Monokai':
             fontColor = 'rgb(179,182,166)';
+            remarkTextColor = 'rgb(154,154,154)';
             background = 'rgb(39,40,34)';
             menuBackground = 'rgb(83,83,83)';
             liHoverBackground = 'rgb(78,80,73)';
@@ -129,6 +131,7 @@ function getThemeColor(area) {
             break;
         case 'Atom One Dark':
             fontColor = 'rgb(171,178,191)';
+            remarkTextColor = 'rgb(154,154,154)';
             background = 'rgb(40,44,53)';
             menuBackground = 'rgb(50,56,66)';
             liHoverBackground = 'rgb(44,47,55)';
@@ -141,6 +144,7 @@ function getThemeColor(area) {
             break;
         default:
             fontColor = 'rgb(51, 51, 51)';
+            remarkTextColor = 'rgb(104,104,104)';
             background = 'rgb(255,250,232)';
             menuBackground = 'rgb(255,252,243)';
             liHoverBackground = 'rgb(224,237,211)';
@@ -207,6 +211,7 @@ function getThemeColor(area) {
         inputBgColor,
         cursorColor,
         fontColor,
+        remarkTextColor,
         lineColor,
         scrollbarColor,
         d2h_ins_bg,
@@ -904,7 +909,7 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
         "html", "js", "ts", "vue", "md",
         "css", "less", "scss", "sass", "styl",
         "py", "java", "php", "c", "cpp", "go", "sql",
-        "img", "zip", "json", 
+        "img", "zip", "json",
         "xml", "sh",
         "csv", "xls", "xlsx", "doc", "docx"];
     let img_suffix_list = ["png", "jpg", "jpeg", "gif", "bmp", "webp", "svg", "ico"];
@@ -944,25 +949,31 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
                         };
                         let f_icon = file_suffix + "_icon";
 
+                        let basename = path.basename(fpath);
+                        let dirname = path.dirname(fpath);
+                        if (dirname == '.') {
+                            dirname = '';
+                        }
+
                         if (['DD','AU','UD','UA','DU','AA','UU'].includes(tag)) {
                             if (['DD','UD','DU'].includes(tag)) {
-                                data.conflicted.push({'tag': 'D', 'path': fpath, 'icon': f_icon});
+                                data.conflicted.push({"tag": "D", "path": fpath, "dir": dirname, "name": basename,"icon": f_icon});
                             } else {
-                                data.conflicted.push({'tag': 'C', 'path': fpath, 'icon': f_icon});
+                                data.conflicted.push({"tag": "C", "path": fpath, "dir": dirname, "name": basename, "icon": f_icon});
                             };
                         } else if (tag == 'MM' || tag == 'AM') {
-                            data.staged.push({'tag': 'M', 'path': fpath, 'icon': f_icon});
-                            data.notStaged.push({'tag': 'M', 'path': fpath, 'icon': f_icon});
+                            data.staged.push({"tag": "M", "path": fpath, "dir": dirname, "name": basename,"icon": f_icon});
+                            data.notStaged.push({"tag": "M", "path": fpath, "dir": dirname, "name": basename,"icon": f_icon});
                         } else if (tag == 'AD' || tag == 'MD') {
-                            data.staged.push({'tag': 'D', 'path': fpath, 'icon': f_icon});
-                            data.notStaged.push({'tag': 'D', 'path': fpath, 'icon': f_icon});
+                            data.staged.push({"tag": "D", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon});
+                            data.notStaged.push({"tag": "D", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon});
                         } else if (tag == 'RD') {
-                            data.staged.push({'tag': 'R', 'path': fpath, 'icon': f_icon});
-                            data.notStaged.push({'tag': 'R', 'path': fpath, 'icon': f_icon});
+                            data.staged.push({"tag": "R", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon});
+                            data.notStaged.push({"tag": "R", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon});
                         } else if (tag.slice(0,1) == ' ' || tag == '??') {
-                            data.notStaged.push({'tag': tag.trim(), 'path': fpath, 'icon': f_icon});
+                            data.notStaged.push({"tag": tag.trim(), "path": fpath, "dir": dirname,"name": basename, "icon": f_icon});
                         } else if (tag.slice(1,2) == ' ') {
-                            data.staged.push({'tag': tag.trim(), 'path': fpath, 'icon': f_icon});
+                            data.staged.push({"tag": tag.trim(), "path": fpath, "dir": dirname,"name": basename, "icon": f_icon});
                         } else {
                             errorList.push(s);
                         };
@@ -988,6 +999,7 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
             });
         return data;
     } catch (e) {
+        console.log(e);
         hx.window.showInformationMessage('EasyGit: 获取文件列表失败，请重试或联系作者反馈问题', ['我知道了']);
         data.msg = 'error';
     };
