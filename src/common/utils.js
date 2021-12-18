@@ -928,6 +928,7 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
             'conflicted': [],
             'staged': [],
             'notStaged': [],
+            'fileTotal': 0,
             'conflictedLength': 0,
             'stagedLength': 0,
             'notStagedLength': 0
@@ -1005,6 +1006,7 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
                 data["conflictedLength"] = (data["conflicted"]).length;
                 data["stagedLength"] = (data["staged"]).length;
                 data["notStagedLength"] = (data["notStaged"]).length;
+                data["fileTotal"] = data["conflictedLength"] + data["stagedLength"] + data["notStagedLength"];
             })
             .catch((err) => {
                 console.log(err)
