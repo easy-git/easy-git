@@ -147,7 +147,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
             .xlsx_icon::before { ${xlsx_ficon} }
             .doc_icon::before { ${doc_ficon} }
             .docx_icon::before { ${docx_ficon} }
-            
+
             @font-face {
                 font-family: 'otherIcon';
                 src: url('${ttfOtherFile}') format('truetype');
@@ -542,11 +542,12 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                         this.gitStagedFileList = this.gitFileResult.staged;
                         this.gitNotStagedileList = this.gitFileResult.notStaged;
 
+                        let fileTotal = this.gitFileResult.fileTotal;
                         this.gitNotStagedileListLength = this.gitFileResult.notStagedLength;
                         this.gitStagedFileListLength = this.gitFileResult.stagedLength;
                         this.gitConflictedFileListLength = this.gitFileResult.conflictedLength;
 
-                        if (this.gitNotStagedileListLength > 30) {
+                        if (this.gitNotStagedileListLength > 40) {
                             this.isShowChangeList("N");
                         };
                         if (this.gitStagedFileListLength > 30) {
@@ -555,6 +556,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                         if (this.gitConflictedFileListLength > 30) {
                             this.isShowConflictedList("N");
                         };
+
                         if (this.gitStagedFileListLength == 0 && this.gitNotStagedileListLength == 0 && this.gitConflictedFileListLength == 0) {
                             this.commitMessage = '';
                         };
