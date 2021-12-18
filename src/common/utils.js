@@ -682,7 +682,7 @@ function checkNodeModulesFileList(projectPath, projectName, GitStatusResult) {
     };
     if (num >= 300) {
         hx.window.setStatusBarMessage(
-            `easy-it: 项目${projectName}下, ${num}个文件发生了变化，easy-git插件需要一定的时间来加载。\n`, 'error', 5000
+            `easy-it: 项目${projectName}下, ${num}个文件发生了变化，easy-git插件需要一定的时间来加载。`, 'error', 5000
         );
     };
 };
