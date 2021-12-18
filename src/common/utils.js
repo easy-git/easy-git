@@ -40,22 +40,25 @@ function isObj(object){
 
 /**
  * @description 获取跟主题相匹配的颜色
- *   - fontFamily           字体
- *   - fontSize             字号
- *   - background           背景色
- *   - fontColor            字体颜色
- *   - liHoverBackground    li类元素，悬停背景色
- *   - inputBgColor         输入框背景色
- *   - inputLineColor       输入框线条颜色
- *   - lineColor            其它线条颜色
- *   - scrollbarColor       滚动条颜色
- *   - cursorColor          光标颜色
+ *   - fontFamily              字体
+ *   - fontSize                字号
+ *   - lefeSideVeiwBackground  左侧视图背景色
+ *   - background              编辑器背景色
+ *   - fontColor               字体颜色
+ *   - liHoverBackground       li类元素，悬停背景色
+ *   - inputBgColor            输入框背景色
+ *   - inputLineColor          输入框线条颜色
+ *   - lineColor               其它线条颜色
+ *   - scrollbarColor          滚动条颜色
+ *   - cursorColor             光标颜色
+ *   - remarkTextColor         备注颜色，主要用于左侧视图文件目录名颜色
  * @param {String} area - HBuilderX区域，当area=undefinded，返回编辑器区域的背景色；当area=siderBar时，返回项目管理器背景色
  * @return {Object}
  */
 function getThemeColor(area) {
     let fontColor;
     let background;
+    let lefeSideVeiwBackground;
     let liHoverBackground;
     let inputColor;
     let inputBgColor;
@@ -119,6 +122,7 @@ function getThemeColor(area) {
         case 'Monokai':
             fontColor = 'rgb(179,182,166)';
             remarkTextColor = 'rgb(154,154,154)';
+            lefeSideVeiwBackground = 'rgb(39,40,34)';
             background = 'rgb(39,40,34)';
             menuBackground = 'rgb(83,83,83)';
             liHoverBackground = 'rgb(78,80,73)';
@@ -132,6 +136,7 @@ function getThemeColor(area) {
         case 'Atom One Dark':
             fontColor = 'rgb(171,178,191)';
             remarkTextColor = 'rgb(154,154,154)';
+            lefeSideVeiwBackground = 'rgb(33,37,43)';
             background = 'rgb(40,44,53)';
             menuBackground = 'rgb(50,56,66)';
             liHoverBackground = 'rgb(44,47,55)';
@@ -145,6 +150,7 @@ function getThemeColor(area) {
         default:
             fontColor = 'rgb(51, 51, 51)';
             remarkTextColor = 'rgb(104,104,104)';
+            lefeSideVeiwBackground = 'rgb(255,250,232)';
             background = 'rgb(255,250,232)';
             menuBackground = 'rgb(255,252,243)';
             liHoverBackground = 'rgb(224,237,211)';
@@ -203,6 +209,7 @@ function getThemeColor(area) {
         fontFamily,
         explorerIconScheme,
         explorerIconTheme,
+        lefeSideVeiwBackground,
         background,
         menuBackground,
         liHoverBackground,

@@ -22,6 +22,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
     // icon
     let {
         background,
+        lefeSideVeiwBackground,
         menuBackground,
         liHoverBackground,
         inputColor,
@@ -85,7 +86,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
         <script src="${vueFile}"></script>
         <style type="text/css">
             :root {
-              --background: ${background};
+              --background: ${lefeSideVeiwBackground};
               --remarkTextColor: ${remarkTextColor};
               --fontColor: ${fontColor};
               --lineColor: ${lineColor};
@@ -712,13 +713,13 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
             });
         </script>
         <script>
-            // let devStatus = ${DisableDevTools};
-            // if (devStatus) {
-            //     window.oncontextmenu = function() {
-            //         event.preventDefault();
-            //         return false;
-            //     };
-            // };
+            let devStatus = ${DisableDevTools};
+            if (devStatus) {
+                window.oncontextmenu = function() {
+                    event.preventDefault();
+                    return false;
+                };
+            };
         </script>
     </body>
 </html>
