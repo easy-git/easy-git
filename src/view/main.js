@@ -30,7 +30,7 @@ function getUIData() {
     // 根据主题适配颜色
     let colorData = utils.getThemeColor('siderBar');
     let {fontColor, explorerIconTheme, explorerIconScheme} = colorData;
-    
+
     // 文件图标
     let ttfFile = path.join(__dirname, 'static', 'file-icon', `${explorerIconTheme}.ttf`);
     let ttfJSONFile = path.join(__dirname, 'static', 'file-icon', `${explorerIconTheme}.json`);
@@ -42,7 +42,7 @@ function getUIData() {
         "html", "js", "ts", "vue", "md",
         "css", "less", "scss", "sass", "styl",
         "py", "java", "php", "c", "cpp", "go", "sql",
-        "img", "zip", "json", 
+        "img", "zip", "json",
         "xml", "sh",
         "csv", "xls", "xlsx", "doc", "docx" ];
     for (let s of flist) {
@@ -195,10 +195,10 @@ class GitFile {
             if (gitData.FileResult) {
                 try{
                     let gitViewFileList = gitData.FileResult;
-                    let totalFile = gitViewFileList.conflicted.length + gitViewFileList.notStaged.length + gitViewFileList.conflicted.length;
-                    if (totalFile > 300) {
+                    let totalFile = gitViewFileList.conflictedLength + gitViewFileList.stagedLength + gitViewFileList.notStagedLength;
+                    if (totalFile > 1) {
                         let userBtn = await utils.hxShowMessageBox('EasyGit',
-                            `当前项目下变更的文件数量超过300个，文件数量太多，继续加载，可能会导致EasyGit插件视图失去响应，建议直接提交。\n\n 直接提交：git add + git commit`, ["继续加载","直接提交", "关闭"],
+                            `当前项目下变更的文件数量超过1000个，文件数量太多，继续加载，可能会导致EasyGit插件视图失去响应，建议直接提交。\n\n 直接提交：git add + git commit`, ["继续加载","直接提交", "关闭"],
                         ).then( (result) => { return result; });
                         if (userBtn == "直接提交") {
                             let ciMsg = await hx.window.showInputBox({
@@ -208,10 +208,12 @@ class GitFile {
                                 return result;
                             });
                             await utils.gitAddCommit(this.projectPath, ciMsg);
+                            this.webviewPanel.webView.postMessage({"command": "closedAnimation"});
                             return;
                         } else if (userBtn == "继续加载") {
                             console.log('EasyGit:...........继续加载');
                         } else {
+                            this.webviewPanel.webView.postMessage({"command": "closedAnimation"});
                             return;
                         };
                     };

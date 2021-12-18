@@ -926,7 +926,10 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
             'msg': 'success',
             'conflicted': [],
             'staged': [],
-            'notStaged': []
+            'notStaged': [],
+            'conflictedLength': 0,
+            'stagedLength': 0,
+            'notStagedLength': 0
         };
         let errorList = [];
 
@@ -997,7 +1000,10 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
                         outputChannel.appendLine(s);
                     };
                     outputChannel.appendLine("\n\n");
-                }
+                };
+                data["conflictedLength"] = (data["conflicted"]).length;
+                data["stagedLength"] = (data["staged"]).length;
+                data["notStagedLength"] = (data["notStaged"]).length;
             })
             .catch((err) => {
                 console.log(err)

@@ -8,6 +8,16 @@ const vueFile = path.join(__dirname, 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
 const mainCssFile = path.join(__dirname, 'static', 'main.css');
 
+/**
+ * hbuilderx.onDidReceiveMessage接收的事件
+ *  - themeColor        当外部改变hx主题时，发送此事件，切换Git视图颜色
+ *  - syncBehindAhead   同步Git behind、ahead数字；只有git fetch操作会触发此事件。
+ *  - animation         Git视图显示加载动画
+ *  - closedAnimation   Git视图关闭动画
+ *  - CommitMessage     用于填充Git Commit消息输入框，一般发生在Git合并、revert等事件之后
+ *  - autoRefresh       接收Git仓库的：文件变更列表、分支名称、Git URL、behind、ahead等基本信息
+ *  - HEAD              同步Git仓库的：behind、ahead、branchName、url信息
+ */
 
 /**
  * @description 获取webview内容
@@ -454,6 +464,9 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             if (msg.command == 'animation') {
                                 this.refreshProgress = true;
                             };
+                            if (msg.command == 'closedAnimation') {
+                                this.refreshProgress = false;
+                            };
 
                             if (msg.command == 'HEAD') {
                                 this.ahead = msg.ahead;
@@ -489,8 +502,8 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             data: fpath
                         });
                     },
-                    isShowConflictedList() {
-                        if (this.ConflictedIcon == '${ChevronDownIcon}') {
+                    isShowConflictedList(isShow=undefined) {
+                        if (this.isShowConflicted || isShow == "N") {
                             this.isShowConflicted = false;
                             this.ConflictedIcon = '${ChevronRightIcon}';
                         } else {
@@ -498,8 +511,8 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             this.ConflictedIcon = '${ChevronDownIcon}';
                         }
                     },
-                    isShowChangeList() {
-                        if (this.ChangeIcon == '${ChevronDownIcon}') {
+                    isShowChangeList(isShow=undefined) {
+                        if (this.isShowChange || isShow == "N") {
                             this.isShowChange = false;
                             this.ChangeIcon = '${ChevronRightIcon}';
                         } else {
@@ -507,8 +520,8 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             this.ChangeIcon = '${ChevronDownIcon}';
                         }
                     },
-                    isShowStagedList() {
-                        if (this.StagedIcon == '${ChevronDownIcon}') {
+                    isShowStagedList(isShow=undefined) {
+                        if (this.isShowStaged || isShow == "N") {
                             this.isShowStaged = false;
                             this.StagedIcon = '${ChevronRightIcon}';
                         } else {
@@ -521,10 +534,19 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                         this.gitStagedFileList = this.gitFileResult.staged;
                         this.gitNotStagedileList = this.gitFileResult.notStaged;
 
-                        this.gitStagedFileListLength = (this.gitStagedFileList).length;
-                        this.gitNotStagedileListLength = (this.gitNotStagedileList).length;
-                        this.gitConflictedFileListLength = (this.gitConflictedFileList).length;
+                        this.gitNotStagedileListLength = this.gitFileResult.notStagedLength;
+                        this.gitStagedFileListLength = this.gitFileResult.stagedLength;
+                        this.gitConflictedFileListLength = this.gitFileResult.conflictedLength;
 
+                        if (this.gitNotStagedileListLength > 30) {
+                            this.isShowChangeList("N");
+                        };
+                        if (this.gitStagedFileListLength > 30) {
+                            this.isShowStagedList("N");
+                        };
+                        if (this.gitConflictedFileListLength > 30) {
+                            this.isShowConflictedList("N");
+                        };
                         if (this.gitStagedFileListLength == 0 && this.gitNotStagedileListLength == 0 && this.gitConflictedFileListLength == 0) {
                             this.commitMessage = '';
                         };
