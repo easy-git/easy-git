@@ -38,13 +38,15 @@ function getUIData() {
 
     let fListIcon = {"explorerIconTheme": explorerIconTheme};
     let flist = [
-        "",
+        "", "folder",
         "html", "js", "ts", "vue", "md",
         "css", "less", "scss", "sass", "styl",
         "py", "java", "php", "c", "cpp", "go", "sql",
         "img", "zip", "json",
         "xml", "sh",
         "csv", "xls", "xlsx", "doc", "docx" ];
+    
+    // vs-stei没有文件夹图标，因此vs-stei图标单独取自other.ttf
     for (let s of flist) {
         fListIcon[`${s}_ficon`] = ttfContent[`${s}_${explorerIconScheme}`] ? ttfContent[`${s}_${explorerIconScheme}`] : ttfContent[`_${explorerIconScheme}`];
     };
@@ -196,7 +198,7 @@ class GitFile {
                 try{
                     let gitViewFileList = gitData.FileResult;
                     let totalFile = gitViewFileList.conflictedLength + gitViewFileList.stagedLength + gitViewFileList.notStagedLength;
-                    if (totalFile > 1) {
+                    if (totalFile > 1000) {
                         let userBtn = await utils.hxShowMessageBox('EasyGit',
                             `当前项目下变更的文件数量超过1000个，文件数量太多，继续加载，可能会导致EasyGit插件视图失去响应，建议直接提交。\n\n 直接提交：git add + git commit`, ["继续加载","直接提交", "关闭"],
                         ).then( (result) => { return result; });

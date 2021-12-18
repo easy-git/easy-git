@@ -1,6 +1,8 @@
 {
     "_light": "content: '\\E900';color: #C1A766;font-family: 'ficon'",
     "_dark": "content: '\\E900';color: #BEBEBE;font-family: 'ficon'",
+    "folder_light": "content: '\\E905';color: #C1A766;font-family: 'ficon'",
+    "folder_dark": "content: '\\E905';color: #BEBEBE;font-family: 'ficon'",
     "js_light": "content: '\\E901';color: #C1A766;font-family: 'ficon'",
     "js_dark": "content: '\\E901';color: #BEBEBE;font-family: 'ficon'",
     "ts_light": "content: '\\E918';color: #C1A766;font-family: 'ficon'",

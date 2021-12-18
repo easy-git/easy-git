@@ -1,6 +1,8 @@
 {
     "_light": "content: '\\E01E';color: #498ba7;font-family: 'ficon'",
     "_dark": "content: '\\E01E';color: #519aba;font-family: 'ficon'",
+    "folder_light": "content: '\\e66d';color: #498ba7;font-family: 'otherIcon';font-size: 13px; top: 0px; padding: 0 4px;",
+    "folder_dark": "content: '\\e66d';color: #519aba;font-family: 'otherIcon';font-size: 13px; top: 0px; padding: 0 4px;",
     "js_light": "content: '\\E048';color: #b7b73b;font-family: 'ficon'",
     "js_dark": "content: '\\E048';color: #cbcb41;font-family: 'ficon'",
     "ts_light": "content: '\\E083';color: #498ba7;font-family: 'ficon'",

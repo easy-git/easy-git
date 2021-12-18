@@ -913,6 +913,7 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
     // 文件后缀，作用：用于Git源代码管理器，显示文件图标
     let file_suffix = "";
     let fsuffix_list = [
+        "folder",
         "html", "js", "ts", "vue", "md",
         "css", "less", "scss", "sass", "styl",
         "py", "java", "php", "c", "cpp", "go", "sql",
@@ -963,7 +964,7 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
                         let dirname = path.dirname(fpath);
                         if (dirname == '.') {
                             dirname = '';
-                        }
+                        };
 
                         if (['DD','AU','UD','UA','DU','AA','UU'].includes(tag)) {
                             if (['DD','UD','DU'].includes(tag)) {

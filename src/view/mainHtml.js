@@ -7,6 +7,7 @@ const osName = os.platform();
 const vueFile = path.join(__dirname, 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
 const mainCssFile = path.join(__dirname, 'static', 'main.css');
+const ttfOtherFile = path.join(__dirname, 'static', 'file-icon', "other.ttf");
 
 /**
  * hbuilderx.onDidReceiveMessage接收的事件
@@ -61,7 +62,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
         HandleIcon,
         CommandPanelIcon,
         ttfFile,
-        _ficon,
+        _ficon, folder_ficon,
         html_ficon, js_ficon,ts_ficon,vue_ficon,md_ficon,css_ficon,
         less_ficon,scss_ficon, sass_ficon,styl_ficon,xml_ficon,
         py_ficon,php_ficon,java_ficon,c_ficon,cpp_ficon,sh_ficon, go_ficon, sql_ficon,
@@ -73,7 +74,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
     let iconSize = "14px";
     let iconTop = "2px";
     if (explorerIconTheme == "vs-seti") {
-        iconSize = "18px";
+        iconSize = "19px";
         iconTop = "4px";
     };
 
@@ -109,8 +110,9 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
             }
             @font-face {
                 font-family: 'ficon';
-                src: url('${ttfFile}');
+                src: url('${ttfFile}') format('truetype');
             }
+
             .before_ficon::before {
                 position: relative;
                 top: ${iconTop};
@@ -145,6 +147,12 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
             .xlsx_icon::before { ${xlsx_ficon} }
             .doc_icon::before { ${doc_ficon} }
             .docx_icon::before { ${docx_ficon} }
+            
+            @font-face {
+                font-family: 'otherIcon';
+                src: url('${ttfOtherFile}') format('truetype');
+            }
+            .folder_icon::before { ${folder_ficon} }
         </style>
         <link rel="stylesheet" href="${mainCssFile}">
     </head>
