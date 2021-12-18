@@ -198,9 +198,9 @@ class GitFile {
                 try{
                     let gitViewFileList = gitData.FileResult;
                     let totalFile = gitViewFileList.conflictedLength + gitViewFileList.stagedLength + gitViewFileList.notStagedLength;
-                    if (totalFile > 500) {
+                    if (totalFile > 300) {
                         let userBtn = await utils.hxShowMessageBox('EasyGit',
-                            `当前项目下变更的文件数量超过500个，文件数量太多，继续加载，可能会导致EasyGit插件视图失去响应，建议直接提交。\n\n 直接提交：git add + git commit`, ["继续加载","直接提交", "关闭"],
+                            `当前项目下变更的文件数量超过300个，文件数量太多，继续加载，可能会导致EasyGit插件视图失去响应，建议直接提交。\n\n 备注：一些非必要的文件，比如node_modules, 建议加入.gitignore进行忽略。\n\n直接提交：git add + git commit`, ["设置.gitignore","继续加载","直接提交", "关闭"],
                         ).then( (result) => { return result; });
                         if (userBtn == "直接提交") {
                             let ciMsg = await hx.window.showInputBox({
@@ -211,6 +211,9 @@ class GitFile {
                             });
                             await utils.gitAddCommit(this.projectPath, ciMsg);
                             this.webviewPanel.webView.postMessage({"command": "closedAnimation"});
+                            return;
+                        } else if (userBtn == "设置.gitignore") {
+                            gitConfigFileSetting(this.projectPath, '.gitignore')
                             return;
                         } else if (userBtn == "继续加载") {
                             console.log('EasyGit:...........继续加载');
