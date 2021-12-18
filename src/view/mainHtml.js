@@ -65,9 +65,10 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
         _ficon, folder_ficon,
         html_ficon, js_ficon,ts_ficon,vue_ficon,md_ficon,css_ficon,
         less_ficon,scss_ficon, sass_ficon,styl_ficon,xml_ficon,
-        py_ficon,php_ficon,java_ficon,c_ficon,cpp_ficon,sh_ficon, go_ficon, sql_ficon,
+        py_ficon,php_ficon,java_ficon,c_ficon,cpp_ficon,sh_ficon, bat_ficon, go_ficon, sql_ficon,
         img_ficon, zip_ficon,json_ficon,
         docx_ficon, doc_ficon, xls_ficon, xlsx_ficon, csv_ficon,
+        git_ficon, config_ficon, license_ficon,
         explorerIconTheme
     } = uiData;
 
@@ -147,6 +148,10 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
             .xlsx_icon::before { ${xlsx_ficon} }
             .doc_icon::before { ${doc_ficon} }
             .docx_icon::before { ${docx_ficon} }
+            .bat_icon::before { ${bat_ficon} }
+            .git_icon::before { ${git_ficon} }
+            .license_icon::before { ${license_ficon} }
+            .config_icon::before { ${config_ficon} }
 
             @font-face {
                 font-family: 'otherIcon';
@@ -541,7 +546,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                         this.gitConflictedFileList = this.gitFileResult.conflicted;
                         this.gitStagedFileList = this.gitFileResult.staged;
                         this.gitNotStagedileList = this.gitFileResult.notStaged;
-                        
+
                         let fileTotal = this.gitFileResult.fileTotal;
                         this.gitNotStagedileListLength = this.gitFileResult.notStagedLength;
                         this.gitStagedFileListLength = this.gitFileResult.stagedLength;

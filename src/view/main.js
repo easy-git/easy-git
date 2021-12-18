@@ -32,19 +32,21 @@ function getUIData() {
     let {fontColor, explorerIconTheme, explorerIconScheme} = colorData;
 
     // 文件图标
-    let ttfFile = path.join(__dirname, 'static', 'file-icon', `${explorerIconTheme}.ttf`);
+    let ttfFileName = explorerIconTheme == 'vs-seti' ? `${explorerIconTheme}.woff` : `${explorerIconTheme}.ttf`;
+    let ttfFilePath = path.join(__dirname, 'static', 'file-icon', ttfFileName);
     let ttfJSONFile = path.join(__dirname, 'static', 'file-icon', `${explorerIconTheme}.json`);
     let ttfContent = require(ttfJSONFile);
 
-    let fListIcon = {"explorerIconTheme": explorerIconTheme};
+    let fListIcon = {"explorerIconTheme": explorerIconTheme, "ttfFile": ttfFilePath};
     let flist = [
         "", "folder",
         "html", "js", "ts", "vue", "md",
         "css", "less", "scss", "sass", "styl",
         "py", "java", "php", "c", "cpp", "go", "sql",
         "img", "zip", "json",
-        "xml", "sh",
-        "csv", "xls", "xlsx", "doc", "docx" ];
+        "xml", "sh", "bat",
+        "csv", "xls", "xlsx", "doc", "docx",
+        "license", "config", "git"];
 
     // vs-stei没有文件夹图标，因此vs-stei图标单独取自other.ttf
     for (let s of flist) {
@@ -77,7 +79,6 @@ function getUIData() {
     let CommandPanelIcon = icon.getCommandPanelIcon(fontColor);
 
     let iconData = {
-        ttfFile,
         CancelIconSvg,
         OpenFileIconSvg,
         AddIconSvg,

@@ -918,9 +918,13 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u'], isR
         "css", "less", "scss", "sass", "styl",
         "py", "java", "php", "c", "cpp", "go", "sql",
         "img", "zip", "json",
-        "xml", "sh",
-        "csv", "xls", "xlsx", "doc", "docx"];
+        "xml", "sh", "bat",
+        "csv", "xls", "xlsx", "doc", "docx", "license"];
     let img_suffix_list = ["png", "jpg", "jpeg", "gif", "bmp", "webp", "svg", "ico"];
+    let config_suffix_list = ["config", "cfg", "conf", "editorconfig", "env"];
+    let git_suffix_list = ["gitconfig", "gitkeep", "gitattributes", "gitmodules", "gitignore"];
+
+    let all_suffix_list = [...fsuffix_list, ...img_suffix_list, ...config_suffix_list, ...git_suffix_list];
 
     let data = {
         'msg': 'success',
@@ -948,17 +952,26 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u'], isR
                             fpath = fpath.replace(reg, "$1");
                         };
                         file_suffix = s.split('.').pop().toLowerCase();
+                        if (!all_suffix_list.includes(file_suffix)) {
+                            file_suffix = '';
+                        };
                         if (img_suffix_list.includes(file_suffix)) {
                             file_suffix = "img";
-                        };
-                        if (!fsuffix_list.includes(file_suffix) && !img_suffix_list.includes(file_suffix)) {
-                            file_suffix = '';
                         };
                         if (file_suffix == 'markdown') {
                             file_suffix = "md";
                         };
                         if (file_suffix == 'htm') {
                             file_suffix = "html";
+                        };
+                        if (config_suffix_list.includes(file_suffix)){
+                            file_suffix = "config";
+                        };
+                        if (git_suffix_list.includes(file_suffix)) {
+                            file_suffix = "git";
+                        };
+                        if (fpath == "license") {
+                            file_suffix = "license";
                         };
                         let f_icon = file_suffix + "_icon";
 
@@ -1008,6 +1021,7 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u'], isR
                 data["stagedLength"] = (data["staged"]).length;
                 data["notStagedLength"] = (data["notStaged"]).length;
                 data["fileTotal"] = data["conflictedLength"] + data["stagedLength"] + data["notStagedLength"];
+                console.log(data);
             })
             .catch((err) => {
                 console.log(err)
