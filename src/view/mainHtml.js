@@ -541,7 +541,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                         this.gitConflictedFileList = this.gitFileResult.conflicted;
                         this.gitStagedFileList = this.gitFileResult.staged;
                         this.gitNotStagedileList = this.gitFileResult.notStaged;
-
+                        
                         let fileTotal = this.gitFileResult.fileTotal;
                         this.gitNotStagedileListLength = this.gitFileResult.notStagedLength;
                         this.gitStagedFileListLength = this.gitFileResult.stagedLength;

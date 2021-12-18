@@ -907,7 +907,7 @@ async function gitFileStatus(workingDir, selectedFile, options) {
  * @description 获取git文件列表
  * @param {String} workingDir Git工作目录
  */
-async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
+async function gitFileListStatus(workingDir, options=['status', '-s', '-u'], isReturnDefault=undefined) {
     var reg = /^['|"](.*)['|"]$/;
 
     // 文件后缀，作用：用于Git源代码管理器，显示文件图标
@@ -922,19 +922,20 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u']) {
         "csv", "xls", "xlsx", "doc", "docx"];
     let img_suffix_list = ["png", "jpg", "jpeg", "gif", "bmp", "webp", "svg", "ico"];
 
-    try {
-        let data = {
-            'msg': 'success',
-            'conflicted': [],
-            'staged': [],
-            'notStaged': [],
-            'fileTotal': 0,
-            'conflictedLength': 0,
-            'stagedLength': 0,
-            'notStagedLength': 0
-        };
-        let errorList = [];
+    let data = {
+        'msg': 'success',
+        'conflicted': [],
+        'staged': [],
+        'notStaged': [],
+        'fileTotal': 0,
+        'conflictedLength': 0,
+        'stagedLength': 0,
+        'notStagedLength': 0
+    };
+    if (isReturnDefault) {return data};
 
+    try {
+        let errorList = [];
         await git(workingDir).raw(options)
             .then((res) => {
                 let files = res.split('\n');
@@ -1070,6 +1071,8 @@ async function gitStatus(workingDir, isShowFileList=true) {
         if (isShowFileList == true) {
             let files = statusSummary.files;
             if (files.length) {
+                result.FileResult = await gitFileListStatus(workingDir);
+            } else {
                 result.FileResult = await gitFileListStatus(workingDir);
             };
         };
@@ -2701,29 +2704,6 @@ class gitRestore {
         };
     };
 
-    // get option
-    getRestoreOptions(projectPath, selectedFile) {
-        let options = selectedFile;
-
-        projectPath = path.normalize(projectPath);
-        selectedFile = path.normalize(selectedFile);
-
-        // 选择：整个项目
-        if (projectPath == selectedFile || selectedFile == '*') {
-          options = '*';
-        } else {
-          let state = fs.statSync(selectedFile);
-          if (state.isFile()) {
-              options = selectedFile;
-          };
-          if (state.isDirectory()) {
-              let dirName = selectedFile.replace(projectPath, '');
-              options = path.join('.', path.sep, dirName.slice(1), path.sep, '*');
-          };
-        };
-        return options;
-    };
-
     /**
      * @param {Object} projectInfo
      * @param {Object} actionName  restoreChanged | restoreChanged
@@ -2735,10 +2715,6 @@ class gitRestore {
         };
 
         let options = selectedFile;
-        if (selectedFile != '*') {
-            options = this.getRestoreOptions(projectPath, selectedFile);
-        };
-
         if (selectedFile != '*') {
             // 检查是否是否修改
             let checkResult = await gitFileStatus(projectPath, selectedFile, ['s', selectedFile]);
