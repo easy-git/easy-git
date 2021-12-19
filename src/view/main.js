@@ -13,6 +13,9 @@ let utils = require('../common/utils.js');
 const icon = require('./static/icon.js');
 const html = require('./mainHtml.js')
 
+// 字体图标文件路径
+let ttfOtherFile = path.join(__dirname, 'static', 'file-icon', "other.ttf");
+
 const osName = os.platform();
 
 // 主题
@@ -37,7 +40,13 @@ function getUIData() {
     let ttfJSONFile = path.join(__dirname, 'static', 'file-icon', `${explorerIconTheme}.json`);
     let ttfContent = require(ttfJSONFile);
 
-    let fListIcon = {"explorerIconTheme": explorerIconTheme, "ttfFile": ttfFilePath};
+    // windows路径处理
+    if ( osName != 'darwin') {
+        ttfOtherFile = ttfOtherFile.replace(/\\/g, '/');
+        ttfFilePath = ttfFilePath.replace(/\\/g, '/');
+    };
+
+    let fListIcon = {"explorerIconTheme": explorerIconTheme, "ttfFile": ttfFilePath, "ttfOtherFile": ttfOtherFile};
     let flist = [
         "", "folder",
         "html", "js", "ts", "vue", "md",

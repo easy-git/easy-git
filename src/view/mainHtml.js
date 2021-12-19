@@ -7,7 +7,6 @@ const osName = os.platform();
 const vueFile = path.join(__dirname, 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
 const mainCssFile = path.join(__dirname, 'static', 'main.css');
-const ttfOtherFile = path.join(__dirname, 'static', 'file-icon', "other.ttf");
 
 /**
  * hbuilderx.onDidReceiveMessage接收的事件
@@ -61,7 +60,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
         ChevronRightIcon,
         HandleIcon,
         CommandPanelIcon,
-        ttfFile,
+        ttfFile, ttfOtherFile,
         _ficon, folder_ficon,
         html_ficon, js_ficon,ts_ficon,vue_ficon,md_ficon,css_ficon,
         less_ficon,scss_ficon, sass_ficon,styl_ficon,xml_ficon,

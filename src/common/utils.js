@@ -1021,7 +1021,6 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u'], isR
                 data["stagedLength"] = (data["staged"]).length;
                 data["notStagedLength"] = (data["notStaged"]).length;
                 data["fileTotal"] = data["conflictedLength"] + data["stagedLength"] + data["notStagedLength"];
-                console.log(data);
             })
             .catch((err) => {
                 console.log(err)
