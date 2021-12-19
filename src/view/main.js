@@ -486,7 +486,7 @@ class GitFile {
         if (!['HEAD^', 'HEAD'].includes(version)) {
             return;
         }
-        let msg = version == 'HEAD' ? 'Git: 重置代码到当前版本' : 'Git: 重置代码到上个版本';
+        let msg = version == 'HEAD' ? 'Git: 重置当前修改' : 'Git: 重置代码到上个版本';
         let resetStatus = await utils.gitReset(this.projectPath, ['--hard', version], msg);
         if (resetStatus == 'success') {
             this.refreshFileList();

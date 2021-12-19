@@ -1461,6 +1461,12 @@ async function gitCancelAdd(workingDir, filename) {
  * @param {Object} workingDir
  */
 async function gitReset(workingDir, options, msg) {
+    let boxMsg = "确认重置后，您本地未提交的代码，将会丢失。\n\n执行的Git命令为：git reset " + options.join(" ");
+    let btnText = await hxShowMessageBox(`${msg}`, boxMsg, ['确认重置', '关闭']).then( btn => {
+        return btn;
+    });
+    if (btnText != '确认重置') return;
+
     try {
         let status = await git(workingDir)
             .reset(options)
