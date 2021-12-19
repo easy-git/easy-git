@@ -47,8 +47,6 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
     let {
         background,
         liHoverBackground,
-        inputColor,
-        inputLineColor,
         cursorColor,
         fontColor,
         lineColor,
@@ -80,8 +78,6 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
             :root {
                 --background: ${background};
                 --liHoverBackground: ${liHoverBackground};
-                --inputColor: ${inputColor};
-                --inputLineColor: ${inputLineColor};
                 --cursorColor: ${cursorColor};
                 --fontColor: ${fontColor};
                 --lineColor: ${lineColor};
@@ -260,8 +256,6 @@ function getDefaultContent(fname='') {
     let {
         background,
         liHoverBackground,
-        inputColor,
-        inputLineColor,
         cursorColor,
         fontColor,
         lineColor
