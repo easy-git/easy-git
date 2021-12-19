@@ -52,19 +52,19 @@ button {
 
 @-webkit-keyframes pulse {
     0% {
-        background: var(--inputLineColor) !important;
+        background: var(--inputLineColor);
         left: 0px;
         top: 0px;
     }
 
     50% {
-        background: var(--inputLineColor) !important;
+        background: var(--inputLineColor);
         left: 50%;
         top: 0px;
     }
 
     100% {
-        background: var(--inputLineColor) !important;
+        background: var(--inputLineColor);
         left: 100%;
         top: 0px;
     }
@@ -81,24 +81,25 @@ button {
     box-shadow: none !important;
 }
 
-.form-group .form-control::-webkit-input-placeholder,
-.form-control::-webkit-input-placeholder {
-    font-size: 0.9rem !important;
-    font-weight: 200 !important;
-    color: #c0c4cc !important;
+.form-control-bg {
+    background-color: var(--inputBgColor) !important;
 }
 
 .form-control {
     border-radius: 2px !important;
     font-size: 0.9rem !important;
-    border: 1px solid var(--lineColor);
-    background-color: var(--background) !important;
+    border: 1px solid var(--background);
 }
 
 .form-control:focus {
     border-radius: 2px !important;
     border: 1px solid var(--inputLineColor) !important;
-    background-color: var(--background) !important;
+}
+
+.form-group .form-control::-webkit-input-placeholder {
+    font-size: 0.9rem !important;
+    font-weight: 200 !important;
+    color: #c0c4cc !important;
 }
 
 .top {
@@ -111,12 +112,9 @@ button {
     transform: scale(0.9);
 }
 
-.gitfile:hover .hideicon {
-    opacity: 1;
-}
-
-.gitfile:hover .ci {
-    display: none;
+.ci {
+    font-size: 0.8rem;
+    margin-top: 3px;
 }
 
 .lif {
@@ -132,6 +130,13 @@ button {
     overflow: hidden
 }
 
+.hideicon {
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s;
+    /*transform: translateY(100%);*/
+}
+
 .lif>.hideicon {
     position: relative;
     float: right;
@@ -142,11 +147,12 @@ button {
     background-color: var(--liHoverBackground) !important;
 }
 
-.hideicon {
-    overflow: hidden;
-    opacity: 0;
-    transition: all 0.3s;
-    /*transform: translateY(100%);*/
+.gitfile:hover .hideicon {
+    opacity: 1;
+}
+
+.gitfile:hover .ci {
+    display: none;
 }
 
 .fixedBottom {
@@ -174,10 +180,7 @@ button {
     top: 1px;
 }
 
-.ci {
-    font-size: 0.8rem;
-    margin-top: 3px;
-}
+
 
 .btnd {
     border: 1px solid var(--lineColor);
@@ -199,14 +202,14 @@ button {
     font-size: 14px;
 }
 
-.major-title:hover .is-show {
-    display: inline;
-}
-
 .is-show {
     display: none;
     float: right;
     font-size: 14px;
+}
+
+.major-title:hover .is-show {
+    display: inline;
 }
 
 .count-num {

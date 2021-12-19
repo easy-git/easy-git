@@ -21,6 +21,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
     // icon
     let {
         background,
+        lefeSideVeiwBackground,
         liHoverBackground,
         inputColor,
         inputLineColor,
@@ -76,7 +77,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
         <script src="${vueFile}"></script>
         <style type="text/css">
             :root {
-                --background:${background};
+                --background:${lefeSideVeiwBackground};
                 --liHoverBackground:${liHoverBackground};
                 --inputColor:${inputColor};
                 --inputLineColor:${inputLineColor};
@@ -108,7 +109,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                 <input
                                     id="inputBranch"
                                     type="text"
-                                    class="form-control outline-none"
+                                    class="form-control form-control-bg outline-none"
                                     :placeholder="inputBranchPlaceholder"
                                     autofocus="autofocus"
                                     v-model.trim="inputBranch"

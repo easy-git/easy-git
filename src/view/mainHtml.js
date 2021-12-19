@@ -37,6 +37,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
         liHoverBackground,
         inputColor,
         inputLineColor,
+        inputBgColor,
         cursorColor,
         fontColor,
         remarkTextColor,
@@ -101,6 +102,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
               --remarkTextColor: ${remarkTextColor};
               --fontColor: ${fontColor};
               --lineColor: ${lineColor};
+              --inputBgColor: ${inputBgColor};
               --inputLineColor: ${inputLineColor};
               --scrollbarColor: ${scrollbarColor};
               --menuBackground: ${menuBackground};
@@ -213,7 +215,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             <textarea rows=1
                                 id="commitMsg"
                                 v-model="commitMessage"
-                                class="form-control outline-none textarea"
+                                class="form-control outline-none textarea form-control-bg"
                                 :placeholder="commitMessagePlaceholder"
                                 @keyup.${ctrl}.enter="gitCommit();"
                                 :title="GitAlwaysAutoCommitPush ? 'commit & push' : 'commit'">

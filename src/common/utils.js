@@ -128,7 +128,7 @@ function getThemeColor(area) {
             liHoverBackground = 'rgb(78,80,73)';
             inputColor = 'rgb(255,254,250)';
             inputBgColor = '#2E2E2E';
-            inputLineColor = 'rgb(81,140,255)';
+            inputLineColor = '#CECECE';
             cursorColor = 'rgb(255,255,255)';
             lineColor = 'rgb(23,23,23)';
             scrollbarColor = '#6F6F6F';
@@ -141,10 +141,10 @@ function getThemeColor(area) {
             menuBackground = 'rgb(50,56,66)';
             liHoverBackground = 'rgb(44,47,55)';
             inputColor = 'rgb(255,254,250)';
-            inputBgColor = '#2E2E2E';
-            inputLineColor = 'rgb(81,140,255)';
+            inputBgColor = '#282c35';
+            inputLineColor = 'rgb(65, 111, 204)';
             cursorColor = 'rgb(255,255,255)';
-            lineColor = 'rgb(33,37,43)';
+            lineColor = '#282c35';
             scrollbarColor = '#6F6F6F';
             break;
         default:
@@ -155,7 +155,7 @@ function getThemeColor(area) {
             menuBackground = 'rgb(255,252,243)';
             liHoverBackground = 'rgb(224,237,211)';
             inputColor = 'rgb(255,252,243)';
-            inputBgColor = '#2E2E2E';
+            inputBgColor = 'rgb(248, 243, 226)';
             inputLineColor = 'rgb(65,168,99)';
             cursorColor = 'rgb(0,0,0)';
             lineColor = 'rgb(225,212,178)';
