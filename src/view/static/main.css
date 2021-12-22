@@ -331,6 +331,6 @@ body::-webkit-scrollbar {
 
 .dirname {
     color: var(--remarkTextColor);
-    font-size: 11px;
+    font-size: 0.83rem;
     margin-left: 5px;
 }
