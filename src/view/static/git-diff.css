@@ -22,6 +22,17 @@ body::-webkit-scrollbar {
     display: none;
 }
 
+.icon-git {
+    font-size: 18px;
+}
+.icon-git-commit::before {
+    content: '\e7ae';
+    color: var(--fontColor);
+    font-family: 'diff-icon';
+    position: relative;
+    top: 2px;
+}
+
 .diff-head {
     height: 50px;
     background-color: var(--background) !important;
@@ -46,6 +57,15 @@ body::-webkit-scrollbar {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.diff-head-action span {
+    margin: 0 3px;
+}
+
+.revision-disabled {
+    pointer-events: none;
+    color: #898989;
 }
 
 .diff-body {

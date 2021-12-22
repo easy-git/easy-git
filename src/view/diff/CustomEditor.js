@@ -155,6 +155,11 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
         };
     }catch(e){};
 
+    let panal = GitDiffCustomWebViewPanal._webView._msgListeners;
+    if (panal) {
+        GitDiffCustomWebViewPanal._webView._msgListeners = [];
+    };
+
     let GitDiff = new Diff(ProjectData, userConfig, GitDiffCustomWebViewPanal);
     GitDiff.SetView();
 
@@ -174,9 +179,11 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
         let action = msg.command;
         GitHBuilderXInnerTrigger = true;
         switch (action) {
+            // 在编辑器打开文件
             case 'openFile':
                 GitDiff.openFile(selectedFile);
                 break;
+            // 打开日志视图
             case 'openLog':
                 let data = {
                     'projectPath': projectPath,
@@ -186,12 +193,26 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
                 };
                 hx.commands.executeCommand('EasyGit.log', data);
                 break;
+            // 处理冲突
             case 'handleConflict':
                 let options = ['checkout', msg.options, selectedFile];
                 GitDiff.handleConflict(selectedFile, options);
                 break;
+            // 文件对比配置：全文对比、三行差异对比
             case 'fileDiffLineSet':
                 GitDiff.setFileDiffConfig();
+                break;
+            // 获取文件历史提交记录 Return: List
+            case 'getFileHistoryCommitHashList':
+                GitDiff.getFileHistoryCommitHashList();
+                break;
+            // 点击previous或next获取对比数据
+            case 'historyRevision':
+                GitDiff.SetViewForRevision(msg.param, msg.isPrevious);
+                break;
+            // 选择某条历史提交记录进行对比
+            case 'selectOneRevisionToDiff':
+                GitDiff.selectOneRevisionToDiff();
                 break;
             default:
                 break;

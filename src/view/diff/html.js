@@ -10,6 +10,7 @@ const vueFile = path.join(path.resolve(__dirname, '..'), 'static', '','vue.min.j
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
 const diff2htmlCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'diff2html.min.css');
 const gitDiffCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'git-diff.css');
+const ttfFile = path.join(path.resolve(__dirname, '..'), 'static', 'font' ,'diff.ttf');
 
 
 /**
@@ -92,6 +93,10 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                 --d2h_linenum_color: ${d2h_linenum_color};
                 --diff_scrollbar_color: ${diff_scrollbar_color};
             }
+            @font-face {
+                font-family: 'diff-icon';
+                src: url('${ttfFile}') format('truetype');
+            }
         </style>
         <link rel="stylesheet" href="${gitDiffCssFile}">
     </head>
@@ -113,11 +118,19 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                             </div>
                         </div>
                     </div>
-                    <div class="row" v-if="isConflicted">
-                        <div class="col-auto mr-auto"></div>
-                        <div class="col-auto px-5 cursor-default">
-                            <span title="git checkout --ours" @click="gitHandleConflict('--ours')">保留当前分支文件 | </span>
-                            <span title="git checkout --theirs" @click="gitHandleConflict('--theirs')">采用传入的文件</span>
+                    <div class="row">
+                        <div class="col-auto mr-auto">
+                        </div>
+                        <div class="col-auto mr-2 cursor-default">
+                            <div v-if="isConflicted">
+                                <span title="git checkout --ours" @click="gitHandleConflict('--ours')">保留当前分支文件 | </span>
+                                <span title="git checkout --theirs" @click="gitHandleConflict('--theirs')">采用传入的文件</span>
+                            </div>
+                            <div class="diff-head-action" v-else>
+                                <span :class="[ stylePreviousRevsion ? 'revision-disabled' : '' ]" @click="openChangeWithRevision('+')" title="open change with previous Revision">Previous</span>
+                                <span :class="[ styleNextRevsion ? 'revision-disabled' : '' ]" @click="openChangeWithRevision('-')" title="open change with Next Revision">Next</span>
+                                <span class="icon-git icon-git-commit" @click="openChangeWithOneRevision()" title="选择某条历史提交进行对比"></span>
+                            </div>
                         </div>
                     </div>
                     <div class="row" v-else>
@@ -157,18 +170,27 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                     titleRight: '${titleRight}',
                     isConflicted: ${isConflicted},
                     gitDiffResult: '',
-                    isFullTextDiffFile: ''
+                    isFullTextDiffFile: '',
+                    isClickRevision: '',
+                    currentHash: 0,
+                    HistoryHashList: [],
+                    HistoryHashNum: 0
                 },
                 computed: {
                     // 文件对比，是否显示全文，icon悬停文本提示语
                     isFullTextDiffFileIconTitle() {
                         return this.isFullTextDiffFile == 'full' ? '关闭全文对比, 使用默认行数上下文生成差异' : '开启全文对比';
-                    }
+                    },
+                    stylePreviousRevsion() {
+                        return this.HistoryHashNum >= this.currentHash && this.HistoryHashList.length ? false : true;
+                    },
+                    styleNextRevsion() {
+                        return this.currentHash >= 0 && this.isClickRevision && this.HistoryHashList.length ? false : true;
+                    },
                 },
                 created() {
                     this.isFullTextDiffFile = '${isFullTextDiffFile}';
                     let text = this.isFullTextDiffFile == 'full' ? '关闭全文对比, 使用默认行数上下文生成差异' : '开启全文对比';
-                    console.log(text)
                 },
                 mounted() {
                     this.forInit();
@@ -177,6 +199,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                     window.onload = function() {
                         setTimeout(function() {
                             that.Receive();
+                            that.getFileHistoryCommitHashList();
                         }, 800);
                     };
                 },
@@ -201,6 +224,29 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                                 this.titleLeft = '';
                                 this.titleRight = '';
                             };
+                            if (msg.command == 'updateRevisionContent') {
+                                let isPrevious = msg.isPrevious;
+                                let diffParam = msg.diffParam;
+                                this.isClickRevision = msg.isPrevious;
+                                if (['-', '+'].includes(isPrevious) && diffParam.length) {
+                                    if (diffParam[0] == 'HEAD^') {
+                                        this.currentHash = 0;
+                                        this.isClickRevision = '';
+                                    } else {
+                                        this.currentHash = isPrevious == '+' ? this.currentHash + 1 : this.currentHash;
+                                    };
+                                };
+                                this.gitDiffResult = '';
+                                let data = msg.result;
+                                this.isDiffHtml = data.isDiffHtml;
+                                this.gitDiffResult = data.diffResult;
+                                this.titleLeft = '';
+                                this.titleRight = '';
+                            };
+                            if (msg.command == 'LogHistoryHash') {
+                                this.HistoryHashList = msg.list;
+                                this.HistoryHashNum = msg.historyHashNum;
+                            }
                         });
                     },
                     openFile() {
@@ -229,6 +275,42 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                         } else {
                             this.isFullTextDiffFile = true;
                         };
+                    },
+                    getFileHistoryCommitHashList() {
+                        hbuilderx.postMessage({
+                            command: 'getFileHistoryCommitHashList'
+                        });
+                    },
+                    openChangeWithRevision(e) {
+                        if (this.currentHash == -1) {
+                            this.currentHash = 0;
+                        };
+                        let n = this.currentHash;
+                        if (n >= 0 && e == '-' && this.isClickRevision != '') {
+                            n = n - 1;
+                            this.currentHash = this.currentHash - 1;
+                        };
+                        if ((n == 0 && e == '-' && this.isClickRevision == '') || ( n == -1 && e == '-')) {
+                            hbuilderx.postMessage({
+                                command: 'historyRevision',
+                                isPrevious: e,
+                                param: ["HEAD"]
+                            });
+                            return;
+                        };
+                        let commit = this.HistoryHashList[n];
+                        let {hash} = commit;
+                        let options = [hash+'^', hash];
+                        hbuilderx.postMessage({
+                            command: 'historyRevision',
+                            isPrevious: e,
+                            param: options
+                        });
+                    },
+                    openChangeWithOneRevision() {
+                        hbuilderx.postMessage({
+                            command: 'selectOneRevisionToDiff'
+                        });
                     }
                 }
             })
@@ -338,10 +420,10 @@ function getDefaultContent(fname='') {
             })
         </script>
         <script>
-            // window.oncontextmenu = function() {
-            //     event.preventDefault();
-            //     return false;
-            // };
+            window.oncontextmenu = function() {
+                event.preventDefault();
+                return false;
+            };
         </script>
     </body>
 </html>

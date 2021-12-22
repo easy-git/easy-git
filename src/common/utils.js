@@ -2175,6 +2175,33 @@ async function gitLog2(workingDir, filter) {
     };
 };
 
+/**
+ * @description 获取文件历史hash
+ * @param {Object} workingDir
+ * @param {Object} filter
+ */
+async function gitFileHistoryLogHash(workingDir, filter) {
+    try {
+        let result = [];
+        let status = await git(workingDir).log(filter).then((res) => {
+            let data = res.all;
+            if (data) {
+                result = data.map(item => {
+                    return {
+                        'hash': item.hash,
+                        'date': item.date,
+                        'msg': item.author_name + ': ' + item.message
+                    };
+                });
+            };
+        }).catch((err) => {
+            return result;
+        });
+        return result;
+    } catch (e) {
+        return result;
+    };
+};
 
 /**
  * @description 显示远程仓库信息
@@ -2838,6 +2865,7 @@ module.exports = {
     gitRemoteshowOrigin,
     gitLog,
     gitLog2,
+    gitFileHistoryLogHash,
     gitStash,
     gitStashList,
     gitAddRemote,
