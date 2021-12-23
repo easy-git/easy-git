@@ -10,6 +10,7 @@ const { openOAuthBox, Gitee, onUriForResponse } = require('./common/oauth.js');
 const { goSetEncoding } = require('./commands/base.js');
 
 const git = require('./commands/index.js');
+const quickOpen = require('./commands/quick_open.js');
 const { gitRepositoryCreate } = require('./commands/repository.js');
 const sshKeygen = require('./commands/ssh_keygen.js');
 
@@ -55,6 +56,12 @@ function activate(context) {
         showCommandPanel(param);
     });
     context.subscriptions.push(CommandPanel);
+
+    // 快速打开Git项目
+    let quickOpenGitProject = hx.commands.registerCommand('EasyGit.quickOpenGitProject', (param) => {
+        quickOpen(param);
+    });
+    context.subscriptions.push(quickOpenGitProject);
 
     // 创建远程仓库
     let CreateRemoteRepository = hx.commands.registerCommand('EasyGit.CreateRemoteRepository', (param) => {

@@ -23,6 +23,7 @@
         "onUri",
         "onCommand:EasyGit.oauth",
         "onCommand:EasyGit.CommandPanel",
+        "onCommand:EasyGit.quickOpenGitProject",
         "onCommand:EasyGit.CreateRemoteRepository",
         "onCommand:EasyGit.main",
         "onCommand:EasyGit.branch",
@@ -191,6 +192,10 @@
             {
                 "command": "EasyGit.oauth",
                 "title": "easy-git: oauth - 授权github/gitee"
+            },
+            {
+                "command": "EasyGit.quickOpenGitProject",
+                "title": "easy-git: 快速选择打开Git项目..."
             },
             {
                 "command": "EasyGit.CreateRemoteRepository",
