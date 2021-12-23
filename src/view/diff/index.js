@@ -21,7 +21,7 @@ async function openDiffFileView(ProjectData, userConfig) {
         isShowDiffMessage = true;
         setTimeout(function() {
             GitDiffCustomEditorRenderHtml(ProjectData, userConfig);
-        }, 1500);
+        }, 1000);
     } else {
         setTimeout(function() {
             GitDiffCustomEditorRenderHtml(ProjectData, userConfig);

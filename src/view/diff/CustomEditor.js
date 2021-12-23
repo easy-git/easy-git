@@ -155,10 +155,12 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
         };
     }catch(e){};
 
-    let panal = GitDiffCustomWebViewPanal._webView._msgListeners;
-    if (panal) {
-        GitDiffCustomWebViewPanal._webView._msgListeners = [];
-    };
+    try{
+        let msgListeners = GitDiffCustomWebViewPanal._webView._msgListeners;
+        if (msgListeners) {
+            GitDiffCustomWebViewPanal._webView._msgListeners = [];
+        };
+    }catch(e){};
 
     let GitDiff = new Diff(ProjectData, userConfig, GitDiffCustomWebViewPanal);
     GitDiff.SetView();

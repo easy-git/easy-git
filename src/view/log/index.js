@@ -175,6 +175,14 @@ async function GitLogCustomEditorRenderHtml(projectData, userConfig) {
     if (gitRootDir == 'error') {
         gitRootDir = projectPath;
     };
+    
+    // 解决消息重复监听的Bug
+    try{
+        let msgListeners = GitLogCustomWebViewPanal._webView._msgListeners;
+        if (msgListeners) {
+            GitLogCustomWebViewPanal._webView._msgListeners = [];
+        };
+    }catch(e){};
 
     let LastGitData = Object.assign(projectData, {"gitRootDir": gitRootDir});
     let Log = new GitLogAction(LastGitData, userConfig, GitLogCustomWebViewPanal);
