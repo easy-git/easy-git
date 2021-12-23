@@ -190,12 +190,12 @@
         ],
         "commands": [
             {
-                "command": "EasyGit.oauth",
-                "title": "easy-git: oauth - 授权github/gitee"
-            },
-            {
                 "command": "EasyGit.quickOpenGitProject",
                 "title": "easy-git: 快速选择打开Git项目..."
+            },
+            {
+                "command": "EasyGit.oauth",
+                "title": "easy-git: oauth - 授权github/gitee"
             },
             {
                 "command": "EasyGit.CreateRemoteRepository",
