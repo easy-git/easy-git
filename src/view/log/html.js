@@ -39,7 +39,7 @@ function generateLogHtml(userConfig, initData) {
     let {DisableDevTools} = userConfig;
 
     let uiData = getUIData();
-    
+
     // ui、color、font
     let {
         background,
@@ -236,7 +236,7 @@ function generateLogHtml(userConfig, initData) {
                     </p>
                     <div class="mt-3">
                         <div class="d-flex flex-row">
-                            <div class="flex-average change-files">
+                            <div class="change-files-list">
                                 <ul class="pl-0">
                                     <li v-for="(v5,i5) in logDetailsFiles" :key="i5">
                                         <div class="d-inline-block" v-if="!v5.binary" style="width: 110px !important;">
@@ -258,7 +258,7 @@ function generateLogHtml(userConfig, initData) {
                                     </li>
                                 </ul>
                              </div>
-                             <div class="flex-average change-files commit-file-details" v-if="CommitFileChangeDetails != ''">
+                             <div class="change-files-list commit-file-details" v-if="CommitFileChangeDetails != ''">
                                 <p class="mb-0 ml-3">{{ ShowCommitFilePath }}</p>
                                 <div v-html="CommitFileChangeDetails"></div>
                              </div>

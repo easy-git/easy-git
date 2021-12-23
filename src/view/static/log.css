@@ -235,16 +235,17 @@ button {
     transform: scale(0.9);
 }
 
-.change-files {
-    height: 270px;
+.change-files-list {
+    height: 270px !important;
     overflow-y: auto;
+    width: 36%;
 }
 
-.change-files::-webkit-scrollbar {
+.change-files-list::-webkit-scrollbar {
     display: none;
 }
 
-.change-files li {
+.change-files-list li {
     color: var(--fontColor);
     height: 1.7rem;
     line-height: 1.7rem;
@@ -259,21 +260,24 @@ button {
     flex: 1 1 50% !important;
 }
 
-.change-files .num {
+.change-files-list .num {
     width: 28px;
     display: inline-block;
 }
 
-.change-files .binary {
+.change-files-list .binary {
     font-size: 12px;
 }
 
-.change-files ul>li {
+.change-files-list ul>li {
     list-style: none;
 }
 
 .commit-file-details {
+    flex: 1;
     border-left: 1px solid var(--lineColor);
+    height: 270px !important;
+    overflow-y: auto;
 }
 
 .commit-file-details p {
