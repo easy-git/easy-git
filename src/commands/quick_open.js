@@ -3,11 +3,15 @@ const fs = require('fs');
 const path = require('path');
 
 const {
+    mkdirsSync,
     getFilesExplorerProjectInfo,
     checkIsGitProject
 } = require('../common/utils.js');
 const count = require('../common/count.js');
 
+const appDataDir = hx.env.appData;
+const gitHistoryDir = path.join(appDataDir, 'easy-git', 'history');
+const gitHistoryFile = path.join(appDataDir, 'easy-git', 'history', 'project.json');
 
 /**
  * @description 快速打开项目管理器的Git项目、或本地的Git项目
@@ -15,6 +19,9 @@ const count = require('../common/count.js');
  */
 async function quickOpen(param) {
     let gitList = [];
+
+    // 读取曾打开的历史数据
+    let h = new History();
 
     let ExplorerReulst = await getFilesExplorerProjectInfo();
     let { success, Folders } = ExplorerReulst;
@@ -24,6 +31,13 @@ async function quickOpen(param) {
                 gitList.push({"label": s.FolderName, "description": s.GitRepository, "projectPath":s.GitRepository, "action": "open"});
             };
         };
+        let flist = Folders.map( item => {return item.GitRepository});
+        await h.save(flist);
+    };
+
+    let historyData = await h.main();
+    if (historyData.length && historyData) {
+        gitList = [...historyData];
     };
 
     let pickerList = [
@@ -54,9 +68,80 @@ async function quickOpen(param) {
         if (action == 'open') {
             hx.commands.executeCommand("EasyGit.main", info);
         };
-
     };
 };
+
+
+
+/**
+ * @description 曾经打开的历史项目列表
+ */
+class History {
+    constructor() {
+        this.local_list = [];
+    };
+
+    // project: Array | String
+    async save(project) {
+        if (!project) return;
+        try{
+
+            let oldData = await this.read();
+            if (Array.isArray(project)) {
+                project = project.sort();
+                if (JSON.stringify(project) == JSON.stringify(oldData)) return;
+                oldData = [...project, ...oldData]
+            } else {
+                oldData.push(project);
+            };
+
+            const status = fs.existsSync(gitHistoryFile);
+            if (!status) {
+                mkdirsSync(gitHistoryDir);
+            };
+
+            let last = [...new Set(oldData)];
+            fs.writeFile(gitHistoryFile, JSON.stringify(last), function (err) {
+               if (err) throw err;
+            });
+        }catch(e){
+            console.log(e);
+        };
+    };
+
+    async read() {
+        try{
+            let fileRawContent = fs.readFileSync(gitHistoryFile, 'utf-8');
+            let fileLastContent = JSON.parse(fileRawContent);
+
+            let check = fileLastContent instanceof Object;
+            if (!check) {return []};
+            if (!fileLastContent.length || !fileLastContent) {return []};
+            return fileLastContent.sort();
+        }catch(e){
+            return [];
+        };
+    };
+
+    async main() {
+        let historyData = await this.read();
+        if (!historyData) return [];
+
+        for (let s of historyData) {
+            if (!fs.existsSync(s)) {
+                continue;
+            };
+            let isCheckGit = await checkIsGitProject(s).catch( error => {
+                return 'No'
+            });
+            let basename = path.basename(s);
+            if (isCheckGit != 'No') {
+                this.local_list.push({"projectPath": s,"description": s,"label": basename,"action": 'open'});
+            };
+        };
+        return this.local_list;
+    }
+}
 
 
 async function goValidate(formData, that) {
@@ -133,6 +218,10 @@ async function selecteOpenLocalProject() {
             "easyGitInner": true
         };
         hx.commands.executeCommand("EasyGit.main", info);
+
+        // save history
+        let h = new History();
+        await h.save(GitDir);
     }catch(e){
         hx.window.showErrorMessage('EasyGit: 打开项目失败', ['我知道了']);
     }
