@@ -7,6 +7,7 @@ const osName = os.platform();
 const vueFile = path.join(__dirname, 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
 const mainCssFile = path.join(__dirname, 'static', 'main.css');
+const gitTTFFile = path.join(__dirname, 'static', 'font' ,'git.ttf');
 
 /**
  * hbuilderx.onDidReceiveMessage接收的事件
@@ -114,6 +115,10 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                 font-family: 'ficon';
                 src: url('${ttfFile}') format('truetype');
             }
+            @font-face {
+                font-family: 'git-icon';
+                src: url('${gitTTFFile}') format('truetype');
+            }
 
             .before_ficon::before {
                 position: relative;
@@ -168,7 +173,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                 <div id="page-top" class="fixed-top">
                     <div id="refresh-progress" v-show="refreshProgress"></div>
                     <div class="row m-3">
-                        <div class="col-auto p-0 project-name" :title="'项目名称:'+projectName">
+                        <div class="col-auto p-0 project-name" @click="runHBuilderXCommands('EasyGit.quickOpenGitProject')">
                             <span class="top">{{projectName}}</span>
                         </div>
                         <div class="col-auto ml-auto p-0 top-function-icon">
@@ -745,6 +750,12 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                     openCommandPanel() {
                         hbuilderx.postMessage({
                             command: 'openCommandPanel'
+                        });
+                    },
+                    runHBuilderXCommands(name) {
+                        hbuilderx.postMessage({
+                            command: 'hxCommand',
+                            name: name
                         });
                     }
                 }

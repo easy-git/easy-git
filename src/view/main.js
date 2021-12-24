@@ -954,6 +954,10 @@ function active(webviewPanel, userConfig, ProjectData) {
             case 'send_msg':
                 hx.window.setStatusBarMessage(msg.text, 10000, msg.level);
                 break;
+            case 'hxCommand':
+                let {name} = msg;
+                hx.commands.executeCommand(name);
+                break;
             default:
                 break;
         };

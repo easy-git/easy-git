@@ -119,6 +119,13 @@ body::-webkit-scrollbar {
     text-overflow: ellipsis;
 }
 
+.project-name::after {
+    font-family: 'git-icon';
+    content: "\e6a4";
+    top: 2px;
+    position: relative;
+}
+
 @media screen and (max-width: 249px) {
     .project-name {
         width: 35px;
