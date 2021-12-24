@@ -1,0 +1,113 @@
+.top {
+    font-size: 0.95rem;
+    height: 30px;
+    color: var(--fontColor);
+}
+
+.icon:active {
+    -webkit-transform: rotate(0.9);
+    transform: scale(0.9);
+}
+
+.icon-arrow-down::after {
+    font-family: 'git-icon';
+    content: "\e6a4";
+    top: 2px;
+    position: relative;
+}
+
+.git-icon {
+    font-family: "git-icon";
+    font-size: 16px;
+    margin: 0 1px;
+    line-height: 30px;
+}
+
+.icon-code:before {
+  content: "\e60f";
+}
+
+.icon-dash:before {
+  content: "\e610";
+}
+
+.icon-comment:before {
+  content: "\e611";
+}
+
+.icon-chexiao:before {
+  content: "\e699";
+}
+
+.icon-commit:before {
+  content: "\e60c";
+}
+
+.icon-sync:before {
+  content: "\e732";
+}
+
+.icon-arrow-up:before {
+  content: "\e60a";
+}
+
+.icon-arrow-left:before {
+  content: "\e60b";
+}
+
+.icon-chevron-down:before {
+  content: "\e60d";
+}
+
+.icon-chevron-up:before {
+  content: "\e60e";
+}
+
+.icon-more:before {
+  content: "\e613";
+}
+
+.icon-git-branch:before {
+  content: "\e617";
+}
+
+.icon-history:before {
+  content: "\e61a";
+}
+
+.icon-add:after {
+  content: "\e624";
+}
+
+.icon-search:before {
+  content: "\e629";
+}
+
+.icon-sync1:before {
+  content: "\e62b";
+}
+
+.icon-triangle-down:before {
+  content: "\e62d";
+}
+
+.icon-x:before {
+  content: "\e62f";
+}
+
+.icon-refresh:before {
+  content: "\e6a0";
+  font-size: 15px;
+}
+
+.icon-command:before {
+  content: "\e743";
+}
+
+.icon-arrowdown:before {
+  content: "\e6a4";
+}
+
+.icon-git-commit:before {
+  content: "\e7ae";
+}
