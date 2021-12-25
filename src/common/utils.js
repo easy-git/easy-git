@@ -77,13 +77,10 @@ function getThemeColor(area) {
     if (colorScheme == undefined) {
         colorScheme = 'Default';
     };
-
-    if (explorerIconTheme == '') {
+    if (explorerIconTheme == '' || !explorerIconTheme) {
         explorerIconTheme = "vs-seti"
     };
-    if (explorerIconTheme == undefined) {
-        explorerIconTheme = "hx-file-icons"
-    };
+
     if (!["hx-file-icons", "vs-seti", "hx-file-icons-colorful"].includes(explorerIconTheme)) {
         explorerIconTheme = "vs-seti"
     };
@@ -96,7 +93,7 @@ function getThemeColor(area) {
 
     // 获取HBuilderX编辑器字体大小
     let fontSize = config.get('editor.fontSize');
-    if (fontSize == undefined) {
+    if (fontSize == '' || fontSize == undefined) {
         fontSize = 14;
     };
 

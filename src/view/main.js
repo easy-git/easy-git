@@ -968,6 +968,9 @@ function active(webviewPanel, userConfig, ProjectData) {
                 "command": "themeColor",
                 "data": ThemeColor
             });
+        };
+        if(event.affectsConfiguration("explorer.iconTheme")){
+            hx.window.showInformationMessage("EasyGit: 检测到您切换了文件图标，Git管理视图，下次启动生效。", ["我知道了"]);
         }
     });
 };
