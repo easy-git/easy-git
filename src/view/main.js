@@ -960,16 +960,10 @@ function active(webviewPanel, userConfig, ProjectData) {
     });
 
     let configurationChangeDisplose = hx.workspace.onDidChangeConfiguration(function(event){
-        if(event.affectsConfiguration("editor.colorScheme")){
-            let ThemeColor = utils.getThemeColor();
-            view.postMessage({
-                "command": "themeColor",
-                "data": ThemeColor
-            });
+        if(event.affectsConfiguration("editor.colorScheme") || event.affectsConfiguration("explorer.iconTheme")){
+            let uiData2 = getUIData();
+            view.html = html.getWebviewContent(userConfig, uiData2, ProjectData);
         };
-        if(event.affectsConfiguration("explorer.iconTheme")){
-            hx.window.showInformationMessage("EasyGit: 检测到您切换了文件图标，Git管理视图，下次启动生效。", ["我知道了"]);
-        }
     });
 };
 
