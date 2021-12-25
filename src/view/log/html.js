@@ -177,27 +177,20 @@ function generateLogHtml(userConfig, initData) {
                             <ul class="pl-0 mb-0" style="list-style-type:none;">
                                 <li class="li-log gitfile"
                                     v-for="(item,idx) of gitLogInfoList" :key="idx"
-                                    :id="'msg_'+idx"
-                                    :class="{  'li-log-selected' : selectedLogID == item.hash }"
+                                    :class="{ 'li-log-selected' : selectedLogID == item.hash }"
                                     @contextmenu.prevent.stop="openMenu($event,item)"
                                     @mouseover="hoverLogID = 'msg_'+idx"
                                     @mouseleave="mouseleaveLogItem()">
                                     <div class="row">
                                         <div class="col-9 col-md-7 col-lg-8 htext" @click.stop="viewDetails(item);" @click.middle="copyLogMsg(item, 'msg');">
-                                            <span class="gtag" v-show="item.refs != ''" v-for="(v2,i2) in (item.refs).split(',')" :key="i2">
-                                                {{ v2 }}
-                                            </span>
+                                            <span class="gtag" v-for="(v2,i2) in item.refs" :key="i2">{{ v2 }}</span>
                                             <span title="点击查看变更的文件列表; 鼠标中键点击即可复制消息到剪贴板">{{ item.message }}</span>
                                         </div>
                                         <div class="col-3 col-md-1 col-lg-1 htext" @click.stop="goSearchAuthor('author',item.author_name);">
-                                            <span :title="item.author_email + '点击搜索此用户提交记录'">
-                                                {{ item.author_name }}
-                                            </span>
+                                            <span title="点击搜索此用户提交记录">{{ item.author_name }}</span>
                                         </div>
                                         <div class="col-md-2 col-lg-2 htext md-screen">
-                                            <span>
-                                                {{ item.date | FormatDate }}
-                                            </span>
+                                            <span>{{ item.date }}</span>
                                         </div>
                                         <div class="col-md-2 col-lg-1 htext md-screen" @dblclick="copyLogMsg(item, 'commit_id');">
                                             <span class="hash" title="双击复制commit id">
@@ -227,7 +220,7 @@ function generateLogHtml(userConfig, initData) {
                         </div>
                     </div>
                     <p class="intro">
-                        {{ logDetails.author_name }} {{ logDetails.date  | FormatDate}}
+                        {{ logDetails.author_name }} {{ logDetails.date }}
                         <span>
                             ; {{ logDetails.diff.changed }} file changed,
                             {{ logDetails.diff.insertions }} insertions(+),
@@ -329,18 +322,7 @@ function generateLogHtml(userConfig, initData) {
                             }
                         }
                     },
-                    filters: {
-                        FormatDate: function(date) {
-                            let d = new Date(date);
-                            let year = d.getFullYear();
-                            let month = d.getMonth() + 1;
-                            let day = d.getDate() <10 ? '0' + d.getDate() : '' + d.getDate();
-                            let hour = d.getHours();
-                            let minutes = d.getMinutes();
-                            let seconds = d.getSeconds();
-                            return year+ '-' + month + '-' + day + ' ' + hour + ':' + minutes + ':' + seconds;
-                        }
-                    },
+                    filters: {},
                     created() {
                         this.projectName = '${projectName}';
                         this.searchText = '${searchText}';

@@ -3,6 +3,7 @@ const os = require('os');
 const path = require('path');
 const process = require('process');
 const {exec} = require('child_process');
+const dayjs = require('dayjs');
 
 const hx = require('hbuilderx');
 const spawn = require('cross-spawn');
@@ -2078,7 +2079,7 @@ async function gitConfigShow(workingDir, isPrint=true) {
  * @param {String} refname 特定的本地分支、远程分支、tag名称
  */
 async function gitLog(workingDir, searchType, filterCondition, refname) {
-    filter = ['-n 100']
+    filter = ['-n 80']
     if (filterCondition != 'default') {
         if (filterCondition.includes('-n')) {
             filter = filterCondition.split(',');
@@ -2119,18 +2120,27 @@ async function gitLog(workingDir, searchType, filterCondition, refname) {
             return result;
         };
 
-        let status = await git(workingDir)
+        let LogResult = await git(workingDir)
             .log(filter)
             .then((res) => {
                 let data = res.all;
                 result.data = data
-                return result;
+                return data;
             })
             .catch((err) => {
                 result.errorMsg = err.message;
                 result.success = false;
                 return result;
             });
+
+        try{
+            let parseResult = await parseLogData(LogResult);
+            if (parseResult){
+                result.data = parseResult;
+            };
+        }catch(e){
+            console.log(e)
+        };
         return result;
     } catch (e) {
         result.errorMsg = e;
@@ -2139,6 +2149,21 @@ async function gitLog(workingDir, searchType, filterCondition, refname) {
     };
 };
 
+/**
+ * @description 解析log数据：格式化日期、标签等
+ */
+async function parseLogData(LogList) {
+    if (!Array.isArray(LogList)) return LogList;
+    let tmp = [];
+    for (let i of LogList) {
+        i["date"] = dayjs(i["date"]).format('YYYY/MM/DD HH:mm:ss');
+        if (i["refs"]) {
+            i["refs"] = i["refs"].split(',');
+        };
+        tmp.push(i);
+    };
+    return tmp;
+};
 
 /**
  * @description 获取log
