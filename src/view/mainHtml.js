@@ -136,11 +136,11 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                 <div id="page-top" class="fixed-top">
                     <div id="refresh-progress" v-show="refreshProgress"></div>
                     <div class="row m-3">
-                        <div class="col-auto p-0 project-name" @click="runHBuilderXCommands('EasyGit.quickOpenGitProject')">
+                        <div class="col-auto p-0 project-name" @click="runHXCommands('EasyGit.quickOpenGitProject')">
                             <span class="top">{{projectName}}</span>
                         </div>
                         <div class="col-auto ml-auto p-0 top-function-icon">
-                            <span class="top" @click="openCommandPanel();" title="打开命令面板">${CommandPanelIcon}</span>
+                            <span class="top" @click="runHXCommands('EasyGit.CommandPanel', 'CommandPanel');" title="打开命令面板">${CommandPanelIcon}</span>
                             <span class="top" @click="getProjectGitInfo();" title="刷新当前视图">${iconRefresh}</span>
                             <span class="top" @click="gitCommit();" :title="GitAlwaysAutoCommitPush && gitStagedFileList.length ? 'commit & push' : 'commit'">${CheckMarkIcon}</span>
                             <span class="top" @click="gitLog();" title="查看日志">${HistoryIcon}</span>
@@ -170,7 +170,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                         <li title="git show remote origin" @click="showRemoteOrigin();">查看远程仓库信息</li>
                                         <li @click="openRemoteServerInBrowser();">浏览器里查看远程仓库</li>
                                         <li class="divider"></li>
-                                        <li @click="openCommandPanel();">Git 命令面板</li>
+                                        <li @click="runHXCommands('EasyGit.CommandPanel', 'CommandPanel')">Git 命令面板</li>
                                     </ul>
                                 </div>
                             </span>
@@ -710,15 +710,11 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             command: 'openRemoteServer'
                         });
                     },
-                    openCommandPanel() {
-                        hbuilderx.postMessage({
-                            command: 'openCommandPanel'
-                        });
-                    },
-                    runHBuilderXCommands(name) {
+                    runHXCommands(commandName, actionName) {
                         hbuilderx.postMessage({
                             command: 'hxCommand',
-                            name: name
+                            commandName: commandName,
+                            actionName: actionName
                         });
                     }
                 }

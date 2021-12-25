@@ -940,9 +940,6 @@ function active(webviewPanel, userConfig, ProjectData) {
             case 'switchLastBranch':
                 File.switchLastBranch();
                 break;
-            case 'openCommandPanel':
-                hx.commands.executeCommand('EasyGit.CommandPanel', EasyGitInnerParams);
-                break;
             case 'syncBehindAhead':
                 File.syncBehindAhead();
                 break;
@@ -950,8 +947,9 @@ function active(webviewPanel, userConfig, ProjectData) {
                 hx.window.setStatusBarMessage(msg.text, 10000, msg.level);
                 break;
             case 'hxCommand':
-                let {name} = msg;
-                hx.commands.executeCommand(name);
+                let {actionName, commandName} = msg;
+                let commandparam = actionName ? EasyGitInnerParams : {};
+                hx.commands.executeCommand(commandName, commandparam);
                 break;
             default:
                 break;
