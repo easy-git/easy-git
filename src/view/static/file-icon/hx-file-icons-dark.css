@@ -1,0 +1,100 @@
+._icon::before {
+    content: "\E900";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.folder_icon::before {
+    content: "\E905";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.js_icon::before {
+    content: "\E901";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.ts_icon::before {
+    content: "\E918";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.vue_icon::before {
+    content: "\E902";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.json_icon::before {
+    content: "\E90B";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.css_icon::before {
+    content: "\E908";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.scss_icon::before {
+    content: "\E916";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.sass_icon::before {
+    content: "\E916";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.less_icon::before {
+    content: "\E913";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.html_icon::before {
+    content: "\E909";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.md_icon::before {
+    content: "\E90C";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.img_icon::before {
+    content: "\E90A";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.java_icon::before {
+    content: "\E912";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.php_icon::before {
+    content: "\E914";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.py_icon::before {
+    content: "\E915";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.xml_icon::before {
+    content: "\E91B";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.c_icon::before {
+    content: "\E910";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.cpp_icon::before {
+    content: "\E911";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.styl_icon::before {
+    content: "\E917";
+    color: #bebebe;
+    font-family: "ficon";
+}

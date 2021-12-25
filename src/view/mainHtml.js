@@ -62,14 +62,8 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
         ChevronRightIcon,
         HandleIcon,
         CommandPanelIcon,
-        ttfFile, ttfOtherFile,
-        _ficon, folder_ficon,
-        html_ficon, js_ficon,ts_ficon,vue_ficon,md_ficon,css_ficon,
-        less_ficon,scss_ficon, sass_ficon,styl_ficon,xml_ficon,
-        py_ficon,php_ficon,java_ficon,c_ficon,cpp_ficon,sh_ficon, bat_ficon, go_ficon, sql_ficon,
-        img_ficon, zip_ficon,json_ficon,
-        docx_ficon, doc_ficon, xls_ficon, xlsx_ficon, csv_ficon,
-        git_ficon, config_ficon, license_ficon,
+        ttfFile, ttfCSSFilePath,
+        ttfOtherFile, folder_ficon,
         explorerIconTheme
     } = uiData;
 
@@ -115,49 +109,17 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                 font-family: 'ficon';
                 src: url('${ttfFile}') format('truetype');
             }
+
             @font-face {
                 font-family: 'git-icon';
                 src: url('${gitTTFFile}') format('truetype');
             }
-
             .before_ficon::before {
                 position: relative;
                 top: ${iconTop};
                 font-size: ${iconSize};
                 font-weight: 500;
             }
-            ._icon::before { ${_ficon} }
-            .js_icon::before { ${js_ficon} }
-            .ts_icon::before { ${ts_ficon} }
-            .vue_icon::before { ${vue_ficon} }
-            .md_icon::before { ${md_ficon} }
-            .css_icon::before { ${css_ficon} }
-            .less_icon::before { ${less_ficon} }
-            .scss_icon::before { ${scss_ficon} }
-            .sass_icon::before { ${sass_ficon} }
-            .html_icon::before { ${html_ficon} }
-            .py_icon::before { ${py_ficon} }
-            .java_icon::before { ${java_ficon} }
-            .php_icon::before { ${php_ficon} }
-            .img_icon::before { ${img_ficon} }
-            .zip_icon::before { ${zip_ficon} }
-            .json_icon::before { ${json_ficon} }
-            .c_icon::before { ${c_ficon} }
-            .cpp_icon::before { ${cpp_ficon} }
-            .sh_icon::before { ${sh_ficon} }
-            .styl_icon::before { ${styl_ficon} }
-            .xml_icon::before { ${xml_ficon} }
-            .go_icon::before { ${go_ficon} }
-            .sql_icon::before { ${sql_ficon} }
-            .csv_icon::before { ${csv_ficon} }
-            .xls_icon::before { ${xls_ficon} }
-            .xlsx_icon::before { ${xlsx_ficon} }
-            .doc_icon::before { ${doc_ficon} }
-            .docx_icon::before { ${docx_ficon} }
-            .bat_icon::before { ${bat_ficon} }
-            .git_icon::before { ${git_ficon} }
-            .license_icon::before { ${license_ficon} }
-            .config_icon::before { ${config_ficon} }
 
             @font-face {
                 font-family: 'otherIcon';
@@ -165,6 +127,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
             }
             .folder_icon::before { ${folder_ficon} }
         </style>
+        <link rel="stylesheet" href="${ttfCSSFilePath}">
         <link rel="stylesheet" href="${mainCssFile}">
     </head>
     <body>

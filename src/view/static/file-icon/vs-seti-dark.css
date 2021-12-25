@@ -1,0 +1,228 @@
+._icon::before {
+    content: "\E023";
+    color: #d4d7d6;
+    font-family: "ficon";
+}
+.folder_icon::before {
+    content: "\e66d";
+    color: #519aba;
+    font-family: "otherIcon";
+    font-size: 13px;
+    top: 0px;
+    padding: 0 4px;
+}
+.js_icon::before {
+    content: "\E051";
+    color: #cbcb41;
+    font-family: "ficon";
+}
+.ts_icon::before {
+    content: "\E099";
+    color: #519aba;
+    font-family: "ficon";
+}
+.vue_icon::before {
+    content: "\E09C";
+    color: #8dc149;
+    font-family: "ficon";
+}
+.json_icon::before {
+    content: "\E055";
+    color: #cbcb41;
+    font-family: "ficon";
+}
+.css_icon::before {
+    content: "\E01D";
+    color: #519aba;
+    font-family: "ficon";
+}
+.scss_icon::before {
+    content: "\E084";
+    color: #f55385;
+    font-family: "ficon";
+}
+.sass_icon::before {
+    content: "\E084";
+    color: #f55385;
+    font-family: "ficon";
+}
+.less_icon::before {
+    content: "\E059";
+    color: #519aba;
+    font-family: "ficon";
+}
+.styl_icon::before {
+    content: "\E08E";
+    color: #8dc149;
+    font-family: "ficon";
+}
+.html_icon::before {
+    content: "\E048";
+    color: #519aba;
+    font-family: "ficon";
+}
+.md_icon::before {
+    content: "\E060";
+    color: #519aba;
+    font-family: "ficon";
+}
+.sh_icon::before {
+    content: "\E089";
+    color: #8dc149;
+    font-family: "ficon";
+}
+.java_icon::before {
+    content: "\E050";
+    color: #cc3e44;
+    font-family: "ficon";
+}
+.class_icon::before {
+    content: "\E050";
+    color: #cc3e44;
+    font-family: "ficon";
+}
+.php_icon::before {
+    content: "\E070";
+    color: #a074c4;
+    font-family: "ficon";
+}
+.py_icon::before {
+    content: "\E07B";
+    color: #519aba;
+    font-family: "ficon";
+}
+.zip_icon::before {
+    content: "\E0A8";
+    color: #cc3e44;
+    font-family: "ficon";
+}
+.xml_icon::before {
+    content: "\E0A4";
+    color: #e37933;
+    font-family: "ficon";
+}
+.yml_icon::before {
+    content: "\E0A6";
+    color: #a074c4;
+    font-family: "ficon";
+}
+.c_icon::before {
+    content: "\E00C";
+    color: #519aba;
+    font-family: "ficon";
+}
+.cpp_icon::before {
+    content: "\E01A";
+    color: #519aba;
+    font-family: "ficon";
+}
+.h_icon::before {
+    content: "\E00C";
+    color: #519aba;
+    font-family: "ficon";
+}
+.img_icon::before {
+    content: "\E04C";
+    color: #a074c4;
+    font-family: "ficon";
+}
+.go_icon::before {
+    content: "\E039";
+    color: #519aba;
+    font-family: "ficon";
+}
+.bat_icon::before {
+    content: "\E0A1";
+    color: #519aba;
+    font-family: "ficon";
+}
+.coffee_icon::before {
+    content: "\E016";
+    color: #cbcb41;
+    font-family: "ficon";
+}
+.lua_icon::before {
+    content: "\E05E";
+    color: #519aba;
+    font-family: "ficon";
+}
+.perl_icon::before {
+    content: "\E06E";
+    color: #519aba;
+    font-family: "ficon";
+}
+.ruby_icon::before {
+    content: "\E081";
+    color: #cc3e44;
+    font-family: "ficon";
+}
+.rust_icon::before {
+    content: "\E082";
+    color: #dd4b78;
+    font-family: "ficon";
+}
+.sql_icon::before {
+    content: "\E022";
+    color: #f55385;
+    font-family: "ficon";
+}
+.swift_icon::before {
+    content: "\E092";
+    color: #e37933;
+    font-family: "ficon";
+}
+.kotlin_icon::before {
+    content: "\E058";
+    color: #e37933;
+    font-family: "ficon";
+}
+.config_icon::before {
+    content: "\E019";
+    color: #6d8086;
+    font-family: "ficon";
+}
+.lock_icon::before {
+    content: "\E05D";
+    color: #8dc149;
+    font-family: "ficon";
+}
+.font_icon::before {
+    content: "\E033";
+    color: #cc3e44;
+    font-family: "ficon";
+}
+.git_icon::before {
+    content: "\E034";
+    color: #41535b;
+    font-family: "ficon";
+}
+.license_icon::before {
+    content: "\E05A";
+    color: #cbcb41;
+    font-family: "ficon";
+}
+.csv_icon::before {
+    content: "\E01E";
+    color: #8dc149;
+    font-family: "ficon";
+}
+.xls_icon::before {
+    content: "\E0A3";
+    color: #8dc149;
+    font-family: "ficon";
+}
+.xlsx_icon::before {
+    content: "\E0A3";
+    color: #8dc149;
+    font-family: "ficon";
+}
+.doc_icon::before {
+    content: "\E0A2";
+    color: #519aba;
+    font-family: "ficon";
+}
+.docx_icon::before {
+    content: "\E0A2";
+    color: #519aba;
+    font-family: "ficon";
+}

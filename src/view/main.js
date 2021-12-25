@@ -40,22 +40,17 @@ function getUIData() {
     let ttfJSONFile = path.join(__dirname, 'static', 'file-icon', `${explorerIconTheme}.json`);
     let ttfContent = require(ttfJSONFile);
 
+    let cssName = `${explorerIconTheme}-${explorerIconScheme}.css`;
+    let ttfCSSFilePath = path.join(__dirname, 'static', 'file-icon', cssName);
+
     // windows路径处理
     if ( osName != 'darwin') {
         ttfOtherFile = ttfOtherFile.replace(/\\/g, '/');
         ttfFilePath = ttfFilePath.replace(/\\/g, '/');
     };
 
-    let fListIcon = {"explorerIconTheme": explorerIconTheme, "ttfFile": ttfFilePath, "ttfOtherFile": ttfOtherFile};
-    let flist = [
-        "", "folder",
-        "html", "js", "ts", "vue", "md",
-        "css", "less", "scss", "sass", "styl",
-        "py", "java", "php", "c", "cpp", "go", "sql",
-        "img", "zip", "json",
-        "xml", "sh", "bat",
-        "csv", "xls", "xlsx", "doc", "docx",
-        "license", "config", "git"];
+    let fListIcon = {"explorerIconTheme": explorerIconTheme, "ttfFile": ttfFilePath, "ttfCSSFilePath": ttfCSSFilePath ,"ttfOtherFile": ttfOtherFile};
+    let flist = [];
 
     // vs-stei没有文件夹图标，因此vs-stei图标单独取自other.ttf
     for (let s of flist) {
