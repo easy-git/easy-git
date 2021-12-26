@@ -106,7 +106,7 @@ function generateLogHtml(userConfig, initData) {
             </style>
             <link rel="stylesheet" href="${logCssFile}">
         </head>
-        <body style="">
+        <body style="height: 100vh;">
             <div id="app" v-cloak>
                 <div id="log-list" class="container-fluid p-0">
                     <div id="page-top" class="fixed-top">
@@ -208,8 +208,9 @@ function generateLogHtml(userConfig, initData) {
                         </div>
                     </div>
                 </div>
-                <div id="log-view-file" class="fixed-bottom p-3 view-log-details" v-if="isShowViewDetails" @mouseenter="viewDetailsMouseenter();" @mouseleave="viewDetailsMouseleave();">
-                    <div class="d-flex">
+                <div id="log-view-file" class="fixed-bottom view-log-details px-3" v-if="isShowViewDetails"  @mouseenter="viewDetailsMouseenter();" @mouseleave="viewDetailsMouseleave();">
+                    <div class="c-line" @mousedown="mousedown" @mouseup="mouseup"></div>
+                    <div id="commit-message" class="d-flex">
                         <div class="flex-grow-1" @dblclick="copyLogMsg(logDetails.message, 'onlyMsg');">
                             <h6 title="双击复制消息到剪切板">{{ logDetails.message }}</h6>
                         </div>
@@ -227,9 +228,9 @@ function generateLogHtml(userConfig, initData) {
                             {{ logDetails.diff.deletions }} deletions(-)
                         </span>
                     </p>
-                    <div class="mt-3">
+                    <div id="commit-details" class="mt-3">
                         <div class="d-flex flex-row">
-                            <div class="change-files-list">
+                            <div class="commit-files-list">
                                 <ul class="pl-0">
                                     <li v-for="(v5,i5) in logDetailsFiles" :key="i5">
                                         <div class="d-inline-block" v-if="!v5.binary" style="width: 110px !important;">
@@ -251,7 +252,7 @@ function generateLogHtml(userConfig, initData) {
                                     </li>
                                 </ul>
                              </div>
-                             <div class="change-files-list commit-file-details" v-if="CommitFileChangeDetails != ''">
+                             <div id="commit-file-details" class="commit-files-list commit-file-details" v-if="CommitFileChangeDetails != ''">
                                 <p class="mb-0 ml-3">{{ ShowCommitFilePath }}</p>
                                 <div v-html="CommitFileChangeDetails"></div>
                              </div>
@@ -340,6 +341,31 @@ function generateLogHtml(userConfig, initData) {
                         };
                     },
                     methods: {
+                        mousedown(e) {
+                            let GFD = document.getElementById('log-view-file');
+                            GFD.onmousedown = function(e) {
+                                let lineLeft = e.clientY;
+                                let e_height = GFD.clientHeight;
+                                document.onmousemove = function(e) {
+                                    let diffVal = e_height - (e.clientY - lineLeft);
+                                    if (diffVal >= document.body.clientHeight * 0.1 && diffVal <= document.body.clientHeight *0.9) {
+                                        GFD.style.height = diffVal + 'px';
+                                        let t = parseInt(diffVal) - 40;
+                                        document.getElementById('commit-file-details').style.height = t + 'px';
+                                    };
+                                };
+                                document.onmouseup = function() {
+                                    document.onmousemove = null;
+                                    document.onmouseup = null;
+                                };
+                            };
+                        },
+                        mouseup() {
+                            document.onmouseup = function() {
+                                document.onmousemove = null;
+                                document.onmouseup = null;
+                            };
+                        },
                         openMenu(e, item) {
                             this.selectedLogID = item.hash;
                             this.rightClickItem = item;

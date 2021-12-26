@@ -202,8 +202,19 @@ button {
     color: rgb(245, 108, 108);
 }
 
+#log-view-file {
+    height: 360px;
+}
+
+#log-view-file > .c-line {
+    cursor: n-resize;
+    height: 5px;
+    padding-top: 15px;
+    width: 100%;
+}
+
 .view-log-details {
-    z-index: 2999 !important;
+    z-index: 9999 !important;
     border-top: 1px solid var(--lineColor);
     background-color: var(--background);
     box-shadow:-2px -2px 5px -1px var(--background) !important;
@@ -235,17 +246,17 @@ button {
     transform: scale(0.9);
 }
 
-.change-files-list {
-    height: 270px !important;
+.commit-files-list {
+    height: 270px;
     overflow-y: auto;
     width: 36%;
 }
 
-.change-files-list::-webkit-scrollbar {
+.commit-files-list::-webkit-scrollbar {
     display: none;
 }
 
-.change-files-list li {
+.commit-files-list li {
     color: var(--fontColor);
     height: 1.7rem;
     line-height: 1.7rem;
@@ -260,24 +271,25 @@ button {
     flex: 1 1 50% !important;
 }
 
-.change-files-list .num {
+.commit-files-list .num {
     width: 28px;
     display: inline-block;
 }
 
-.change-files-list .binary {
+.commit-files-list .binary {
     font-size: 12px;
 }
 
-.change-files-list ul>li {
+.commit-files-list ul>li {
     list-style: none;
 }
 
 .commit-file-details {
     flex: 1;
     border-left: 1px solid var(--lineColor);
-    height: 270px !important;
+    height: 270px;
     overflow-y: auto;
+    cursor: default;
 }
 
 .commit-file-details p {
