@@ -43,16 +43,20 @@ function isObj(object){
  * @description 获取跟主题相匹配的颜色
  *   - fontFamily              字体
  *   - fontSize                字号
+ *   - fontColor               字体颜色
  *   - lefeSideVeiwBackground  左侧视图背景色
  *   - background              编辑器背景色
- *   - fontColor               字体颜色
  *   - liHoverBackground       li类元素，悬停背景色
+ *   - inputColor              输入框颜色
  *   - inputBgColor            输入框背景色
  *   - inputLineColor          输入框线条颜色
  *   - lineColor               其它线条颜色
+ *   - menuBackground          菜单背景色
+ *   - menuCutLineColor        菜单分割线
  *   - scrollbarColor          滚动条颜色
  *   - cursorColor             光标颜色
  *   - remarkTextColor         备注颜色，主要用于左侧视图文件目录名颜色
+ *   - lineForBorderTopColor   日志视图，commit详情 border-top
  * @param {String} area - HBuilderX区域，当area=undefinded，返回编辑器区域的背景色；当area=siderBar时，返回项目管理器背景色
  * @return {Object}
  */
@@ -67,8 +71,10 @@ function getThemeColor(area) {
     let cursorColor;
     let lineColor;
     let menuBackground;
+    let menuCutLineColor;
     let scrollbarColor;
     let remarkTextColor;
+    let lineForBorderTopColor;
 
     let config = hx.workspace.getConfiguration();
     let colorScheme = config.get('editor.colorScheme');
@@ -118,17 +124,19 @@ function getThemeColor(area) {
 
     switch (colorScheme){
         case 'Monokai':
-            fontColor = 'rgb(179,182,166)';
+            fontColor = 'rgb(227,227,227)';
             remarkTextColor = 'rgb(154,154,154)';
             lefeSideVeiwBackground = 'rgb(39,40,34)';
             background = 'rgb(39,40,34)';
-            menuBackground = 'rgb(83,83,83)';
+            menuBackground = 'rgb(58,58,58)';
+            menuCutLineColor = 'rgb(119,119,119)';
             liHoverBackground = 'rgb(78,80,73)';
             inputColor = 'rgb(255,254,250)';
             inputBgColor = '#2E2E2E';
             inputLineColor = '#CECECE';
             cursorColor = 'rgb(255,255,255)';
             lineColor = 'rgb(23,23,23)';
+            lineForBorderTopColor = 'rgb(23,23,23)';
             scrollbarColor = '#6F6F6F';
             break;
         case 'Atom One Dark':
@@ -136,13 +144,15 @@ function getThemeColor(area) {
             remarkTextColor = 'rgb(154,154,154)';
             lefeSideVeiwBackground = 'rgb(33,37,43)';
             background = 'rgb(40,44,53)';
-            menuBackground = 'rgb(50,56,66)';
+            menuBackground = 'rgb(53,59,69)';
+            menuCutLineColor = 'rgb(119,119,119)';
             liHoverBackground = 'rgb(44,47,55)';
             inputColor = 'rgb(255,254,250)';
             inputBgColor = '#282c35';
             inputLineColor = 'rgb(65, 111, 204)';
             cursorColor = 'rgb(255,255,255)';
             lineColor = '#282c35';
+            lineForBorderTopColor = 'rgb(24,26,31)';
             scrollbarColor = '#6F6F6F';
             break;
         default:
@@ -150,13 +160,15 @@ function getThemeColor(area) {
             remarkTextColor = 'rgb(104,104,104)';
             lefeSideVeiwBackground = 'rgb(255,250,232)';
             background = 'rgb(255,250,232)';
-            menuBackground = 'rgb(255,252,243)';
+            menuBackground = 'rgb(255,254,250)';
+            menuCutLineColor = 'rgb(207,207,207)';
             liHoverBackground = 'rgb(224,237,211)';
             inputColor = 'rgb(255,252,243)';
             inputBgColor = 'rgb(248, 243, 226)';
             inputLineColor = 'rgb(65,168,99)';
             cursorColor = 'rgb(0,0,0)';
             lineColor = 'rgb(225,212,178)';
+            lineForBorderTopColor = 'rgb(225,212,178)';
             scrollbarColor = 'rgb(207,181,106)';
             break;
     };
@@ -210,6 +222,7 @@ function getThemeColor(area) {
         lefeSideVeiwBackground,
         background,
         menuBackground,
+        menuCutLineColor,
         liHoverBackground,
         inputColor,
         inputLineColor,
@@ -218,6 +231,7 @@ function getThemeColor(area) {
         fontColor,
         remarkTextColor,
         lineColor,
+        lineForBorderTopColor,
         scrollbarColor,
         d2h_ins_bg,
         d2h_ins_border,

@@ -48,7 +48,10 @@ function generateLogHtml(userConfig, initData) {
         inputLineColor,
         cursorColor,
         fontColor,
+        menuBackground,
+        menuCutLineColor,
         lineColor,
+        lineForBorderTopColor,
         scrollbarColor,
         d2h_ins_bg,
         d2h_ins_border,
@@ -87,12 +90,15 @@ function generateLogHtml(userConfig, initData) {
             <style type="text/css">
                 :root {
                     --background: ${background};
+                    --menuBackground: ${menuBackground};
+                    --menuCutLineColor: ${menuCutLineColor};
                     --liHoverBackground: ${liHoverBackground};
                     --inputColor: ${inputColor};
                     --inputLineColor: ${inputLineColor};
                     --cursorColor: ${cursorColor};
                     --fontColor: ${fontColor};
                     --lineColor: ${lineColor};
+                    --lineForBorderTopColor: ${lineForBorderTopColor};
                     --scrollbarColor: ${scrollbarColor};
                     --d2h_ins_bg: ${d2h_ins_bg};
                     --d2h_ins_border: ${d2h_ins_border};
