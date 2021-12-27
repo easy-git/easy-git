@@ -207,6 +207,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                     forInit() {
                         this.gitDiffResult = \`${diffResult}\`
                     },
+                    drag() {},
                     Receive() {
                         hbuilderx.onDidReceiveMessage((msg) => {
                             if (msg.command == 'themeColor') {
@@ -313,7 +314,30 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                         });
                     }
                 }
-            })
+            });
+            window.onload = function() {
+                // 拖曳操作
+                let side1 = document.getElementById('side1');
+                let cutLine = document.getElementById('cut-line');
+                let side2 = document.getElementById('side2');
+                cutLine.onmousedown = function(e) {
+                    console.log(e)
+                    let lineLeft = e.clientX;
+                    cutLine.left = cutLine.offsetLeft;
+                    document.onmousemove = function(e) {
+                        let diffVal = cutLine.left + (e.clientX -lineLeft);
+                        if(diffVal >= document.body.clientWidth * 0.1 && diffVal <= document.body.clientWidth * 0.9) {
+                            cutLine.style.left = diffVal+'px';
+                            side1.style.width = diffVal +'px';
+                            side2.style.width = document.body.clientWidth - diffVal +'px';
+                        }
+                    };
+                    document.onmouseup = function() {
+                        document.onmousemove = null;
+                        document.onmouseup = null;
+                    };
+                };
+            };
         </script>
         <script>
             let devStatus = ${DisableDevTools};

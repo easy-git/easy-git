@@ -142,3 +142,9 @@ body::-webkit-scrollbar {
 .cursor-default {
     cursor: default;
 }
+
+#cut-line {
+    display: initial;
+    cursor: w-resize;
+    width: 1px;
+}
