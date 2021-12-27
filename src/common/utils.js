@@ -1406,9 +1406,10 @@ async function gitPull(workingDir, options) {
 /**
  * @description git: fetch
  * @param {String} projectPath 项目路径
- * @param {String} isShowMsg 是否在底部状态栏显示消息，默认ture
+ * @param {String} isShowMsg 是否显示错误消息，默认ture
+ * @param {String} showZone 显示区域：console - 控制台， statusBar 状态栏
  */
-async function gitFetch(workingDir, isShowMsg=true) {
+async function gitFetch(workingDir, isShowMsg=true, showZone="console") {
     // status bar show message
     if (isShowMsg) {
         hx.window.setStatusBarMessage(`Git: 正在同步信息 (fetch) ......`);
@@ -1424,13 +1425,19 @@ async function gitFetch(workingDir, isShowMsg=true) {
                 return 'success';
             })
             .catch((err) => {
+                hx.window.clearStatusBarMessage();
+                if (!isShowMsg) return;
                 let errMsg = (err).toString();
+                if (showZone && showZone =="statusBar") {
+                    let projectName = path.basename(workingDir);
+                    hx.window.setStatusBarMessage(`EasyGit: 项目${projectName}, Git fetch操作失败。`, 10000, 'error');
+                    return 'fail';
+                };
                 if (errMsg.includes('Could not resolve host')) {
                     createOutputChannel(`Git: fetch失败，原因：Could not resolve host`, 'error');
                 } else {
                     createOutputChannel(`Git: fetch失败 \n\n ${errMsg}`, 'error');
                 };
-
                 createOutputChannel("fetch操作说明：\n1. 当您打开Git源代码管理器时，easy-git插件会自动进行git fetch操作；git fetch 并没更改本地仓库的代码，只是拉取了远程 commit 等数据。\n2. fetch操作，错误说明及解决方法: https://easy-git.github.io/docs/file/fetch\n", "info");
                 return 'fail';
             });

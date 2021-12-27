@@ -676,7 +676,7 @@ class GitFile {
 
     // Git: sync git behind and git ahead
     async syncBehindAhead() {
-        let fetchStatus = await utils.gitFetch(this.projectPath, false);
+        let fetchStatus = await utils.gitFetch(this.projectPath, true, 'statusBar');
         if (fetchStatus == 'success') {
             let gitInfo = await utils.gitStatus(this.projectPath, false);
             let { behind, ahead } = gitInfo;
