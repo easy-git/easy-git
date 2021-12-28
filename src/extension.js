@@ -6,13 +6,10 @@ const file = require('./common/file.js');
 const upgrade = require('./common/upgrade.js');
 
 const { getThemeColor } = require('./common/utils.js');
-const { openOAuthBox, Gitee, onUriForResponse } = require('./common/oauth.js');
+const { Gitee, onUriForResponse } = require('./common/oauth.js');
 const { goSetEncoding } = require('./commands/base.js');
 
 const git = require('./commands/index.js');
-const quickOpen = require('./commands/quick_open.js');
-const { gitRepositoryCreate } = require('./commands/repository.js');
-const sshKeygen = require('./commands/ssh_keygen.js');
 
 let showCommandPanel = require('./commands/commandPanel.js');
 
@@ -59,7 +56,7 @@ function activate(context) {
 
     // 快速打开Git项目
     let quickOpenGitProject = hx.commands.registerCommand('EasyGit.quickOpenGitProject', (param) => {
-        quickOpen(param);
+        git.independentFunction('quickOpenGitProject', param);
     });
     context.subscriptions.push(quickOpenGitProject);
 
@@ -68,7 +65,7 @@ function activate(context) {
         if (param == null) {
             param = {};
         };
-        gitRepositoryCreate(param);
+        git.independentFunction('CreateRemoteRepository', param);
     });
     context.subscriptions.push(CreateRemoteRepository);
 
@@ -508,13 +505,13 @@ function activate(context) {
 
     // oauth
     let gitOAuth = hx.commands.registerCommand('EasyGit.oauth', () => {
-        openOAuthBox();
+        git.independentFunction('openOAuthBox');
     });
     context.subscriptions.push(gitOAuth);
 
     // ssh
     let ssh = hx.commands.registerCommand('EasyGit.sshKeygen', () => {
-        sshKeygen();
+        git.independentFunction('sshKeygen');
     });
     context.subscriptions.push(ssh);
 };

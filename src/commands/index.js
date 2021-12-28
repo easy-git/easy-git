@@ -6,6 +6,12 @@ const file = require('../common/file.js');
 const utils = require('../common/utils.js');
 const count = require('../common/count.js');
 
+const quickOpen = require('../commands/quick_open.js');
+const sshKeygen = require('../commands/ssh_keygen.js');
+
+const { gitRepositoryCreate } = require('../commands/repository.js');
+const { openOAuthBox } = require('../common/oauth.js');
+
 const { goStash, goStashPop, goStashClear, goStashShow } = require('./stash.js');
 const { gitInitProject } = require('./repository_init.js');
 const { gitAddFile, goCleanFile, goCommit } = require('./file.js');
@@ -280,6 +286,34 @@ async function action(param, action_name) {
 };
 
 
+/**
+ * @description 独立的功能
+ */
+async function independentFunction(action_name, param) {
+
+    try{
+        count(action_name);
+    }catch(e){};
+
+    switch (action_name){
+        case 'quickOpenGitProject':
+            quickOpen(param);
+            break;
+        case 'CreateRemoteRepository':
+            gitRepositoryCreate(param);
+            break;
+        case 'sshKeygen':
+            sshKeygen();
+            break;
+        case 'openOAuthBox':
+            openOAuthBox();
+            break;
+        default:
+            break;
+    };
+};
+
 module.exports = {
-    action
+    action,
+    independentFunction
 }
