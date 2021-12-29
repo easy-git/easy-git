@@ -226,8 +226,8 @@ class sshKeygen {
         ];
         return {
     		title: "SSH KEY一键生成工具",
-    		width: 340,
-    		height: 380,
+    		width: 400,
+    		height: 420,
     		footer: '<a href="https://easy-git.github.io/auth/ssh-generate">SSH相关教程</a>',
             formItems: formItems,
         };
