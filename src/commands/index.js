@@ -303,7 +303,8 @@ async function independentFunction(action_name, param) {
             gitRepositoryCreate(param);
             break;
         case 'sshKeygen':
-            sshKeygen();
+            let ssh = new sshKeygen()
+            ssh.main();
             break;
         case 'openOAuthBox':
             openOAuthBox();
