@@ -34,7 +34,7 @@ body::-webkit-scrollbar {
 }
 
 .diff-head {
-    height: 50px;
+    height: 60px;
     background-color: var(--background) !important;
     z-index: 100;
 }
@@ -69,7 +69,8 @@ body::-webkit-scrollbar {
 }
 
 .diff-body {
-    margin-top: 50px !important;
+    margin-top: 60px !important;
+    overflow: hidden;
 }
 
 .d2h-file-wrapper {
@@ -77,17 +78,19 @@ body::-webkit-scrollbar {
     margin-bottom: 0px !important;
 }
 
-/* .d2h-files-diff .d2h-file-side-diff:last-child {
-    border-left: 1px solid var(--lineColor) !important;
-} */
-
-.d2h-file-side-diff::-webkit-scrollbar {
-    height: 9px !important
+.d2h-wrapper {
+    height: calc(100vh - 60px) !important;
+    overflow-y: scroll;
 }
 
-.d2h-file-side-diff {
-    min-height: calc(100vh - 50px);
-    position: relative;
+.d2h-code-wrapper {
+    /* height: 100%;
+    overflow-x: scroll; */
+    /* position: fixed; */
+}
+
+..d2h-file-side-diff::-webkit-scrollbar {
+    height: 9px !important
 }
 
 .d2h-file-header {
