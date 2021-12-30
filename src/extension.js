@@ -54,6 +54,12 @@ function activate(context) {
     });
     context.subscriptions.push(CommandPanel);
 
+    // 对比command列表
+    let CommandListForDiff = hx.commands.registerCommand('EasyGit.CommandListForDiff', (param) => {
+        showCommandPanel(param, 'diff');
+    });
+    context.subscriptions.push(CommandListForDiff);
+
     // 快速打开Git项目
     let quickOpenGitProject = hx.commands.registerCommand('EasyGit.quickOpenGitProject', (param) => {
         git.independentFunction('quickOpenGitProject', param);

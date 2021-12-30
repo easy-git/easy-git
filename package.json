@@ -81,6 +81,7 @@
         "onCommand:EasyGit.tagDelete",
         "onCommand:EasyGit.tagDetails",
         "onCommand:EasyGit.diffFile",
+        "onCommand:EasyGit.CommandListForDiff",
         "onCommand:EasyGit.archive",
         "onCommand:EasyGit.reflog",
         "onCommand:EasyGit.annotate",
@@ -462,6 +463,10 @@
                 "title": "easy-git: 打开命令面板"
             },
             {
+                "command": "EasyGit.CommandListForDiff",
+                "title": "easy-git: diff - 更多对比操作"
+            },
+            {
                 "command": "EasyGit.set",
                 "title": "easy-git插件设置"
             },
@@ -694,14 +699,8 @@
                     "group": "easygit@5"
                 },
                 {
-                    "command": "EasyGit.BranchDiff",
-                    "title": "diff - 对比两个分支提交",
-                    "when": "isGit",
-                    "group": "easygit@5"
-                },
-                {
-                    "command": "EasyGit.twoBranchSpecificFileDiff",
-                    "title": "diff - 显示两个分支指定文件的差异",
+                    "command": "EasyGit.CommandListForDiff",
+                    "title": "diff - Git其它对比操作",
                     "when": "isGit",
                     "group": "easygit@5"
                 },

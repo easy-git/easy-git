@@ -32,7 +32,7 @@ async function unfocusedAction() {
  * @description 命令面板
  * @datetime 2020-10-30 10:16:00
  */
-async function showCommandPanel(param) {
+async function showCommandPanel(param, name) {
     if (param == null) {
         let unfocusedResult = await unfocusedAction();
         if (unfocusedResult == null || unfocusedResult == 'fouceEditorFail') {
@@ -45,11 +45,23 @@ async function showCommandPanel(param) {
     }catch(e){};
 
     let tmp = [];
-    for (let s of commands) {
-        if (s.command != 'EasyGit.CommandPanel') {
-            // s["title"] = s["title"].replace('easy-git:', 'git ')
+    if (name) {
+        for (let s of commands) {
+            if (['EasyGit.CommandPanel', 'EasyGit.CommandListForDiff'].includes(s.command)) {
+                continue;
+            };
+            if (name && (s.title).includes(name)) {
+                tmp.push(s);
+            };
+        };
+        tmp.push({"title": "返回 - 查看其它Git操作", "command": "back"});
+    } else {
+        for (let s of commands) {
+            if (s.command == 'EasyGit.CommandPanel') {
+                continue;
+            };
             tmp.push(s);
-        }
+        };
     };
 
     let data = JSON.parse(JSON.stringify(tmp).replace(/title/g,"label"));
@@ -60,7 +72,11 @@ async function showCommandPanel(param) {
     pickResult.then(function(result) {
         if (!result) { return; };
         let cmd = result.command;
-        hx.commands.executeCommand(cmd, param);
+        if (cmd == 'back') {
+            hx.commands.executeCommand("EasyGit.CommandPanel", param);
+        } else {
+            hx.commands.executeCommand(cmd, param);
+        };
     });
 };
 
