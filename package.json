@@ -700,7 +700,7 @@
                 },
                 {
                     "command": "EasyGit.CommandListForDiff",
-                    "title": "diff - Git其它对比操作",
+                    "title": "diff - 更多对比操作",
                     "when": "isGit",
                     "group": "easygit@5"
                 },
