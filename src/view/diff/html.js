@@ -26,8 +26,9 @@ function getUIData() {
     let OpenFileIconSvg = icon.getOpenFileIcon(fontColor);
     let HistoryIcon = icon.getHistoryIcon(fontColor);
     let DiffFullTextIcon = icon.getDiffFullIcon(fontColor);
+    let RefreshIcon = icon.getRefreshIcon(fontColor);
 
-    let iconData = {OpenFileIconSvg, HistoryIcon, DiffFullTextIcon};
+    let iconData = {OpenFileIconSvg, HistoryIcon, DiffFullTextIcon, RefreshIcon};
     let uiData = Object.assign(iconData, colorData);
     return uiData;
 };
@@ -63,7 +64,8 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
         diff_scrollbar_color,
         OpenFileIconSvg,
         HistoryIcon,
-        DiffFullTextIcon
+        DiffFullTextIcon,
+        RefreshIcon
     } = uiData;
 
     let { titleLeft, titleRight, isDiffHtml, diffResult, isConflicted, isDisplayPrompt } = diffData;
@@ -110,7 +112,8 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                                 <div class="col-10">
                                     <span class="file-title" @click="openFile();">${selectedFilePath}</span>
                                 </div>
-                                <div class="col-2 mr-2" style="right: 0; position: absolute; text-align: end;">
+                                <div class="col-2 mr-4" style="right: 0; position: absolute; text-align: end;">
+                                    <span title="刷新当前视图" @click="refresh();">${RefreshIcon}</span>
                                     <span title="打开文件" @click="openFile();">${OpenFileIconSvg}</span>
                                     <span title="查看日志" @click="openLog();">${HistoryIcon}</span>
                                     <span :title="isFullTextDiffFileIconTitle" @click="setDiffFileConfig();">${DiffFullTextIcon}</span>
@@ -121,7 +124,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                     <div class="row">
                         <div class="col-auto mr-auto">
                         </div>
-                        <div class="col-auto mr-2 cursor-default">
+                        <div class="col-auto mr-4 cursor-default">
                             <div v-if="isConflicted">
                                 <span title="git checkout --ours" @click="gitHandleConflict('--ours')">保留当前分支文件 | </span>
                                 <span title="git checkout --theirs" @click="gitHandleConflict('--theirs')">采用传入的文件</span>
@@ -219,7 +222,7 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                                 let diffVal = cutLine.left + (e.clientX -lineLeft);
                                 if(diffVal >= document.body.clientWidth * 0.05 && diffVal <= document.body.clientWidth * 0.95) {
                                     cutLine.style.left = diffVal+'px';
-                                    cutLine.style.width = '2px';
+                                    // cutLine.style.width = '2px';
                                     side1.style.width = diffVal +'px';
                                     side2.style.width = document.body.clientWidth - diffVal +'px';
                                 }
@@ -280,6 +283,11 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                     openLog() {
                         hbuilderx.postMessage({
                             command: 'openLog'
+                        });
+                    },
+                    refresh() {
+                        hbuilderx.postMessage({
+                            command: 'refresh'
                         });
                     },
                     gitHandleConflict(options) {

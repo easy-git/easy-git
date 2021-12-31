@@ -216,6 +216,10 @@ function GitDiffCustomEditorRenderHtml(ProjectData, userConfig) {
             case 'selectOneRevisionToDiff':
                 GitDiff.selectOneRevisionToDiff();
                 break;
+            // 刷新
+            case 'refresh':
+                GitDiff.SetView();
+                break;
             default:
                 break;
         };
