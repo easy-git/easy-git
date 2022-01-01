@@ -442,6 +442,36 @@ async function getFilesExplorerProjectInfo() {
     return data;
 };
 
+/**
+ * @description 控制台链接跳转
+ * @param {String} message
+ * @param {String} linkText
+ */
+function createOutputViewForHyperLinksForCommand(message, linkText, commandName, commandParam={}) {
+    let outputView = hx.window.createOutputView({
+        name: "easy-git",
+        id: ""
+    });
+    outputView.show();
+
+    let msg = message;
+    outputView.appendLine({
+        line: msg + linkText,
+        level: "info",
+        hyperlinks:[
+            {
+                linkPosition: {
+                    start: msg.length,
+                    end: (msg + linkText).length
+                },
+                onOpen: function() {
+                    hx.commands.executeCommand(commandName, commandParam);
+                }
+            }
+        ]
+    });
+};
+
 
 /**
  * @description 创建输出控制台
@@ -2516,16 +2546,11 @@ async function gitAddRemoteOrigin(projectPath, originUrl=false) {
         let commands = ['remote', 'add', 'origin', originUrl];
         let rResult = await gitRaw(projectPath, commands, '关联远程仓库', 'statusCode');
         if (rResult == 'success') {
-            // try{
-            //     await gitFetch(projectPath);
-            // }catch(e){
-            //     hx.window.setStatusBarMessage('EasyGit: 获取Git仓库信息失败', 5000, 'info');
-            // };
             hx.window.setStatusBarMessage('EasyGit: 添加远程仓库成功。', 10000, 'info');
         };
         return rResult;
     } else {
-        hx.window.showErrorMessage('EasyGit: 远程仓库地址无效。如还需要进行关联，请在源代码管理器底部操作。', ['我知道了']);
+        hx.window.showErrorMessage('EasyGit: 远程仓库地址无效。如还需要进行关联，请在源代码管理器底部或命令面板内操作。', ['我知道了']);
         return 'fail';
     };
 };
@@ -2860,6 +2885,7 @@ module.exports = {
     FileWriteAndOpen,
     createOutputChannel,
     createOutputView,
+    createOutputViewForHyperLinksForCommand,
     isGitInstalled,
     getGitVersion,
     getHBuilderXiniConfig,

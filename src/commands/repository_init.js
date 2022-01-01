@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 
 const hx = require('hbuilderx');
 const {
@@ -9,7 +10,8 @@ const {
     gitLocalBranchToRemote,
     gitConfigShow,
     gitConfigSet,
-    createOutputChannel
+    createOutputChannel,
+    createOutputViewForHyperLinksForCommand
 } = require('../common/utils.js');
 const { goSetEncoding } = require('./base.js');
 
@@ -51,7 +53,9 @@ async function gitInitProject(ProjectInfo) {
     };
 
     createOutputChannel("当前仓库，还未关联到远程仓库上, 请在弹窗输入框中输入仓库地址。如不需要关联远程仓库、或后期设置，请直接关闭弹窗。", "warning");
-    createOutputChannel("新建仓库、及获取远程仓库地址，参考: https://easy-git.github.io/connecting/init\n")
+    createOutputChannel("新建仓库、及获取远程仓库地址，参考: https://easy-git.github.io/connecting/init");
+
+    createOutputViewForHyperLinksForCommand("EasyGit插件，授权Gitee、GitHub后，支持在HBuilderX内，创建远程仓库。", "点击创建远程仓库", "EasyGit.CreateRemoteRepository", ProjectInfo);
 
     // 打开源代码管理器
     ProjectInfo.easyGitInner = true;
@@ -63,7 +67,8 @@ async function gitInitProject(ProjectInfo) {
     // 关联远程仓库
     try {
         let pdata = Object.assign(ProjectInfo)
-        gitSetForWebDialog(pdata);
+        let gas = new gitInitAfterSetting();
+        gas.main(pdata)
     } catch (e) {
         let relationResult = await gitAddRemoteOrigin(projectPath);
         if (relationResult == 'success') {
@@ -72,308 +77,143 @@ async function gitInitProject(ProjectInfo) {
     };
 };
 
+
 /**
- * @description 用于git init之后的操作
+ * @description 关联远程仓库
  */
-var isDisplayError;
-async function gitConfigSetForWebDialog(webviewDialog, ProjectInfo) {
-    // 清除上次错误提示
-    if (isDisplayError) {
-        webviewDialog.displayError('');
+class gitInitAfterSetting {
+    constructor(arg) {
+        this.projectName = '';
+        this.projectPath = '';
+    }
+
+    /**
+     * @description 校验输入
+     * @param {Object} formData
+     * @param {Object} that
+     */
+    async goValidate(formData, that) {
+        let {RepositoryURL, new_email} = formData;
+        let reg = /^(https:\/\/|http:\/\/|git@)/g;
+        if (RepositoryURL.length == 0 || !reg.test(RepositoryURL)) {
+            that.showError(`仓库地址无效`);
+            return false;
+        };
+        if (!new_email.includes('@')) {
+            that.showError(`git user.email无效`);
+            return false;
+        };
+        return true;
     };
 
-    let {
-        projectName, projectPath,
-        username, email,
-        oldUserName, oldEmail,
-        RemoteBranch, RepositoryURL
-    } = ProjectInfo;
+    /**
+     * @description 绘制视图
+     * @description {Object} preFillData 预填充数据
+     * @param {String} action
+     * @param {Object} formData
+     */
+    getFormItems(preFillData={}, action='ManualInput', formData) {
+        let {local_email, local_username, projectName, projectPath, repo_url} = preFillData;
+        let formItems = [];
+        // let formItems = [{
+        //         type: "radioGroup",name: "action", "value": action,
+        //         items: [
+        //             {"label": "手动输入仓库地址", "id": "ManualInput"},{"label": "托管到Github", "id": "github"},{"label": "托管到Gitee", "id": "gitee"}
+        //         ]
+        //     }
+        // ];
+        // if (fs.existsSync(projectPath)) {
+        //     let displayProjectPath = projectPath;
+        //     if (displayProjectPath.length > 50) {
+        //         displayProjectPath = displayProjectPath.slice(0, 50) + "......";
+        //     };
+        //     formItems.push({type: "label",name: "remark_1",text: `本地路径 ${displayProjectPath}`});
+        // };
+        if (action == 'ManualInput') {
+            let mi_info = [{type: "input",name: "RepositoryURL",label: "仓库地址",placeholder: '请添加的仓库地址，以https://或git@开头',value: ''},
+            {type: "input",name: "new_username",label: "user.name",placeholder: "user.name", value: local_username},
+            {type: "input",name: "new_email",label: "user.email",placeholder: "user.email，比如xxx@xx.com", value: local_email},
+            {type: "label",name: "remark_desc_1",text: '<span style="color: #a0a0a0; font-size: 12px;">1. 若无仓库，可到<a href="https://github.com">Github</a>、<a href="https://gitee.com/">Gitee</a>等托管服务器创建仓库获取仓库URL。</span>'},
+            {type: "label",name: "remark_desc_2",text: "<span style='color: #a0a0a0; font-size: 12px;'>2. user.name和user.email用于身份标识，每个 Git 提交都会使用这些信息，它们会写入到每一次提交中。</span>"}];
+            formItems = [...formItems, ...mi_info];
+        };
+        if (action == "github") {};
+        if (action == "gitee") {};
 
-    let reg = /^(https:\/\/|http:\/\/|git@)/g;
-    if (RepositoryURL.length == 0 || !reg.test(RepositoryURL)) {
-        return webviewDialog.displayError('仓库地址无效');
+        let title = projectName ? 'Git仓库设置' + ' - ' + projectName : 'Git仓库设置';
+        let subtitle = fs.existsSync(projectPath) ? `<span style="color: #a0a0a0;font-size: 12px;">本地路径 ${projectPath}</span>`: '';
+        return {
+            title: title,
+            subtitle: subtitle,
+            width: 400,
+            height: 320,
+            footer: '<a href="https://easy-git.github.io/extensions/create-remote-repo">了解在HBuilderX内创建远程仓库</a>',
+            formItems: formItems,
+        };
     };
 
-    if (username.length == 0) {
-        return webviewDialog.displayError('git user.name无效');
-    };
+    async main(ProjectInfo) {
+        // 获取项目信息
+        let { projectName, projectPath, repo_url } = ProjectInfo;
+        if (repo_url == undefined) {
+            repo_url = "";
+        };
 
-    if (!email.includes('@')) {
-        return webviewDialog.displayError('git user.email无效');
-    };
+        // 用于填充html中的email和username字段
+        let local_username = '', local_email = '';
+        if (gitUserName != undefined && gitUserName) {
+            local_username = gitUserName;
+        };
+        if (gitEmail != undefined && gitEmail) {
+            local_email = gitEmail;
+        };
 
-    webviewDialog.displayError('');
-    webviewDialog.setButtonStatus("开始设置", ["loading", "disable"]);
+        let preFillData = {local_email, local_username, projectName, projectPath, repo_url};
 
-    // 添加远程仓库
-    let addOriginResult = await gitAddRemoteOrigin(projectPath, RepositoryURL);
-
-    if (email != oldEmail) {
-        gitConfigSet(projectPath, {"key": "user.email", "value": email});
-    };
-    if (username != oldUserName) {
-        gitConfigSet(projectPath, {"key": "user.name", "value": username});
-    };
-
-    if (addOriginResult) {
-        // 发送消息到webdialog
-        webviewDialog.setButtonStatus("开始设置", []);
-        let webview = webviewDialog.webView
-        webview.postMessage({
-            command: 'setResult',
-            status: addOriginResult
+        let that = this;
+        let setInfo = await hx.window.showFormDialog({
+            submitButtonText: "确定(&S)",
+            cancelButtonText: "取消(&C)",
+            validate: function(formData) {
+                let checkResult = that.goValidate(formData, this);
+                return checkResult;
+            },
+            onChanged: function (field, value, formData) {
+              if (field == "action") {
+                this.updateForm(that.getFormItems(preFillData, value, formData));
+              }
+            },
+            ...that.getFormItems(preFillData)
+        }).then((res) => {
+            return res;
+        }).catch(error => {
+            console.log(error);
         });
 
-        // 打印日志到控制台
-        createOutputChannel(`项目【${projectName}】远程仓库添加地址成功。`, "success");
+        if (setInfo == undefined) return;
+        let {RepositoryURL, new_username, new_email} = setInfo;
 
-        // 刷新项目管理器
-        let pinfo = {"easyGitInner": true, "projectPath": projectPath, "projectName": projectName};
-        hx.commands.executeCommand('EasyGit.main', pinfo);
-    };
-};
-
-/**
- * @description 加载webdialog
- * @param {Object} ProjectInfo
- */
-async function gitSetForWebDialog(ProjectInfo) {
-    
-    // 获取项目信息
-    let { projectName, projectPath, repo_url } = ProjectInfo;
-    if (repo_url == undefined) {
-        repo_url = "";
-    };
-
-    // 用于填充html中的email和username字段
-    let username = '', email = '';
-    if (gitUserName != undefined && gitUserName) {
-        username = gitUserName;
-    };
-    if (gitEmail != undefined && gitEmail) {
-        email = gitEmail;
-    };
-
-
-    // 创建webviewdialog
-    let webviewDialog = hx.window.createWebViewDialog({
-        modal: true,
-        title: "Git仓库设置",
-        dialogButtons: ["开始设置", "关闭"],
-        size: {
-            width: 730,
-            height: 430
-        }
-    }, {
-        enableScripts: true
-    });
-
-    let webview = webviewDialog.webView;
-
-    webview.onDidReceiveMessage((msg) => {
-        let action = msg.command;
-        let { info } = msg;
-        switch (action) {
-            case 'closed':
-                webviewDialog.close();
-                break;
-            case 'set':
-                let setData = Object.assign(
-                    info,
-                    {"oldUserName": gitUserName, "oldEmail": gitEmail},
-                    {"projectPath": projectPath, "projectName": projectName},
-                )
-                gitConfigSetForWebDialog(webviewDialog, setData);
-                break;
-            case 'createRemoteRepo':
-                let LocalRepoParams = {
-                    "fromProjectPath": projectPath,
-                    "fromProjectName": projectName
-                };
-                hx.commands.executeCommand('EasyGit.CreateRemoteRepository', LocalRepoParams);
-                webviewDialog.close();
-                break;
-            default:
-                break;
+        // 添加远程仓库
+        let addOriginResult = await gitAddRemoteOrigin(projectPath, RepositoryURL);
+        if (addOriginResult == 'success') {
+            createOutputChannel(`本地项目【${projectName}】，添加远程仓库地址成功。`, "success");
         };
-    });
 
-    let promi = webviewDialog.show();
-    promi.then(function (data) {
-        // 处理错误信息
-    });
+        if (new_email != local_email) {
+            gitConfigSet(projectPath, {"key": "user.email", "value": new_email});
+        };
 
-    webview.html = `<!DOCTYPE html>
-    <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <link rel="stylesheet" href="${bootstrapCssFile}">
-            <link rel="stylesheet" href="${customCssFile}">
-            <script src="${vueFile}"></script>
-            <style type="text/css">
-                body {
-                    font-size: 14px;
-                }
-                body::-webkit-scrollbar {
-                    display: none;
-                }
-                * {
-                    outline: none;
-                    moz-user-select: -moz-none;
-                    -moz-user-select: none;
-                    -o-user-select:none;
-                    -khtml-user-select:none;
-                    -webkit-user-select:none;
-                    -ms-user-select:none;
-                    user-select:none;
-                }
-                [v-cloak] {
-                    display: none;
-                }
-            </style>
-        </head>
-        <body>
-            <div id="app" v-cloak>
-                <form>
-                    <div class="form-group row m-0">
-                        <label for="u-p" class="col-sm-2 px-0">项目名称</label>
-                        <div class="col-sm-10">
-                            <span>{{ projectName }}</span>
-                        </div>
-                    </div>
-                    <div class="form-group row m-0 mt-3">
-                        <label for="u-p" class="col-sm-2 px-0 pt-3">仓库URL</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control outline-none" id="git-url" placeholder="要添加的Git仓库地址，以https://或git@开头" v-model.trim="init_data.RepositoryURL">
-                            <p class="form-text text-muted pl-2 mb-0">
-                                若无仓库，可到
-                                <span><a href="https://github.com/">GitHub官网</a>、</span>
-                                <span><a href="https://gitee.com/">Gitee官网</a></span>
-                                等托管服务器拷贝仓库URL
-                            </p>
-                            <p class="form-text text-muted pl-2">
-                                或点击此处: <span style="color: #007bff !important;" @click="gitCreateRemoteRepo();">创建远程仓库</span>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="form-group row m-0 mt-1" v-if="isShowRemote">
-                        <label for="u-p" class="col-sm-2 px-0 pt-2">关联远程分支</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control outline-none" id="git-branch" placeholder="要关联远程分支, 默认master分支; 如果是github，新建仓库默认分支为main" v-model.trim="RemoteBranch">
-                        </div>
-                    </div>
-                    <div class="form-group row m-0">
-                        <label for="u-p" class="col-sm-2 px-0 pt-3">用户名与邮箱</label>
-                        <div class="col-sm-10">
-                            <div class="row">
-                                <div class="col">
-                                    <input type="text" class="form-control outline-none" id="git-user" placeholder="user.name" v-model.trim="init_data.username">
-                                </div>
-                                <div class="col">
-                                    <input type="text" class="form-control outline-none" id="git-email" placeholder="user.email" v-model.trim="init_data.email">
-                                </div>
-                            </div>
-                            <p class="form-text text-muted">user.name和user.email用于标识身份，因为每一个 Git 提交都会使用这些信息。</p>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <script>
-                Vue.directive('focus', {
-                  inserted: function (el) {
-                    el.focus()
-                  }
-                });
-                var app = new Vue({
-                    el: '#app',
-                    data: {
-                        projectName: '',
-                        isShowRemote: false,
-                        RemoteBranch: '',
-                        init_data: {
-                            RepositoryURL: '',
-                            username: '',
-                            email: ''
-                        }
-                    },
-                    computed: {
-                        git_url() {
-                            return this.init_data.RepositoryURL;
-                        }
-                    },
-                    watch: {
-                        git_url: function (newv, oldv) {
-                            let url = this.init_data.RepositoryURL;
-                            if (url.includes('github.com')) {
-                                this.RemoteBranch = 'main';
-                            };
-                        }
-                    },
-                    created() {
-                        this.projectName = '${projectName}';
-                        this.init_data.username = '${username}';
-                        this.init_data.email = '${email}';
-                        this.init_data.RepositoryURL = '${repo_url}';
-                    },
-                    mounted() {
-                        this.$nextTick(() => {
-                            window.addEventListener('hbuilderxReady', () => {
-                                this.gitSet();
-                                this.getResult();
-                            })
-                        })
-                    },
-                    methods: {
-                        getResult() {
-                            hbuilderx.onDidReceiveMessage((msg) => {
-                                if (msg.command == 'setResult') {
-                                    let {status} = msg;
-                                    if (['error', 'fail'].includes(status)){
-                                        this.btnDisable = false;
-                                    } else {
-                                        hbuilderx.postMessage({
-                                            command: 'closed'
-                                        });
-                                    }
-                                };
-                            });
-                        },
-                        gitCreateRemoteRepo() {
-                            hbuilderx.postMessage({
-                                command: 'createRemoteRepo'
-                            });
-                        },
-                        gitSet() {
-                            hbuilderx.onDidReceiveMessage((msg)=>{
-                                if(msg.type == 'DialogButtonEvent'){
-                                    let button = msg.button;
-                                    if(button == '开始设置'){
-                                        hbuilderx.postMessage({
-                                            command: 'set',
-                                            info: this.init_data
-                                        });
-                                    } else if(button == '关闭'){
-                                        hbuilderx.postMessage({
-                                            command: 'closed'
-                                        });
-                                    };
-                                };
-                            });
-                        }
-                    }
-                });
-            </script>
-            <script>
-                window.oncontextmenu = function() {
-                    event.preventDefault();
-                    return false;
-                };
-            </script>
-        </body>
-    </html>`
+        if (new_username != local_username) {
+            gitConfigSet(projectPath, {"key": "user.name", "value": new_username});
+        };
+    };
 };
 
+function gitSetForWebDialog() {
+
+}
 module.exports = {
     gitInitProject,
-    gitSetForWebDialog
+    gitSetForWebDialog,
+    gitInitAfterSetting
 }
