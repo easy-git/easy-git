@@ -8,7 +8,7 @@ const { gitSetForWebDialog } = require('./repository_init.js');
 
 const { axiosPost, axiosGet } = require('../common/axios.js');
 const { Gitee, Github, gitRepoCreate } = require('../common/oauth.js');
-const { gitRaw, createOutputChannel } = require('../common/utils.js');
+const { gitRaw, createOutputChannel, gitAddRemoteOrigin } = require('../common/utils.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'bootstrap.min.css');
@@ -91,21 +91,22 @@ class Api {
             if (!fromProjectPath && !fromProjectName) {
                 return hx.window.showErrorMessage(`警告：获取本地项目名称和项目路径失败，【本地关联远程仓库】操作中断。`, ['我知道了']);
             };
-            try{
-                let { status, ssh_url, http_url } = createResult;
-                if (status == 'success') {
-                    let repo_url = Protocol == 'ssh' ? ssh_url : http_url;
-                    let setInfo = {
-                        "repo_url": repo_url,
-                        "projectName": fromProjectName,
-                        "projectPath": fromProjectPath
+            let { status, ssh_url, http_url } = createResult;
+
+            if (status == 'success') {
+                let repo_url = Protocol == 'ssh' ? ssh_url : http_url;
+                // let setInfo = {"repo_url": repo_url,"projectName": fromProjectName,"projectPath": fromProjectPath};
+                // gitSetForWebDialog(setInfo);
+                try{
+                    let relationResult = await gitAddRemoteOrigin(fromProjectPath, repo_url);
+                    if (relationResult == 'success') {
+                        createOutputChannel(`项目【${fromProjectName}】, 成功添加远程仓库地址。`, "success");
                     };
-                    gitSetForWebDialog(setInfo);
+                }catch(e){
+                    let emsg = isRemoteAdd ? '，因此中断【本地关联远程仓库】操作，请自行处理' : '';
+                    hx.window.showErrorMessage(`警告：远程仓库创建成功后，解析返回值失败${emsg}。`, ['我知道了']);
                 };
-            }catch(e){
-                let emsg = isRemoteAdd ? '，因此中断【本地关联远程仓库】操作，请自行处理' : '';
-                hx.window.showErrorMessage(`警告：远程仓库创建成功后，解析返回值失败${emsg}。`, ['我知道了']);
-            }
+            };
         };
     };
 };
@@ -122,7 +123,7 @@ async function gitRepositoryCreate(FromData={}) {
         fromProjectPath = '';
         fromProjectName = '';
     };
-    
+
     let giteeOAuthInfo = await giteeOAuth.readLocalToken();
     let githubOAuthInfo = await githubOAuth.readLocalToken();
 
