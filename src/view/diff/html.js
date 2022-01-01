@@ -225,7 +225,8 @@ function getWebviewDiffContent(selectedFilePath, userConfig, diffData) {
                                     // cutLine.style.width = '2px';
                                     side1.style.width = diffVal +'px';
                                     side2.style.width = document.body.clientWidth - diffVal +'px';
-                                }
+                                    window.scrollRight(10000);
+                                };
                             };
                             document.onmouseup = function() {
                                 document.onmousemove = null;
