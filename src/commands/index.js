@@ -81,12 +81,14 @@ async function action(param, action_name) {
     try{
         let gitCountList = [
             "init",
-            "add", "commit", "commitAmend",
+            "add", "RemoteRmOrigin","commit", "commitAmend",
             "cherryPick",
             "BranchDiff", "twoBranchSpecificFileDiff", "BranchSwitch", "BranchMerge",
             "annotate", "BlameForLineChange",
             "stash", "stashAll",
-            "tagCreate"
+            "tagCreate", "archive",
+            "reflog", "annotate", "BlameForLineChange",
+            "showAnotherBranchFile"
         ];
         if (gitCountList.includes(action_name)) {
             count(action_name);
