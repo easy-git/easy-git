@@ -209,11 +209,8 @@ class gitInitAfterSetting {
     };
 };
 
-function gitSetForWebDialog() {
 
-}
 module.exports = {
     gitInitProject,
-    gitSetForWebDialog,
     gitInitAfterSetting
 }

@@ -6,14 +6,15 @@ const file = require('../common/file.js');
 const utils = require('../common/utils.js');
 const count = require('../common/count.js');
 
-const quickOpen = require('../commands/quick_open.js');
-const sshKeygen = require('../commands/ssh_keygen.js');
-
-const { gitRepositoryCreate } = require('../commands/repository.js');
 const { openOAuthBox } = require('../common/oauth.js');
 
+const quickOpen = require('./quick_open.js');
+const sshKeygen = require('./ssh_keygen.js');
 const { goStash, goStashPop, goStashClear, goStashShow } = require('./stash.js');
-const { gitInitProject } = require('./repository_init.js');
+
+const { gitRepositoryCreate } = require('./repository.js');
+const { gitInitProject, gitInitAfterSetting } = require('./repository_init.js');
+
 const { gitAddFile, goCleanFile, goCommit } = require('./file.js');
 const { goSetConfig, goShowConfig } = require('./base.js');
 
@@ -100,7 +101,8 @@ async function action(param, action_name) {
             gitInitProject(ProjectInfo);
             break;
         case 'addRemoteOrigin':
-            utils.gitAddRemoteOrigin(projectPath);
+            let aro = new gitInitAfterSetting();
+            aro.main(ProjectInfo);
             break;
         case 'RemoteRmOrigin':
             utils.gitRmRemoteOrigin(projectPath, projectName);
