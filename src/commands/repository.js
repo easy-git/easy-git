@@ -9,6 +9,7 @@ const { gitSetForWebDialog } = require('./repository_init.js');
 const { axiosPost, axiosGet } = require('../common/axios.js');
 const { Gitee, Github, gitRepoCreate } = require('../common/oauth.js');
 const { gitRaw, createOutputChannel, gitAddRemoteOrigin } = require('../common/utils.js');
+const count = require('../common/count.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'bootstrap.min.css');
@@ -55,6 +56,9 @@ class Api {
             githubOAuth.authorize(true);
             this.listeningAuthorize(host);
         };
+        try{
+            count(`open_${host}_auth`).catch( error=> {});
+        }catch(e){};
     };
 
     async refreshAuthorizeStatus(host) {
@@ -76,9 +80,13 @@ class Api {
         // isRemoteAdd, fromProjectPath, fromProjectName 这3个字段用于处理从初始化窗口跳转过来的数据。
         let { isRemoteAdd, fromProjectPath, fromProjectName } = CreateInfo;
 
-        let { host, name, isPrivate, isClone, Protocol } = CreateInfo;
-        if (!name.length) {
-            this.webviewDialog.displayError('创建：仓库名称无效，请重新输入。');
+        let { host, name, isPrivate, isClone, Protocol, owner} = CreateInfo;
+        if (host == 'github' && /[a-zA-Z0-9_\-\.]{1,100}$/.test(name) == false) {
+            this.webviewDialog.displayError('仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，且长度为1~100个字符');
+            return;
+        };
+        if (host == 'gitee' && /^[a-zA-Z][a-zA-Z0-9_\-\.]{1,191}$/.test(name) == false) {
+            this.webviewDialog.displayError('仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，必须以字母开头，且长度为2~191个字符');
             return;
         };
 
@@ -86,27 +94,47 @@ class Api {
         this.webviewDialog.setButtonStatus("开始创建", ["loading", "disable"]);
 
         let createResult = await gitRepoCreate(CreateInfo, this.webviewDialog);
+        let { status, ssh_url, http_url } = createResult;
 
+        if (status == 'auth_error') {
+            this.webviewDialog.displayError('错误: 访问服务器的token无效，请重新授权。');
+            this.webviewDialog.setButtonStatus("开始创建", []);
+            return;
+        };
+        if (['error', 'fail'].includes(status) && status != 'success') {
+            this.webviewDialog.setButtonStatus("开始创建", []);
+            return;
+        };
+
+        // 关闭webviewdialog窗口
+        this.webviewDialog.close();
+
+        // 添加远程仓库
         if (isRemoteAdd) {
             if (!fromProjectPath && !fromProjectName) {
                 return hx.window.showErrorMessage(`警告：获取本地项目名称和项目路径失败，【本地关联远程仓库】操作中断。`, ['我知道了']);
             };
-            let { status, ssh_url, http_url } = createResult;
-
-            if (status == 'success') {
-                let repo_url = Protocol == 'ssh' ? ssh_url : http_url;
-                // let setInfo = {"repo_url": repo_url,"projectName": fromProjectName,"projectPath": fromProjectPath};
-                // gitSetForWebDialog(setInfo);
-                try{
-                    let relationResult = await gitAddRemoteOrigin(fromProjectPath, repo_url);
-                    if (relationResult == 'success') {
-                        createOutputChannel(`项目【${fromProjectName}】, 成功添加远程仓库地址。`, "success");
-                    };
-                }catch(e){
-                    let emsg = isRemoteAdd ? '，因此中断【本地关联远程仓库】操作，请自行处理' : '';
-                    hx.window.showErrorMessage(`警告：远程仓库创建成功后，解析返回值失败${emsg}。`, ['我知道了']);
-                };
+            let repo_url = Protocol == 'ssh' ? ssh_url : http_url;
+            try{
+                let relationResult = await gitAddRemoteOrigin(fromProjectPath, repo_url);
+                if (relationResult == 'success') {
+                    createOutputChannel(`项目【${fromProjectName}】, 添加远程仓库地址成功。即执行git add remote origin ${repo_url} 成功。`, "success");
+                } else {
+                    createOutputChannel(`项目【${fromProjectName}】, 添加远程仓库地址失败。即执行git add remote origin ${repo_url} 失败。`, "fail");
+                }
+            }catch(e){
+                let emsg = isRemoteAdd ? '，因此中断【本地关联远程仓库】操作，请自行处理' : '';
+                hx.window.showErrorMessage(`警告：远程仓库创建成功后，解析返回值失败${emsg}。`, ['我知道了']);
             };
+        };
+
+        if (isClone) {
+            const openWebDialog = require('../view/clone/view_webdialog.js');
+            let repo_url = ssh_url;
+            if (Protocol == 'http') {
+                repo_url = http_url;
+            };
+            openWebDialog(repo_url);
         };
     };
 };
@@ -254,7 +282,7 @@ async function gitRepositoryCreate(FromData={}) {
                         <div class="col-sm-10">
                             <div class="row m-0 p-0">
                                 <div class="col-4 p-0" @mouseenter="isShowOrgsList=true" @mouseleave="isShowOrgsList=false">
-                                    <input type="text" title="归属组织" placeholder="归属" class="form-control outline-none pl-0" v-model="repos.owner" disabled/>
+                                    <input type="text" title="归属组织，默认。不确定默认即可，请勿乱填。" placeholder="归属组织，非必填；默认" class="form-control outline-none pl-0" v-model="repos.owner"/>
                                     <ul class="forlist" v-show="isShowOrgsList">
                                         <li v-for="(item,idx) in orgs" :key="idx" @click="repos.owner=item">{{item}}</li>
                                     </ul>
@@ -277,7 +305,7 @@ async function gitRepositoryCreate(FromData={}) {
                         <label for="repo-isClone" class="col-sm-2 px-0">克隆</label>
                         <div class="col-sm-10">
                             <input type="checkbox" class="mr-2" v-model="isClone" />
-                            <label class="d-inline">远程仓库创建后，是否克隆到本地</label>
+                            <label class="d-inline">远程仓库创建后，是否克隆到本地。勾选后，会打开克隆视图。</label>
                         </div>
                     </div>
                     <div class="form-group row m-0 mt-3" v-if="fromProjectName && fromProjectPath">
@@ -352,13 +380,9 @@ async function gitRepositoryCreate(FromData={}) {
                                 orgs = this.githubOAuthInfo.orgs;
                             };
                             if (orgs == undefined) {
-                                this.repos.owner = "默认";
-                                return ["默认"];
+                                return [""];
                             };
-                            if (orgs.length) {
-                                this.repos.owner = orgs[0];
-                            };
-                            return orgs ? orgs : ["默认"];
+                            return orgs ? orgs : [""];
                         }
                     },
                      watch:{

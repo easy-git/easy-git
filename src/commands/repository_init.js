@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-
+const uuid = require('uuid');
 const hx = require('hbuilderx');
 const {
     gitRaw,
@@ -15,12 +15,16 @@ const {
 } = require('../common/utils.js');
 const { goSetEncoding } = require('./base.js');
 
-const vueFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'vue.min.js');
-const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'bootstrap.min.css');
-const customCssFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'custom.css');
+const count = require('../common/count.js');
+const { Gitee, Github, gitRepoCreate } = require('../common/oauth.js');
 
 var gitUserName;
 var gitEmail;
+
+let giteeOAuth = new Gitee();
+let githubOAuth = new Github();
+
+let tmpProjectInfo = {};
 
 /**
  * @description Git项目初始化; 初始化成功后，创建.gitignore文件, 并询问用户是否关联远程仓库
@@ -52,10 +56,8 @@ async function gitInitProject(ProjectInfo) {
         goSetEncoding("i18n.logoutputencoding", 'StatusBar');
     };
 
-    createOutputChannel("当前仓库，还未关联到远程仓库上, 请在弹窗输入框中输入仓库地址。如不需要关联远程仓库、或后期设置，请直接关闭弹窗。", "warning");
-    createOutputChannel("新建仓库、及获取远程仓库地址，参考: https://easy-git.github.io/connecting/init");
-
-    createOutputViewForHyperLinksForCommand("EasyGit插件，授权Gitee、GitHub后，支持在HBuilderX内，创建远程仓库。", "点击创建远程仓库", "EasyGit.CreateRemoteRepository", ProjectInfo);
+    createOutputChannel("当前仓库，初始化成功，还未关联到远程仓库上, 请在弹窗输入框中输入仓库地址。如不需要关联远程仓库、或后期设置，请直接关闭弹窗。", "warning");
+    createOutputChannel("新建仓库、及获取远程仓库地址，参考: https://easy-git.github.io/connecting/init\n");
 
     // 打开源代码管理器
     ProjectInfo.easyGitInner = true;
@@ -67,13 +69,10 @@ async function gitInitProject(ProjectInfo) {
     // 关联远程仓库
     try {
         let pdata = Object.assign(ProjectInfo)
-        let gas = new gitInitAfterSetting();
-        gas.main(pdata)
+        let set_1 = new gitInitAfterSetting();
+        set_1.main(pdata);
     } catch (e) {
-        let relationResult = await gitAddRemoteOrigin(projectPath);
-        if (relationResult == 'success') {
-            createOutputChannel(`项目【${projectName}】远程仓库添加地址成功。`, "success");
-        };
+        createOutputChannel(`项目【${projectName}】, 打开仓库设置窗口失败。`, "fail");
     };
 };
 
@@ -85,7 +84,11 @@ class gitInitAfterSetting {
     constructor(arg) {
         this.projectName = '';
         this.projectPath = '';
-    }
+        this.giteeInfo = false;
+        this.githubInfo = false;
+        this.giteeOrgs = '';
+        this.githubOrgs = '';
+    };
 
     /**
      * @description 校验输入
@@ -93,17 +96,63 @@ class gitInitAfterSetting {
      * @param {Object} that
      */
     async goValidate(formData, that) {
-        let {RepositoryURL, new_email} = formData;
-        let reg = /^(https:\/\/|http:\/\/|git@)/g;
-        if (RepositoryURL.length == 0 || !reg.test(RepositoryURL)) {
-            that.showError(`仓库地址无效`);
-            return false;
+        let {action, RepositoryName, oauth_desc_gitee, oauth_desc_github} = formData;
+        if (["github", "gitee"].includes(action) && ( !oauth_desc_gitee || !oauth_desc_github )) return true;
+
+        if (action == 'ManualInput') {
+            let {RepositoryURL, new_email} = formData;
+            let reg = /^(https:\/\/|http:\/\/|git@)/g;
+            if (RepositoryURL.length == 0 || !reg.test(RepositoryURL)) {
+                that.showError(`仓库地址无效`);
+                return false;
+            };
+            if (!new_email.includes('@')) {
+                that.showError(`git user.email无效`);
+                return false;
+            };
         };
-        if (!new_email.includes('@')) {
-            that.showError(`git user.email无效`);
-            return false;
+        if (action == 'github') {
+            let t1 = RepositoryName.trim();
+            if (/[a-zA-Z0-9_\-\.]{1,100}$/.test(t1) == false || t1 == '.') {
+                that.showError('仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，且长度为1~100个字符');
+                return false;
+            };
+        };
+        if (action == 'gitee') {
+            let t2 = RepositoryName.trim();
+            if (/^[a-zA-Z][a-zA-Z0-9_\-\.]{1,191}$/.test(t2) == false) {
+                that.showError('仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，必须以字母开头，且长度为2~191个字符');
+                return false;
+            };
         };
         return true;
+    };
+
+    async isOAuth() {
+        try{
+            let giteeOAuthInfo = await giteeOAuth.readLocalToken();
+            console.log('aaaaa', this.giteeOAuthInfo)
+            if (giteeOAuthInfo.status == 'success-authorize') {
+                this.giteeInfo = giteeOAuthInfo;
+                let {orgs, login} = giteeOAuthInfo;
+                if (orgs.length && Array.isArray(orgs)) {
+                    let orgs_list = orgs.map(item => {if(item != login) {return item} });
+                    this.giteeOrgs = orgs_list.join(' ');
+                };
+            };
+        }catch(e){};
+
+        try{
+            let githubOAuthInfo = await githubOAuth.readLocalToken();
+            console.log('aaaaa', this.githubOAuthInfo)
+            if (githubOAuthInfo.status == 'success-authorize') {
+                this.githubInfo = githubOAuthInfo;
+                let orgs2 = githubOAuthInfo.orgs;
+                if (orgs2.length && Array.isArray(orgs2)) {
+                    this.githubOrgs = orgs2.join(' ');
+                };
+            };
+        }catch(e){};
     };
 
     /**
@@ -113,51 +162,140 @@ class gitInitAfterSetting {
      * @param {Object} formData
      */
     getFormItems(preFillData={}, action='ManualInput', formData) {
-        let {local_email, local_username, projectName, projectPath, repo_url} = preFillData;
-        let formItems = [];
-        // let formItems = [{
-        //         type: "radioGroup",name: "action", "value": action,
-        //         items: [
-        //             {"label": "手动输入仓库地址", "id": "ManualInput"},{"label": "托管到Github", "id": "github"},{"label": "托管到Gitee", "id": "gitee"}
-        //         ]
-        //     }
-        // ];
-        // if (fs.existsSync(projectPath)) {
-        //     let displayProjectPath = projectPath;
-        //     if (displayProjectPath.length > 50) {
-        //         displayProjectPath = displayProjectPath.slice(0, 50) + "......";
-        //     };
-        //     formItems.push({type: "label",name: "remark_1",text: `本地路径 ${displayProjectPath}`});
-        // };
-        if (action == 'ManualInput') {
-            let mi_info = [{type: "input",name: "RepositoryURL",label: "仓库地址",placeholder: '请添加的仓库地址，以https://或git@开头',value: ''},
-            {type: "input",name: "new_username",label: "user.name",placeholder: "user.name", value: local_username},
-            {type: "input",name: "new_email",label: "user.email",placeholder: "user.email，比如xxx@xx.com", value: local_email},
-            {type: "label",name: "remark_desc_1",text: '<span style="color: #a0a0a0; font-size: 12px;">1. 若无仓库，可到<a href="https://github.com">Github</a>、<a href="https://gitee.com/">Gitee</a>等托管服务器创建仓库获取仓库URL。</span>'},
-            {type: "label",name: "remark_desc_2",text: "<span style='color: #a0a0a0; font-size: 12px;'>2. user.name和user.email用于身份标识，每个 Git 提交都会使用这些信息，它们会写入到每一次提交中。</span>"}];
-            formItems = [...formItems, ...mi_info];
-        };
-        if (action == "github") {};
-        if (action == "gitee") {};
+        let {local_email, local_username, projectName, projectPath} = preFillData;
 
         let title = projectName ? 'Git仓库设置' + ' - ' + projectName : 'Git仓库设置';
         let subtitle = fs.existsSync(projectPath) ? `<span style="color: #a0a0a0;font-size: 12px;">本地路径 ${projectPath}</span>`: '';
+        let footer = '<a href="https://easy-git.github.io/extensions/create-remote-repo">了解在HBuilderX内创建远程仓库</a>';
+        let RepositoryName = projectName ? projectName : '';
+
+        let tService = action;
+
+        var oauth_desc = `<span>您使用此功能之前，需要先授权插件访问 ${tService}。
+            <br/><br/>通过OAuth授权后，可以在本地操作远程Git服务器某些功能；比如无需再登录浏览器，直接在本地创建远程仓库。
+            <br/><br/>授权后Git访问凭证仅会存储在您的个人电脑上，不会上传网络，且本地信息已加密。
+            <br/><br/><span style="font-weight: 600;">点击【确定】按钮后，将跳转到浏览器 ${tService} 认证页面.</span></span><br/><br/>`;
+
+        let formItems = [{
+                type: "radioGroup",name: "action", "value": action,
+                items: [
+                    {"label": "手动输入仓库地址", "id": "ManualInput"}, {"label": "托管到Github.com", "id": "github"}, {"label": "托管到Gitee.com", "id": "gitee"}
+                ]
+            }
+        ];
+        let service_items = [
+            {type: "input",name: "RepositoryName",label: "仓库名称",placeholder: '英文字母或数字, 比如abc',value: RepositoryName},
+            {type: "input",name: "owner",label: "归属组织",placeholder: '可选；不填写，则为默认组织',value: ''},
+            {type: "label",name: "blank_line_1",text: ""},
+            {type: "checkBox",name: "isPrivate",label: "是否私有；私有，仅仓库成员可见；公开，则所有人可见", value: true},
+            {type: "label",name: "blank_line_2",text: ""},
+            {type: "checkBox",name: "isAddRemoteOrigin",label: `远程仓库创建成功后，并给本地项目 ${this.projectName} 添加到远程仓库URL，即执行 git add remote origin url`, value: true},
+            {type: "label",name: "blank_line_3",text: ""},
+        ];
+
+        if (action == 'ManualInput') {
+            let mi_info = [
+                {type: "input",name: "RepositoryURL",label: "仓库地址",placeholder: '请添加的仓库地址，以https://或git@开头',value: ''},
+                {type: "input",name: "new_username",label: "user.name",placeholder: "user.name", value: local_username},
+                {type: "input",name: "new_email",label: "user.email",placeholder: "user.email，比如xxx@xx.com", value: local_email},
+                {type: "label",name: "remark_desc_1",text: '<span style="color: #a0a0a0; font-size: 12px;"><br/>1. 若无仓库，可到<a href="https://github.com">Github</a>、<a href="https://gitee.com/">Gitee</a>等托管服务器创建仓库获取仓库URL。</span>'},
+                {type: "label",name: "remark_desc_2",text: "<span style='color: #a0a0a0; font-size: 12px;'>2. user.name和user.email用于身份标识，每个 Git 提交都会使用这些信息，它们会写入到每一次提交中。<br/></span>"}
+            ];
+            formItems = [...formItems, ...mi_info];
+        };
+        if (action == 'gitee') {
+            if (this.giteeInfo && typeof this.giteeInfo == "object") {
+                if (this.giteeOrgs) {
+                    service_items.splice(2, 0, {type: "label",name: "gitee_orgs_desc",text: `<span style='color: #a0a0a0; font-size: 12px;'>Gitee上，除默认组织，其它用户组织为: ${this.giteeOrgs} </span>`})
+                };
+                formItems = [...formItems, ...service_items];
+            } else {
+                formItems.push({type: "label",name: "blank_line_10",text: ""});
+                formItems.push({type: "label",name: "oauth_desc_gitee",text: oauth_desc});
+            };
+            footer = '<a href="https://easy-git.github.io/oauth">了解OAuth详情</a>';
+        };
+        if (action == "github") {
+            if (this.githubInfo && typeof this.githubInfo == "object") {
+                if (this.githubOrgs) {
+                    service_items.splice(2, 0, {type: "label",name: "github_orgs_desc",text: `<span style='color: #a0a0a0; font-size: 12px;'>Github上，除默认组织，其它用户组织为: ${this.githubOrgs} </span>`})
+                };
+                formItems = [...formItems, ...service_items];
+            } else {
+                formItems.push({type: "label",name: "blank_line_10",text: ""});
+                formItems.push({type: "label",name: "oauth_desc_github",text: oauth_desc});
+            };
+            footer = '<a href="https://easy-git.github.io/oauth">了解OAuth详情</a>';
+        };
+
         return {
             title: title,
             subtitle: subtitle,
             width: 400,
             height: 320,
-            footer: '<a href="https://easy-git.github.io/extensions/create-remote-repo">了解在HBuilderX内创建远程仓库</a>',
+            footer: footer,
             formItems: formItems,
         };
     };
 
+    async view(preFillData, action='ManualInput') {
+        let that = this;
+        let setInfo = await hx.window.showFormDialog({
+            submitButtonText: "确定(&S)",
+            cancelButtonText: "取消(&C)",
+            validate: function(formData) {
+                let checkResult = that.goValidate(formData, this);
+                return checkResult;
+            },
+            onChanged: function (field, value, formData) {
+                this.showError('');
+                if (field == "action") {
+                    this.updateForm(that.getFormItems(preFillData, value, formData));
+                }
+            },
+            ...that.getFormItems(preFillData, action)
+        }).then((res) => {
+            return res;
+        }).catch(error => {
+            console.log(error);
+        });
+        return setInfo;
+    };
+
+    // 跳转到认证
+    async gotoOAuth(action, ProjectInfo) {
+        if (action == 'gitee' && !this.giteeInfo) {
+            createOutputChannel(`正在打开 ${action} 进行认证........`, "success");
+            createOutputViewForHyperLinksForCommand(`如 ${action} 认证授权成功，请重新打开Git仓库设置窗口。`, "Git仓库设置", "success", "EasyGit.addRemoteOrigin", ProjectInfo);
+            giteeOAuth.authorize(true);
+            return;
+        };
+        if (action == 'github' && !this.githubInfo) {
+            createOutputChannel(`正在打开 ${action} 进行认证........`, "success");
+            createOutputChannel(`注意：认证之前，请确认本地可以正常访问Github。`, "info");
+            createOutputViewForHyperLinksForCommand(`如 ${action} 认证授权成功，请重新打开Git仓库设置窗口。`, "Git仓库设置", "success", "EasyGit.addRemoteOrigin", ProjectInfo);
+            githubOAuth.authorize(true);
+            return;
+        };
+        return true;
+    };
+
     async main(ProjectInfo) {
         // 获取项目信息
-        let { projectName, projectPath, repo_url } = ProjectInfo;
-        if (repo_url == undefined) {
-            repo_url = "";
+        let { projectName, projectPath, git_service } = ProjectInfo;
+        this.projectName = projectName;
+        this.projectPath = projectPath;
+        if (!['ManualInput', 'gitee', 'github'].includes(git_service)) {
+            git_service = "ManualInput";
         };
+
+        // 获取github和gitee认证信息
+        await this.isOAuth();
+
+        // 获取配置, 填充user.name和user.email
+        let configData = await gitConfigShow(projectPath, false);
+        gitUserName = configData['user.name'];
+        gitEmail = configData['user.email'];
 
         // 用于填充html中的email和username字段
         let local_username = '', local_email = '';
@@ -168,43 +306,64 @@ class gitInitAfterSetting {
             local_email = gitEmail;
         };
 
-        let preFillData = {local_email, local_username, projectName, projectPath, repo_url};
-
-        let that = this;
-        let setInfo = await hx.window.showFormDialog({
-            submitButtonText: "确定(&S)",
-            cancelButtonText: "取消(&C)",
-            validate: function(formData) {
-                let checkResult = that.goValidate(formData, this);
-                return checkResult;
-            },
-            onChanged: function (field, value, formData) {
-              if (field == "action") {
-                this.updateForm(that.getFormItems(preFillData, value, formData));
-              }
-            },
-            ...that.getFormItems(preFillData)
-        }).then((res) => {
-            return res;
-        }).catch(error => {
-            console.log(error);
-        });
-
+        // 打开Git设置窗口
+        let preFillData = {local_email, local_username, projectName, projectPath};
+        let setInfo = await this.view(preFillData, git_service);
         if (setInfo == undefined) return;
-        let {RepositoryURL, new_username, new_email} = setInfo;
+        let {action} = setInfo;
 
-        // 添加远程仓库
-        let addOriginResult = await gitAddRemoteOrigin(projectPath, RepositoryURL);
-        if (addOriginResult == 'success') {
-            createOutputChannel(`本地项目【${projectName}】，添加远程仓库地址成功。`, "success");
+        // 手动添加远程仓库
+        if (action == 'ManualInput') {
+            let {RepositoryURL, new_username, new_email} = setInfo;
+            let addOriginResult = await gitAddRemoteOrigin(projectPath, RepositoryURL);
+            if (addOriginResult == 'success') {
+                createOutputChannel(`本地项目【${projectName}】，添加远程仓库地址成功。`, "success");
+            } else {
+                return {"status": "fail"};
+            };
+            if (new_email != local_email) {
+                gitConfigSet(projectPath, {"key": "user.email", "value": new_email});
+            };
+            if (new_username != local_username) {
+                gitConfigSet(projectPath, {"key": "user.name", "value": new_username});
+            };
+            return {"status": "success"};
         };
+        if (['github', 'gitee'].includes(action)) {
+            let {RepositoryName, isPrivate, owner, isAddRemoteOrigin} = setInfo;
 
-        if (new_email != local_email) {
-            gitConfigSet(projectPath, {"key": "user.email", "value": new_email});
-        };
+            // oauth认证
+            let OauthStatus = await this.gotoOAuth(action, ProjectInfo);
+            if (!OauthStatus) return;
 
-        if (new_username != local_username) {
-            gitConfigSet(projectPath, {"key": "user.name", "value": new_username});
+            let CreateInfo = {
+                "name": RepositoryName,
+                "host": action,
+                "isPrivate": isPrivate,
+                "owner": owner
+            };
+            try{
+                count("CreateRemoteRepository_from_init");
+            }catch(e){};
+
+            try{
+                let createResult = await gitRepoCreate(CreateInfo);
+                if (createResult.status == 'success') {
+                    let {ssh_url, http_url} = createResult;
+                    if (!isAddRemoteOrigin) return;
+                    let addOriginResult = await gitAddRemoteOrigin(projectPath, http_url);
+                    if (addOriginResult == 'success') {
+                        createOutputChannel(`本地项目【${projectName}】，添加远程仓库地址成功。即执行git add remote origin ${http_url} 成功。`, "success");
+                        return {"status": "success"};
+                    } else {
+                        createOutputChannel(`本地项目【${projectName}】，添加远程仓库地址失败。即执行git add remote origin ${http_url} 失败。`, "error");
+                    };
+                } else {
+                    let innerParams = Object.assign(ProjectInfo, {"easyGitInner": true, "git_service": action});
+                    hx.commands.executeCommand("EasyGit.addRemoteOrigin", innerParams)
+                };
+            }catch(e){console.error(e)};
+            return {"status": "fail"};
         };
     };
 };

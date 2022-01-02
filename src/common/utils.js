@@ -447,17 +447,21 @@ async function getFilesExplorerProjectInfo() {
  * @param {String} message
  * @param {String} linkText
  */
-function createOutputViewForHyperLinksForCommand(message, linkText, commandName, commandParam={}) {
+function createOutputViewForHyperLinksForCommand(message, linkText, level="info", commandName, commandParam={}) {
     let outputView = hx.window.createOutputView({
         name: "easy-git",
         id: ""
     });
     outputView.show();
 
+    if (!["success", "error", "info"].includes(level)) {
+        level = "info";
+    };
+
     let msg = message;
     outputView.appendLine({
         line: msg + linkText,
-        level: "info",
+        level: level,
         hyperlinks:[
             {
                 linkPosition: {
@@ -762,7 +766,7 @@ async function gitInit(projectPath, projectName) {
         } catch(e) {};
 
         if (status == 'success') {
-            createOutputChannel(`项目【${projectName}】初始化存储库成功！\n`, 'success');
+            createOutputChannel(`项目【${projectName}】初始化存储库成功！`, 'success');
         };
         return status;
     } catch(e) {
@@ -2746,7 +2750,7 @@ async function gitRepositoryUrl(projectPath) {
 /**
  * @description 新建文件、写入文件内容保存，并在hx打开
  */
-async function FileWriteAndOpen(filename, filecontent){
+async function FileWriteAndOpen(filename, filecontent, isOpen=true){
     let appDataDir = hx.env.appData;
     let EasyGitDir = path.join(appDataDir, 'easy-git');
     let status = fs.existsSync(EasyGitDir);
@@ -2756,7 +2760,9 @@ async function FileWriteAndOpen(filename, filecontent){
     let fpath = path.join(EasyGitDir, filename);
     fs.writeFile(fpath, filecontent, function (err) {
        if (err) throw err;
-       hx.workspace.openTextDocument(fpath);
+       if (isOpen) {
+           hx.workspace.openTextDocument(fpath);
+       };
     });
 };
 
