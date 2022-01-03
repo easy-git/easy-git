@@ -18,7 +18,7 @@ const osName = os.platform();
 
 let USERHOME = osName == 'darwin'
     ? process.env.HOME
-    : USERHOME = path.join(process.env.HOMEDRIVE, process.env.HOMEPATH);
+    : path.join(process.env.HOMEDRIVE, process.env.HOMEPATH);
 
 let SSHDIR = path.join(USERHOME, '.ssh');
 let ssh_config_file = path.join(SSHDIR, 'config');
