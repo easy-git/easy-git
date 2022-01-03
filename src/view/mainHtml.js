@@ -7,7 +7,12 @@ const osName = os.platform();
 const vueFile = path.join(__dirname, 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
 const mainCssFile = path.join(__dirname, 'static', 'main.css');
-const gitTTFFile = path.join(__dirname, 'static', 'font' ,'git.ttf');
+
+let gitTTFFile = path.join(__dirname, 'static', 'font' ,'git.ttf');
+// windows路径处理
+if ( osName != 'darwin') {
+    gitTTFFile = gitTTFFile.replace(/\\/g, '/');
+};
 
 /**
  * hbuilderx.onDidReceiveMessage接收的事件

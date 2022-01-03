@@ -10,8 +10,13 @@ const vueFile = path.join(path.resolve(__dirname, '..'), 'static', '','vue.min.j
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
 const diff2htmlCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'diff2html.min.css');
 const gitDiffCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'git-diff.css');
-const ttfFile = path.join(path.resolve(__dirname, '..'), 'static', 'font' ,'diff.ttf');
 
+let ttfFile = path.join(path.resolve(__dirname, '..'), 'static', 'font' ,'diff.ttf');
+// windows路径处理
+const osName = os.platform();
+if ( osName != 'darwin') {
+    ttfFile = ttfFile.replace(/\\/g, '/');
+};
 
 /**
  * @description 获取图标、各种颜色
