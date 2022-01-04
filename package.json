@@ -85,6 +85,7 @@
         "onCommand:EasyGit.archive",
         "onCommand:EasyGit.reflog",
         "onCommand:EasyGit.annotate",
+        "onCommand:EasyGit.grep",
         "onCommand:EasyGit.showAnotherBranchFile",
         "onCommand:EasyGit.showHashFile",
         "onCommand:EasyGit.openGitRepositoryInBrowser",
@@ -137,6 +138,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Git某些操作，语音播报执行结果（仅限MacOSX操作系统, 修改后重启编辑器生效)。"
+                },
+                "EasyGit.isShowGrepMenu": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "项目管理器，是否显示Git grep菜单；默认显示。"
                 },
                 "EasyGit.VoiceBroadcastLanguage": {
                     "type": "string",
@@ -207,10 +213,6 @@
                 "title": "easy-git: ssh-keygen 生成SSH KEY"
             },
             {
-                "command": "EasyGit.clone",
-                "title": "easy-git: clone - 克隆"
-            },
-            {
                 "command": "EasyGit.main",
                 "title": "easy-git: 视图 - 源代码管理"
             },
@@ -223,220 +225,244 @@
                 "title": "easy-git: 视图 - 日志log"
             },
             {
+                "command": "EasyGit.clone",
+                "title": "git clone - 克隆"
+            },
+            {
                 "command": "EasyGit.init",
-                "title": "easy-git: init - 初始化仓库"
+                "title": "git init - 初始化仓库"
             },
             {
                 "command": "EasyGit.openGitRepositoryInBrowser",
-                "title": "easy-git: 在浏览器查看Git仓库(URL)"
+                "title": "git 在浏览器查看Git仓库(URL)"
             },
             {
                 "command": "EasyGit.addRemoteOrigin",
-                "title": "easy-git: remote add origin url - 关联/添加远程仓库url"
+                "title": "git remote add origin url - 关联/添加远程仓库url"
             },
             {
                 "command": "EasyGit.RemoteRmOrigin",
-                "title": "easy-git: remote rm origin - 删除远程仓库url"
+                "title": "git remote rm origin - 删除远程仓库url"
             },
             {
                 "command": "EasyGit.pull",
-                "title": "easy-git: pull - 拉取"
+                "title": "git pull - 拉取"
             },
             {
                 "command": "EasyGit.pullRebase",
-                "title": "easy-git: pull --rebase - 拉取"
+                "title": "git pull --rebase - 拉取"
             },
             {
                 "command": "EasyGit.pullRebaseAutostash",
-                "title": "easy-git: pull --rebase --autostash"
+                "title": "git pull --rebase --autostash"
             },
             {
                 "command": "EasyGit.fetch",
-                "title": "easy-git: fetch - 抓取"
+                "title": "git fetch - 抓取"
             },
             {
                 "command": "EasyGit.push",
-                "title": "easy-git: push - 推送"
+                "title": "git push - 推送"
             },
             {
                 "command": "EasyGit.pushForce",
-                "title": "easy-git: push --force - 强制推送"
+                "title": "git push --force - 强制推送"
             },
             {
                 "command": "EasyGit.pushForceWithLease",
-                "title": "easy-git: push --force-with-lease - 安全性的强制推送"
+                "title": "git push --force-with-lease - 安全性的强制推送"
             },
             {
                 "command": "EasyGit.pushNoVerify",
-                "title": "easy-git: push --no-verify - 绕过验证推送"
+                "title": "git push --no-verify - 绕过验证推送"
             },
             {
                 "command": "EasyGit.add",
-                "title": "easy-git: add - 添加文件到暂存区"
+                "title": "git add - 添加文件到暂存区"
             },
             {
                 "command": "EasyGit.commit",
-                "title": "easy-git: commit 提交代码"
+                "title": "git commit 提交代码"
             },
             {
                 "command": "EasyGit.commitAmend",
-                "title": "easy-git: commit --amend 修改最后提交的commit消息"
+                "title": "git commit --amend 修改最后提交的commit消息"
             },
             {
                 "command": "EasyGit.resetSoftLastCommit",
-                "title": "easy-git: reset --soft HEAD^ - 撤销上次commit，即重置代码到工作区"
+                "title": "git reset --soft HEAD^ - 撤销上次commit，即重置代码到工作区"
             },
             {
                 "command": "EasyGit.resetHard",
-                "title": "easy-git: reset --hard HEAD - 重置当前所有修改"
+                "title": "git reset --hard HEAD - 重置当前所有修改"
             },
             {
                 "command": "EasyGit.resetHardLastCommit",
-                "title": "easy-git: reset --hard HEAD^ - 重置代码到上次提交"
+                "title": "git reset --hard HEAD^ - 重置代码到上次提交"
             },
             {
                 "command": "EasyGit.resetHardCommitID",
-                "title": "easy-git: reset --hard commitID - 重置代码到指定提交"
+                "title": "git reset --hard commitID - 重置代码到指定提交"
             },
             {
                 "command": "EasyGit.restore",
-                "title": "easy-git: restore - 撤消对文件的修改"
+                "title": "git restore - 撤消对文件的修改"
             },
             {
                 "command": "EasyGit.checkoutFile",
-                "title": "easy-git: checkout -- filename - 撤消对文件的修改"
+                "title": "git checkout -- filename - 撤消对文件的修改"
             },
             {
                 "command": "EasyGit.restoreStaged",
-                "title": "easy-git: restore --staged - 撤销(取消)暂存"
+                "title": "git restore --staged - 撤销(取消)暂存"
             },
             {
                 "command": "EasyGit.revert",
-                "title": "easy-git: revert - 还原指定commit"
+                "title": "git revert - 还原指定commit"
             },
             {
                 "command": "EasyGit.clean",
-                "title": "easy-git: clean -df - 删除全部未跟踪的文件"
+                "title": "git clean -df - 删除全部未跟踪的文件"
             },
             {
                 "command": "EasyGit.pushSetUpstream",
-                "title": "easy-git: push --set-upstream - 本地分支追踪远程分支"
+                "title": "git push --set-upstream - 本地分支追踪远程分支"
             },
             {
                 "command": "EasyGit.BranchSwitch",
-                "title": "easy-git: branch switch - 分支切换"
+                "title": "git branch switch - 分支切换"
             },
             {
                 "command": "EasyGit.BranchDelete",
-                "title": "easy-git: branch delete - 分支删除"
+                "title": "git branch delete - 分支删除"
             },
             {
                 "command": "EasyGit.BranchRename",
-                "title": "easy-git: branch -m - 重命名当前分支"
+                "title": "git branch -m - 重命名当前分支"
             },
             {
                 "command": "EasyGit.BranchCreate",
-                "title": "easy-git: branch create - 创建分支"
+                "title": "git branch create - 创建分支"
             },
             {
                 "command": "EasyGit.merge",
-                "title": "easy-git: branch merge - 分支合并"
+                "title": "git branch merge - 分支合并"
             },
             {
                 "command": "EasyGit.mergeAbort",
-                "title": "easy-git: branch merge abort - 分支合并取消"
+                "title": "git branch merge abort - 分支合并取消"
             },
             {
                 "command": "EasyGit.BranchDiff",
-                "title": "easy-git: diff branch - 对比两个分支提交"
+                "title": "git diff branch - 对比两个分支提交"
             },
             {
                 "command": "EasyGit.twoBranchSpecificFileDiff",
-                "title": "easy-git: diff branch file - 显示两个分支指定文件的差异"
+                "title": "git diff branch file - 显示两个分支指定文件的差异"
             },
             {
                 "command": "EasyGit.cherryPick",
-                "title": "easy-git: cherry-pick"
+                "title": "git cherry-pick"
             },
             {
                 "command": "EasyGit.stash",
-                "title": "easy-git: stash - 储藏"
+                "title": "git stash - 储藏"
             },
             {
                 "command": "EasyGit.stashAll",
-                "title": "easy-git: stash -a - 储藏全部(包含未跟踪的)"
+                "title": "git stash -a - 储藏全部(包含未跟踪的)"
             },
             {
                 "command": "EasyGit.stashPop",
-                "title": "easy-git: stash pop - 弹出储藏..."
+                "title": "git stash pop - 弹出储藏..."
             },
             {
                 "command": "EasyGit.stashPopNew",
-                "title": "easy-git: stash pop new - 弹出最新储藏..."
+                "title": "git stash pop new - 弹出最新储藏..."
             },
             {
                 "command": "EasyGit.stashClear",
-                "title": "easy-git: stash clear - 删除所有储藏..."
+                "title": "git stash clear - 删除所有储藏..."
             },
             {
                 "command": "EasyGit.stashShow",
-                "title": "easy-git: stash show - 查看储藏内容"
+                "title": "git stash show - 查看储藏内容"
             },
             {
                 "command": "EasyGit.gitBlameForLineChange",
-                "title": "easy-git: blame - 显示当前行最后一次修改信息"
+                "title": "git blame - 显示当前行最后一次修改信息"
             },
             {
                 "command": "EasyGit.tagCreate",
-                "title": "easy-git: tag create - 标签创建"
+                "title": "git tag create - 标签创建"
             },
             {
                 "command": "EasyGit.tagDetails",
-                "title": "easy-git: tag - 标签查看列表、及详情"
+                "title": "git tag - 标签查看列表、及详情"
             },
             {
                 "command": "EasyGit.tagDelete",
-                "title": "easy-git: tag -d - 标签删除"
+                "title": "git tag -d - 标签删除"
             },
             {
                 "command": "EasyGit.diffFile",
-                "title": "easy-git: diff file - 文件对比差异"
+                "title": "git diff file - 文件对比差异"
             },
             {
                 "command": "EasyGit.archive",
-                "title": "easy-git: archive - 归档"
+                "title": "git archive - 归档"
+            },
+            {
+                "command": "EasyGit.grep",
+                "title": "git grep"
             },
             {
                 "command": "EasyGit.reflog",
-                "title": "easy-git: reflog - 救命神器"
+                "title": "git reflog - 救命神器"
             },
             {
                 "command": "EasyGit.annotate",
-                "title": "easy-git: annotate - 用提交信息标注文件中的每一行"
+                "title": "git annotate - 用提交信息标注文件中的每一行"
             },
             {
                 "command": "EasyGit.showAnotherBranchFile",
-                "title": "easy-git: show branch:file - 查看文件在另一个分支的内容（无需切换分支）"
+                "title": "git show branch:file - 查看文件在另一个分支的内容（无需切换分支）"
             },
             {
                 "command": "EasyGit.showHashFile",
-                "title": "easy-git: show commitID:file - 查看文件的历史提交版本内容"
+                "title": "git show commitID:file - 查看文件的历史提交版本内容"
             },
             {
                 "command": "EasyGit.showConfigLocal",
-                "title": "easy-git: config --list --local - 查看仓库配置"
+                "title": "git config --list --local - 查看仓库配置"
             },
             {
                 "command": "EasyGit.showConfigGlobal",
-                "title": "easy-git: config --list --global - 查看用户配置"
+                "title": "git config --list --global - 查看用户配置"
             },
             {
                 "command": "EasyGit.showConfigSystem",
-                "title": "easy-git: config --list --system - 查看系统配置"
+                "title": "git config --list --system - 查看系统配置"
             },
             {
                 "command": "EasyGit.showConfigAll",
-                "title": "easy-git: config --show-origin - 查看所有配置信息及所在文件"
+                "title": "git config --show-origin - 查看所有配置信息及所在文件"
+            },
+            {
+                "command": "EasyGit.setEncodingForQuote",
+                "title": "git config --global core.quotepath false - 设置中文编码"
+            },
+            {
+                "command": "EasyGit.setI18nLogoutputencoding",
+                "title": "git config --global i18n.logoutputencoding utf-8 - 设置log编码"
+            },
+            {
+                "command": "EasyGit.CommandListForDiff",
+                "title": "git diff - 更多对比操作"
+            },
+            {
+                "command": "EasyGit.CommandPanel",
+                "title": "easy-git: 打开命令面板"
             },
             {
                 "command": "EasyGit.setGitingore",
@@ -451,36 +477,20 @@
                 "title": "easy-git: config - 设置user.name和user.email"
             },
             {
-                "command": "EasyGit.setEncodingForQuote",
-                "title": "easy-git: config --global core.quotepath false - 设置中文编码"
-            },
-            {
-                "command": "EasyGit.setI18nLogoutputencoding",
-                "title": "easy-git: config --global i18n.logoutputencoding utf-8 - 设置log编码"
-            },
-            {
-                "command": "EasyGit.CommandPanel",
-                "title": "easy-git: 打开命令面板"
-            },
-            {
-                "command": "EasyGit.CommandListForDiff",
-                "title": "easy-git: diff - 更多对比操作"
-            },
-            {
                 "command": "EasyGit.set",
-                "title": "easy-git插件设置"
+                "title": "easy-git: 插件设置"
             },
             {
                 "command": "EasyGit.keyboard",
-                "title": "easy-git打开快捷键帮助文档"
+                "title": "easy-git: 打开快捷键帮助文档"
             },
             {
                 "command": "EasyGit.help",
-                "title": "easy-git帮助文档"
+                "title": "easy-git: 帮助文档"
             },
             {
                 "command": "EasyGit.checkUpdate",
-                "title": "easy-git检查更新"
+                "title": "easy-git: 检查更新"
             },
             {
                 "command": "EasyGit.about",
@@ -529,6 +539,15 @@
                 }
             ],
             "explorer/context": [
+                {
+                    "command": "EasyGit.grep",
+                    "title": "git grep 在Git仓库中查找字符串",
+                    "when": "isGit && config.EasyGit.isShowGrepMenu",
+                    "group": "cutcopy"
+                },
+                {
+                    "group": "cutcopy"
+                },
                 {
                     "group": "z_commands"
                 },

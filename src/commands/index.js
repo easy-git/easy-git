@@ -25,6 +25,7 @@ const gitBlameForLineChange = require('./blame.js');
 const gitAnnotate = require('./annotate.js');
 
 const gitConfig = require('./gitConfig.js');
+const gitGrep = require('./grep.js');
 
 /**
  * @description 提供webview视图外Git的操作
@@ -83,7 +84,7 @@ async function action(param, action_name) {
         let gitCountList = [
             "init",
             "add", "RemoteRmOrigin","commit", "commitAmend",
-            "cherryPick",
+            "cherryPick", "grep",
             "BranchDiff", "twoBranchSpecificFileDiff", "BranchSwitch", "BranchMerge",
             "annotate", "BlameForLineChange",
             "stash", "stashAll",
@@ -101,8 +102,13 @@ async function action(param, action_name) {
             gitInitProject(ProjectInfo);
             break;
         case 'addRemoteOrigin':
+            let remoteParam = Object.assign(ProjectInfo);
+            let {git_service} = param;
+            if (git_service) {
+                remoteParam = Object.assign(ProjectInfo, {"git_service": git_service});
+            };
             let aro = new gitInitAfterSetting();
-            aro.main(ProjectInfo);
+            aro.main(remoteParam);
             break;
         case 'RemoteRmOrigin':
             utils.gitRmRemoteOrigin(projectPath, projectName);
@@ -245,6 +251,10 @@ async function action(param, action_name) {
             break;
         case 'BlameForLineChange':
             gitBlameForLineChange(projectPath, selectedFile);
+            break;
+        case 'grep':
+            let gp = new gitGrep(ProjectInfo);
+            gp.main();
             break;
         case 'tagCreate':
             let { hash } = param;

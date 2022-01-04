@@ -433,9 +433,15 @@ function activate(context) {
 
     // git blame: show line last change info
     let ForLineChange = hx.commands.registerCommand('EasyGit.gitBlameForLineChange', (param)=> {
-        git.action(param, 'BlameForLineChange')
+        git.action(param, 'BlameForLineChange');
     });
     context.subscriptions.push(ForLineChange);
+
+    // git grep
+    let grep = hx.commands.registerCommand('EasyGit.grep', (param) => {
+        git.action(param, 'grep');
+    });
+    context.subscriptions.push(grep);
 
     // git tag create
     let tagCreate = hx.commands.registerCommand('EasyGit.tagCreate', (param)=> {
