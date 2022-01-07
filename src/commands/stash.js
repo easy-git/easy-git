@@ -8,28 +8,50 @@ const {
     applyEdit
 } = require('../common/utils.js');
 
+
 /**
  * @description 储藏
  */
-async function goStash(ProjectInfo, option, stashMsg) {
-    let msg = option == '-a' ? '消息必填' : '消息选填';
-    let inputResult = await hx.window.showInputBox({
-        prompt: "stash - 储藏消息",
-        placeHolder: msg
-    }).then((result)=>{
-        return result
+async function goStash(ProjectInfo, option) {
+    ProjectInfo.easyGitInner = true;
+    let isStashALL = option == '-a' ? true : false;
+
+    let setInfo = await hx.window.showFormDialog({
+        title: "Git Stash - 储藏",
+        subtitle: "git stash 能够将所有未提交的修改保存至堆栈中，用于后续恢复当前工作目录",
+        submitButtonText: "确定(&S)",
+        cancelButtonText: "取消(&C)",
+        width: 400,
+        height: 210,
+        validate: function(formData) {
+            let {message} = formData;
+            if (message.replace(/(^\s*)|(\s*$)/g, "") == '') {
+                this.showError(`储藏消息不能为空！`);
+                return false;
+            };
+            return true;
+        },
+        formItems:[
+            {type: "input",name: "message",label: "储藏消息",placeholder: "必填，请输入储藏消息"},
+            {type: "checkBox",name: "isAll",label: "是否储藏全部，包含未跟踪的文件", value: isStashALL},
+            {type: "label",name: "blank_line_0",text: ""}
+        ]
+    }).then((res) => {
+        return res;
+    }).catch(error => {
+        console.log(error);
     });
 
-    ProjectInfo.easyGitInner = true;
-    let options = [];
-    if (inputResult != '' && inputResult) {
-        if (option == '-a') {
-            options = ['save', '-a', inputResult]
-        } else {
-            options = ['save', inputResult]
+    if (!setInfo) return;
+    let {message, isAll} = setInfo;
+
+    if (message) {
+        let options = ['save', message];
+        if (isAll) {
+            options = ['save', '-a', message]
         };
+        await gitStash(ProjectInfo, options, "git stash 储藏");
     };
-    gitStash(ProjectInfo, options, stashMsg);
 };
 
 /**
