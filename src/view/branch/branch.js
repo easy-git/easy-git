@@ -8,6 +8,7 @@ const hx = require('hbuilderx');
 
 let utils = require('../../common/utils.js');
 const { Branch } = require('../../commands/ref.js');
+const { gitInitAfterSetting } = require('../../commands/repository_init.js');
 
 const icon = require('../static/icon.js');
 const getWebviewBranchContent = require('./html.js')
@@ -396,7 +397,7 @@ async function GitBranchView(webviewPanel, userConfig, projectData) {
                 };
                 break;
             case 'publish':
-                goPublish(projectPath, msg);
+                goPublish(msg);
                 break;
             case 'fetch':
                 fetch(projectPath,msg.text);
@@ -465,12 +466,16 @@ async function GitBranchView(webviewPanel, userConfig, projectData) {
     });
 
     // git publish
-    async function goPublish(projectPath, msg) {
+    async function goPublish(msg) {
         let branchName = msg.text;
-        let pushStatus = await utils.gitAddRemoteOrigin(projectPath, branchName);
-        if (pushStatus == 'success') {
-            Branch.LoadingBranchView();
-        };
+        let tmp = {"projectName": projectName, "projectPath": projectPath, "easyGitInner": true };
+        try{
+            let aro = new gitInitAfterSetting();
+            let pushStatus =  await aro.main(tmp);
+            if (pushStatus.status == 'success') {
+                Branch.LoadingBranchView();
+            };
+        }catch(e){};
     };
 
     // git fetch

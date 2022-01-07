@@ -6,9 +6,11 @@ const { debounce } = require('throttle-debounce');
 
 const hx = require('hbuilderx');
 
-const file = require('../common/file.js');
-const gitAction = require('../commands/index.js');
 let utils = require('../common/utils.js');
+const file = require('../common/file.js');
+
+const { gitInitAfterSetting } = require('../commands/repository_init.js');
+const gitAction = require('../commands/index.js');
 
 const icon = require('./static/icon.js');
 const html = require('./mainHtml.js')
@@ -663,15 +665,14 @@ class GitFile {
 
     // Git: publish
     async goPublish(msg) {
-        let branchName = msg.text;
-        let pushStatus = await utils.gitAddRemoteOrigin(this.projectPath);
-        if (pushStatus == 'success') {
-            // let AssociationResult = await utils.gitLocalBranchToRemote(this.projectPath, branchName);
-            // if (AssociationResult) {
-            //     this.refreshFileList();
-            // };
-            this.refreshFileList();
-        };
+        let tmp = {"projectName": this.projectName, "projectPath": this.projectPath, "easyGitInner": true };
+        try{
+            let aro = new gitInitAfterSetting();
+            let pushStatus =  await aro.main(tmp);
+            if (pushStatus.status == 'success') {
+                this.refreshFileList();
+            };
+        }catch(e){};
     };
 
     // Git: sync git behind and git ahead
