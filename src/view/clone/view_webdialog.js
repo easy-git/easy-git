@@ -103,7 +103,9 @@ async function openGithubSearch(word, webviewDialog, webview) {
         if ( items.length == 0) {
             webviewDialog.displayError("Github搜索，没有搜索到结果。")
             return data;
-        };
+        } else {
+            hx.window.setStatusBarMessage(`easy-git: github搜索 ${word} 成功。`, 500000, 'success');
+        }
         data.ssh = items.map( x => x["ssh_url"]);
         data.https = items.map( x => x["clone_url"]);
         webview.postMessage({command: 'githubSearchResult',data: data});
