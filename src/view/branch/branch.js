@@ -431,6 +431,9 @@ async function GitBranchView(webviewPanel, userConfig, projectData) {
             case 'BranchMerge':
                 Branch.merge(msg.from,msg.to);
                 break;
+            case 'openBranchMerge':
+                hx.commands.executeCommand('EasyGit.merge', currentProjectData);
+                break;
             case 'BranchDiff':
                 hx.commands.executeCommand('EasyGit.BranchDiff', currentProjectData);
                 break;

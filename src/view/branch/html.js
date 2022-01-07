@@ -185,6 +185,13 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                         @click="gitMergeBranch(item.name);">
                                         ${MergeIcon}
                                     </span>
+                                    <span
+                                        class="ml-1"
+                                        v-if="currentBranch == item.name"
+                                        title="选择分支进行合并"
+                                        @click="gitOpenMergeBranch();">
+                                        ${MergeIcon}
+                                    </span>
                                 </div>
                             </li>
                         </ul>
@@ -503,6 +510,11 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             command: 'BranchMerge',
                             from: select,
                             to: this.currentBranch
+                        });
+                    },
+                    gitOpenMergeBranch() {
+                        hbuilderx.postMessage({
+                            command: 'openBranchMerge'
                         });
                     },
                     isShowLocalBranchList() {
