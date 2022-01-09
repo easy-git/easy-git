@@ -27,6 +27,9 @@ const gitAnnotate = require('./annotate.js');
 const gitConfig = require('./gitConfig.js');
 const gitGrep = require('./grep.js');
 
+// 检查是否安装Git
+let isInstallGitForLocal;
+
 /**
  * @description 提供webview视图外Git的操作
  */
@@ -62,6 +65,17 @@ async function action(param, action_name) {
         'selectedFile': selectedFile,
         'easyGitInner': easyGitInner,
         'isFromGitView': isFromGitView
+    };
+
+    // 检查本机是否安装Git
+    isInstallGitForLocal = await utils.isGitInstalled();
+    if (!isInstallGitForLocal) {
+        hx.window.showErrorMessage('检测到您本机未安装Git命令行工具! 如已安装，还提示此错误，请重启HBuilderX。<a href="https://easy-git.github.io/home/git-install">安装教程</a>',['下载Git','关闭']).then((result) => {
+            if (result == '下载Git') {
+                hx.env.openExternal('https://git-scm.com/download');
+            };
+        });
+        return;
     };
 
     let action_list = ["init"];
