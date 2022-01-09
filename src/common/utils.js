@@ -1624,6 +1624,9 @@ async function gitBranchList(workingDir, options='-avvv') {
                 let branches = info.branches;
                 for (let s in branches) {
                     let name = branches[s]['name'];
+                    if (typeof(branches[s]) == 'function') {
+                        continue;
+                    };
                     if (name.startsWith('remotes/origin/')) {
                         let tmp = info.branches[s];
                         tmp.name = name.replace('remotes/', '');
