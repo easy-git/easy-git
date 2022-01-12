@@ -525,6 +525,11 @@
                 "key":"Ctrl+Shift+p",
                 "when":"expression.isShowSourceCode",
                 "macosx":"command+Shift+p"
+            },
+            {
+                "command":"EasyGit.clone",
+                "key":"Ctrl+Shift+c",
+                "macosx":"command+Shift+c"
             }
         ],
         "menus": {
