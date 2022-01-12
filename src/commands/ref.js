@@ -158,12 +158,12 @@ class Tag {
         if (tagName == undefined) return;
 
         let msg = `注意: 删除远端标签后，无法恢复。`;
-        let btns = ['删除本地', '同时删除本地和远端', '关闭'];
+        let btns = ['仅删除本地', '同时删除本地和远端', '关闭'];
         let selectedBtn = await hxShowMessageBox(`Git 删除标签 ${tagName}`, msg , btns).then(btnText => {
             return btnText;
         });
 
-        if (selectedBtn == '删除本地') {
+        if (selectedBtn == '仅删除本地') {
             gitTagDelete(this.projectPath, tagName);
         };
         if (selectedBtn == '同时删除本地和远端') {

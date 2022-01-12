@@ -48,9 +48,6 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
         projectPath,
         projectName,
         GitAssignAction,
-        localBranchList,
-        remoteBranchList,
-        TagsList,
         ahead,
         behind,
         tracking,
@@ -58,10 +55,6 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
         currentBranch
     } = gitBranchData;
 
-    let branchs = JSON.stringify(localBranchList);
-    remoteBranchList = JSON.stringify(remoteBranchList);
-
-    TagsList = JSON.stringify(TagsList.data);
     GitAssignAction = JSON.stringify(GitAssignAction);
 
     let originurlBoolean = originurl != undefined ? true : false;
@@ -242,7 +235,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                         <p class="mx-3 mb-1 major-title cursor-default">
                             <span @click="isShowTagList();">
                                 ${TagIcon}&nbsp;&nbsp;标签
-                                <span class="count-num" v-show="TagsList.length != 0">{{ TagsList.length }}</span>
+                                <span class="count-num">{{ TagsList.length }}</span>
                             </span>
                             <span v-if="!isShowTag" @click="isShowTagList();" class="is-show">显示</span>
                             <span v-else @click="isShowTagList();" class="is-show">隐藏</span>
@@ -369,12 +362,6 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     this.tracking = '${tracking}';
                     this.originurl = '${originurl}';
                     this.originurlBoolean = ${originurlBoolean};
-
-                    this.rawBranchList = ${branchs};
-                    this.BranchList = ${branchs};
-
-                    this.rawOriginBranchList = ${remoteBranchList};
-                    this.OriginBranchList = ${remoteBranchList};
                 },
                 mounted() {
                     let that = this;
@@ -384,8 +371,11 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
 
                     window.onload = function() {
                         setTimeout(function(){
-                            that.getTagsList();
                             that.receiveInfo();
+                            that.getBranchList();
+                        }, 300);
+                        setTimeout(function(){
+                            that.getTagsList();
                         }, 1500);
                     };
 
@@ -426,6 +416,16 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                     this.originurl = data.originurl;
                                 };
                             };
+                            if (msg.command == 'BranchList') {
+                                if (msg.data) {
+                                    let data = msg.data;
+                                    this.rawBranchList = data.localBranchList;
+                                    this.BranchList = data.localBranchList;
+
+                                    this.rawOriginBranchList = data.remoteBranchList;
+                                    this.OriginBranchList = data.remoteBranchList;
+                                };
+                            };
                             if (msg.command == 'TagList') {
                                 if (msg.data) {
                                     this.rawTagsList = msg.data;
@@ -442,6 +442,11 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     getTagsList() {
                         hbuilderx.postMessage({
                             command: 'TagList'
+                        });
+                    },
+                    getBranchList() {
+                        hbuilderx.postMessage({
+                            command: 'BranchList'
                         });
                     },
                     showBranchWindow() {

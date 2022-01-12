@@ -117,7 +117,7 @@ class GitBranch {
             'localBranchList': localBranchList,
             'remoteBranchList': remoteBranchList,
             'TagsList': {'data':[]}
-        }, {
+        },{
             'projectName': this.projectName,
             'projectPath': this.projectPath,
             'GitAssignAction': GitAssignAction,
@@ -141,6 +141,38 @@ class GitBranch {
         this.firstInit = false;
     };
 
+    /**
+     * @description 加载分支视图
+     */
+    async BranchList() {
+        if (this.webviewPanel) {
+            this.webviewPanel.webView.postMessage({
+                command: "animation"
+            });
+        };
+
+        // 获取分支数据
+        let {localBranchList, remoteBranchList} = await utils.gitBranchList(this.projectPath, '-avvv');
+
+        let currentBranch = '';
+        for (let s of localBranchList) {
+            if (s.current) {
+                currentBranch = s.name;
+                break;
+            };
+        };
+
+        let gitBranchData = {
+            'localBranchList': localBranchList,
+            'remoteBranchList': remoteBranchList
+        };
+
+        this.webviewPanel.webView.postMessage({
+           command: "BranchList",
+           data: gitBranchData
+        });
+    };
+
     // Git branch: switch
     async switch(branchInfo) {
         let {name,current} = branchInfo;
@@ -152,37 +184,15 @@ class GitBranch {
         };
         let switchStatus = await utils.gitBranchSwitch(this.projectPath,name);
         if (switchStatus == 'success') {
-            this.LoadingBranchView();
-        };
-    };
-
-    // Git branch: create
-    async create(info) {
-        let { newBranchName, ref } = info;
-        let data = Object.assign(
-            { 'projectPath': this.projectPath }, info
-        );
-        if (newBranchName == '') {
-            return hx.window.showErrorMessage('Git: 在输入框输入分支名称后，再点击创建。',['关闭']);
-        };
-        if (ref == undefined) {
-            let breachCreateStatus = await utils.gitBranchCreate(data);
-            if (breachCreateStatus == 'success') {
-                this.LoadingBranchView();
-            };
-        } else {
-            let breachCreateStatus = await utils.gitBranchCreate(data);
-            if (breachCreateStatus == 'success') {
-                this.LoadingBranchView();
-            };
+            this.BranchList();
         };
     };
 
     // Git branch: 推送本地的分支到远端
     async LocalToRemote(branchName) {
-        let toStatus = await utils.gitLocalBranchToRemote(this.projectPath,branchName);
+        let toStatus = await utils.gitLocalBranchToRemote(this.projectPath, branchName);
         if (toStatus == 'success') {
-            this.LoadingBranchView();
+            this.BranchList();
         };
     };
 
@@ -243,18 +253,17 @@ class GitBranch {
         let btn = await utils.hxShowMessageBox(title, delMsg, ['删除','关闭']).then((result) =>{
             return result;
         });
-        if (btn != '删除') {
-            return;
-        };
+        if (btn != '删除') return;
+
         if (branchName.includes('origin/')) {
             let delStatus1 = await utils.gitDeleteRemoteBranch(this.projectPath,branchName);
             if (delStatus1 == 'success') {
-                this.LoadingBranchView();
+                this.BranchList();
             };
         } else {
             let delStatus2 = await utils.gitDeleteLocalBranch(this.projectPath,branchName);
             if (delStatus2 == 'success') {
-                this.LoadingBranchView();
+                this.BranchList();
             };
         };
     };
@@ -270,7 +279,7 @@ class GitBranch {
             command: "TagList",
             data: data
         });
-    }
+    };
 
     // Git tag: create
     async TagCreate() {
@@ -402,6 +411,9 @@ async function GitBranchView(webviewPanel, userConfig, projectData) {
             case 'fetch':
                 fetch(projectPath,msg.text);
                 break;
+            case 'BranchList':
+                Branch.BranchList();
+                break;
             case 'BranchInfo':
                 if (msg.text == 'branch') {
                     if (originurl == undefined) {
@@ -418,9 +430,6 @@ async function GitBranchView(webviewPanel, userConfig, projectData) {
                 break;
             case 'BranchSwitch':
                 Branch.switch(msg.text);
-                break;
-            case 'BranchCreate':
-                Branch.create(msg);
                 break;
             case 'BranchCreateForExecuteCommand':
                 let BcParams = Object.assign({'ref': msg.refName, 'action': msg.action}, currentProjectData);
