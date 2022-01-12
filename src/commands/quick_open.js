@@ -46,7 +46,7 @@ async function quickOpen(param) {
         ...gitList
     ];
     let selected = await hx.window.showQuickPick(pickerList, {
-        'placeHolder': '请选择要打开的项目...'
+        'placeHolder': '请选择要打开的Git项目...'
     }).then( (res)=> {
         return res;
     });

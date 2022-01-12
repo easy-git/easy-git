@@ -530,10 +530,20 @@
                 "command":"EasyGit.clone",
                 "key":"Ctrl+Shift+c",
                 "macosx":"command+Shift+c"
+            },
+            {
+                "command": "EasyGit.quickOpenGitProject",
+                "key":"Ctrl+Shift+O",
+                "macosx":"command+Shift+O"
             }
         ],
         "menus": {
             "menubar/file": [
+                {
+                    "command": "EasyGit.quickOpenGitProject",
+                    "title": "快速选择打开Git项目...",
+                    "group": "tab"
+                },
                 {
                     "command": "EasyGit.clone",
                     "title": "Git克隆仓库",
