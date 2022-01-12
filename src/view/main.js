@@ -39,8 +39,7 @@ function getUIData() {
     // 文件图标
     let ttfFileName = explorerIconTheme == 'vs-seti' ? `${explorerIconTheme}.woff` : `${explorerIconTheme}.ttf`;
     let ttfFilePath = path.join(__dirname, 'static', 'file-icon', ttfFileName);
-    let ttfJSONFile = path.join(__dirname, 'static', 'file-icon', `${explorerIconTheme}.json`);
-    let ttfContent = require(ttfJSONFile);
+
 
     let cssName = `${explorerIconTheme}-${explorerIconScheme}.css`;
     let ttfCSSFilePath = path.join(__dirname, 'static', 'file-icon', cssName);
@@ -54,7 +53,9 @@ function getUIData() {
     let fListIcon = {"explorerIconTheme": explorerIconTheme, "ttfFile": ttfFilePath, "ttfCSSFilePath": ttfCSSFilePath ,"ttfOtherFile": ttfOtherFile};
     let flist = [];
 
-    // vs-stei没有文件夹图标，因此vs-stei图标单独取自other.ttf
+    // 文件夹图标: 2022-01-12 好像并没有什么用？暂时保留吧
+    let ttfJSONFile = path.join(__dirname, 'static', 'file-icon', `${explorerIconTheme}.json`);
+    let ttfContent = require(ttfJSONFile);
     for (let s of flist) {
         fListIcon[`${s}_ficon`] = ttfContent[`${s}_${explorerIconScheme}`] ? ttfContent[`${s}_${explorerIconScheme}`] : ttfContent[`_${explorerIconScheme}`];
     };

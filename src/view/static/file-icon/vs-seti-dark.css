@@ -226,3 +226,8 @@
     color: #519aba;
     font-family: "ficon";
 }
+.txt_icon::before {
+    content: "\E023";
+    color: #d4d7d6;
+    font-family: "ficon";
+}

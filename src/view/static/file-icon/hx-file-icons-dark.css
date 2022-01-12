@@ -98,3 +98,38 @@
     color: #bebebe;
     font-family: "ficon";
 }
+.sh_icon::before {
+    content: "\E900";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.zip_icon::before {
+    content: "\E900";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.sql_icon::before {
+    content: "\E900";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.bat_icon::before {
+    content: "\E900";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.txt_icon::before {
+    content: "\E900";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.doc_icon::before {
+    content: "\E900";
+    color: #bebebe;
+    font-family: "ficon";
+}
+.docx_icon::before {
+    content: "\E900";
+    color: #bebebe;
+    font-family: "ficon";
+}
