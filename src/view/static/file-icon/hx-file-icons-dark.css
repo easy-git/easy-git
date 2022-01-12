@@ -133,3 +133,8 @@
     color: #bebebe;
     font-family: "ficon";
 }
+.go_icon::before {
+    content: "\E900";
+    color: #bebebe;
+    font-family: "ficon";
+}
