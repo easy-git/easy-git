@@ -542,7 +542,7 @@
                 {
                     "command": "EasyGit.grep",
                     "title": "git grep 在Git仓库中查找字符串",
-                    "when": "isGit && config.EasyGit.isShowGrepMenu",
+                    "when": "isGit && config.EasyGit.isShowGrepMenu && explorerResourceCount == 1",
                     "group": "cutcopy"
                 },
                 {
