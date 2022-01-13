@@ -121,12 +121,8 @@ class Common {
                     selectedFile = param.document.uri.fsPath;
                 };
             } catch(e){
-                let res = await hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试，或克隆一个项目', ['克隆','我知道了']).then( res => {
-                    if (res == '克隆') {
-                        return 'goClone';
-                    } else {
-                        return 'error';
-                    };
+                let res = await hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试，或克隆一个项目', ['克隆','我知道了']).then( btnText => {
+                    return btnText == '克隆' ? 'goClone' : 'error';
                 });
                 return res;
             };

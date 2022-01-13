@@ -13,16 +13,18 @@ let colorScheme = config.get('editor.colorScheme');
 hxTheme = colorScheme ? colorScheme : "Default";
 
 let currentDate = undefined;
-let logFlags = false;
-let mainFlags = false;
-let initFlags = false;
-let diffFlags = false;
-let cloneFlags = false;
-let CommandPanelFlags = false;
+let logFlags = 0;
+let mainFlags = 0;
+let initFlags = 0;
+let diffFlags = 0;
+let cloneFlags = 0;
+let CommandPanelFlags = 0;
 
 let hxVersion = hx.env.appVersion;
 let pluginVersion = packageFile.version;
 let osName = os.platform() + ' ' + os.release();
+
+let ReferenceCounting = {};
 
 /**
  * @description 生成用户UID
@@ -65,14 +67,24 @@ function getCurrentData() {
 async function count(viewname) {
 
     if (["log", "main", "diff", "CommandPanel", "clone", "init"].includes(viewname)) {
-       let view_flags = eval(viewname+ "Flags");
-       let view_flags_date = getCurrentData();
-
-       // only count once
-       if (view_flags && currentDate == view_flags_date) {
+        let view_flags = eval(viewname+ "Flags");
+        let view_flags_date = getCurrentData();
+        
+        if (view_flags >= 3  && currentDate == view_flags_date) {
            return;
-       };
+        };
     };
+
+    try{
+        let t = ReferenceCounting[viewname];
+        if (t == undefined) {
+            ReferenceCounting[viewname] = 1;
+        };
+        if (Number.isFinite(t)) {
+            if (t >= 3) return;
+            ReferenceCounting[viewname] = t + 1;
+        };
+    }catch(e){};
 
     let uid;
     let isShareUsageData = true;
@@ -104,12 +116,12 @@ async function count(viewname) {
             instance.get(url, {params: param})
                 .then(function(response) {
                     currentDate = getCurrentData();
-                    if (viewname == 'log') { logFlags = true};
-                    if (viewname == 'main') { mainFlags = true};
-                    if (viewname == 'diff') { diffFlags = true};
-                    if (viewname == 'clone') { cloneFlags = true};
-                    if (viewname == 'init') { initFlags = true};
-                    if (viewname == 'CommandPanel') { CommandPanelFlags = true};
+                    if (viewname == 'log') { logFlags++ };
+                    if (viewname == 'main') { mainFlags++ };
+                    if (viewname == 'diff') { diffFlags++ };
+                    if (viewname == 'clone') { cloneFlags++ };
+                    if (viewname == 'init') { initFlags++ };
+                    if (viewname == 'CommandPanel') { CommandPanelFlags++ };
                     resolve(response);
                 })
                 .catch(function(error) {
