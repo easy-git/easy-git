@@ -1029,23 +1029,24 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u'], isR
 
                         if (['DD','AU','UD','UA','DU','AA','UU'].includes(tag)) {
                             if (['DD','UD','DU'].includes(tag)) {
-                                data.conflicted.push({"tag": "D", "path": fpath, "dir": dirname, "name": basename,"icon": f_icon});
+                                data.conflicted.push({"tag": "D", "path": fpath, "dir": dirname, "name": basename,"icon": f_icon, "style": "fs_red"});
                             } else {
-                                data.conflicted.push({"tag": "C", "path": fpath, "dir": dirname, "name": basename, "icon": f_icon});
+                                data.conflicted.push({"tag": "C", "path": fpath, "dir": dirname, "name": basename, "icon": f_icon, "style": "fs_default"});
                             };
                         } else if (tag == 'MM' || tag == 'AM') {
-                            data.staged.push({"tag": "M", "path": fpath, "dir": dirname, "name": basename,"icon": f_icon});
-                            data.notStaged.push({"tag": "M", "path": fpath, "dir": dirname, "name": basename,"icon": f_icon});
+                            data.staged.push({"tag": "M", "path": fpath, "dir": dirname, "name": basename,"icon": f_icon, "style": "fs_default"});
+                            data.notStaged.push({"tag": "M", "path": fpath, "dir": dirname, "name": basename,"icon": f_icon, "style": "fs_default"});
                         } else if (tag == 'AD' || tag == 'MD') {
-                            data.staged.push({"tag": "D", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon});
-                            data.notStaged.push({"tag": "D", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon});
+                            data.staged.push({"tag": "D", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon, "style": "fs_red"});
+                            data.notStaged.push({"tag": "D", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon, "style": "fs_red"});
                         } else if (tag == 'RD') {
-                            data.staged.push({"tag": "R", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon});
-                            data.notStaged.push({"tag": "R", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon});
+                            data.staged.push({"tag": "R", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon, "style": "fs_default"});
+                            data.notStaged.push({"tag": "R", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon, "style": "fs_default"});
                         } else if (tag.slice(0,1) == ' ' || tag == '??') {
-                            data.notStaged.push({"tag": tag.trim(), "path": fpath, "dir": dirname,"name": basename, "icon": f_icon});
+                            data.notStaged.push({"tag": tag.trim(), "path": fpath, "dir": dirname,"name": basename, "icon": f_icon, "style": "fs_default"});
                         } else if (tag.slice(1,2) == ' ') {
-                            data.staged.push({"tag": tag.trim(), "path": fpath, "dir": dirname,"name": basename, "icon": f_icon});
+                            let tmpStyle = tag.trim() == 'A' ? 'fs_green' : 'fs_default';
+                            data.staged.push({"tag": tag.trim(), "path": fpath, "dir": dirname,"name": basename, "icon": f_icon, "style": tmpStyle});
                         } else {
                             errorList.push(s);
                         };

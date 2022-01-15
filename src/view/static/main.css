@@ -104,8 +104,17 @@ body::-webkit-scrollbar {
     color: green;
 }
 
-.f111 {
+/* fs_开头的，Git文件状态标记: U|M|A|??|D等 */
+.fs_default {
     color: rgb(182, 151, 103);
+}
+
+.fs_green {
+    color: green;
+}
+
+.fs_red {
+    color: red;
 }
 
 #page-top {

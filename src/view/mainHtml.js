@@ -218,7 +218,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                         <span title="加入暂存 (git add)" @click="gitAdd(v1.path, v1.tag);">${AddIconSvg}</span>
                                     </div>
                                     <div class="d-inline ml-1 pt-2">
-                                        <span class="file-label fred"> {{ v1.tag }} </span>
+                                        <span class="file-label fs_red"> {{ v1.tag }} </span>
                                     </div>
                                 </div>
                             </li>
@@ -254,7 +254,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                         </span>
                                     </div>
                                     <div class="d-inline ml-1 pt-2">
-                                        <span class="file-label" :class="gitStatusStyle(vv.tag)">{{ vv.tag }}</span>
+                                        <span class="file-label" :class="vv.style">{{ vv.tag }}</span>
                                     </div>
                                 </div>
                             </li>
@@ -289,7 +289,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                         <span title="放弃、撤销对文件的修改 (git restore)" @click="gitCheckout(v);">${checkoutIconSvg}</span>
                                     </div>
                                     <div class="d-inline ml-1 pt-2">
-                                        <span class="file-label" :class="gitStatusStyle(v.tag)"> {{ v.tag }} </span>
+                                        <span class="file-label" :class="v.style"> {{ v.tag }} </span>
                                     </div>
                                 </div>
                             </li>
