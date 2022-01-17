@@ -304,7 +304,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     originurlBoolean: '',
                     isShowModel: false,
                     inputBranch: '',
-                    inputBranchPlaceholder: '分支名称',
+                    inputBranchPlaceholder: '查找本地分支...',
                     isShowLocalBranch: true,
                     isShowOrigin: false,
                     rawOriginBranchList: [],
