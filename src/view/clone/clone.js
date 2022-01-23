@@ -5,9 +5,9 @@ let openWebDialog = require('./view_webdialog.js');
 
 const {hxShowMessageBox} = require('../../common/utils.js');
 
-function openCloneView(webviewPanel=undefined) {
+function openCloneView(isSwitchSearchGithub=false) {
     try{
-        openWebDialog();
+        openWebDialog('', isSwitchSearchGithub);
     }catch(e){
         hxShowMessageBox(
             "EasyGit",

@@ -29,6 +29,7 @@
         "onCommand:EasyGit.branch",
         "onCommand:EasyGit.log",
         "onCommand:EasyGit.clone",
+        "onCommand:EasyGit.searchGithubToClone",
         "onCommand:EasyGit.init",
         "onCommand:EasyGit.addRemoteOrigin",
         "onCommand:EasyGit.RemoteRmOrigin",
@@ -227,6 +228,10 @@
             {
                 "command": "EasyGit.clone",
                 "title": "git clone - 克隆"
+            },
+            {
+                "command": "EasyGit.searchGithubToClone",
+                "title": "git clone - 搜索Github并克隆"
             },
             {
                 "command": "EasyGit.init",

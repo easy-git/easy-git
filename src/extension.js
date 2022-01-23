@@ -138,10 +138,20 @@ function activate(context) {
     // 菜单【工具】【克隆存储库】
     let clone = hx.commands.registerCommand('EasyGit.clone',(param) => {
         context.source = 'clone';
+        context.isSwitchSearchGithub = false;
         let view_clone = new Main('clone',param, FileView, context);
         view_clone.run();
     });
     context.subscriptions.push(clone);
+
+    // 搜索Github并克隆
+    let searchGithubToClone = hx.commands.registerCommand('EasyGit.searchGithubToClone',(param) => {
+        context.source = 'clone';
+        context.isSwitchSearchGithub = true;
+        let view_clone = new Main('clone',param, FileView, context);
+        view_clone.run();
+    });
+    context.subscriptions.push(searchGithubToClone);
 
     // 菜单【工具】【关于】
     let about = hx.commands.registerCommand('EasyGit.about', () => {

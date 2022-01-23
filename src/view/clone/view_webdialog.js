@@ -286,12 +286,14 @@ async function clone(webviewDialog, webview, info) {
 /**
  * @description 打开克隆视图
  * @param {String} clone_url 用于外部调用
+ * @param {String} isSwitchSearchGithub 是否默认切换到Github搜索
  */
-function showClone(clone_url="") {
+function showClone(clone_url="", isSwitchSearchGithub=false) {
 
     // 获取克隆目录
     ProjectWizard = getProjectWizard();
-    let hxData = { 'ProjectWizard': ProjectWizard };
+    isSwitchSearchGithub = typeof isSwitchSearchGithub == 'boolean' ? isSwitchSearchGithub : false;
+    let hxData = { 'ProjectWizard': ProjectWizard, "isSwitchSearchGithub": isSwitchSearchGithub};
 
     if (clone_url != "") {
         GitRepoUrl = clone_url;
@@ -364,7 +366,7 @@ function showClone(clone_url="") {
  */
 function generateLogHtml(hxData) {
 
-    let { ProjectWizard, GitRepoUrl } = hxData;
+    let { ProjectWizard, GitRepoUrl, isSwitchSearchGithub} = hxData;
     ProjectWizard = ProjectWizard.split(path.sep).join('/');
 
     return `
@@ -653,6 +655,11 @@ function generateLogHtml(hxData) {
                     created() {
                         this.ProjectWizard = '${ProjectWizard}';
                         this.cloneInfo.localPath = '${ProjectWizard}';
+
+                        let isSwitchSearchGithub = ${isSwitchSearchGithub};
+                        if (isSwitchSearchGithub) {
+                            this.isSearchGitHub = 1;
+                        };
 
                         // 上次发生错误，再次打开后，自动填充url
                         let repo = '${GitRepoUrl}';

@@ -291,7 +291,8 @@ class Main extends Common {
 
         // git clone
         if (this.viewType == 'clone' || beforeResult == 'goClone') {
-            openCloneView(this.webviewPanel);
+            let {isSwitchSearchGithub} = this.context;
+            openCloneView(isSwitchSearchGithub);
             return;
         };
 
