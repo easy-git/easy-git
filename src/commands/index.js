@@ -30,6 +30,9 @@ const gitGrep = require('./grep.js');
 // 检查是否安装Git
 let isInstallGitForLocal;
 
+// 上次信息
+let lastProjectInfo = {};
+
 /**
  * @description 提供webview视图外Git的操作
  */
@@ -73,6 +76,9 @@ async function action(param, action_name) {
         'easyGitInner': easyGitInner,
         'isFromGitView': isFromGitView
     };
+    
+    // 记录当前操作的项目信息
+    let lastProjectInfo = {projectName, projectPath};
 
     // 检查本机是否安装Git
     isInstallGitForLocal = await utils.isGitInstalled();
@@ -84,7 +90,7 @@ async function action(param, action_name) {
         });
         return;
     };
-    
+
     let action_list = ["init", "set-username-useremail"];
     if (easyGitInner != true && !action_list.includes(action_name)) {
         let isGit = await utils.checkIsGitProject(projectPath).catch( error => { return 'No' });
