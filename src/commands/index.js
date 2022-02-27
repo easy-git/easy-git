@@ -35,29 +35,36 @@ let isInstallGitForLocal;
  */
 async function action(param, action_name) {
     let easyGitInner, projectName, projectPath, selectedFile, isFromGitView;
-    try{
-        if (param != null) {
+
+    if (param != null) {
+        try{
             easyGitInner = param.easyGitInner;
-        };
-        if (easyGitInner != undefined) {
-            projectName = param.projectName;
-            projectPath = param.projectPath;
-            selectedFile = param.selectedFile;
-            isFromGitView = param.isFromGitView;
-        } else {
-            try {
-                projectName = param.workspaceFolder.name;
-                projectPath = param.workspaceFolder.uri.fsPath;
-                selectedFile = param.fsPath;
-            } catch (e) {
-                projectName = param.document.workspaceFolder.name;
-                projectPath = param.document.workspaceFolder.uri.fsPath;
-                selectedFile = param.document.uri.fsPath;
+            if (easyGitInner != undefined) {
+                projectName = param.projectName;
+                projectPath = param.projectPath;
+                selectedFile = param.selectedFile;
+                isFromGitView = param.isFromGitView;
+            } else {
+                try {
+                    projectName = param.workspaceFolder.name;
+                    projectPath = param.workspaceFolder.uri.fsPath;
+                    selectedFile = param.fsPath;
+                } catch (e) {
+                    projectName = param.document.workspaceFolder.name;
+                    projectPath = param.document.workspaceFolder.uri.fsPath;
+                    selectedFile = param.document.uri.fsPath;
+                };
             };
+        } catch(e){
+            return hx.window.showErrorMessage('easy-git: 无法获取到项目路径，请在项目管理器选中项目后再试。', ["我知道了"]);
         };
-    } catch(e){
-        return hx.window.showErrorMessage('easy-git: 无法获取到项目路径，请在项目管理器选中项目后再试。', ["我知道了"]);
+    } else {
+        let NotFocusList = ['set-username-useremail'];
+        if (!NotFocusList.includes(action_name)){
+            return hx.window.showErrorMessage('easy-git: 无法获取到项目路径，请在项目管理器选中项目后再试。', ["我知道了"]);
+        };
     };
+
 
     let ProjectInfo = {
         'projectName': projectName,
@@ -77,8 +84,8 @@ async function action(param, action_name) {
         });
         return;
     };
-
-    let action_list = ["init"];
+    
+    let action_list = ["init", "set-username-useremail"];
     if (easyGitInner != true && !action_list.includes(action_name)) {
         let isGit = await utils.checkIsGitProject(projectPath).catch( error => { return 'No' });
         if (isGit == 'No') {

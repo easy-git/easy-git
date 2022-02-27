@@ -10,14 +10,18 @@ const {
  * @description 验证用户填写数据
  * @param {Object} formData
  */
-async function goValidate(formData, that) {
-    let {username, useremail} = formData;
+async function goValidate(formData, that, projectPath) {
+    let {username, useremail, level} = formData;
+    if (level == "local" && projectPath == undefined) {
+        that.showError("如需设置local，请选中项目或将焦点置于项目文件上后再试。");
+        return false;
+    };
     if (username.replace(/(^\s*)|(\s*$)/g,"") == '') {
         that.showError(`user.name不能为空`);
         return false;
     };
-    if (useremail.replace(/(^\s*)|(\s*$)/g,"") == '') {
-        that.showError(`user.email不能为空`);
+    if (useremail.replace(/(^\s*)|(\s*$)/g,"") == '' || !useremail.includes('@')) {
+        that.showError(`user.email不能为空，且必须为有效的email`);
         return false;
     };
     return true;
@@ -61,7 +65,7 @@ async function setConfig(projectPath) {
         submitButtonText: "确定(&S)",
         cancelButtonText: "取消(&C)",
         validate: function(formData) {
-            let checkResult = goValidate(formData, this);
+            let checkResult = goValidate(formData, this, projectPath);
             return checkResult;
         }
     }).then((res) => {
@@ -71,7 +75,7 @@ async function setConfig(projectPath) {
     });
 
     if (!ConfigInfo) return;
-    
+
     let {username, useremail,level} = ConfigInfo;
     git_level = '--' + level;
 
