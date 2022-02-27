@@ -5,7 +5,8 @@ const path = require('path');
 const {
     mkdirsSync,
     getFilesExplorerProjectInfo,
-    checkIsGitProject
+    checkIsGitProject,
+    importProjectToExplorer
 } = require('../common/utils.js');
 const count = require('../common/count.js');
 
@@ -147,6 +148,9 @@ class History {
 async function goValidate(formData, that) {
     // 检查：所有项不能为空
     for (let v in formData) {
+        if (v == 'blank_line' || typeof formData[v] == 'boolean') {
+            continue;
+        };
         let info = (formData[v]).trim();
         if (info == "" || !info) {
             that.showError(`不能为空或填写错误`);
@@ -187,6 +191,8 @@ async function selecteOpenLocalProject() {
     let subtitle = '请选择本地磁盘上的Git项目';
     let formItems = [
         {type: "fileSelectInput",name: "GitDir",label: "选择",placeholder: '请选择本地磁盘上的Git项目', mode: "folder"},
+        {type: "checkBox",name: "isJoin",label: "将选择的项目加入到项目管理器列表中", value: true},
+        {type: "label",name: "blank_line",text: ""}
     ];
 
     let Selected = await hx.window.showFormDialog({
@@ -210,7 +216,7 @@ async function selecteOpenLocalProject() {
 
     if (!Selected) return;
     try{
-        let {GitDir} = Selected;
+        let {GitDir, isJoin} = Selected;
         let projectName = path.basename(GitDir);
         let info = {
             "projectPath": GitDir,
@@ -222,6 +228,11 @@ async function selecteOpenLocalProject() {
         // save history
         let h = new History();
         await h.save(GitDir);
+
+        // 导入项目到hx
+        if (isJoin) {
+            importProjectToExplorer(GitDir);
+        };
     }catch(e){
         hx.window.showErrorMessage('EasyGit: 打开项目失败', ['我知道了']);
     }
