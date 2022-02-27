@@ -16,16 +16,17 @@ async function unfocusedAction() {
     }catch(e){
         return null;
     };
-    // 获取激活的项目信息
-    let activeEditor = await hx.window.getActiveTextEditor().then(function(editor){
-        return editor;
-    }).catch( error => {
-        return "fouceEditorFail";
-    });
-    if (activeEditor == 'fouceEditorFail') {
-        hx.commands.executeCommand('workbench.view.explorer');
-    };
-    return activeEditor;
+    // 2022-02-27 屏蔽此段。 即使焦点不在项目管理器也应该打开命令面板
+    // // 获取激活的项目信息
+    // let activeEditor = await hx.window.getActiveTextEditor().then(function(editor){
+    //     return editor;
+    // }).catch( error => {
+    //     return "fouceEditorFail";
+    // });
+    // if (activeEditor == 'fouceEditorFail') {
+    //     hx.commands.executeCommand('workbench.view.explorer');
+    // };
+    // return activeEditor;
 };
 
 /**
@@ -35,7 +36,7 @@ async function unfocusedAction() {
 async function showCommandPanel(param, name) {
     if (param == null) {
         let unfocusedResult = await unfocusedAction();
-        if (unfocusedResult == null || unfocusedResult == 'fouceEditorFail') {
+        if (unfocusedResult == null || unfocusedResult == 'fouceEditorFail' || unfocusedResult == undefined) {
             hx.window.setStatusBarMessage('EasyGit: 请将焦点置于项目管理器Git项目上、或在编辑器中打开Git项目下文件，再进行操作。', 5000, 'info');
         };
     };
