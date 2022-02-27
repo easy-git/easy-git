@@ -51,7 +51,7 @@ function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
                 hx.commands.executeCommand('EasyGit.init',data);
                 break;
             case 'select':
-                hx.commands.executeCommand('workbench.view.explorer');
+                hx.commands.executeCommand('EasyGit.quickOpenGitProject');
                 break;
             case 'open':
                 hx.commands.executeCommand('workbench.action.files.openFolder');

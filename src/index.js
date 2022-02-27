@@ -179,7 +179,12 @@ class Main extends Common {
         let isGitProject = false;
         let { FoldersNum, Folders } = this.ExplorerInfo;
         if (FoldersNum != 1) {
-            initView.show(this.webviewPanel, this.userConfig, this.ExplorerInfo);
+            // 2022-02-27 优化：废弃init视图，改用 EasyGit.quickOpenGitProject
+            try{
+                hx.commands.executeCommand("EasyGit.quickOpenGitProject");
+            }catch(e){
+                initView.show(this.webviewPanel, this.userConfig, this.ExplorerInfo);
+            };
             return;
         };
 
@@ -204,7 +209,12 @@ class Main extends Common {
                         break;
                 };
             } else {
-                initView.show(this.webviewPanel, this.userConfig, this.ExplorerInfo);
+                // 2022-02-27 优化：废弃init视图，改用 EasyGit.quickOpenGitProject
+                try{
+                    hx.commands.executeCommand("EasyGit.quickOpenGitProject");
+                }catch(e){
+                    initView.show(this.webviewPanel, this.userConfig, this.ExplorerInfo);
+                };
                 return;
             };
         };
