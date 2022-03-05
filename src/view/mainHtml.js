@@ -142,7 +142,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                     <div id="refresh-progress" v-show="refreshProgress"></div>
                     <div class="row m-3">
                         <div class="col-auto p-0 project-name" @click="runHXCommands('EasyGit.quickOpenGitProject')">
-                            <span class="top">{{projectName}}</span>
+                            <span class="top" :title="'项目名称: ' + projectName + '，支持鼠标点击切换项目'">{{projectName}}</span>
                         </div>
                         <div class="col-auto ml-auto p-0 top-function-icon">
                             <span class="top" @click="runHXCommands('EasyGit.CommandPanel', 'CommandPanel');" title="打开命令面板">${CommandPanelIcon}</span>
