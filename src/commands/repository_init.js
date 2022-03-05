@@ -206,7 +206,7 @@ class gitInitAfterSetting {
         if (action == 'gitee') {
             if (this.giteeInfo && typeof this.giteeInfo == "object") {
                 if (this.giteeOrgs) {
-                    service_items.splice(2, 0, {type: "label",name: "gitee_orgs_desc",text: `<span style='color: #a0a0a0; font-size: 12px;'>Gitee上，除默认组织，其它用户组织为: ${this.giteeOrgs} </span>`})
+                    service_items.splice(2, 0, {type: "label",name: "gitee_orgs_desc",text: `<span style='color: #a0a0a0; font-size: 12px;'>Gitee上，除默认组织外，其它用户组织列表: ${this.giteeOrgs} </span>`})
                 };
                 formItems = [...formItems, ...service_items];
             } else {
@@ -218,7 +218,7 @@ class gitInitAfterSetting {
         if (action == "github") {
             if (this.githubInfo && typeof this.githubInfo == "object") {
                 if (this.githubOrgs) {
-                    service_items.splice(2, 0, {type: "label",name: "github_orgs_desc",text: `<span style='color: #a0a0a0; font-size: 12px;'>Github上，除默认组织，其它用户组织为: ${this.githubOrgs} </span>`})
+                    service_items.splice(2, 0, {type: "label",name: "github_orgs_desc",text: `<span style='color: #a0a0a0; font-size: 12px;'>Github上，除默认组织外，其它用户组织列表: ${this.githubOrgs} </span>`})
                 };
                 formItems = [...formItems, ...service_items];
             } else {
