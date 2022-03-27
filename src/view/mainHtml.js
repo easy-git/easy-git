@@ -152,7 +152,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             <span class="top" @click="gitLog();" title="查看日志" v-once>${HistoryIcon}</span>
                             <span class="top" @click="clickMenu()">
                                 <i title="更多操作">${MenuIcon} </i>
-                                <div id="menu" :class="[ isShowMenu ? 'menu' : 'd-none' ]" @mouseleave="isShowMenu=false">
+                                <div id="menu" :class="[ isShowMoreMenu ? 'menu' : 'd-none' ]" @mouseleave="isShowMoreMenu=false">
                                     <ul>
 								        <li title="git commit，仅提交，不受其它设置影响" @click="gitCommit(true);">提交 - commit</li>
                                         <li title="git pull" @click="gitPull('');">拉取 - pull</li>
