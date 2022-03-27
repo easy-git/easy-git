@@ -310,7 +310,6 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             ${SyncIcon}
                         </div>
                         <div @click="gitPull('rebase');" title="git pull --rebase">
-                        {{ isShowMoreMenu }}
                             <span class="cactive num">{{ behind }}</span>
                             <span>${DownArrowIcon}</span>
                         </div>
@@ -340,7 +339,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                         originurlBoolean: true,
                         commitMessage: '',
                         gitFileResult: {},
-                        isShowMoreMenu: 0,
+                        isShowMoreMenu: false,
                         bodyWidth: 0,
                         hoverConflictedFileID: false,
                         hoverChangeFileID: false,

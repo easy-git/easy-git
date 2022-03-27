@@ -131,7 +131,6 @@ class gitInitAfterSetting {
     async isOAuth() {
         try{
             let giteeOAuthInfo = await giteeOAuth.readLocalToken();
-            console.log('aaaaa', this.giteeOAuthInfo)
             if (giteeOAuthInfo.status == 'success-authorize') {
                 this.giteeInfo = giteeOAuthInfo;
                 let {orgs, login} = giteeOAuthInfo;
@@ -144,7 +143,6 @@ class gitInitAfterSetting {
 
         try{
             let githubOAuthInfo = await githubOAuth.readLocalToken();
-            console.log('aaaaa', this.githubOAuthInfo)
             if (githubOAuthInfo.status == 'success-authorize') {
                 this.githubInfo = githubOAuthInfo;
                 let orgs2 = githubOAuthInfo.orgs;
