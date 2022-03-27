@@ -4,7 +4,7 @@ const os = require('os');
 const path = require('path');
 const osName = os.platform();
 
-const vueFile = path.join(__dirname, 'static', '','vue.min.js');
+const vueFile = path.join(__dirname, 'static', 'vue', '3.2.31', 'vue.global.prod.js');
 const bootstrapCssFile = path.join(__dirname, 'static', 'bootstrap.min.css');
 const mainCssFile = path.join(__dirname, 'static', 'main.css');
 
@@ -124,6 +124,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                 top: ${iconTop};
                 font-size: ${iconSize};
                 font-weight: 500;
+                margin-right: 5px;
             }
 
             @font-face {
@@ -141,16 +142,16 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                 <div id="page-top" class="fixed-top">
                     <div id="refresh-progress" v-show="refreshProgress"></div>
                     <div class="row m-3">
-                        <div class="col-auto p-0 project-name" @click="runHXCommands('EasyGit.quickOpenGitProject')">
+                        <div class="col-auto p-0 project-name" @click="runHXCommands('EasyGit.quickOpenGitProject')" v-once>
                             <span class="top" :title="'项目名称: ' + projectName + '，支持鼠标点击切换项目'">{{projectName}}</span>
                         </div>
                         <div class="col-auto ml-auto p-0 top-function-icon">
-                            <span class="top" @click="runHXCommands('EasyGit.CommandPanel', 'CommandPanel');" title="打开命令面板">${CommandPanelIcon}</span>
-                            <span class="top" @click="getProjectGitInfo();" title="刷新当前视图">${iconRefresh}</span>
-                            <span class="top" @click="gitCommit();" :title="GitAlwaysAutoCommitPush && gitStagedFileList.length ? 'commit & push' : 'commit'">${CheckMarkIcon}</span>
-                            <span class="top" @click="gitLog();" title="查看日志">${HistoryIcon}</span>
-                            <span class="top" @click.stop="clickMenu();">
-                                <i title="更多操作">${MenuIcon}</i>
+                            <span class="top" @click="runHXCommands('EasyGit.CommandPanel', 'CommandPanel');" title="打开命令面板" v-once>${CommandPanelIcon}</span>
+                            <span class="top" @click="getProjectGitInfo();" title="刷新当前视图" v-once>${iconRefresh}</span>
+                            <span class="top" @click="gitCommit();" :title="GitAlwaysAutoCommitPush && gitStagedFileList.length ? 'commit & push' : 'commit'" v-once>${CheckMarkIcon}</span>
+                            <span class="top" @click="gitLog();" title="查看日志" v-once>${HistoryIcon}</span>
+                            <span class="top" @click="clickMenu()">
+                                <i title="更多操作">${MenuIcon} </i>
                                 <div id="menu" :class="[ isShowMenu ? 'menu' : 'd-none' ]" @mouseleave="isShowMenu=false">
                                     <ul>
 								        <li title="git commit，仅提交，不受其它设置影响" @click="gitCommit(true);">提交 - commit</li>
@@ -203,7 +204,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             <span class="gtag">{{ gitConflictedFileListLength }}</span>
                         </p>
                         <ul style="list-style-type:none;padding-left:0;" id="git_merge_data" v-show="isShowConflicted">
-                            <li class="d-flex px-3 lif gitfile" v-for="(v1,i1) in gitConflictedFileList" :key="i1"
+                            <li class="li_git_file" v-for="(v1,i1) in gitConflictedFileList" :key="i1"
                                 @mouseover="hoverConflictedFileID = 'conflicted_'+i1"
                                 @mouseleave="hoverConflictedFileID = false">
                                 <div class="flex-grow-1 text-hidden cursor-default" :title="v1.path" >
@@ -235,7 +236,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             </span>
                         </p>
                         <ul style="list-style-type:none;padding-left:0;" id="git_stash_list" v-show="isShowStaged">
-                            <li class="d-flex px-3 lif gitfile"
+                            <li class="li_git_file"
                                 v-for="(vv,ii) in gitStagedFileList" :key="ii"
                                 @mouseover="hoverStashFileID = 'stash_'+ii"
                                 @mouseleave="hoverStashFileID = false">
@@ -274,7 +275,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             </span>
                         </p>
                         <ul style="list-style-type:none;padding-left:0;" id="git_change_data" v-show="isShowChange">
-                            <li class="d-flex px-3 lif gitfile" v-for="(v,i) in gitNotStagedileList" :key="i"
+                            <li class="li_git_file" v-for="(v,i) in gitNotStagedileList" :key="i"
                                 @mouseover="hoverChangeFileID = 'change_'+i"
                                 @mouseleave="hoverChangeFileID = false">
                                 <div class="flex-grow-1 text-hidden cursor-default" :title="v.path">
@@ -283,7 +284,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                     <span class="dirname">{{ v.dir }}</span>
                                 </div>
                                 <div class="d-inline float-right">
-                                    <div class="d-inline"  v-if="hoverChangeFileID == 'change_'+i">
+                                    <div class="d-inline" v-if="hoverChangeFileID == 'change_'+i">
                                         <span title="打开文件" @click="openFile(v.path);">${OpenFileIconSvg}</span>
                                         <span title="加入暂存 (git add)" @click="gitAdd(v.path, v.tag);">${AddIconSvg}</span>
                                         <span title="放弃、撤销对文件的修改 (git restore)" @click="gitCheckout(v);">${checkoutIconSvg}</span>
@@ -309,6 +310,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             ${SyncIcon}
                         </div>
                         <div @click="gitPull('rebase');" title="git pull --rebase">
+                        {{ isShowMoreMenu }}
                             <span class="cactive num">{{ behind }}</span>
                             <span>${DownArrowIcon}</span>
                         </div>
@@ -326,37 +328,38 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
             </div>
         </div>
         <script>
-            var app = new Vue({
-                el: '#app',
-                data: {
-                    refreshProgress: true,
-                    projectName: "${projectName}",
-                    currentBranch: "",
-                    behind: "",
-                    ahead: "",
-                    tracking: "",
-                    originurlBoolean: true,
-                    commitMessage: '',
-                    gitFileResult: {},
-                    isShowMenu: false,
-                    bodyWidth: 0,
-                    hoverConflictedFileID: false,
-                    hoverChangeFileID: false,
-                    hoverStashFileID: false,
-                    ConflictedIcon: '${ChevronDownIcon}',
-                    isShowConflicted: true,
-                    gitConflictedFileList: [],
-                    gitConflictedFileListLength:0,
-                    ChangeIcon: '${ChevronDownIcon}',
-                    isShowChange: true,
-                    gitNotStagedileList: [],
-                    gitNotStagedileListLength: 0,
-                    StagedIcon: '${ChevronDownIcon}',
-                    isShowStaged: true,
-                    gitStagedFileList: [],
-                    gitStagedFileListLength: 0,
-                    GitAlwaysAutoCommitPush: false,
-                    ctrl: ''
+            let AttributeBinding = {
+                data() {
+                    return {
+                        refreshProgress: true,
+                        projectName: "${projectName}",
+                        currentBranch: "",
+                        behind: "",
+                        ahead: "",
+                        tracking: "",
+                        originurlBoolean: true,
+                        commitMessage: '',
+                        gitFileResult: {},
+                        isShowMoreMenu: 0,
+                        bodyWidth: 0,
+                        hoverConflictedFileID: false,
+                        hoverChangeFileID: false,
+                        hoverStashFileID: false,
+                        ConflictedIcon: '${ChevronDownIcon}',
+                        isShowConflicted: true,
+                        gitConflictedFileList: [],
+                        gitConflictedFileListLength:0,
+                        ChangeIcon: '${ChevronDownIcon}',
+                        isShowChange: true,
+                        gitNotStagedileList: [],
+                        gitNotStagedileListLength: 0,
+                        StagedIcon: '${ChevronDownIcon}',
+                        isShowStaged: true,
+                        gitStagedFileList: [],
+                        gitStagedFileListLength: 0,
+                        GitAlwaysAutoCommitPush: false,
+                        ctrl: ''
+                    }
                 },
                 computed: {
                     gitStatusStyle() {
@@ -542,12 +545,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                     },
                     clickMenu() {
                         this.bodyWidth = document.body.clientWidth;
-                        if (this.isShowMenu) {
-                            this.isShowMenu = false
-                        } else {
-                            this.isShowMenu = true
-                        };
-                        if (document.body.clientWidth < 200) {
+                        this.isShowMoreMenu = this.isShowMoreMenu ? false : true;                        if (document.body.clientWidth < 200) {
                             hbuilderx.postMessage({
                                 command: 'send_msg',
                                 text: 'EasyGit: 视图区域，宽度太窄，请拉宽后再试。',
@@ -723,7 +721,8 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                         });
                     }
                 }
-            });
+            };
+            Vue.createApp(AttributeBinding).mount('#app')
         </script>
         <script>
             let devStatus = ${DisableDevTools};

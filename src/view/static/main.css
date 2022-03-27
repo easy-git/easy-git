@@ -263,6 +263,36 @@ body::-webkit-scrollbar {
     font-size: 12px;
 }
 
+/**
+ * @change by 2022-03-26
+ * 源代码管理器，文件变更列表样式
+ */
+.li_git_file {
+    display: flex !important;
+    margin: 0;
+    padding: 3px 10px 3px 18px !important;
+    height: 25px;
+    font-size: 0.9rem;
+    color: var(--fontColor);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    align-items: flex-end;
+}
+
+.li_git_file:hover {
+    background-color: var(--liHoverBackground) !important;
+}
+
+..li_git_file:hover .hideicon {
+    opacity: 1;
+}
+
+.li_git_file .file-label {
+    font-weight: 500;
+    font-size: 12px;
+}
+
 .fixedBottom {
     position: fixed;
     bottom: 0;
