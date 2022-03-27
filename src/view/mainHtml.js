@@ -306,10 +306,10 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                         </span>
                     </div>
                     <div class="col-auto push-pull" v-if="GitAssociationRemote">
-                        <div class="ml-2" @click="gitFetch();" title="git fetch --all">
+                        <div @click="gitFetch();" title="git fetch --all">
                             ${SyncIcon}
                         </div>
-                        <div @click="gitPull('rebase');" title="git pull --rebase">
+                        <div class="mx-2" @click="gitPull('rebase');" title="git pull --rebase">
                             <span class="cactive num">{{ behind }}</span>
                             <span>${DownArrowIcon}</span>
                         </div>

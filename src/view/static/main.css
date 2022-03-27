@@ -313,7 +313,7 @@ body::-webkit-scrollbar {
 }
 
 .push-pull>div>.num {
-    right: -6px;
+    right: -2px;
     position: relative;
     top: 1px;
 }
