@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.7.4
+* 修复 HBuilderX自定义主题 源代码管理器视图 没有适配项目管理器颜色的Bug （感谢 QQ用户：`苏陌` 的反馈）
+* 新增 设置项 `EasyGit.theme.siderBar`和`EasyGit.theme.editor` 用于自定义EasyGit源代码管理器视图和日志视图主题 [Git视图自定义主题规则](https://easy-git.github.io/setting/theme)
+
 ## 1.7.3
 * 优化 源代码管理器 项目名称 增加title 支持鼠标悬停查看
 * 修复 没有焦点时，打开设置username和useremail窗口失败的Bug
