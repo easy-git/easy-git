@@ -187,6 +187,8 @@ body::-webkit-scrollbar {
 .form-control:focus {
     border-radius: 2px !important;
     border: 1px solid var(--inputLineColor);
+    /* border: 1px solid var(--inputBgColor); */
+    /* border: none !important; */
     transition: none !important;
     color: var(--fontColor);
 }

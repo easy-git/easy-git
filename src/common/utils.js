@@ -118,10 +118,6 @@ function getThemeColor(area) {
         };
     } catch (e) {};
 
-    let viewBackgroundOptionName = area == 'siderBar' ? 'sideBar.background' : 'editor.background';
-    let viewFontOptionName = area == 'siderBar' ? 'list.foreground' : undefined;
-    let viewLiHoverBgOptionName = area == 'siderBar' ? 'list.hoverBackground' : 'list.hoverBackground';
-
     switch (colorScheme){
         case 'Monokai':
             fontColor = 'rgb(227,227,227)';
@@ -173,16 +169,28 @@ function getThemeColor(area) {
             break;
     };
 
+    // siderBar: 代表左侧视图
+    let viewBackgroundOptionName = area == 'siderBar' ? 'sideBar.background' : 'editor.background';
+    let viewFontOptionName = area == 'siderBar' ? 'list.foreground' : undefined;
+    let viewLiHoverBgOptionName = area == 'siderBar' ? 'list.hoverBackground' : 'list.hoverBackground';
+
     if (customColors != undefined && JSON.stringify(customColors) != '{}') {
         if (customColors[viewBackgroundOptionName] && viewBackgroundOptionName in customColors) {
             background = customColors[viewBackgroundOptionName];
+            lefeSideVeiwBackground = customColors[viewBackgroundOptionName];
             menuBackground = customColors[viewBackgroundOptionName];
+
         };
         if (customColors[viewFontOptionName] && viewFontOptionName in customColors) {
             fontColor = customColors[viewFontOptionName];
         };
         if (customColors[viewLiHoverBgOptionName] && viewLiHoverBgOptionName in customColors) {
             liHoverBackground = customColors[viewLiHoverBgOptionName];
+
+            // 左侧视图，输入框背景色，跟li元素悬停背景色保持一致
+            inputBgColor = customColors[viewLiHoverBgOptionName];
+
+            lineColor = customColors[viewLiHoverBgOptionName]
         };
     };
 
