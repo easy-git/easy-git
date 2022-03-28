@@ -194,23 +194,45 @@ function getThemeColor(area) {
         };
     };
 
-    // easygit主题自定义：左侧视图颜色
-    let customThemeConfigForSider= config.get('EasyGit.theme.siderBar');
     // 十六进制颜色正则
     let HexReg = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-    if (Object.prototype.toString.call(customThemeConfigForSider) == "[object Object]" && JSON.stringify(customThemeConfigForSider) != '{}') {
-        let sTmp = Object.assign(customThemeConfigForSider);
-        if (HexReg.test(sTmp["background"])) { lefeSideVeiwBackground = sTmp["background"]; };
-        if (HexReg.test(sTmp["fontColor"])) { fontColor = sTmp["fontColor"]; };
-        if (HexReg.test(sTmp["lineColor"])) { lineColor = sTmp["lineColor"]; };
-        if (HexReg.test(sTmp["inputColor"])) { inputColor = sTmp["inputColor"]; };
-        if (HexReg.test(sTmp["inputBgColor"])) { inputBgColor = sTmp["inputBgColor"]; };
-        if (HexReg.test(sTmp["inputLineColor"])) { inputLineColor = sTmp["inputLineColor"]; };
-        if (HexReg.test(sTmp["scrollbarColor"])) { scrollbarColor = sTmp["scrollbarColor"]; };
-        if (HexReg.test(sTmp["remarkTextColor"])) { remarkTextColor = sTmp["remarkTextColor"]; };
-        if (HexReg.test(sTmp["menuBackground"])) { menuBackground = sTmp["menuBackground"]; };
-        if (HexReg.test(sTmp["liHoverBackground"])) { liHoverBackground = sTmp["liHoverBackground"]; };
-        if (HexReg.test(sTmp["cursorColor"])) { cursorColor = sTmp["cursorColor"]; };
+
+    // easygit主题自定义：左侧视图颜色
+    if (area == 'siderBar') {
+        let customThemeConfigForSider= config.get('EasyGit.theme.siderBar');
+        if (isObj(customThemeConfigForSider) && JSON.stringify(customThemeConfigForSider) != '{}') {
+            let sTmp = Object.assign(customThemeConfigForSider);
+            if (HexReg.test(sTmp["background"])) { lefeSideVeiwBackground = sTmp["background"]; };
+            if (HexReg.test(sTmp["fontColor"])) { fontColor = sTmp["fontColor"]; };
+            if (HexReg.test(sTmp["lineColor"])) { lineColor = sTmp["lineColor"]; };
+            if (HexReg.test(sTmp["inputColor"])) { inputColor = sTmp["inputColor"]; };
+            if (HexReg.test(sTmp["inputBgColor"])) { inputBgColor = sTmp["inputBgColor"]; };
+            if (HexReg.test(sTmp["inputLineColor"])) { inputLineColor = sTmp["inputLineColor"]; };
+            if (HexReg.test(sTmp["scrollbarColor"])) { scrollbarColor = sTmp["scrollbarColor"]; };
+            if (HexReg.test(sTmp["remarkTextColor"])) { remarkTextColor = sTmp["remarkTextColor"]; };
+            if (HexReg.test(sTmp["menuBackground"])) { menuBackground = sTmp["menuBackground"]; };
+            if (HexReg.test(sTmp["liHoverBackground"])) { liHoverBackground = sTmp["liHoverBackground"]; };
+            if (HexReg.test(sTmp["cursorColor"])) { cursorColor = sTmp["cursorColor"]; };
+        };
+    } else {
+        // easygit主题自定义：编辑器颜色
+        let customThemeConfigForEditor= config.get('EasyGit.theme.editor');
+        if (isObj(customThemeConfigForEditor) && JSON.stringify(customThemeConfigForEditor) != '{}') {
+            let eTmp = Object.assign(customThemeConfigForEditor);
+            if (HexReg.test(eTmp["background"])) { background = eTmp["background"]; };
+            if (HexReg.test(eTmp["fontColor"])) { fontColor = eTmp["fontColor"]; };
+            if (HexReg.test(eTmp["lineColor"])) { lineColor = eTmp["lineColor"]; };
+            if (HexReg.test(eTmp["inputColor"])) { inputColor = eTmp["inputColor"]; };
+            if (HexReg.test(eTmp["inputBgColor"])) { inputBgColor = eTmp["inputBgColor"]; };
+            if (HexReg.test(eTmp["inputLineColor"])) { inputLineColor = eTmp["inputLineColor"]; };
+            if (HexReg.test(eTmp["scrollbarColor"])) { scrollbarColor = eTmp["scrollbarColor"]; };
+            if (HexReg.test(eTmp["remarkTextColor"])) { remarkTextColor = eTmp["remarkTextColor"]; };
+            if (HexReg.test(eTmp["menuBackground"])) { menuBackground = eTmp["menuBackground"]; };
+            if (HexReg.test(eTmp["menuCutLineColor"])) { menuCutLineColor = eTmp["menuCutLineColor"]; };
+            if (HexReg.test(eTmp["liHoverBackground"])) { liHoverBackground = eTmp["liHoverBackground"]; };
+            if (HexReg.test(eTmp["cursorColor"])) { cursorColor = eTmp["cursorColor"]; };
+            if (HexReg.test(eTmp["lineForBorderTopColor"])) { lineForBorderTopColor = eTmp["lineForBorderTopColor"]; };
+        };
     };
 
     // 文件对比相关颜色
