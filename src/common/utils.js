@@ -194,6 +194,25 @@ function getThemeColor(area) {
         };
     };
 
+    // easygit主题自定义：左侧视图颜色
+    let customThemeConfigForSider= config.get('EasyGit.theme.siderBar');
+    // 十六进制颜色正则
+    let HexReg = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+    if (Object.prototype.toString.call(customThemeConfigForSider) == "[object Object]" && JSON.stringify(customThemeConfigForSider) != '{}') {
+        let sTmp = Object.assign(customThemeConfigForSider);
+        if (HexReg.test(sTmp["background"])) { lefeSideVeiwBackground = sTmp["background"]; };
+        if (HexReg.test(sTmp["fontColor"])) { fontColor = sTmp["fontColor"]; };
+        if (HexReg.test(sTmp["lineColor"])) { lineColor = sTmp["lineColor"]; };
+        if (HexReg.test(sTmp["inputColor"])) { inputColor = sTmp["inputColor"]; };
+        if (HexReg.test(sTmp["inputBgColor"])) { inputBgColor = sTmp["inputBgColor"]; };
+        if (HexReg.test(sTmp["inputLineColor"])) { inputLineColor = sTmp["inputLineColor"]; };
+        if (HexReg.test(sTmp["scrollbarColor"])) { scrollbarColor = sTmp["scrollbarColor"]; };
+        if (HexReg.test(sTmp["remarkTextColor"])) { remarkTextColor = sTmp["remarkTextColor"]; };
+        if (HexReg.test(sTmp["menuBackground"])) { menuBackground = sTmp["menuBackground"]; };
+        if (HexReg.test(sTmp["liHoverBackground"])) { liHoverBackground = sTmp["liHoverBackground"]; };
+        if (HexReg.test(sTmp["cursorColor"])) { cursorColor = sTmp["cursorColor"]; };
+    };
+
     // 文件对比相关颜色
     let d2h_ins_bg, d2h_ins_border;
     let d2h_del_bg, d2h_del_border;
