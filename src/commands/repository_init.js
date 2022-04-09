@@ -1,5 +1,7 @@
 const path = require('path');
+const os = require('os');
 const fs = require('fs');
+const process = require('process');
 const uuid = require('uuid');
 const hx = require('hbuilderx');
 const {
@@ -11,12 +13,20 @@ const {
     gitConfigShow,
     gitConfigSet,
     createOutputChannel,
-    createOutputViewForHyperLinksForCommand
+    createOutputViewForHyperLinksForCommand,
+    hxShowMessageBox
 } = require('../common/utils.js');
 const { goSetEncoding } = require('./base.js');
 
 const count = require('../common/count.js');
 const { Gitee, Github, gitRepoCreate } = require('../common/oauth.js');
+
+// 获取操作系统SSH目录
+const osName = os.platform();
+const USERHOME = osName == 'darwin'
+    ? process.env.HOME
+    : path.join(process.env.HOMEDRIVE, process.env.HOMEPATH);
+const SSHDIR = path.join(USERHOME, '.ssh');
 
 var gitUserName;
 var gitEmail;
@@ -96,8 +106,10 @@ class gitInitAfterSetting {
      * @param {Object} that
      */
     async goValidate(formData, that) {
-        let {action, RepositoryName, oauth_desc_gitee, oauth_desc_github} = formData;
-        if (["github", "gitee"].includes(action) && ( !oauth_desc_gitee || !oauth_desc_github )) return true;
+        let {action, RepositoryName, oauth_desc_gitee, oauth_desc_github, isHttp} = formData;
+
+        if (action == 'github' && oauth_desc_github) return true;
+        if (action == 'gitee' && oauth_desc_gitee) return true;
 
         if (action == 'ManualInput') {
             let {RepositoryURL, new_email} = formData;
@@ -123,6 +135,18 @@ class gitInitAfterSetting {
             if (/^[a-zA-Z][a-zA-Z0-9_\-\.]{1,191}$/.test(t2) == false) {
                 that.showError('仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，必须以字母开头，且长度为2~191个字符');
                 return false;
+            };
+        };
+
+        if (["gitee", "github"].includes(action)) {
+            if (!isHttp) {
+                if (!fs.existsSync(SSHDIR)) {
+                    let boxMsg = `使用SSH协议，添加远程仓库地址,需要本地存在SSH密钥，并在 ${action} 网站上进行SSH配置。否则Git pull、push等操作会失败。如果SSH已配置，请忽略。`;
+                    let btnText = await hxShowMessageBox("提醒", boxMsg, ["返回修改", "确定使用SSH"]).then( btnText => {
+                        return btnText;
+                    });
+                    return btnText == "确定使用SSH" ? true : false;
+                };
             };
         };
         return true;
@@ -187,8 +211,9 @@ class gitInitAfterSetting {
             {type: "label",name: "blank_line_1",text: ""},
             {type: "checkBox",name: "isPrivate",label: "是否私有；私有，仅仓库成员可见；公开，则所有人可见", value: true},
             {type: "label",name: "blank_line_2",text: ""},
-            {type: "checkBox",name: "isAddRemoteOrigin",label: `远程仓库创建成功后，并给本地项目 ${this.projectName} 添加到远程仓库URL，即执行 git add remote origin url`, value: true},
+            {type: "checkBox",name: "isAddRemoteOrigin",label: `${tService}远程仓库创建成功后，并添加远程仓库地址到${this.projectName}项目 ，即执行 git add remote origin url`, value: true},
             {type: "label",name: "blank_line_3",text: ""},
+            {type: "checkBox",name: "isHttp",label: '使用HTTP，添加远程仓库地址；反之，则使用SSH', value: true}
         ];
 
         if (action == 'ManualInput') {
@@ -308,7 +333,7 @@ class gitInitAfterSetting {
         let preFillData = {local_email, local_username, projectName, projectPath};
         let setInfo = await this.view(preFillData, git_service);
         if (setInfo == undefined) return;
-        let {action} = setInfo;
+        let {action, isHttp} = setInfo;
 
         // 手动添加远程仓库
         if (action == 'ManualInput') {
@@ -349,12 +374,13 @@ class gitInitAfterSetting {
                 if (createResult.status == 'success') {
                     let {ssh_url, http_url} = createResult;
                     if (!isAddRemoteOrigin) return;
-                    let addOriginResult = await gitAddRemoteOrigin(projectPath, http_url);
+                    let useUrl = isHttp ? http_url : ssh_url;
+                    let addOriginResult = await gitAddRemoteOrigin(projectPath, useUrl);
                     if (addOriginResult == 'success') {
-                        createOutputChannel(`本地项目【${projectName}】，添加远程仓库地址成功。即执行git add remote origin ${http_url} 成功。`, "success");
+                        createOutputChannel(`本地项目【${projectName}】，添加远程仓库地址成功。即执行git add remote origin ${useUrl} 成功。`, "info");
                         return {"status": "success"};
                     } else {
-                        createOutputChannel(`本地项目【${projectName}】，添加远程仓库地址失败。即执行git add remote origin ${http_url} 失败。`, "error");
+                        createOutputChannel(`本地项目【${projectName}】，添加远程仓库地址失败。即执行git add remote origin ${useUrl} 失败。`, "error");
                     };
                 } else {
                     let innerParams = Object.assign(ProjectInfo, {"easyGitInner": true, "git_service": action});
