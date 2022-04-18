@@ -1448,7 +1448,7 @@ async function gitPull(workingDir, options) {
                 let msg = 'Git: pull 操作成功。';
                 if (res) {
                     let fnum = (res.files).length;
-                    msg = `Git: pull 操作成功, 项目下共有 ${fnum} 个文件发生变动。`;
+                    msg = fnum == 0 ? 'Git: pull 操作成功, 没有文件发生变动。' : `Git: pull 操作成功, 项目下共有 ${fnum} 个文件发生变动，可通过Git日志查看变动。`;
                 };
                 hx.window.setStatusBarMessage(msg);
                 return 'success';
