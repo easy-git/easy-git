@@ -36,6 +36,9 @@ let githubOAuth = new Github();
 
 let tmpProjectInfo = {};
 
+// 记录用户选择的git服务
+let gitServiceUserSelect = undefined;
+
 /**
  * @description Git项目初始化; 初始化成功后，创建.gitignore文件, 并询问用户是否关联远程仓库
  * @param {Object} ProjectInfo 项目信息，即焦点在项目管理器、编辑器时，获取的文件信息
@@ -108,8 +111,8 @@ class gitInitAfterSetting {
     async goValidate(formData, that) {
         let {action, RepositoryName, oauth_desc_gitee, oauth_desc_github, isHttp} = formData;
 
-        if (action == 'github' && oauth_desc_github) return true;
-        if (action == 'gitee' && oauth_desc_gitee) return true;
+        if (action == 'github' && oauth_desc_github === null) return true;
+        if (action == 'gitee' && oauth_desc_gitee === null) return true;
 
         if (action == 'ManualInput') {
             let {RepositoryURL, new_email} = formData;
@@ -123,6 +126,7 @@ class gitInitAfterSetting {
                 return false;
             };
         };
+
         if (action == 'github') {
             let t1 = RepositoryName.trim();
             if (/[a-zA-Z0-9_\-\.]{1,100}$/.test(t1) == false || t1 == '.') {
@@ -192,6 +196,7 @@ class gitInitAfterSetting {
         let RepositoryName = projectName ? projectName : '';
 
         let tService = action;
+        gitServiceUserSelect = action;
 
         var oauth_desc = `<span>您使用此功能之前，需要先授权插件访问 ${tService}。
             <br/><br/>通过OAuth授权后，可以在本地操作远程Git服务器某些功能；比如无需再登录浏览器，直接在本地创建远程仓库。
@@ -280,7 +285,7 @@ class gitInitAfterSetting {
         }).then((res) => {
             return res;
         }).catch(error => {
-            console.log(error);
+            console.error(error);
         });
         return setInfo;
     };
@@ -332,7 +337,11 @@ class gitInitAfterSetting {
         // 打开Git设置窗口
         let preFillData = {local_email, local_username, projectName, projectPath};
         let setInfo = await this.view(preFillData, git_service);
-        if (setInfo == undefined) return;
+        if (setInfo == undefined) {
+            let nextPreData = Object.assign(ProjectInfo, {"git_service": gitServiceUserSelect});
+            createOutputViewForHyperLinksForCommand(`您手动关闭了设置窗口，如需要，请点击【Git仓库设置】链接打开Git仓库设置窗口。`, "Git仓库设置", "success", "EasyGit.addRemoteOrigin", nextPreData);
+            return;
+        };
         let {action, isHttp} = setInfo;
 
         // 手动添加远程仓库
