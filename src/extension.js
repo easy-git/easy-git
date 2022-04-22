@@ -191,7 +191,11 @@ function activate(context) {
 
     // 菜单 【.gitignore】
     let setGitignore = hx.commands.registerCommand('EasyGit.setGitingore', (param)=> {
-        file.gitignore(param);
+        try{
+            git.action(param, 'gitignore');
+        }catch(e){
+            file.gitignore(param);
+        };
     });
     context.subscriptions.push(setGitignore);
 

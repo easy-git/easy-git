@@ -503,7 +503,7 @@
             }
         ],
         "expressions": {
-            "isGitignore": "!(file.exists <- '${workspaceFolder}/.gitignore')",
+            "isGitignore": "explorerResourceIsFolder && !(file.exists <- '${workspaceFolder}/${workspaceFolderRelativePath}/.gitignore')",
             "isShowSourceCode": "isGit"
         },
         "keybindings":[
@@ -636,7 +636,7 @@
                 {
                     "command": "EasyGit.setGitingore",
                     "title": "设置.gitignore",
-                    "when": "isGit",
+                    "when": "expression.isGitignore",
                     "group": "easygit@4"
                 },
                 {

@@ -27,6 +27,8 @@ const gitAnnotate = require('./annotate.js');
 const gitConfig = require('./gitConfig.js');
 const gitGrep = require('./grep.js');
 
+const gitignore = require('./gitignore.js');
+
 // 检查是否安装Git
 let isInstallGitForLocal;
 
@@ -76,7 +78,7 @@ async function action(param, action_name) {
         'easyGitInner': easyGitInner,
         'isFromGitView': isFromGitView
     };
-    
+
     // 记录当前操作的项目信息
     let lastProjectInfo = {projectName, projectPath};
 
@@ -117,7 +119,8 @@ async function action(param, action_name) {
             "stash", "stashAll",
             "tagCreate", "archive",
             "reflog", "annotate", "BlameForLineChange",
-            "showAnotherBranchFile"
+            "showAnotherBranchFile",
+            "gitignore"
         ];
         if (gitCountList.includes(action_name)) {
             count(action_name);
@@ -127,6 +130,9 @@ async function action(param, action_name) {
     switch (action_name){
         case 'init':
             gitInitProject(ProjectInfo);
+            break;
+        case 'gitignore':
+            gitignore(ProjectInfo);
             break;
         case 'addRemoteOrigin':
             let remoteParam = Object.assign(ProjectInfo);
