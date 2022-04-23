@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.7.5
+* 优化 初始化存储库后，gitehub/gitee添加远程仓库， 支持选择http还是ssh
+* 优化 .gitignore创建窗口UI
+* 优化 日志视图 文件修改详情 支持鼠标选择
+* 优化 初始化仓库窗口 增加创建组织链接入口
+
 ## 1.7.4
 * 修复 HBuilderX自定义主题 源代码管理器视图 没有适配项目管理器颜色的Bug （感谢 QQ用户：`苏陌` 的反馈）
 * 新增 设置项 `EasyGit.theme.siderBar`和`EasyGit.theme.editor` 用于自定义EasyGit源代码管理器视图和日志视图主题 [Git视图自定义主题规则](https://easy-git.github.io/setting/theme)
