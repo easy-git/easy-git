@@ -1489,6 +1489,18 @@ async function gitPull(workingDir, options) {
                 } else if (errMsg.includes("local changes")) {
                     createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
                     createOutputChannel(msgForPullOther, 'info');
+                } else if (errMsg.includes("no tracking") && errMsg.includes("set tracking") && errMsg.includes("git branch --set-upstream-to=origin")) {
+                    createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
+                    // 判断 是否设置URL
+                    let configData = gitConfigShow(workingDir, false);
+                    let remoteOriginUrl = configData['remote.origin.url'];
+                    if (remoteOriginUrl == undefined) {
+                        let ProjectInfo = {"projectPath":workingDir, "ProjectName": "", "easyGitInner": true};
+                        createOutputViewForHyperLinksForCommand(
+                            "原因：本地仓库未设置Git远程仓库URL,请关联远程仓库后再进行pull操作。", "Git仓库设置", "error",
+                            "EasyGit.addRemoteOrigin", ProjectInfo
+                        );
+                    };
                 } else if (errMsg.includes("git --help")){
                     createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
                 } else {
