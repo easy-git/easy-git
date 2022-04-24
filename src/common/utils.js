@@ -20,6 +20,7 @@ const fileIO= require('./file.js');
 const osName = os.platform();
 
 const cmp_hx_version = require('./cmp.js');
+const { error } = require('console');
 // let hxVersion = hx.env.appVersion;
 // hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
 
@@ -1460,56 +1461,67 @@ async function gitPull(workingDir, options) {
     hx.window.setStatusBarMessage(msg, 5000,'info');
 
     try {
-        let status = await git(workingDir)
+        let pullResult = await git(workingDir)
             .pull(args)
             .then((res) => {
                 let msg = 'Git: pull 操作成功。';
                 if (res) {
                     let fnum = (res.files).length;
-                    msg = fnum == 0 ? 'Git: pull 操作成功, 没有文件发生变动。' : `Git: pull 操作成功, 项目下共有 ${fnum} 个文件发生变动，可通过Git日志查看变动。`;
+                    msg = fnum == 0
+                        ? 'Git: pull 操作成功, 没有文件发生变动。'
+                        : `Git: pull 操作成功, 项目下共有 ${fnum} 个文件发生变动，可通过Git日志查看变动。`;
                 };
                 hx.window.setStatusBarMessage(msg);
-                return 'success';
+                return {"status": "success", "msg": msg};
             })
             .catch((err) => {
-                let cmd_details = args.join(' ');
-                let msgForPullOther = "提醒：如需执行其它pull选项操作，将焦点置于当前要查看的项目上；然后打开命令面板，输入pull，即可看到其它相关的git pull选项。"
-                let errMsg = (err).toString();
-                if (errMsg.includes('cannot pull with rebase')) {
-                    let msg1 = "\n原因：项目下存在未提交的文件，请处理后再操作。\n\n如需执行其它pull命令, 请点击下列按钮。"
-                    errMsg = errMsg + msg1;
-                    let title = `Git pull ${cmd_details} 执行失败。`;
-                    gitPullRebaseForFail(title, errMsg, workingDir);
-                } else if (errMsg.includes('could not read Username')) {
-                    createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
-                    createOutputChannel('关于身份认证信息的解决方法: https://easy-git.github.io/question/username', 'info')
-                } else if (errMsg.includes('Permission denied (publickey)')) {
-                    createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
-                    createOutputChannel('关于Permission denied (publickey)的解决方法: https://easy-git.github.io/question/Permission_denied_publickey', 'info')
-                } else if (errMsg.includes("local changes")) {
-                    createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
-                    createOutputChannel(msgForPullOther, 'info');
-                } else if (errMsg.includes("no tracking") && errMsg.includes("set tracking") && errMsg.includes("git branch --set-upstream-to=origin")) {
-                    createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
-                    // 判断 是否设置URL
-                    let configData = gitConfigShow(workingDir, false);
-                    let remoteOriginUrl = configData['remote.origin.url'];
-                    if (remoteOriginUrl == undefined) {
-                        let ProjectInfo = {"projectPath":workingDir, "ProjectName": "", "easyGitInner": true};
-                        createOutputViewForHyperLinksForCommand(
-                            "原因：本地仓库未设置Git远程仓库URL,请关联远程仓库后再进行pull操作。", "Git仓库设置", "error",
-                            "EasyGit.addRemoteOrigin", ProjectInfo
-                        );
-                    };
-                } else if (errMsg.includes("git --help")){
-                    createOutputChannel(`Git: pull ${cmd_details} 执行失败。 \n ${errMsg}`, 'error');
-                } else {
-                    createOutputChannel(`Git: pull ${cmd_details}失败。 \n ${errMsg}`, 'error');
-                    createOutputChannel(msgForPullOther, 'info');
-                }
-                return 'fail';
+                return {"status": "fail", "msg": err};
             });
-        return status
+
+        // 状态码、消息
+        let {status, msg} = pullResult;
+
+        if (status == "success") return "success";
+
+        // pull 错误消息处理
+        let errMsg = (msg).toString();
+        let cmd_details = args.join(' ');
+        let msgForPullOther = "提醒：如需执行其它pull选项操作，将焦点置于当前要查看的项目上；然后打开命令面板，输入pull，即可看到其它相关的git pull选项。";
+
+        // 输出git pull命令行输出的操作消息
+        createOutputChannel(`Git: pull ${cmd_details} 执行失败。错误详情： \n ${errMsg}`, 'error');
+
+        if (errMsg.includes('cannot pull with rebase')) {
+            // 项目下存在未提交的文件，弹窗提示其它git pull操作
+            let msg1 = "\n原因：项目下存在未提交的文件，请处理后再操作。\n\n如需执行其它pull命令, 请点击下列按钮。"
+            errMsg = errMsg + msg1;
+            let title = `Git pull ${cmd_details} 执行失败。`;
+            gitPullRebaseForFail(title, errMsg, workingDir);
+        } else if (errMsg.includes('could not read Username')) {
+            createOutputChannel('关于身份认证信息的解决方法: https://easy-git.github.io/question/username', 'info');
+        } else if (errMsg.includes('Permission denied (publickey)')) {
+            createOutputChannel('关于Permission denied (publickey)的解决方法: https://easy-git.github.io/question/Permission_denied_publickey', 'info');
+        } else if (errMsg.includes("Host key verification failed")) {
+            createOutputChannel('身份信息认证失败，可能SSH Key失效。请根据上面的错误消息进行解决！', 'error');
+        } else if (errMsg.includes("local changes")) {
+            createOutputChannel(msgForPullOther, 'info');
+        } else if (errMsg.includes("no tracking") && errMsg.includes("set tracking") && errMsg.includes("git branch --set-upstream-to=origin")) {
+            // 判断 是否设置URL
+            let configData = gitConfigShow(workingDir, false);
+            let remoteOriginUrl = configData['remote.origin.url'];
+            if (remoteOriginUrl == undefined) {
+                let ProjectInfo = {"projectPath":workingDir, "ProjectName": "", "easyGitInner": true};
+                createOutputViewForHyperLinksForCommand(
+                    "原因：本地仓库未设置Git远程仓库URL,请关联远程仓库后再进行pull操作。", "Git仓库设置", "error",
+                    "EasyGit.addRemoteOrigin", ProjectInfo
+                );
+            };
+        } else if (errMsg.includes("connect to host")) {
+            createOutputChannel('原因：无法连接远程Git服务器，可能网络出了问题，请检查。', 'error');
+        } else {
+            createOutputChannel(msgForPullOther, 'info');
+        };
+        return status;
     } catch (e) {
         console.log(e);
         return 'error';
