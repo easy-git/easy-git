@@ -495,6 +495,9 @@ async function getFilesExplorerProjectInfo() {
  * @description 控制台链接跳转
  * @param {String} message
  * @param {String} linkText
+ * @param {String} level 消息级别
+ * @param {String} commandName git操作command名称
+ * @param {Object} commandParam command操作参数
  */
 function createOutputViewForHyperLinksForCommand(message, linkText, level="info", commandName, commandParam={}) {
     let outputView = hx.window.createOutputView({
@@ -713,7 +716,10 @@ async function checkGitCredentials(projectPath, unset=false) {
         return;
     };
     let configData = await gitConfigShow(projectPath, false);
+
     let remoteOriginUrl = configData['remote.origin.url'];
+    if (remoteOriginUrl == undefined) return;
+
     if (remoteOriginUrl.slice(0,4) == 'git@') { return 'ssh'; };
 
     let credential = configData['credential.helper'];
@@ -1337,6 +1343,7 @@ async function gitAddCommit(workingDir,commitComment) {
 /**
  * @description git: push
  * @param {String} projectPath 项目路径
+ * @param {Array} options git push操作参数，比如 -f
  */
 async function gitPush(workingDir, options=[]) {
     // status bar show message
@@ -1346,6 +1353,7 @@ async function gitPush(workingDir, options=[]) {
         msg = `Git: git push ${tmsg} 正在向远端推送.....`;
     };
     hx.window.setStatusBarMessage(msg, 30000, 'info');
+
     try {
         let checkResult = await checkGitCredentials(workingDir);
         let status = await git(workingDir)
@@ -1367,6 +1375,16 @@ async function gitPush(workingDir, options=[]) {
                 hx.window.clearStatusBarMessage();
                 let errMsg = (err).toString();
                 let title = "Git: push操作失败。";
+
+                // 未关联远程仓库
+                if (errMsg.includes("URL") && errMsg.includes("remote repository") && checkResult == undefined) {
+                    let ProjectInfo = {"projectPath":workingDir, "ProjectName": "", "easyGitInner": true};
+                    createOutputChannel(`${title} \n ${errMsg}`, 'error');
+                    createOutputViewForHyperLinksForCommand("原因：本地仓库未设置Git远程仓库URL。", "Git仓库设置", "error", "EasyGit.addRemoteOrigin", ProjectInfo);
+                    return;
+                };
+
+                // 身份认证失败
                 if (errMsg.includes('Authentication failed') || errMsg.includes('could not read Username')) {
                     checkGitCredentials(workingDir, true);
                     let osErrorMsg = osName == 'darwin'
