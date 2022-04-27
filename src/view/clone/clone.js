@@ -2,11 +2,13 @@ const hx = require('hbuilderx');
 
 // hbuilderx 3.1.2+, use webviewDialog
 let openWebDialog = require('./view_webdialog.js');
+let openFormDialog = require('./formdialog.js');
 
 const {hxShowMessageBox} = require('../../common/utils.js');
 
 function openCloneView(isSwitchSearchGithub=false) {
     try{
+        // openFormDialog();
         openWebDialog('', isSwitchSearchGithub);
     }catch(e){
         hxShowMessageBox(
