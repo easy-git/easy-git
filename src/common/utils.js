@@ -531,7 +531,7 @@ function createOutputViewForHyperLinksForCommand(message, linkText, level="info"
 
 
 /**
- * @description 创建输出控制台
+ * @description 创建输出控制台（早期）
  * @param {String} msg
  * @param {msgLevel} msgLevel (warning | success | error | info), 控制文本颜色
  */
@@ -547,6 +547,39 @@ function createOutputChannel(msg, msgLevel=undefined) {
         console.log(e)
         outputChannel.appendLine(msg);
     };
+};
+
+/**
+ * @description 创建输出控制台, 跟createOutputChannel方法的区别是，这个方法可以控制是否换行
+ * @param {String} msg
+ * @param {Boolean} newline (true | false), 是否换行
+ */
+ function createOutputChannelForClone(msg, newline=true) {
+    let channel_name = "easy-git";
+    let outputChannel = hx.window.createOutputChannel(channel_name);
+    outputChannel.show();
+
+    let text = `${msg}`;
+    if (newline) {
+        outputChannel.appendLine('\n' + text);
+    } else {
+        outputChannel.appendLine(text);
+    };
+};
+
+/**
+ * @description 创建独立输出控制台
+ * @param {String} msg
+ * @param {msgLevel} msgLevel (warning | success | error | info), 控制文本颜色
+ */
+function createConsoleWindow(msg, msgLevel=undefined) {
+    let outputView = hx.window.createOutputView({"id":"easy-git","title":"Git控制台"});
+    outputView.show();
+
+    outputView.appendLine({
+        line: msg,
+        level: msgLevel,
+    });
 };
 
 /**
@@ -585,6 +618,8 @@ function createOutputView(msg, msgLevel='info', linkText) {
                     if (fs.existsSync(linkText)) {
                         return hx.workspace.openTextDocument(linkText);
                     };
+
+                    // 用于ssh操作
                     const file_content = linkText.includes('.ssh/config') ? `#Host github\n#\tHostName github.com\n#\tPreferredAuthentications publickey\n#\tIdentityFile ~/.ssh/<private-key-filename>` : '';
                     fs.appendFile(linkText, file_content , (error) => {
                         if (error) {return};
@@ -596,21 +631,6 @@ function createOutputView(msg, msgLevel='info', linkText) {
     });
 };
 
-/**
- * @description 创建输出控制台
- */
-function createOutputChannelForClone(msg, newline=true) {
-    let channel_name = "easy-git";
-    let outputChannel = hx.window.createOutputChannel(channel_name);
-    outputChannel.show();
-
-    let text = `${msg}`;
-    if (newline) {
-        outputChannel.appendLine('\n' + text);
-    } else {
-        outputChannel.appendLine(text);
-    };
-};
 
 /**
  * @description 运行命令
