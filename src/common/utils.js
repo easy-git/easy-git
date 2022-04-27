@@ -20,7 +20,7 @@ const fileIO= require('./file.js');
 const osName = os.platform();
 
 const cmp_hx_version = require('./cmp.js');
-const { error } = require('console');
+
 // let hxVersion = hx.env.appVersion;
 // hxVersion = hxVersion.replace('-alpha', '').replace(/.\d{8}/, '');
 
@@ -902,22 +902,24 @@ function runGitClone(options) {
 
 /**
  * @description clone
+ * @param {Object} info 克隆信息，字段：username, password, repo, branch, localPath, projectName, isAuth
+ * 
  */
 async function gitClone(info) {
 
     let remote = '';
     let {username, password, repo, branch, localPath, projectName, isAuth} = info;
 
-    if (username.includes('@')) {
-        username = username.replace('@','%40')
-    };
-    if (password.includes('@')) {
-        password = password.replace('@','%40')
-    };
-
+    // 克隆协议
     let cloneWay = repo.substring(0,4) == 'git@' ? 'ssh' : 'http';
 
     if (isAuth) {
+        if (username.includes('@')) {
+            username = username.replace('@','%40')
+        };
+        if (password.includes('@')) {
+            password = password.replace('@','%40')
+        };
         if (/(http|https):\/\//.test(repo)) {
             let http = 'http://';
             if (/https:\/\//.test(repo)) { http = "https://"};
