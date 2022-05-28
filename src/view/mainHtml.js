@@ -158,6 +158,8 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                         <li title="git pull" @click="gitPull('');">拉取 - pull</li>
                                         <li title="git pull" @click="gitPush();">推送 - push</li>
                                         <li class="divider"></li>
+                                        <li title="git pull" @click="runHXCommands('EasyGit.branch', 'branch');">分支 / Tag 管理</li>
+                                        <li class="divider"></li>
                                         <li title="git reset --soft HEAD^" @click="gitResetSoftHEAD();">撤销上次commit</li>
                                         <li title="git reset --hard HEAD" @click="gitResetHardHEAD('HEAD');">重置当前修改</li>
                                         <li title="git reset --hard HEAD^" @click="gitResetHardHEAD('HEAD^');">重置代码到上个版本</li>
