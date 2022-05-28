@@ -1818,14 +1818,14 @@ async function gitCurrentBranchName(workingDir) {
 
 /**
  * @description 分支切换
+ * @param {String} workingDir Git工作目录
+ * @param {String} branchName 分支名称或 - , - 代表上一次分支
  */
-async function gitBranchSwitch(workingDir,branchName) {
+ async function gitBranchSwitch(workingDir,branchName) {
     try {
         let status = await git(workingDir)
             .checkout([branchName])
             .then(() => {
-                hx.window.setStatusBarMessage(`Git: 分支切换成功, 当前分支是 ${branchName}`, 20000, 'info');
-                voiceSay(`branch.switch.success`, `当前分支是 ${branchName}`);
                 return 'success';
             })
             .catch((err) => {
@@ -1837,10 +1837,20 @@ async function gitBranchSwitch(workingDir,branchName) {
                 };
                 return 'fail';
             });
+        if (status == 'success') {
+            if (branchName == '-') {
+                let result = await gitCurrentBranchName(workingDir);
+                if (result) {
+                    branchName = result;
+                };
+            };
+            hx.window.setStatusBarMessage(`Git: 分支切换成功, 当前分支是 ${branchName}`, 20000, 'info');
+            voiceSay(`branch.switch.success`, `当前分支是 ${branchName}`);
+        };
         return status;
     } catch (e) {
         return 'error';
-    }
+    };
 };
 
 /**
