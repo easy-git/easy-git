@@ -273,9 +273,6 @@ async function GitLogCustomEditorRenderHtml(projectData, userConfig) {
             case 'showCommitFileChange':
                 Log.showCommitFileChange(msg.data);
                 break;
-            case 'openCommandPanel':
-                hx.commands.executeCommand('EasyGit.CommandPanel', easyGitInnerParams);
-                break;
             case 'showRefList':
                 Log.goRefs();
                 break;

@@ -301,7 +301,7 @@ function generateLogHtml(userConfig, initData) {
                         <li @click="copyLogMsg(rightClickItem, 'commit_id')">复制commit id到剪贴板</li>
                         <div class="dropdown-divider"></div>
                         <li @click="archive(rightClickItem)">归档</li>
-                        <li @click="openCommandPanel(rightClickItem)">Git 命令面板</li>
+                        <li @click="runHXCommands('EasyGit.CommandPanel');">Git 命令面板</li>
                     </ul>
                 </div>
             </div>
@@ -662,11 +662,6 @@ function generateLogHtml(userConfig, initData) {
                                 if (msg.command != 'showCommitFileChange') {return};
                                 this.CommitFileChangeDetails = msg.result.data;
                             });
-                        },
-                        openCommandPanel() {
-                            hbuilderx.postMessage({
-                                command: 'openCommandPanel'
-                            })
                         },
                         showRefList() {
                             hbuilderx.postMessage({
