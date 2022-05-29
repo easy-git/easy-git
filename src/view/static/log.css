@@ -94,6 +94,12 @@ button {
     color: var(--inputLineColor);
 }
 
+.project-name::after {
+    font-family: 'git-icon';
+    content: "\e6a4";
+    position: relative;
+}
+
 .outline-none {
     box-shadow: none !important;
 }

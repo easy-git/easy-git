@@ -1,4 +1,5 @@
 const path = require('path');
+const os = require('os');
 
 const icon = require('../static/icon.js');
 const {getThemeColor} = require('../../common/utils.js');
@@ -8,6 +9,12 @@ const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'boo
 const diff2htmlCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'diff2html.min.css');
 const logCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'log.css');
 
+let gitTTFFile = path.join(path.resolve(__dirname, '..'), 'static', 'font' ,'git.ttf');
+// windows路径处理
+const osName = os.platform();
+if ( osName != 'darwin') {
+    gitTTFFile = gitTTFFile.replace(/\\/g, '/');
+};
 
 /**
  * @description 获取图标、各种颜色
@@ -109,6 +116,10 @@ function generateLogHtml(userConfig, initData) {
                     --d2h_emptyplaceholder_bg: ${d2h_emptyplaceholder_bg};
                     --d2h_emptyplaceholder_border: ${d2h_emptyplaceholder_border};
                 }
+                @font-face {
+                    font-family: 'git-icon';
+                    src: url('${gitTTFFile}') format('truetype');
+                }
             </style>
             <link rel="stylesheet" href="${logCssFile}">
         </head>
@@ -121,14 +132,14 @@ function generateLogHtml(userConfig, initData) {
                                 <div class="d-flex">
                                     <div class="mr-auto">
                                         <h6 class="project-info cursor-default">
-                                            <span>{{ projectName }} / </span>
-                                            <span title="仅显示当前分支log" class="branch"
-                                                :class="{ active: searchType == 'branch'}"
-                                                @click="switchSearchType('branch');">{{ currentBranch }} </span>
-                                            <span> | </span>
+                                            <span class="project-name" @click="runHXCommands('EasyGit.quickOpenGitProject', 'logView');" title="点击选择其它Git项目查看日志">{{ projectName }}</span>
+                                            <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                             <span title="显示所有分支log" class="branch"
                                                 :class="{ active: searchType == 'all'}"
                                                 @click="switchSearchType('all');">所有分支</span>
+                                            <span title="仅显示当前分支log" class="branch"
+                                                :class="{ active: searchType == 'branch'}"
+                                                @click="switchSearchType('branch');"> |  {{ currentBranch }} </span>
                                         </h6>
                                     </div>
                                     <div class="cursor-default">
@@ -669,6 +680,13 @@ function generateLogHtml(userConfig, initData) {
                                 command: 'archive',
                                 hash: hash
                             })
+                        },
+                        runHXCommands(commandName, commandParam) {
+                            hbuilderx.postMessage({
+                                command: 'hxCommand',
+                                commandName: commandName,
+                                commandParam: commandParam
+                            });
                         }
                     }
                 })

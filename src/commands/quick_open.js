@@ -18,7 +18,14 @@ const gitHistoryFile = path.join(appDataDir, 'easy-git', 'history', 'project.jso
  * @description 快速打开项目管理器的Git项目、或本地的Git项目
  * @param {Object} param
  */
-async function quickOpen(param) {
+async function quickOpen(param={}) {
+
+    // 2022-05-29: 用于打开指定视图， 目前只有：log、main
+    let viewName;
+    if (param != null && typeof(param) == "object") {
+        viewName = param['viewName'];
+    };
+
     let gitList = [];
 
     // 读取曾打开的历史数据
@@ -46,8 +53,10 @@ async function quickOpen(param) {
         {"label": "没有找到? 打开本地磁盘上的Git项目", "action": "openLocal"},
         ...gitList
     ];
+
+    let placeHolder = viewName == "logView" ? '请选择Git项目查看Log...' : '请选择要打开的Git项目...';
     let selected = await hx.window.showQuickPick(pickerList, {
-        'placeHolder': '请选择要打开的Git项目...'
+        'placeHolder': placeHolder
     }).then( (res)=> {
         return res;
     });
@@ -66,7 +75,9 @@ async function quickOpen(param) {
         if (action == 'openLocal') {
             selecteOpenLocalProject();
         };
-        if (action == 'open') {
+        if (action == 'open' && viewName == 'logView') {
+            hx.commands.executeCommand("EasyGit.log", info);
+        } else {
             hx.commands.executeCommand("EasyGit.main", info);
         };
     };

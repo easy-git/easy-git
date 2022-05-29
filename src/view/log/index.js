@@ -283,6 +283,10 @@ async function GitLogCustomEditorRenderHtml(projectData, userConfig) {
                 let archvieParams = Object.assign({'hash': msg.hash}, easyGitInnerParams);
                 hx.commands.executeCommand('EasyGit.archive', archvieParams);
                 break;
+            case 'hxCommand':
+                let {commandParam, commandName} = msg;
+                hx.commands.executeCommand(commandName, {"viewName": commandParam, "easyGitInner": true});
+                break;
             default:
                 break;
         };
