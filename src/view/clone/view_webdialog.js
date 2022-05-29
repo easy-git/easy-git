@@ -353,8 +353,11 @@ function showClone(clone_url="", isSwitchSearchGithub=false) {
     });
 
     let promi = webviewDialog.show();
-    promi.then(function (data) {
-        // 处理错误信息
+    promi.then(function(data) {
+        let { code, message } = data;
+        if (message) {
+            hx.window.showErrorMessage(`EasyGit: 内置浏览器运行错误，请重新安装内置浏览器插件。${message}`, ["我知道了"]);
+        };
     });
 };
 
