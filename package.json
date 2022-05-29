@@ -133,7 +133,7 @@
                 "EasyGit.DisableDevTools": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Git视图页面，是否禁用右键菜单开发者工具，即审查元素 (非必要时，请勿开启)。"
+                    "description": "Git源代码管理器视图，禁用右键菜单开发者工具，即禁用审查元素 (非必要时，请勿开启)。"
                 },
                 "EasyGit.VoiceBroadcast": {
                     "type": "boolean",
