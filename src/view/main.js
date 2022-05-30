@@ -705,6 +705,8 @@ let watchProjectPath;
 let watcherListen;
 var lastListeningFileInfo;
 function watchProjectDir(projectDir, func) {
+    if (projectDir == undefined) return;
+    
     let gitDir = path.join(projectDir, '.git');
     let refsPath = path.join(gitDir, 'refs', 'remotes', 'origin');
     let refsHeads = path.join(gitDir, 'refs', 'heads');

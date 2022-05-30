@@ -414,8 +414,9 @@ function importProjectToExplorer(projectPath) {
  * @return {String} git-dir
  */
 function checkIsGitProject(projectPath) {
-    process.chdir(projectPath);
+    if (projectPath == undefined) return 'No';
     return new Promise((resolve, reject) => {
+        process.chdir(projectPath);
         try{
             exec('git rev-parse --git-dir', function(error, stdout, stderr) {
                 if (error) {

@@ -93,7 +93,10 @@ function activate(context) {
 
     // 菜单【日志】, 打开日志视图
     let view_log_manage = hx.commands.registerCommand('EasyGit.log', (param) => {
-        if (param == undefined) {return};
+        if (param == undefined) {
+            hx.commands.executeCommand('EasyGit.quickOpenGitProject', {"viewName": "logView", "easyGitInner": true});
+            return;
+        };
 
         let LogCscratFile = path.join(__dirname, 'view',  'log', 'cscrat', 'EasyGit - 日志');
         hx.workspace.openTextDocument(LogCscratFile);

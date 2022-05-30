@@ -59,6 +59,9 @@ function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
             case 'open_clone':
                 hx.commands.executeCommand('EasyGit.clone');
                 break;
+            case 'quickOpen':
+                hx.commands.executeCommand('EasyGit.quickOpenGitProject');
+                break;
             default:
                 break;
         };
@@ -182,6 +185,9 @@ function generateLogHtml(userConfig, uiData, FilesExplorerProjectInfo) {
                         <div>
                             <button class="btn-imp" @click="goClone();">克隆Git存储库</button>
                         </div>
+                        <div>
+                            <button class="btn-imp" @click="quickOpen();">打开历史Git存储库</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -241,6 +247,11 @@ function generateLogHtml(userConfig, uiData, FilesExplorerProjectInfo) {
                         goClone() {
                             hbuilderx.postMessage({
                                 command: 'open_clone'
+                            });
+                        },
+                        quickOpen() {
+                            hbuilderx.postMessage({
+                                command: 'quickOpen'
                             });
                         }
                     }

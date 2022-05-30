@@ -121,10 +121,8 @@ class Common {
                     selectedFile = param.document.uri.fsPath;
                 };
             } catch(e){
-                let res = await hx.window.showErrorMessage('easy-git: 请在项目管理器选中项目后再试，或克隆一个项目', ['克隆','我知道了']).then( btnText => {
-                    return btnText == '克隆' ? 'goClone' : 'error';
-                });
-                return res;
+                hx.commands.executeCommand('EasyGit.quickOpenGitProject');
+                return;
             };
         };
 
@@ -231,6 +229,7 @@ class Main extends Common {
      */
     async Focus() {
         this.ProjectData = await super.getProjectInfo(this.param);
+        if (this.ProjectData == undefined) return;
 
         // 获取项目名称、项目路径
         let { projectName, projectPath, selectedFile, GitAssignAction, easyGitInner } = this.ProjectData;
