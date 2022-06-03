@@ -263,6 +263,10 @@ class Main extends Common {
             return;
         };
 
+        if (this.viewType == 'main') {
+            hx.window.setStatusBarMessage(`EasyGit: 正在打开打开源代码管理器视图...`, 5000, 'info');
+        };
+
         try{
             let isActive = this.webviewPanel._webView._html;
             if (isActive != '') {

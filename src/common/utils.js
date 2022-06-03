@@ -2291,45 +2291,44 @@ async function gitLog(workingDir, searchType, filterCondition, refname) {
         filter = [...tmpFilter];
     };
 
-    try {
-        let result = {
-            "success": true,
-            "errorMsg": '',
-            "data": []
-        };
-        if (workingDir == undefined || workingDir == '') {
-            result.errorMsg = '无法获取项目路径，git log执行失败。请重试。';
-            result.success = false;
-            return result;
-        };
-
-        let LogResult = await git(workingDir)
-            .log(filter)
-            .then((res) => {
-                let data = res.all;
-                result.data = data
-                return data;
-            })
-            .catch((err) => {
-                result.errorMsg = err.message;
-                result.success = false;
-                return result;
-            });
-
-        try{
-            let parseResult = await parseLogData(LogResult);
-            if (parseResult){
-                result.data = parseResult;
-            };
-        }catch(e){
-            console.log(e)
-        };
-        return result;
-    } catch (e) {
-        result.errorMsg = e;
+    let result = {
+        "success": true,
+        "errorMsg": '',
+        "data": []
+    };
+    if (workingDir == undefined || workingDir == '') {
+        result.errorMsg = '无法获取项目路径，git log执行失败。请重试。';
         result.success = false;
         return result;
     };
+
+    let LogResult = await git(workingDir)
+        .log(filter)
+        .then((res) => {
+            let data = res.all;
+            result.data = data
+            return data;
+        })
+        .catch((err) => {
+            result.errorMsg = err.message;
+            result.success = false;
+            return result;
+        });
+
+    let { success } = LogResult;
+    if (success == false) {
+        return result;
+    };
+
+    try {
+        let parseResult = await parseLogData(LogResult);
+        if (parseResult) {
+            result.data = parseResult;
+        };
+    } catch (e) {
+        console.error(e);
+    };
+    return result;
 };
 
 /**

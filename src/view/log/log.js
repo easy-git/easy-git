@@ -81,11 +81,14 @@ class GitLogAction {
             };
 
             // 引导使用--grep
-            if (this.setGroupSearch(condition)) {
-                condition = '--grep=' + condition;
-            };
+            // if (this.setGroupSearch(condition)) {
+            //     condition = '--grep=' + condition;
+            // };
+            // if (/.*[\u4e00-\u9fa5]+.*$/.test(condition)) {
+            //     condition = '--grep=' + condition;
+            // };
         };
-        
+
         // 获取当前分支名称, 避免在某些情况下，在外部改变分支，此处未刷新的问题。
         try{
             let currentBranchName = await utils.gitCurrentBranchName(this.projectPath);
