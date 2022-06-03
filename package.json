@@ -2,7 +2,7 @@
     "name": "easy-git",
     "description": "vscode源代码管理工具风格，支持连接Github、gitee账号，支持搜索github，支持命令面板，支持克隆、提交/更新/拉取、分支/tag管理、日志、文件对比、储藏等操作。",
     "displayName": "easy-git Git源代码管理工具",
-    "version": "1.7.5",
+    "version": "1.7.6",
     "publisher": "oneone",
     "git_url": "https://github.com/easy-git/easy-git.git",
     "doc_url": "https://easy-git.github.io/",
@@ -157,47 +157,37 @@
             }
         },
         "viewsContainers": {
-            "activitybar": [
-                {
-                    "id": "EasyGitSourceCodeView",
-                    "title": "easy-git",
-                    "icon": {
-                        "Default": "static/icon/default.svg",
-                        "Monokai": "static/icon/Monokai.svg",
-                        "Atom One Dark": "static/icon/atom.svg"
-                    }
+            "activitybar": [{
+                "id": "EasyGitSourceCodeView",
+                "title": "easy-git",
+                "icon": {
+                    "Default": "static/icon/default.svg",
+                    "Monokai": "static/icon/Monokai.svg",
+                    "Atom One Dark": "static/icon/atom.svg"
                 }
-            ]
+            }]
         },
         "views": {
-            "EasyGitSourceCodeView": [
-                {
-                    "id": "EasyGitSourceCodeView",
-                    "title": "easy-git"
-                }
-            ]
+            "EasyGitSourceCodeView": [{
+                "id": "EasyGitSourceCodeView",
+                "title": "easy-git"
+            }]
         },
-        "customEditors": [
-            {
+        "customEditors": [{
                 "viewType": "EasyGit - 日志",
-                "selector": [
-                    {
-                        "fileNamePattern": "EasyGit - 日志"
-                    }
-                ],
+                "selector": [{
+                    "fileNamePattern": "EasyGit - 日志"
+                }],
                 "priority": "default"
             },
             {
                 "viewType": "EasyGit - 对比差异",
-                "selector": [
-                    {
-                        "fileNamePattern": "EasyGit - 对比差异"
-                    }
-                ]
+                "selector": [{
+                    "fileNamePattern": "EasyGit - 对比差异"
+                }]
             }
         ],
-        "commands": [
-            {
+        "commands": [{
                 "command": "EasyGit.quickOpenGitProject",
                 "title": "easy-git: 快速选择打开Git项目..."
             },
@@ -506,45 +496,43 @@
             "isGitignore": "explorerResourceIsFolder && !(file.exists <- '${workspaceFolder}/${workspaceFolderRelativePath}/.gitignore')",
             "isShowSourceCode": "isGit"
         },
-        "keybindings":[
-            {
-                "command":"EasyGit.main",
-                "key":"Ctrl+Shift+G",
-                "when":"expression.isShowSourceCode",
-                "macosx":"Ctrl+Shift+G"
+        "keybindings": [{
+                "command": "EasyGit.main",
+                "key": "Ctrl+Shift+G",
+                "when": "expression.isShowSourceCode",
+                "macosx": "Ctrl+Shift+G"
             },
             {
-                "command":"EasyGit.log",
-                "key":"Ctrl+Shift+H",
-                "when":"expression.isShowSourceCode",
-                "macosx":"Ctrl+Shift+H"
+                "command": "EasyGit.log",
+                "key": "Ctrl+Shift+H",
+                "when": "expression.isShowSourceCode",
+                "macosx": "Ctrl+Shift+H"
             },
             {
-                "command":"EasyGit.branch",
-                "key":"Ctrl+Shift+B",
-                "when":"expression.isShowSourceCode",
-                "macosx":"Ctrl+Shift+B"
+                "command": "EasyGit.branch",
+                "key": "Ctrl+Shift+B",
+                "when": "expression.isShowSourceCode",
+                "macosx": "Ctrl+Shift+B"
             },
             {
-                "command":"EasyGit.CommandPanel",
-                "key":"Ctrl+Shift+p",
-                "when":"expression.isShowSourceCode",
-                "macosx":"command+Shift+p"
+                "command": "EasyGit.CommandPanel",
+                "key": "Ctrl+Shift+p",
+                "when": "expression.isShowSourceCode",
+                "macosx": "command+Shift+p"
             },
             {
-                "command":"EasyGit.clone",
-                "key":"Ctrl+Shift+c",
-                "macosx":"command+Shift+c"
+                "command": "EasyGit.clone",
+                "key": "Ctrl+Shift+c",
+                "macosx": "command+Shift+c"
             },
             {
                 "command": "EasyGit.quickOpenGitProject",
-                "key":"Ctrl+Shift+O",
-                "macosx":"command+Shift+O"
+                "key": "Ctrl+Shift+O",
+                "macosx": "command+Shift+O"
             }
         ],
         "menus": {
-            "menubar/file": [
-                {
+            "menubar/file": [{
                     "command": "EasyGit.quickOpenGitProject",
                     "title": "快速选择打开Git项目...",
                     "group": "tab"
@@ -558,8 +546,7 @@
                     "group": "tab"
                 }
             ],
-            "explorer/context": [
-                {
+            "explorer/context": [{
                     "command": "EasyGit.grep",
                     "title": "git grep 在Git仓库中查找字符串",
                     "when": "isGit && config.EasyGit.isShowGrepMenu && explorerResourceCount == 1",
@@ -649,8 +636,7 @@
                     "group": "z_commands"
                 }
             ],
-            "editor/context": [
-                {
+            "editor/context": [{
                     "group": "z_commands"
                 },
                 {
@@ -747,8 +733,7 @@
                     "group": "z_commands"
                 }
             ],
-            "menubar/tool": [
-                {
+            "menubar/tool": [{
                     "group": "ext_settings"
                 },
                 {
