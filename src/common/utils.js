@@ -46,11 +46,14 @@ function isObj(object){
  *   - fontSize                字号
  *   - fontColor               字体颜色
  *   - lefeSideVeiwBackground  左侧视图背景色
+ *   - leftSideViewLiBackground 左侧视图文件选中颜色
+ *   - toolBarBgColor          工具栏颜色
  *   - background              编辑器背景色
  *   - liHoverBackground       li类元素，悬停背景色
  *   - inputColor              输入框颜色
  *   - inputBgColor            输入框背景色
  *   - inputLineColor          输入框线条颜色
+ *   - inputPlaceholderColor   输入框placeholder颜色
  *   - lineColor               其它线条颜色
  *   - menuBackground          菜单背景色
  *   - menuCutLineColor        菜单分割线
@@ -124,11 +127,14 @@ function getThemeColor(area) {
             fontColor = 'rgb(227,227,227)';
             remarkTextColor = 'rgb(154,154,154)';
             lefeSideVeiwBackground = 'rgb(39,40,34)';
+            leftSideViewLiBackground = 'rgb(57,60,49)';
+            toolBarBgColor = 'rgb(65,65,65)';
             background = 'rgb(39,40,34)';
             menuBackground = 'rgb(58,58,58)';
             menuCutLineColor = 'rgb(119,119,119)';
             liHoverBackground = 'rgb(78,80,73)';
             inputColor = 'rgb(255,254,250)';
+            inputPlaceholderColor = 'rgb(62,64,59)';
             inputBgColor = '#2E2E2E';
             inputLineColor = '#CECECE';
             cursorColor = 'rgb(255,255,255)';
@@ -140,12 +146,15 @@ function getThemeColor(area) {
             fontColor = 'rgb(171,178,191)';
             remarkTextColor = 'rgb(154,154,154)';
             lefeSideVeiwBackground = 'rgb(33,37,43)';
+            leftSideViewLiBackground = 'rgb(38,40,48)';
+            toolBarBgColor = 'rgb(34,37,47)';
             background = 'rgb(40,44,53)';
             menuBackground = 'rgb(53,59,69)';
             menuCutLineColor = 'rgb(119,119,119)';
             liHoverBackground = 'rgb(44,47,55)';
             inputColor = 'rgb(255,254,250)';
             inputBgColor = '#282c35';
+            inputPlaceholderColor = 'rgb(133,136,140)';
             inputLineColor = 'rgb(65, 111, 204)';
             cursorColor = 'rgb(255,255,255)';
             lineColor = '#282c35';
@@ -156,6 +165,8 @@ function getThemeColor(area) {
             fontColor = 'rgb(51, 51, 51)';
             remarkTextColor = 'rgb(104,104,104)';
             lefeSideVeiwBackground = 'rgb(255,250,232)';
+            leftSideViewLiBackground = 'rgb(255,254,249)';
+            toolBarBgColor = 'rgb(255,254,249)';
             background = 'rgb(255,250,232)';
             menuBackground = 'rgb(255,254,250)';
             menuCutLineColor = 'rgb(207,207,207)';
@@ -163,6 +174,7 @@ function getThemeColor(area) {
             inputColor = 'rgb(255,252,243)';
             inputBgColor = 'rgb(248, 243, 226)';
             inputLineColor = 'rgb(65,168,99)';
+            inputPlaceholderColor = 'rgb(135,135,133)';
             cursorColor = 'rgb(0,0,0)';
             lineColor = 'rgb(225,212,178)';
             lineForBorderTopColor = 'rgb(225,212,178)';
@@ -180,7 +192,6 @@ function getThemeColor(area) {
             background = customColors[viewBackgroundOptionName];
             lefeSideVeiwBackground = customColors[viewBackgroundOptionName];
             menuBackground = customColors[viewBackgroundOptionName];
-
         };
         if (customColors[viewFontOptionName] && viewFontOptionName in customColors) {
             fontColor = customColors[viewFontOptionName];
@@ -270,6 +281,8 @@ function getThemeColor(area) {
         explorerIconScheme,
         explorerIconTheme,
         lefeSideVeiwBackground,
+        leftSideViewLiBackground,
+        toolBarBgColor,
         background,
         menuBackground,
         menuCutLineColor,
@@ -277,6 +290,7 @@ function getThemeColor(area) {
         inputColor,
         inputLineColor,
         inputBgColor,
+        inputPlaceholderColor,
         cursorColor,
         fontColor,
         remarkTextColor,
@@ -924,7 +938,7 @@ function runGitClone(options) {
 /**
  * @description clone
  * @param {Object} info 克隆信息，字段：username, password, repo, branch, localPath, projectName, isAuth
- * 
+ *
  */
 async function gitClone(info) {
 

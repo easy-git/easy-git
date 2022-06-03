@@ -49,10 +49,12 @@ function generateLogHtml(userConfig, initData) {
 
     // ui、color、font
     let {
+        toolBarBgColor,
         background,
         liHoverBackground,
         inputColor,
         inputLineColor,
+        inputPlaceholderColor,
         cursorColor,
         fontColor,
         menuBackground,
@@ -100,8 +102,10 @@ function generateLogHtml(userConfig, initData) {
                     --menuBackground: ${menuBackground};
                     --menuCutLineColor: ${menuCutLineColor};
                     --liHoverBackground: ${liHoverBackground};
+                    --toolBarBgColor: ${toolBarBgColor};
                     --inputColor: ${inputColor};
                     --inputLineColor: ${inputLineColor};
+                    --inputPlaceholderColor: ${inputPlaceholderColor};
                     --cursorColor: ${cursorColor};
                     --fontColor: ${fontColor};
                     --lineColor: ${lineColor};
@@ -158,6 +162,13 @@ function generateLogHtml(userConfig, initData) {
                                             autofocus="autofocus"
                                             v-model.trim="searchText"
                                             v-on:keyup.enter="searchLog();" />
+                                        <div class="search-support" v-if="SearchSupportList.length && isShowSearchSupportList == 1">
+                                            <ul class="ul-list">
+                                                <li v-for="(s_item, s_idx) in SearchSupportList" :key="s_idx" @click="selectSearchSupport(s_item);" @mouseleave="isShowSearchSupportList=0">
+                                                    {{s_item}}
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                     <div class="pt-2 px-1">
                                         <span @click="searchLog();">${searchIcon}</span>
@@ -329,7 +340,9 @@ function generateLogHtml(userConfig, initData) {
                         ShowCommitFilePath: '',
                         CommitFileChangeDetails: '',
                         viewRefName: '',
-                        LogErrorMsg: ''
+                        LogErrorMsg: '',
+                        SearchSupportList: [],
+                        isShowSearchSupportList: 0
                     },
                     watch: {
                         visibleRightMenu(value) {
@@ -338,6 +351,25 @@ function generateLogHtml(userConfig, initData) {
                             } else {
                                 document.body.removeEventListener('click', this.closeMenu)
                             }
+                        },
+                        searchText(value) {
+                            if (this.loading) return;
+                            this.SearchSupportList = [];
+
+                            let text = this.searchText;
+                            if (text.includes(',')) return;
+                            if (typeof(text) != 'string') return;
+                            if ((text.trim()).length == 0) return;
+
+                            if (/^(--grep=|--author=)/.test(text)) return;
+
+                            let result = [];
+                            let t1 = "--grep='" + text + "'";
+                            let t2 = "--author='" + text + "'";
+                            result.push(t1);
+                            result.push(t2);
+                            this.isShowSearchSupportList = 1;
+                            this.SearchSupportList = result;
                         }
                     },
                     filters: {},
@@ -487,7 +519,12 @@ function generateLogHtml(userConfig, initData) {
                                 condition: this.searchText
                             });
                         },
+                        selectSearchSupport(item) {
+                            this.searchText = item;
+                            this.searchLog();
+                        },
                         searchLog() {
+                            this.isShowSearchSupportList = 0;
                             if (this.searchText.length == 0) {return;};
                             this.searchText = (this.searchText).replace(/'/g, '').replace(/"/g, '');
                             this.loading = true;

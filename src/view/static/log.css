@@ -106,9 +106,9 @@ button {
 
 .form-group .form-control::-webkit-input-placeholder,
 .form-control::-webkit-input-placeholder {
-    font-size: 0.9rem !important;
-    font-weight: 200 !important;
-    color: #c0c4cc !important;
+    font-size: 0.86rem !important;
+    font-weight: 400 !important;
+    color: var(--inputPlaceholderColor) !important;
 }
 
 .form-control {
@@ -534,6 +534,40 @@ del {
 .cursor-default {
     cursor: default;
 }
+
+.search-support .ul-list {
+    max-height: 104px !important;
+    overflow-y: auto;
+    list-style: none;
+    padding: 0 3px;
+    position: absolute;
+    z-index: 1600;
+    border-radius: 3px;
+    box-shadow: 0 0 8px 0 var(--background);
+    background-color: var(--toolBarBgColor);
+    width: 90%;
+    background-clip: padding-box;
+    border: 1px solid var(--background);
+}
+
+.search-support .ul-list li {
+    height: 36px;
+    line-height: 36px;
+    width: 100%;
+    border-bottom: 1px solid var(--lineColor);
+    padding-left: 16px;
+    font-size: 12px;
+    color: var(--fontColor);
+}
+
+.search-support .ul-list li:nth-last-child(1) {
+    border-bottom: none;
+}
+
+.search-support .ul-list li:hover {
+    color: rgb(65, 168, 99);
+}
+
 
 /* a链接 */
 .link {
