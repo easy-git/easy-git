@@ -534,3 +534,12 @@ del {
 .cursor-default {
     cursor: default;
 }
+
+/* a链接 */
+.link {
+    color: #4e92df !important;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
