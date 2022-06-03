@@ -966,8 +966,10 @@ function active(webviewPanel, userConfig, ProjectData) {
     let configurationChangeDisplose = hx.workspace.onDidChangeConfiguration(function(event){
         if(event.affectsConfiguration("editor.colorScheme") || event.affectsConfiguration("explorer.iconTheme")){
             console.log('-----------主题改变了');
-            let uiData2 = getUIData();
-            view.html = html.getWebviewContent(userConfig, uiData2, ProjectData);
+            setTimeout(function() {
+                let uiData2 = getUIData();
+                view.html = html.getWebviewContent(userConfig, uiData2, ProjectData);
+            }, 1500);
         };
     });
 };
