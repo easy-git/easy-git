@@ -1,7 +1,8 @@
 const hx = require('hbuilderx');
 const fs = require('fs');
 const path = require('path');
-const { checkIsGitProject, getThemeColor } = require('../../common/utils.js');
+const { checkIsGitProject } = require('../../common/utils.js');
+let getThemeColor = require('../../common/theme.js');
 
 const chokidar = require('chokidar');
 const { debounce } = require('throttle-debounce');
@@ -175,7 +176,7 @@ async function GitLogCustomEditorRenderHtml(projectData, userConfig) {
     if (gitRootDir == 'error') {
         gitRootDir = projectPath;
     };
-    
+
     // 解决消息重复监听的Bug
     try{
         let msgListeners = GitLogCustomWebViewPanal._webView._msgListeners;

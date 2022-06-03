@@ -3,8 +3,8 @@ const path = require('path');
 
 const hx = require('hbuilderx');
 
-const utils = require('../../common/utils.js');
 const icon = require('../static/icon.js');
+let getThemeColor = require('../../common/theme.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
@@ -32,7 +32,7 @@ function show(webviewPanel, userConfig, FilesExplorerProjectInfo) {
     };
 
     // 根据主题适配颜色
-    let colorData = utils.getThemeColor('siderBar');
+    let colorData = getThemeColor('siderBar');
     let {fontColor} = colorData;
 
     let uiData = Object.assign(colorData);

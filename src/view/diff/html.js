@@ -5,6 +5,7 @@ const path = require('path');
 
 const icon = require('../static/icon.js');
 let utils = require('../../common/utils.js');
+let getThemeColor = require('../../common/theme.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
@@ -25,7 +26,7 @@ if ( osName != 'darwin') {
 function getUIData() {
 
     // 根据主题适配颜色
-    let colorData = utils.getThemeColor('right');
+    let colorData = getThemeColor('right');
     let {fontColor} = colorData;
 
     let OpenFileIconSvg = icon.getOpenFileIcon(fontColor);

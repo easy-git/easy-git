@@ -10,7 +10,7 @@ const chokidar = require('chokidar');
 const { Diff } = require('./diff.js');
 const { getDefaultContent, getWebviewDiffContent } = require('./html.js');
 
-let { getThemeColor } = require('../../common/utils.js');
+let getThemeColor = require('../../common/theme.js');
 
 let isSelectedFile;
 let isCustomFirstOpen = false;

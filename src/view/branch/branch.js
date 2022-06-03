@@ -7,6 +7,7 @@ const { debounce } = require('throttle-debounce');
 const hx = require('hbuilderx');
 
 let utils = require('../../common/utils.js');
+let getThemeColor = require('../../common/theme.js');
 const { Branch } = require('../../commands/ref.js');
 const { gitInitAfterSetting } = require('../../commands/repository_init.js');
 
@@ -23,7 +24,7 @@ let GitHBuilderXInnerTrigger = false;
 function getUIData() {
 
     // 根据主题适配颜色
-    let colorData = utils.getThemeColor('siderBar');
+    let colorData = getThemeColor('siderBar');
     let {fontColor} = colorData;
 
     // svg icon
@@ -497,7 +498,7 @@ async function GitBranchView(webviewPanel, userConfig, projectData) {
 
     let configurationChangeDisplose = hx.workspace.onDidChangeConfiguration(function(event){
         if(event.affectsConfiguration("editor.colorScheme")){
-            let ThemeColor = utils.getThemeColor();
+            let ThemeColor = getThemeColor();
             view.postMessage({
                 "command": "themeColor",
                 "data": ThemeColor

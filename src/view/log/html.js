@@ -2,7 +2,7 @@ const path = require('path');
 const os = require('os');
 
 const icon = require('../static/icon.js');
-const {getThemeColor} = require('../../common/utils.js');
+let getThemeColor = require('../../common/theme.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'static', '','vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');

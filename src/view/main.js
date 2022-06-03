@@ -7,6 +7,7 @@ const { debounce } = require('throttle-debounce');
 const hx = require('hbuilderx');
 
 let utils = require('../common/utils.js');
+let getThemeColor = require('../common/theme.js');
 const file = require('../common/file.js');
 
 const { gitInitAfterSetting } = require('../commands/repository_init.js');
@@ -31,9 +32,8 @@ let GitHBuilderXInnerTrigger = false;
  * @return {Object} UIData
  */
 function getUIData() {
-
     // 根据主题适配颜色
-    let colorData = utils.getThemeColor('siderBar');
+    let colorData = getThemeColor('siderBar');
     let {fontColor, explorerIconTheme, explorerIconScheme} = colorData;
 
     // 文件图标
@@ -706,7 +706,7 @@ let watcherListen;
 var lastListeningFileInfo;
 function watchProjectDir(projectDir, func) {
     if (projectDir == undefined) return;
-    
+
     let gitDir = path.join(projectDir, '.git');
     let refsPath = path.join(gitDir, 'refs', 'remotes', 'origin');
     let refsHeads = path.join(gitDir, 'refs', 'heads');

@@ -5,7 +5,7 @@ const Main = require("./index.js");
 const file = require('./common/file.js');
 const upgrade = require('./common/upgrade.js');
 
-const { getThemeColor } = require('./common/utils.js');
+let getThemeColor = require('./common/theme.js');
 const { Gitee, onUriForResponse } = require('./common/oauth.js');
 const { goSetEncoding } = require('./commands/base.js');
 
