@@ -284,6 +284,9 @@ async function GitLogCustomEditorRenderHtml(projectData, userConfig) {
                 let {commandParam, commandName} = msg;
                 hx.commands.executeCommand(commandName, {"viewName": commandParam, "easyGitInner": true});
                 break;
+            case 'openSearchHelp':
+                hx.env.openExternal('https://easy-git.github.io/docs/log/search');
+                break;
             default:
                 break;
         };

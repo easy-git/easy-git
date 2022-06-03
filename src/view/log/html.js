@@ -181,7 +181,7 @@ function generateLogHtml(userConfig, initData) {
                             <div class="text-center" style="margin-top: 12%;">
                                 <span>${noIcon}</span>
                                 <p class="no-result">没有结果, 请检查查询条件...</p>
-                                <p class="no-result"><a href="https://easy-git.github.io/docs/log/search">搜索帮助</a></p>
+                                <p class="no-result"><a class="link" @click="openSearchHelp()">搜索帮助</a></p>
                                 <p class="no-result" v-if="searchText">
                                     模糊查询提交消息，建议使用--grep。例如: --grep=xxx
                                     存在多个查询条件，请以逗号分隔。例: -n 10,--auther=xxx,--grep=xxx <br/>
@@ -681,6 +681,11 @@ function generateLogHtml(userConfig, initData) {
                                 command: 'hxCommand',
                                 commandName: commandName,
                                 commandParam: commandParam
+                            });
+                        },
+                        openSearchHelp() {
+                            hbuilderx.postMessage({
+                                command: 'openSearchHelp'
                             });
                         }
                     }
