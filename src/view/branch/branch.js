@@ -204,41 +204,46 @@ class GitBranch {
             'projectName': this.projectName,
             'easyGitInner': true
         };
+
+        let mergeMsg = `确认合并分支 ${fromBranch} 到 ${toBranch}？`;
+        let isMerege = await utils.hxShowMessageBox('Git 分支合并', mergeMsg, ["确定", "关闭"]).then(btnText => {
+            return btnText == '确定' ? true : false;
+        });
+        if (!isMerege) return;
+
+        // 开始合并
         let mergeStatus = await utils.gitBranchMerge(this.projectPath, fromBranch, toBranch);
 
-        // 合并
+        // 合并：Already up to date.
         if (mergeStatus == 'Already up to date.') {
-            utils.hxShowMessageBox('Git 分支合并', "合并结果：Already up to date。没有要合并的提交或文件。", ["关闭"]).then(btnText => {})
+            utils.hxShowMessageBox('Git 分支合并', "合并结果：Already up to date。没有要合并的提交或文件。", ["关闭"]).then(btnText => {});
             return;
         };
 
-        hx.commands.executeCommand('EasyGit.main', param);
+        // 合并后续处理：取消合并、立即推送、稍后推送
         if (mergeStatus != undefined) {
-            let that = this;
-            setTimeout(function() {
-                let msg = `${toBranch} 合并 ${fromBranch} 分支成功，请选择接下来的操作？`;
-                let btns = ['稍后推送', '立即推送'];
-                if (mergeStatus == 'conflicts') {
-                    msg = `${toBranch} 合并 ${fromBranch} 分支，部分文件存在冲突，请选择接下来的操作？\n\n源代码管理器视图，每个文件，鼠标悬停，即可显示解决冲突的图标，点击可以选择：采用远端、采用本地。`;
-                    btns = ['取消合并', '关闭']
-                };
-                if (mergeStatus == 'fail') {
-                    msg = `${toBranch} 合并 ${fromBranch} 分支，合并失败，请解决错误后，再次进行合并。\n 错误信息，请查看控制台。`;
-                    btns = ['好的', '关闭']
-                };
+            let msg = `${toBranch} 合并 ${fromBranch} 分支成功，请选择接下来的操作？`;
+            let btns = ['稍后推送', '立即推送'];
+            if (mergeStatus == 'conflicts') {
+                msg = `${toBranch} 合并 ${fromBranch} 分支，部分文件存在冲突，请选择接下来的操作？\n\n源代码管理器视图，每个文件，鼠标悬停，即可显示解决冲突的图标，点击可以选择：采用远端、采用本地。`;
+                btns = ['取消合并', '查看冲突', '关闭']
+            };
+            if (mergeStatus == 'fail') {
+                msg = `${toBranch} 合并 ${fromBranch} 分支，合并失败，请解决错误后，再次进行合并。\n 错误信息，请查看控制台。`;
+                btns = ['好的', '关闭']
+            };
 
-                utils.hxShowMessageBox('Git 分支合并', msg, btns).then(btnText => {
-                    if (btnText == '取消合并') {
-                        hx.commands.executeCommand('EasyGit.mergeAbort', param);
-                    };
-                    if (btnText == '立即推送') {
-                        hx.commands.executeCommand('EasyGit.push', param);
-                        setTimeout(function() {
-                            hx.commands.executeCommand('EasyGit.main', param);
-                        }, 1200);
-                    };
-                });
-            }, 1000);
+            await utils.hxShowMessageBox('Git 分支合并', msg, btns).then(btnText => {
+                if (btnText == '取消合并') {
+                    hx.commands.executeCommand('EasyGit.mergeAbort', param);
+                };
+                if (btnText == '查看冲突') {
+                    hx.commands.executeCommand('EasyGit.main', param);
+                };
+                if (btnText == '立即推送') {
+                    hx.commands.executeCommand('EasyGit.push', param);
+                };
+            });
         };
     };
 
