@@ -209,9 +209,9 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             <li class="li_git_file" v-for="(v1,i1) in gitConflictedFileList" :key="i1"
                                 @mouseover="hoverConflictedFileID = 'conflicted_'+i1"
                                 @mouseleave="hoverConflictedFileID = false">
-                                <div class="flex-grow-1 text-hidden cursor-default" :title="v1.path" >
+                                <div class="flex-grow-1 text-hidden cursor-default pr-3" :title="v1.path" @click="gitDiff('MergeChanges', v1.path, v1.tag, true);">
                                     <span class="before_ficon" :class="v1.icon"></span>
-                                    <span :class="setStyleForLineThrough(v1.tag)" @click="gitDiff('MergeChanges', v1.path, v1.tag, true);">{{ v1.name }}</span>
+                                    <span :class="setStyleForLineThrough(v1.tag)">{{ v1.name }}</span>
                                     <span class="dirname">{{ v1.dir }}</span>
                                 </div>
                                 <div class="d-inline float-right">
@@ -242,9 +242,9 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                                 v-for="(vv,ii) in gitStagedFileList" :key="ii"
                                 @mouseover="hoverStashFileID = 'stash_'+ii"
                                 @mouseleave="hoverStashFileID = false">
-                                <div class="flex-grow-1 text-hidden cursor-default" :title="vv.path">
+                                <div class="flex-grow-1 text-hidden cursor-default pr-3" :title="vv.path" @click="gitDiff('StagedChanges', vv.path, vv.tag);">
                                     <span class="before_ficon" :class="vv.icon"></span>
-                                    <span :class="setStyleForLineThrough(vv.tag)" @click="gitDiff('StagedChanges', vv.path, vv.tag);">{{ vv.name }}</span>
+                                    <span :class="setStyleForLineThrough(vv.tag)">{{ vv.name }}</span>
                                     <span class="dirname">{{ vv.dir }}</span>
                                 </div>
                                 <div class="d-inline float-right">
@@ -280,9 +280,9 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                             <li class="li_git_file" v-for="(v,i) in gitNotStagedileList" :key="i"
                                 @mouseover="hoverChangeFileID = 'change_'+i"
                                 @mouseleave="hoverChangeFileID = false">
-                                <div class="flex-grow-1 text-hidden cursor-default" :title="v.path">
+                                <div class="flex-grow-1 text-hidden cursor-default pr-3" :title="v.path" @click="gitDiff('Changes', v.path, v.tag);">
                                     <span class="before_ficon" :class="v.icon"></span>
-                                    <span :class="setStyleForLineThrough(v.tag)" @click="gitDiff('Changes', v.path, v.tag);">{{ v.name }}</span>
+                                    <span :class="setStyleForLineThrough(v.tag)">{{ v.name }}</span>
                                     <span class="dirname">{{ v.dir }}</span>
                                 </div>
                                 <div class="d-inline float-right">
