@@ -536,7 +536,7 @@ del {
 }
 
 .search-support .ul-list {
-    max-height: 104px !important;
+    max-height: 190px !important;
     overflow-y: auto;
     list-style: none;
     padding: 0 3px;

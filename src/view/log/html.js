@@ -158,14 +158,15 @@ function generateLogHtml(userConfig, initData) {
                                             type="text"
                                             class="form-control outline-none pl-0"
                                             title="支持git log所有参数，多个条件以逗号分隔。如--author=name,-n 5。默认返回50条结果，如需要更多条数，请输入: -n 数量。"
-                                            placeholder="支持git log所有参数，多个条件以逗号分隔。如--grep=xxx,--author=name,-n 5"
+                                            placeholder="支持git log所有参数，多个条件以逗号分隔。如--grep=xxx,--author=name,-n 5, package.json"
                                             autofocus="autofocus"
                                             v-model.trim="searchText"
                                             v-on:keyup.enter="searchLog();" />
-                                        <div class="search-support" v-if="SearchSupportList.length && isShowSearchSupportList == 1">
+                                        <div class="search-support" v-if="SearchSupportList.length && isShowSearchSupportList == 1"  @mouseleave="isShowSearchSupportList=0">
                                             <ul class="ul-list">
-                                                <li v-for="(s_item, s_idx) in SearchSupportList" :key="s_idx" @click="selectSearchSupport(s_item);" @mouseleave="isShowSearchSupportList=0">
-                                                    {{s_item}}
+                                                <li v-for="(s_item, s_idx) in SearchSupportList" :key="s_idx" @click="selectSearchSupport(s_item.value);">
+                                                    <span class="mr-3">{{ s_item.name }}</span>
+                                                    <span>{{ s_item.value }}</span>
                                                 </li>
                                             </ul>
                                         </div>
@@ -192,13 +193,17 @@ function generateLogHtml(userConfig, initData) {
                             <div class="text-center" style="margin-top: 12%;">
                                 <span>${noIcon}</span>
                                 <p class="no-result">没有结果, 请检查查询条件...</p>
-                                <p class="no-result"><a class="link" @click="openSearchHelp()">搜索帮助</a></p>
-                                <p class="no-result" v-if="searchText">
-                                    模糊查询提交消息，建议使用--grep。例如: --grep=xxx
-                                    存在多个查询条件，请以逗号分隔。例: -n 10,--auther=xxx,--grep=xxx <br/>
-                                    注意：当使用--grep、--author、--after等带有 -- 的参数进行查询时，必须使用 =
-                                </p>
-                                <p class="no-result">{{ LogErrorMsg }}</p>
+                                <p class="no-result d-block">查询错误：{{ LogErrorMsg }}</p>
+                            </div>
+                            <div class="no-result row justify-content-md-center" v-if="searchText">
+
+                                <ol class="col-md-auto">
+                                    <li>模糊查询提交消息，建议使用--grep。例如: --grep=xxx</li>
+                                    <li>存在多个查询条件，请以逗号分隔。例: -n 10,--auther=xxx,--grep=xxx</li>
+                                    <li>当使用--grep、--author、--after等带有 -- 的参数进行查询时，必须使用 = </li>
+                                    <li>查询特定路径文件Git日志，请将文件路径放在所有查询参数最后</li>
+                                    <li @click="openSearchHelp()"><a class="link">查看更多搜索帮助</a></li>
+                                </ol>
                             </div>
                         </div>
                         <div class="col px-0 mt-2" v-else>
@@ -364,10 +369,11 @@ function generateLogHtml(userConfig, initData) {
                             if (/^(--grep=|--author=)/.test(text)) return;
 
                             let result = [];
-                            let t1 = "--grep='" + text + "'";
-                            let t2 = "--author='" + text + "'";
-                            result.push(t1);
-                            result.push(t2);
+                            result.push({"name": "提交消息模糊查询", "value": "--grep='" + text + "'"});
+                            result.push({"name": "按作者提交者查询", "value": "--author='" + text + "'"});
+                            result.push({"name": "查询特定日期之后", "value": "--after='" + text + "'"});
+                            result.push({"name": "查询特定日期之前", "value": "--before='" + text + "'"});
+                            result.push({"name": "按文件路径查询  ", "value": text});
                             this.isShowSearchSupportList = 1;
                             this.SearchSupportList = result;
                         }
