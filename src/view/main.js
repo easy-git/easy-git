@@ -362,9 +362,12 @@ class GitFile {
                 return;
             };
         };
-
+        if (tag == 'R') {
+            filepath = (filepath.split('->')[1]).trim();
+        };
+        
         let files = [];
-        files.push(text);
+        files.push(filepath);
         let addStatus = await utils.gitAdd(this.projectPath, files);
         if (addStatus == 'success') {
             this.refreshFileList();

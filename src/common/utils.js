@@ -858,6 +858,9 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u'], isR
                         } else if (tag == 'RD') {
                             data.staged.push({"tag": "R", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon, "style": "fs_default"});
                             data.notStaged.push({"tag": "R", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon, "style": "fs_default"});
+                        } else if (tag == 'RM') {
+                            data.staged.push({"tag": "R", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon, "style": "fs_default"});
+                            data.notStaged.push({"tag": "R", "path": fpath, "dir": dirname,"name": basename, "icon": f_icon, "style": "fs_default"});
                         } else if (tag.slice(0,1) == ' ' || tag == '??') {
                             data.notStaged.push({"tag": tag.trim(), "path": fpath, "dir": dirname,"name": basename, "icon": f_icon, "style": "fs_default"});
                         } else if (tag.slice(1,2) == ' ') {
@@ -872,13 +875,12 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u'], isR
                 if (errorList.length) {
                     let outputChannel = hx.window.createOutputChannel('EasyGit插件');
                     outputChannel.show();
-                    outputChannel.appendLine("下列文件状态获取错误，请手动操作在命令行操作。");
+                    outputChannel.appendLine("当您看到此错误时，是因为本插件解析git status命令行输出出错，插件作者未考虑到某些状态导致的。");
                     outputChannel.appendLine("如果您愿意帮助作者改进，反馈地址: https://ext.dcloud.net.cn/plugin?name=easy-git#rating");
 
                     for (let s of errorList) {
                         outputChannel.appendLine(s);
                     };
-                    outputChannel.appendLine("\n\n");
                 };
                 data["conflictedLength"] = (data["conflicted"]).length;
                 data["stagedLength"] = (data["staged"]).length;
@@ -1013,6 +1015,7 @@ async function gitAdd(workingDir, files) {
     if (files == 'all') {
         files = './*'
     };
+    console.error("----", files)
     try {
         let status = await git(workingDir)
             .add(files)
@@ -1022,7 +1025,8 @@ async function gitAdd(workingDir, files) {
             })
             .catch((err) => {
                 let errMsg = "\n\n" + (err).toString();
-                createOutputChannel(`Git: ${files} add失败。${errMsg}`);
+                createOutputChannel(`Git: ${files} add失败。${errMsg}`, 'error');
+                createOutputChannel(`如果您想强制add，临时解决方法：打开操作系统终端命令行工具，进入目录${workingDir}, 手动执行git add 文件名`, 'success');
                 return 'fail';
             });
         return status
