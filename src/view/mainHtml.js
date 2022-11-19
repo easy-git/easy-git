@@ -37,6 +37,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
 
     // icon
     let {
+        fontSize,
         background,
         lefeSideVeiwBackground,
         menuBackground,
@@ -98,6 +99,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
         <script src="${vueFile}"></script>
         <style type="text/css">
             :root {
+              --fontSize: ${fontSize};
               --background: ${lefeSideVeiwBackground};
               --remarkTextColor: ${remarkTextColor};
               --fontColor: ${fontColor};
@@ -131,7 +133,7 @@ function getWebviewContent(userConfig, uiData, ProjectData) {
                 font-family: 'otherIcon';
                 src: url('${ttfOtherFile}') format('truetype');
             }
-            .folder_icon::before { ${folder_ficon} }
+            .folder_icon::before { ${folder_ficon} };
         </style>
         <link rel="stylesheet" href="${ttfCSSFilePath}">
         <link rel="stylesheet" href="${mainCssFile}">

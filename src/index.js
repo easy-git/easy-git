@@ -264,7 +264,7 @@ class Main extends Common {
         };
 
         if (this.viewType == 'main') {
-            hx.window.setStatusBarMessage(`EasyGit: 正在打开打开源代码管理器视图...`, 5000, 'info');
+            hx.window.setStatusBarMessage(`EasyGit: 正在打开源代码管理器视图...`, 5000, 'info');
         };
 
         try{

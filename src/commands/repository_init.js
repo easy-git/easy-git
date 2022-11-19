@@ -213,12 +213,12 @@ class gitInitAfterSetting {
         let service_items = [
             {type: "input",name: "RepositoryName",label: "仓库名称",placeholder: '英文字母或数字, 比如abc',value: RepositoryName},
             {type: "input",name: "owner",label: "归属组织",placeholder: '可选；不填写，则为默认组织',value: ''},
-            {type: "label",name: "blank_line_1",text: ""},
-            {type: "checkBox",name: "isPrivate",label: "是否私有；私有，仅仓库成员可见；公开，则所有人可见", value: true},
-            {type: "label",name: "blank_line_2",text: ""},
+            // {type: "label",name: "blank_line_1",text: ""},
+            {type: "checkBox",name: "isPrivate",label: "是否私有；私有，仅仓库成员可见；不勾选，则代表公开，即所有人可见", value: true},
+            // {type: "label",name: "blank_line_2",text: ""},
             {type: "checkBox",name: "isAddRemoteOrigin",label: `${tService}远程仓库创建成功后，并添加远程仓库地址到${this.projectName}项目 ，即执行 git add remote origin url`, value: true},
-            {type: "label",name: "blank_line_3",text: ""},
-            {type: "checkBox",name: "isHttp",label: '使用HTTP，添加远程仓库地址；反之，则使用SSH', value: true}
+            // {type: "label",name: "blank_line_3",text: ""},
+            {type: "checkBox",name: "isHttp",label: '使用HTTP，添加远程仓库地址；不勾选，则代表使用SSH', value: true}
         ];
 
         if (action == 'ManualInput') {

@@ -39,6 +39,7 @@ function isObj(object){
  * @return {Object}
  */
 function getThemeColor(area) {
+    let fontSize = 16;
     let fontColor;
     let background;
     let lefeSideVeiwBackground;
@@ -77,10 +78,26 @@ function getThemeColor(area) {
     };
 
     // 获取HBuilderX编辑器字体大小
-    let fontSize = config.get('editor.fontSize');
-    if (fontSize == '' || fontSize == undefined) {
-        fontSize = 14;
+    let configFontSize = config.get('editor.fontSize');
+    if (configFontSize != '' && configFontSize != undefined) {
+        if (/^[0-9]{2}$/.test(configFontSize)) {
+            if (Number(configFontSize) >= 10 && Number(configFontSize) <= 50) {
+                fontSize = configFontSize;
+            };
+        };
     };
+
+    // // 获取easy插件自定义字体大小
+    // let fontSize = config.get('EasyGit.zFontSizeForLeftSideView');
+    // if (fontSize == '' || fontSize == undefined) {
+    //     fontSize = 14;
+    // };
+
+    // // 获取easy插件自定义字体大小
+    // let fontSize = config.get('EasyGit.zFontSizeForMainView');
+    // if (fontSize == '' || fontSize == undefined) {
+    //     fontSize = 14;
+    // };
 
     // 获取HBuilderX编辑器字体
     let fontFamily = config.get("editor.fontFamily");
