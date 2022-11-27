@@ -104,7 +104,6 @@ function updateHBuilderXConfig(key, value, desc=undefined) {
  * @description 读取HBuilderX.ini, 获取ProjectWizard
  */
 function getHBuilderXiniConfig(v) {
-    let iniFile = '';
     try{
         const appData = hx.env.appData;
         const iniFile = path.join(appData,'HBuilder X.ini')

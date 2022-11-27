@@ -25,6 +25,7 @@ let pluginVersion = packageFile.version;
 let osName = os.platform() + ' ' + os.release();
 
 let ReferenceCounting = {};
+let isStopCount = true;
 
 /**
  * @description 生成用户UID
@@ -65,11 +66,13 @@ function getCurrentData() {
  * @param {Object} viewname
  */
 async function count(viewname) {
+    // 2022-11-27日，停止git功能数据上报
+    if (isStopCount) return;
 
     if (["log", "main", "diff", "CommandPanel", "clone", "init"].includes(viewname)) {
         let view_flags = eval(viewname+ "Flags");
         let view_flags_date = getCurrentData();
-        
+
         if (view_flags >= 3  && currentDate == view_flags_date) {
            return;
         };
