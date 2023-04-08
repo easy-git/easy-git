@@ -9,7 +9,6 @@ const hx = require('hbuilderx');
 
 const MainView = require('../main.js');
 const {
-    isDirEmpty,
     getDirFileList,
     gitClone,
     updateHBuilderXConfig,

@@ -227,13 +227,24 @@ async function clone(webviewDialog, webview, info) {
 
     // 仓库名称
     let gitRepoName = GitRepoUrl.split('/').pop()
-    if (gitRepoName.substring(gitRepoName - 4) === '.git') {
-        gitRepoName = gitRepoNamereplace('.git', '');
+    if (gitRepoName.slice(-4) === '.git') {
+        gitRepoName = gitRepoName.slice(0, gitRepoName.length -4);
     };
 
     let { localPath } = info;
     let projectName = path.basename(localPath);
+    if (projectName != gitRepoName) {
+        localPath = path.join(localPath, gitRepoName);
+        projectName = gitRepoName;
+        info.localPath = localPath;
+    };
+
+    // currentCloneDir: 用于记忆填写克隆的目录，避免下次重复填写
     let currentCloneDir = path.dirname(localPath);
+    if (ProjectWizard != currentCloneDir) {
+        updateHBuilderXConfig('EasyGit.LastCloneDir', currentCloneDir);
+    };
+
     info = Object.assign(info,{
         'projectName': projectName
     });
@@ -242,10 +253,11 @@ async function clone(webviewDialog, webview, info) {
         let isEmpty = await isDirEmpty(localPath);
         if (isEmpty > 0) {
             isDisplayError = true;
-            webviewDialog.displayError(`目录 ${localPath} 已存在，请输入一个空目录。`);
+            webviewDialog.displayError(`目录 ${localPath} 已存在内容，请输入一个空目录。`);
             return;
         };
     };
+
     // 清除上次错误提示
     if (isDisplayError) {
         webviewDialog.displayError('');
@@ -275,11 +287,6 @@ async function clone(webviewDialog, webview, info) {
     } else {
         isDisplayError = true;
         webviewDialog.displayError('Git: 克隆失败, 请在底部控制台查看失败原因!');
-    };
-
-    // 记忆上次位置
-    if (ProjectWizard != currentCloneDir) {
-        updateHBuilderXConfig('EasyGit.LastCloneDir', currentCloneDir);
     };
 };
 
