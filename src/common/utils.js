@@ -281,7 +281,7 @@ function createOutputChannel(msg, msgLevel=undefined) {
     try {
         outputChannel.appendLine({ line: msg, level: msgLevel });
     } catch (e) {
-        console.log(e)
+        console.log(e);
         outputChannel.appendLine(msg);
     };
 };
@@ -887,7 +887,7 @@ async function gitFileListStatus(workingDir, options=['status', '-s', '-u'], isR
                 data["fileTotal"] = data["conflictedLength"] + data["stagedLength"] + data["notStagedLength"];
             })
             .catch((err) => {
-                console.log(err)
+                console.log(err);
                 hx.window.showInformationMessage('EasyGit: 获取文件列表失败, 请重试或联系作者反馈问题。', ['我知道了']);
                 data.msg = 'error';
             });
@@ -1014,7 +1014,6 @@ async function gitAdd(workingDir, files) {
     if (files == 'all') {
         files = './*'
     };
-    console.error("----", files)
     try {
         let status = await git(workingDir)
             .add(files)
@@ -1206,7 +1205,7 @@ async function gitPull(workingDir, options) {
                     args = [...args, ...['origin', remoteName]]
                 };
             } catch(e){
-                console.log(e)
+                console.log(e);
             };
         };
     };
@@ -1450,7 +1449,6 @@ async function gitCheckoutConflicted(workingDir, filename) {
 
     let parm = btnText == '保留远端' ? '--theirs' : '--ours';
     let cmd = [parm, filename];
-    console.log(cmd)
     let status = await git(workingDir)
         .checkout(cmd)
         .then(() => {
@@ -1873,7 +1871,7 @@ async function gitTagCreate(workingDir,tagOptions, tagName) {
             });
         return status;
     } catch (e) {
-        console.log(e)
+        console.log(e);
         return 'error';
     }
 };
@@ -1911,7 +1909,7 @@ async function gitTagDelete(workingDir, tagName, isDeleteRemote=false) {
             });
         return status;
     } catch (e) {
-        console.log(e)
+        console.log(e);
         return 'error';
     };
 };
