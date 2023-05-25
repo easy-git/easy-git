@@ -1540,7 +1540,8 @@ async function gitRawGetBranch(workingDir, commands) {
 async function gitCurrentBranchName(workingDir) {
     try {
         let name = await git(workingDir)
-            .raw(['symbolic-ref', '--short', 'HEAD'])
+            // .raw(['symbolic-ref', '--short', 'HEAD'])
+            .raw(['rev-parse', '--abbrev-ref', 'HEAD'])
             .then((info) => {
                 info = info.trim();
                 return info == undefined || info == '' ? false : info;
@@ -1551,6 +1552,7 @@ async function gitCurrentBranchName(workingDir) {
             });
         return name;
     } catch (e) {
+        console.log(e);
         return false;
     };
 };
