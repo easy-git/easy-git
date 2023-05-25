@@ -17,8 +17,9 @@ const gitHistoryFile = path.join(appDataDir, 'easy-git', 'history', 'project.jso
 /**
  * @description 快速打开项目管理器的Git项目、或本地的Git项目
  * @param {Object} param
+ * @param {String} isReturnProjectInfo 是否返回项目信息
  */
-async function quickOpen(param={}) {
+async function quickOpen(param={}, isReturnProjectInfo=false) {
 
     // 2022-05-29: 用于打开指定视图， 目前只有：log、main
     let viewName;
@@ -54,7 +55,7 @@ async function quickOpen(param={}) {
         ...gitList
     ];
 
-    let placeHolder = viewName == "logView" ? '请选择Git项目查看Log...' : '请选择要打开的Git项目...';
+    let placeHolder = viewName == "logView" ? '请选择Git项目查看Log...' : '请选择要操作的Git项目...';
     let selected = await hx.window.showQuickPick(pickerList, {
         'placeHolder': placeHolder
     }).then( (res)=> {
@@ -63,18 +64,27 @@ async function quickOpen(param={}) {
 
     if (selected) {
         let {projectPath, label, action} = selected;
+
+        if (action == 'clone') {
+            hx.commands.executeCommand("EasyGit.clone");
+            return;
+        };
+
+        if (action == 'openLocal') {
+            selecteOpenLocalProject();
+            return;
+        };
+
         let info = {
             "projectPath": projectPath,
             "projectName": label,
             "easyGitInner": true
         };
 
-        if (action == 'clone') {
-            hx.commands.executeCommand("EasyGit.clone");
+        if (isReturnProjectInfo == true) {
+            return info;
         };
-        if (action == 'openLocal') {
-            selecteOpenLocalProject();
-        };
+
         if (action == 'open' && viewName == 'logView') {
             hx.commands.executeCommand("EasyGit.log", info);
         } else {

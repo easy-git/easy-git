@@ -28,6 +28,12 @@ let {background} = getThemeColor('siderBar');
 FileView.webView.html = `<body style="background-color: ${background};"><p style='margin-top: 2rem;font-size: 13px;'>请从项目管理器，选中项目，通过右键菜单打开源代码管理器。</p></body>`;
 
 
+// 全局记忆变量
+global.global_git_projectInfo = {
+    "projectPath": "",
+    "projectName": ""
+};
+
 function activate(context) {
     context.source = 'viewMenu';
 

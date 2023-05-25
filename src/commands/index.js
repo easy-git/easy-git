@@ -60,14 +60,34 @@ async function action(param, action_name) {
                     selectedFile = param.document.uri.fsPath;
                 };
             };
+
+            // 保存全局项目信息
+            global_git_projectInfo.projectPath = projectPath;
+            global_git_projectInfo.projectName = projectName;
         } catch(e){
-            return hx.window.showErrorMessage('easy-git: 无法获取到项目路径，请在项目管理器选中项目后再试。', ["我知道了"]);
+            return hx.window.showErrorMessage('easy-git: 无法得知您需要对哪个Git项目进行操作，请在项目管理器选中项目后再试。', ["我知道了"]);
         };
-    } else {
-        let NotFocusList = ['set-username-useremail'];
-        if (!NotFocusList.includes(action_name)){
-            return hx.window.showErrorMessage('easy-git: 无法获取到项目路径，请在项目管理器选中项目后再试。', ["我知道了"]);
-        };
+    };
+
+    // 不需要获取项目信息的就能进行git操作的命令
+    let NotFocusList = ['set-username-useremail'];
+    
+    // 当无法从hx获取到焦点时的处理
+    if (param == null && !NotFocusList.includes(action_name)) {
+        // 方法1： 当无法获取到焦点时，使用全局记忆的项目信息
+        // if (global_git_projectInfo.projectPath != "" && global_git_projectInfo.projectName != "") {
+        //     projectName = global_git_projectInfo.projectName;
+        //     projectPath = global_git_projectInfo.projectPath;
+        //     let btnText = await utils.hxShowMessageBox(`提示`, `由于没有获取到焦点，请确认是否是对 ${projectName} 项目进行 git ${action_name} 操作。` ["否","是"]);
+        //     if (btnText != "是") return;
+        // };
+
+        // 方法2：当无法获取到焦点时，弹出快速选择项目
+        let quickInfo = await quickOpen({}, true);
+        if (quickInfo == undefined || typeof quickInfo != 'object') return;
+        projectName = quickInfo.projectName;
+        projectPath = quickInfo.projectPath;
+        if (!fs.existsSync(projectPath)) return;
     };
 
 
@@ -109,23 +129,23 @@ async function action(param, action_name) {
     let bch = new Branch();
 
     // 不需要统计所有git操作，只统计某些
-    try{
-        let gitCountList = [
-            "init",
-            "add", "RemoteRmOrigin","commit", "commitAmend",
-            "cherryPick", "grep",
-            "BranchDiff", "twoBranchSpecificFileDiff", "BranchSwitch", "BranchMerge",
-            "annotate", "BlameForLineChange",
-            "stash", "stashAll",
-            "tagCreate", "archive",
-            "reflog", "annotate", "BlameForLineChange",
-            "showAnotherBranchFile",
-            "gitignore"
-        ];
-        if (gitCountList.includes(action_name)) {
-            count(action_name);
-        };
-    }catch(e){};
+    // try{
+    //     let gitCountList = [
+    //         "init",
+    //         "add", "RemoteRmOrigin","commit", "commitAmend",
+    //         "cherryPick", "grep",
+    //         "BranchDiff", "twoBranchSpecificFileDiff", "BranchSwitch", "BranchMerge",
+    //         "annotate", "BlameForLineChange",
+    //         "stash", "stashAll",
+    //         "tagCreate", "archive",
+    //         "reflog", "annotate", "BlameForLineChange",
+    //         "showAnotherBranchFile",
+    //         "gitignore"
+    //     ];
+    //     if (gitCountList.includes(action_name)) {
+    //         count(action_name);
+    //     };
+    // }catch(e){};
 
     switch (action_name){
         case 'init':
@@ -338,9 +358,9 @@ async function action(param, action_name) {
  */
 async function independentFunction(action_name, param) {
 
-    try{
-        count(action_name);
-    }catch(e){};
+    // try{
+    //     count(action_name);
+    // }catch(e){};
 
     switch (action_name){
         case 'quickOpenGitProject':

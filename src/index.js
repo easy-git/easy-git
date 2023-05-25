@@ -192,16 +192,16 @@ class Main extends Common {
 
             // 如果是git项目，直接打开
             if (isGitProject) {
-                let projectInfo = { 'projectName': FolderName, 'projectPath': FolderPath }
+                global_git_projectInfo = { 'projectName': FolderName, 'projectPath': FolderPath }
                 switch (this.viewType){
                     case 'main':
-                        MainView.active(this.webviewPanel, this.userConfig, projectInfo);
+                        MainView.active(this.webviewPanel, this.userConfig, global_git_projectInfo);
                         break;
                     case 'branch':
-                        GitBranchView(this.webviewPanel, this.userConfig, projectInfo);
+                        GitBranchView(this.webviewPanel, this.userConfig, global_git_projectInfo);
                         break;
                     case 'log':
-                        openLogView(this.userConfig, projectInfo);
+                        openLogView(this.userConfig, global_git_projectInfo);
                         break;
                     default:
                         break;
@@ -274,6 +274,10 @@ class Main extends Common {
                 this.webviewPanel._webView._msgListeners = [];
             };
         }catch(e){};
+
+        // 保存全局变量
+        global_git_projectInfo.projectName = projectName;
+        global_git_projectInfo.projectPath = projectPath;
 
         switch (this.viewType){
             case 'diff':
