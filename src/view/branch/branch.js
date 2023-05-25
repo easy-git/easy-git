@@ -91,7 +91,7 @@ class GitBranch {
             });
         };
 
-        let {localBranchList, remoteBranchList} = await utils.gitBranchList(this.projectPath, '-avvv');        
+        let { detached, localBranchList, remoteBranchList } = await utils.gitBranchList(this.projectPath, '-avvv');
 
         let {GitAssignAction, behind, ahead, tracking, originurl} = this.initData;
         if (!this.firstInit) {
@@ -106,18 +106,11 @@ class GitBranch {
         if (ahead == undefined) { ahead = 0 };
 
         // 获取当前分支
-        let currentBranch = '';
-        currentBranch = await utils.gitCurrentBranchName(this.projectPath);
-
-        // for (let s of localBranchList) {
-        //     if (s.current) {
-        //         currentBranch = s.name;
-        //         break;
-        //     };
-        // };
+        let currentBranch = await utils.gitCurrentBranchName(this.projectPath);
 
         // 大部分情况下，并不需要tag，因此等到视图页面渲染后，再获取tags -> TagList
         let gitBranchData = Object.assign({
+            'detached': detached,
             'localBranchList': localBranchList,
             'remoteBranchList': remoteBranchList,
             'TagsList': {'data':[]}
@@ -156,17 +149,14 @@ class GitBranch {
         };
 
         // 获取分支数据
-        let {localBranchList, remoteBranchList} = await utils.gitBranchList(this.projectPath, '-avvv');
+        let {detached, localBranchList, remoteBranchList} = await utils.gitBranchList(this.projectPath, '-avvv');
 
-        let currentBranch = '';
-        for (let s of localBranchList) {
-            if (s.current) {
-                currentBranch = s.name;
-                break;
-            };
-        };
+        // 获取当前分支
+        let currentBranch = await utils.gitCurrentBranchName(this.projectPath);
 
         let gitBranchData = {
+            'currentBranch': currentBranch,
+            'detached': detached,
             'localBranchList': localBranchList,
             'remoteBranchList': remoteBranchList
         };

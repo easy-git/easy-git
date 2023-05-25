@@ -142,7 +142,8 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                         :style="{'color': BranchStyle(item)}"
                                         @click="switchBranch(item);"
                                         :title="'点击即可切换分支'+item.name">
-                                        {{ item.current ? '*' + item.name : (item.name).replace('origin/','') }}
+                                        <span v-if="item.current">{{ currentBranchDetails}} {{ item.name }}</span>
+                                        <span v-else>{{ item.name }}</span>
                                     </span>
                                 </div>
                                 <div id="branch_action_local" class="d-inline float-right cursor-default" v-if="hoverStampID == 'branch_'+idx">
@@ -311,6 +312,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     OriginBranchList: [],
                     isShowTag: false,
                     rawBranchList: [],
+                    detached: undefined,
                     BranchList: [],
                     rawTagsList: [],
                     TagsList: [],
@@ -337,6 +339,14 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                     },
                     GitAssociationRemote() {
                         return this.originurlBoolean
+                    },
+                    currentBranchDetails() {
+                        // 用于在本地分支列表下，显示当前分支详情
+                        if (this.detached == true) {
+                            return '* Detached HEAD - ';
+                        } else {
+                            return '*';
+                        }
                     }
                 },
                 watch: {
@@ -402,6 +412,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                 this.isShowModel = false;
                                 if (msg.data) {
                                     let data = msg.data;
+                                    this.detached = data.detached;
                                     this.rawBranchList = data.localBranchList;
                                     this.BranchList = data.localBranchList;
 
@@ -419,6 +430,8 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                             if (msg.command == 'BranchList') {
                                 if (msg.data) {
                                     let data = msg.data;
+                                    this.detached = data.detached;
+                                    this.currentBranch = data.currentBranch;
                                     this.rawBranchList = data.localBranchList;
                                     this.BranchList = data.localBranchList;
 

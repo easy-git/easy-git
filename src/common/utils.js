@@ -1474,6 +1474,7 @@ async function gitBranchList(workingDir, options='-avvv') {
         let status = await git(workingDir)
             .branch(argv)
             .then((info) => {
+                let isDetached = info.detached;
                 let branches = info.branches;
                 for (let s in branches) {
                     let name = branches[s]['name'];
@@ -1489,11 +1490,11 @@ async function gitBranchList(workingDir, options='-avvv') {
                         local.push(tmp2);
                     };
                 };
-                return { 'localBranchList':local, 'remoteBranchList': remote };
+                return { 'detached': isDetached, 'localBranchList':local, 'remoteBranchList': remote };
             })
             .catch((err) => {
                 hx.window.setStatusBarMessage('Git: 获取分支列表失败，请稍后再试', 3000, 'error');
-                return { 'localBranchList':local, 'remoteBranchList': remote };;
+                return { 'detached': undefined, 'localBranchList':local, 'remoteBranchList': remote };;
             });
         return status;
     } catch (e) {
