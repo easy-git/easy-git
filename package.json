@@ -301,7 +301,7 @@
             },
             {
                 "command": "EasyGit.restore",
-                "title": "git restore - 撤消对文件的修改"
+                "title": "git restore - 撤消(放弃)对文件的修改"
             },
             {
                 "command": "EasyGit.checkoutFile",

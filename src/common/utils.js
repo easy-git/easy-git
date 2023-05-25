@@ -2726,6 +2726,11 @@ class gitRestore {
                 msg = '撤消对文件的修改，';
             };
 
+            // 2023-5-25 增加确认提示
+            let log_for_cmd = cmd.join(' ');
+            let btnText = await hxShowMessageBox("提示", `是否${msg} 此操作不可逆！\n\n操作的Git命令为: git ${log_for_cmd}`, ['确定', '取消']);
+            if (btnText != '确定') return;
+
             let cancelStatus = await gitRaw(projectPath, cmd, msg);
             return cancelStatus;
         };
@@ -2740,6 +2745,12 @@ class gitRestore {
                 cmd1 = ['restore', options];
                 msg1 = '撤消对文件的修改，';
             };
+
+            // 2023-5-25 增加确认提示
+            let log_for_cmd1 = cmd1.join(' ');
+            let btnText = await hxShowMessageBox("提示", `是否${msg1} 此操作不可逆！\n\n操作的Git命令为: git ${log_for_cmd1}`, ['确定', '取消']);
+            if (btnText != '确定') return;
+
             let cancelStatus = await gitRaw(projectPath, cmd1, msg1);
             return cancelStatus;
         };
