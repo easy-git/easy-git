@@ -153,7 +153,6 @@ class GitBranch {
 
         // 获取当前分支
         let currentBranch = await utils.gitCurrentBranchName(this.projectPath);
-
         let gitBranchData = {
             'currentBranch': currentBranch,
             'detached': detached,

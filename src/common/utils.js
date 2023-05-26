@@ -1540,6 +1540,18 @@ async function gitRawGetBranch(workingDir, commands) {
  */
 async function gitCurrentBranchName(workingDir) {
     try {
+        let name1 = await git(workingDir)
+            .raw(['branch', '--show-current'])
+            .then((info) => {
+                info = info.trim();
+                return info == undefined || info == '' ? '' : info;
+            })
+            .catch((err) => {
+                hx.window.setStatusBarMessage('Git: 获取当前分支信息失败', 30000, 'error');
+                return false;
+            });
+        if (name1 != '') return name1
+
         let name = await git(workingDir)
             // .raw(['symbolic-ref', '--short', 'HEAD'])
             .raw(['rev-parse', '--abbrev-ref', 'HEAD'])

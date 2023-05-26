@@ -205,7 +205,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                 @mouseover="hoverStampID = 'origin_'+idx"
                                 @mouseleave="hoverStampID = false">
                                 <div class="d-inline">
-                                    <span>{{ item.name }}</span>
+                                    <span @click="gitCreateBranchForExecuteCommand(item.name);">{{ item.name }}</span>
                                 </div>
                                 <div id="branch_action_origin" class="d-inline float-right" v-if="hoverStampID == 'origin_'+idx">
                                     <span class="ml-1"
@@ -246,7 +246,7 @@ function getWebviewBranchContent(userConfig, uiData, gitBranchData) {
                                 :id="'tag_'+i3"
                                 @mouseover="hoverTagId = 'tag_'+i3"
                                 @mouseleave="hoverTagId = false">
-                                <span title="tag">{{ v3 }}</span>
+                                <span title="tag" @click="gitCreateBranchForExecuteCommand(v3);">{{ v3 }}</span>
                                 <div id="tag_action" class="d-inline float-right" v-if="hoverTagId == 'tag_'+i3">
                                     <span class="ml-1"
                                         title="从此tag上签出新分支"
