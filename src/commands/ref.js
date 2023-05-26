@@ -205,9 +205,17 @@ class Branch {
     // Git: git checkout <branch-name>
     async switchBranch(ProjectInfo) {
         let { projectPath } = ProjectInfo;
-        let branchs = await this.getAllBranch(projectPath, 'local');
 
-        let data = [...[{"label": "切换到之前的分支"}], ...branchs];
+        let tags = [];
+        let branchs = await this.getAllBranch(projectPath, 'all');
+        try {
+            tags = await gitTagsList(projectPath);
+            if (tags.data.length > 0) {
+                tags = tags.data.map( item => { return {"label": `tags/${item}`} } );
+            };
+        } catch (error) {};
+
+        let data = [...[{"label": "切换到之前的分支"}], ...branchs, ...tags];
         let selected = await hx.window.showQuickPick(data, {
             'placeHolder': '请选择要切换的分支名称'
         }).then( (res)=> {
