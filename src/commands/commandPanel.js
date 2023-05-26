@@ -34,16 +34,16 @@ async function unfocusedAction() {
  * @datetime 2020-10-30 10:16:00
  */
 async function showCommandPanel(param, name) {
-    if (param == null) {
-        let unfocusedResult = await unfocusedAction();
-        if (unfocusedResult == null || unfocusedResult == 'fouceEditorFail' || unfocusedResult == undefined) {
-            hx.window.setStatusBarMessage('EasyGit: 请将焦点置于项目管理器Git项目上、或在编辑器中打开Git项目下文件，再进行操作。', 5000, 'info');
-        };
-    };
+    // if (param == null) {
+    //     let unfocusedResult = await unfocusedAction();
+    //     if (unfocusedResult == null || unfocusedResult == 'fouceEditorFail' || unfocusedResult == undefined) {
+    //         hx.window.setStatusBarMessage('EasyGit: 请将焦点置于项目管理器Git项目上、或在编辑器中打开Git项目下文件，再进行操作。', 5000, 'info');
+    //     };
+    // };
 
-    try{
-        count('CommandPanel').catch( error=> {});
-    }catch(e){};
+    // try{
+    //     count('CommandPanel').catch( error=> {});
+    // }catch(e){};
 
     let tmp = [];
     if (name) {
@@ -71,6 +71,7 @@ async function showCommandPanel(param, name) {
     });
 
     pickResult.then(function(result) {
+        console.log("--->", result)
         if (!result) { return; };
         let cmd = result.command;
         if (cmd == 'back') {

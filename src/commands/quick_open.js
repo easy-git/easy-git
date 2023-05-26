@@ -55,7 +55,7 @@ async function quickOpen(param={}, isReturnProjectInfo=false) {
         ...gitList
     ];
 
-    let placeHolder = viewName == "logView" ? '请选择Git项目查看Log...' : '请选择要操作的Git项目...';
+    let placeHolder = viewName == "logView" ? '请选择Git项目查看Log...' : '请选择要操作的Git项目 (按ESC键关闭) ...... ';
     let selected = await hx.window.showQuickPick(pickerList, {
         'placeHolder': placeHolder
     }).then( (res)=> {

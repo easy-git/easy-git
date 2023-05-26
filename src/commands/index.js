@@ -40,7 +40,7 @@ let lastProjectInfo = {};
  */
 async function action(param, action_name) {
     let easyGitInner, projectName, projectPath, selectedFile, isFromGitView;
-
+    
     if (param != null) {
         try{
             easyGitInner = param.easyGitInner;
@@ -50,44 +50,66 @@ async function action(param, action_name) {
                 selectedFile = param.selectedFile;
                 isFromGitView = param.isFromGitView;
             } else {
-                try {
+                if (param.fsPath) {
+                    selectedFile = param.fsPath;
                     projectName = param.workspaceFolder.name;
                     projectPath = param.workspaceFolder.uri.fsPath;
-                    selectedFile = param.fsPath;
-                } catch (e) {
-                    projectName = param.document.workspaceFolder.name;
-                    projectPath = param.document.workspaceFolder.uri.fsPath;
-                    selectedFile = param.document.uri.fsPath;
+                };
+                if (param.metaType == "TextEditor") {
+                    if (param.document?.workspaceFolder?.name == undefined) {
+                        param = null;
+                    } else {
+                        projectName = param.document.workspaceFolder.name;
+                        projectPath = param.document.workspaceFolder.uri.fsPath;
+                        selectedFile = param.document.uri.fsPath;
+                    }
                 };
             };
 
             // 保存全局项目信息
-            global_git_projectInfo.projectPath = projectPath;
-            global_git_projectInfo.projectName = projectName;
+            if (projectPath && projectName) {
+                global_git_projectInfo.projectPath = projectPath;
+                global_git_projectInfo.projectName = projectName;
+            };
         } catch(e){
+            console.error(e)
             return hx.window.showErrorMessage('easy-git: 无法得知您需要对哪个Git项目进行操作，请在项目管理器选中项目后再试。', ["我知道了"]);
         };
     };
 
     // 不需要获取项目信息的就能进行git操作的命令
     let NotFocusList = ['set-username-useremail'];
-    
+
     // 当无法从hx获取到焦点时的处理
     if (param == null && !NotFocusList.includes(action_name)) {
-        // 方法1： 当无法获取到焦点时，使用全局记忆的项目信息
-        // if (global_git_projectInfo.projectPath != "" && global_git_projectInfo.projectName != "") {
-        //     projectName = global_git_projectInfo.projectName;
-        //     projectPath = global_git_projectInfo.projectPath;
-        //     let btnText = await utils.hxShowMessageBox(`提示`, `由于没有获取到焦点，请确认是否是对 ${projectName} 项目进行 git ${action_name} 操作。` ["否","是"]);
-        //     if (btnText != "是") return;
-        // };
+
+        let btnText = undefined;
+        if (global_git_projectInfo.projectName != "" && global_git_projectInfo.projectPath != "") {
+            projectName = global_git_projectInfo.projectName;
+            projectPath = global_git_projectInfo.projectPath;
+
+            btnText = await utils.hxShowMessageBox(`提示`, `由于没有获取到焦点，需要您确认是否是对 ${projectName} 项目进行 git ${action_name} 操作。` , ["选择其它项目","否","是"]);
+
+            if (btnText != "是" && btnText != "选择其它项目") return;
+        };
+
+        if (btnText == "选择其它项目" || (global_git_projectInfo.projectName == "" && global_git_projectInfo.projectPath == "")) {
+            let quickInfo = await quickOpen({}, true);
+            if (quickInfo == undefined || typeof quickInfo != 'object') return;
+            projectName = quickInfo.projectName;
+            projectPath = quickInfo.projectPath;
+            if (!fs.existsSync(projectPath)) {
+                hx.window.setStatusBarMessage(`EasyGit: 项目 ${projectName} 不存在，请检查项目状态。`, 5000);
+                return;
+            };
+        };
 
         // 方法2：当无法获取到焦点时，弹出快速选择项目
-        let quickInfo = await quickOpen({}, true);
-        if (quickInfo == undefined || typeof quickInfo != 'object') return;
-        projectName = quickInfo.projectName;
-        projectPath = quickInfo.projectPath;
-        if (!fs.existsSync(projectPath)) return;
+        // let quickInfo = await quickOpen({}, true);
+        // if (quickInfo == undefined || typeof quickInfo != 'object') return;
+        // projectName = quickInfo.projectName;
+        // projectPath = quickInfo.projectPath;
+        // if (!fs.existsSync(projectPath)) return;
     };
 
 
@@ -117,7 +139,7 @@ async function action(param, action_name) {
     if (easyGitInner != true && !action_list.includes(action_name)) {
         let isGit = await utils.checkIsGitProject(projectPath).catch( error => { return 'No' });
         if (isGit == 'No') {
-            hx.window.showErrorMessage("EasyGit: 请将焦点置于项目管理器Git项目、或在编辑器打开Git项目下的文件后，再进行操作。", ["我知道了"]);
+            utils.hxShowMessageBox("EasyGit", "您选择的项目不是Git项目。请将焦点置于项目管理器Git项目、或在编辑器打开Git项目下的文件后，再进行操作。", ["关闭"]);
             return;
         };
     };
