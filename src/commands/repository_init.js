@@ -69,7 +69,7 @@ async function gitInitProject(ProjectInfo) {
         goSetEncoding("i18n.logoutputencoding", 'StatusBar');
     };
 
-    createOutputChannel("当前仓库，初始化成功，还未关联到远程仓库上, 请在弹窗输入框中输入仓库地址。如不需要关联远程仓库、或后期设置，请直接关闭弹窗。", "warning");
+    createOutputChannel("当前仓库，初始化成功，还未关联到远程仓库上, 请在弹窗输入框中输入仓库地址。如不需要关联远程仓库、或后期设置，请直接关闭弹窗。", "info");
     createOutputChannel("新建仓库、及获取远程仓库地址，参考: https://easy-git.github.io/connecting/init\n");
 
     // 打开源代码管理器
@@ -111,8 +111,14 @@ class gitInitAfterSetting {
     async goValidate(formData, that) {
         let {action, RepositoryName, oauth_desc_gitee, oauth_desc_github, isHttp} = formData;
 
-        if (action == 'github' && oauth_desc_github === null) return true;
-        if (action == 'gitee' && oauth_desc_gitee === null) return true;
+        if (action == 'github' && oauth_desc_github === null) {
+            that.showError(`您点击了【确认】按钮，需要先授权登录Github账号。如果您不想授权登录，可以点击【取消】按钮。`);
+            return false;
+        };
+        if (action == 'gitee' && oauth_desc_gitee === null) {
+            that.showError(`您点击了【确认】按钮，需要先授权登录Gitee账号。如果您不想授权登录，可以点击【取消】按钮。`);
+            return false;
+        };
 
         if (action == 'ManualInput') {
             let {RepositoryURL, new_email} = formData;
@@ -156,29 +162,33 @@ class gitInitAfterSetting {
         return true;
     };
 
-    async isOAuth() {
-        try{
-            let giteeOAuthInfo = await giteeOAuth.readLocalToken();
-            if (giteeOAuthInfo.status == 'success-authorize') {
-                this.giteeInfo = giteeOAuthInfo;
-                let {orgs, login} = giteeOAuthInfo;
-                if (orgs.length && Array.isArray(orgs)) {
-                    let orgs_list = orgs.map(item => {if(item != login) {return item} });
-                    this.giteeOrgs = orgs_list.join(' ');
+    async isOAuth(service="all") {
+        if (service == "all" || service == "gitee") {
+            try{
+                let giteeOAuthInfo = await giteeOAuth.readLocalToken();
+                if (giteeOAuthInfo.status == 'success-authorize') {
+                    this.giteeInfo = giteeOAuthInfo;
+                    let {orgs, login} = giteeOAuthInfo;
+                    if (orgs.length && Array.isArray(orgs)) {
+                        let orgs_list = orgs.map(item => {if(item != login) {return item} });
+                        this.giteeOrgs = orgs_list.join(' ');
+                    };
                 };
-            };
-        }catch(e){};
+            }catch(e){};
+        };
 
-        try{
-            let githubOAuthInfo = await githubOAuth.readLocalToken();
-            if (githubOAuthInfo.status == 'success-authorize') {
-                this.githubInfo = githubOAuthInfo;
-                let orgs2 = githubOAuthInfo.orgs;
-                if (orgs2.length && Array.isArray(orgs2)) {
-                    this.githubOrgs = orgs2.join(' ');
+        if (service == "all" || service == "github") {
+            try{
+                let githubOAuthInfo = await githubOAuth.readLocalToken();
+                if (githubOAuthInfo.status == 'success-authorize') {
+                    this.githubInfo = githubOAuthInfo;
+                    let orgs2 = githubOAuthInfo.orgs;
+                    if (orgs2.length && Array.isArray(orgs2)) {
+                        this.githubOrgs = orgs2.join(' ');
+                    };
                 };
-            };
-        }catch(e){};
+            }catch(e){};
+        };
     };
 
     /**
@@ -188,6 +198,7 @@ class gitInitAfterSetting {
      * @param {Object} formData
      */
     getFormItems(preFillData={}, action='ManualInput', formData) {
+
         let {local_email, local_username, projectName, projectPath} = preFillData;
 
         let title = projectName ? 'Git仓库设置' + ' - ' + projectName : 'Git仓库设置';
@@ -201,7 +212,7 @@ class gitInitAfterSetting {
         var oauth_desc = `<span>您使用此功能之前，需要先授权插件访问 ${tService}。
             <br/><br/>通过OAuth授权后，可以在本地操作远程Git服务器某些功能；比如无需再登录浏览器，直接在本地创建远程仓库。
             <br/><br/>授权后Git访问凭证仅会存储在您的个人电脑上，不会上传网络，且本地信息已加密。
-            <br/><br/><span style="font-weight: 600;">点击【确定】按钮后，将跳转到浏览器 ${tService} 认证页面.</span></span><br/><br/>`;
+            <br/><br/><span style="font-weight: 600;">点击【打开${action}授权】按钮后，将跳转到浏览器 ${tService} 认证页面。授权成功后，请点击刷新按钮。</span></span><br/><br/>`;
 
         let formItems = [{
                 type: "radioGroup",name: "action", "value": action,
@@ -240,8 +251,17 @@ class gitInitAfterSetting {
             } else {
                 formItems.push({type: "label",name: "blank_line_10",text: ""});
                 formItems.push({type: "label",name: "oauth_desc_gitee",text: oauth_desc});
+                formItems.push(
+                    {
+                        type: 'widgetGroup',
+                        name: 'authWidget',
+                        widgets: [
+                            {type: 'button',name: 'authButton',text: `打开${action}授权`,size: 'small'},
+                            {type: 'button',name: 'RefreshButton',text: '刷新',size: 'small'},
+                        ]
+                    }
+                );
             };
-            footer = '<a href="https://easy-git.github.io/oauth">了解OAuth详情</a>';
         };
         if (action == "github") {
             if (this.githubInfo && typeof this.githubInfo == "object") {
@@ -252,7 +272,19 @@ class gitInitAfterSetting {
             } else {
                 formItems.push({type: "label",name: "blank_line_10",text: ""});
                 formItems.push({type: "label",name: "oauth_desc_github",text: oauth_desc});
+                formItems.push(
+                    {
+                        type: 'widgetGroup',
+                        name: 'authWidget',
+                        widgets: [
+                            {type: 'button',name: 'authButton',text: `打开${action}授权`,size: 'small'},
+                            {type: 'button',name: 'RefreshButton',text: '刷新',size: 'small'},
+                        ]
+                    }
+                );
             };
+        };
+        if (["github", "gitee"].includes(action)) {
             footer = '<a href="https://easy-git.github.io/oauth">了解OAuth详情</a>';
         };
 
@@ -266,7 +298,7 @@ class gitInitAfterSetting {
         };
     };
 
-    async view(preFillData, action='ManualInput') {
+    async view(preFillData, action='ManualInput', ProjectInfo) {
         let that = this;
         let setInfo = await hx.window.showFormDialog({
             submitButtonText: "确定(&S)",
@@ -279,6 +311,22 @@ class gitInitAfterSetting {
                 this.showError('');
                 if (field == "action") {
                     this.updateForm(that.getFormItems(preFillData, value, formData));
+                };
+                if (field == "authWidget") {
+                    let btn = value.changedWidget.name;
+                    let services = formData.action;
+                    if (btn == "authButton") {
+                        that.gotoOAuth(services, preFillData, ProjectInfo);
+                    };
+                    if (btn == "RefreshButton") {
+                        (async () => {
+                            await that.isOAuth(services);
+                        })();
+                        let this2 = this;
+                        setTimeout(function() {
+                            this2.updateForm(that.getFormItems(preFillData, services, formData));
+                        }, 1500);
+                    };
                 }
             },
             ...that.getFormItems(preFillData, action)
@@ -336,10 +384,11 @@ class gitInitAfterSetting {
 
         // 打开Git设置窗口
         let preFillData = {local_email, local_username, projectName, projectPath};
-        let setInfo = await this.view(preFillData, git_service);
+        let setInfo = await this.view(preFillData, git_service, ProjectInfo);
+
         if (setInfo == undefined) {
             let nextPreData = Object.assign(ProjectInfo, {"git_service": gitServiceUserSelect});
-            createOutputViewForHyperLinksForCommand(`您手动关闭了设置窗口，如需要，请点击【Git仓库设置】链接打开Git仓库设置窗口。`, "Git仓库设置", "success", "EasyGit.addRemoteOrigin", nextPreData);
+            createOutputViewForHyperLinksForCommand(`您手动关闭了设置窗口，如需要，请点击【Git仓库设置】链接打开Git仓库设置窗口。`, "Git仓库设置", "info", "EasyGit.addRemoteOrigin", nextPreData);
             return;
         };
         let {action, isHttp} = setInfo;
@@ -361,12 +410,9 @@ class gitInitAfterSetting {
             };
             return {"status": "success"};
         };
+
         if (['github', 'gitee'].includes(action)) {
             let {RepositoryName, isPrivate, owner, isAddRemoteOrigin} = setInfo;
-
-            // oauth认证
-            let OauthStatus = await this.gotoOAuth(action, ProjectInfo);
-            if (!OauthStatus) return;
 
             let CreateInfo = {
                 "name": RepositoryName,
@@ -374,9 +420,6 @@ class gitInitAfterSetting {
                 "isPrivate": isPrivate,
                 "owner": owner
             };
-            try{
-                count("CreateRemoteRepository_from_init");
-            }catch(e){};
 
             try{
                 let createResult = await gitRepoCreate(CreateInfo);
