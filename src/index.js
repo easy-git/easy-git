@@ -309,7 +309,7 @@ class Main extends Common {
         // git clone
         if (this.viewType == 'clone' || beforeResult == 'goClone') {
             let {isSwitchSearchGithub} = this.context;
-            openCloneView(isSwitchSearchGithub);
+            openCloneView(this.context, isSwitchSearchGithub);
             return;
         };
 
