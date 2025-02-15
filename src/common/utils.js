@@ -687,7 +687,7 @@ async function gitClone(info) {
 
     try{
         let options = [];
-        if (branch) {
+        if (branch && branch.trim().length != 0) {
             options.push("-b");
             options.push(branch);
         };

@@ -73,11 +73,11 @@
 
         <q-view layout='hbox'>
             <q-label text="账户密码" id="labelView"></q-label>
-            <q-input :text='account.username'
+            <q-input :text='cloneInfo.username'
                 id="elInput" accessibleName="git_account_username"
                 @textChanged="el_set" placeholderText="选填, Git账户用户名或email">
             </q-input>
-            <q-input :text='account.password'
+            <q-input :text='cloneInfo.password'
                 id="elInput" accessibleName="git_account_password"
                 @textChanged="el_set" placeholderText="选填, Git账户密码">
             </q-input>
@@ -140,15 +140,13 @@
                 githubRepoIndex: 0,
                 selectedGithubRepoName: "",
                 github_search_err_msg: false,
-                account: {
-                    username: "",
-                    password: ""
-                },
                 cacheRepoList: [],
                 cacheRepoIndex: -1,
                 cacheRepoName: "",
                 cloneInfo: {
                     protocol: 'ssh',
+                    username: '',
+                    password: '',
                     repo: '',
                     branch: '',
                     local_destination_path: ''
@@ -202,6 +200,12 @@
                 if (accessibleName == "git_local_destination_path") {
                     this.cloneInfo.local_destination_path = e.target.text;
                 };
+                if (accessibleName == "git_account_username") {
+                    this.cloneInfo.username = e.target.text;
+                };
+                if (accessibleName == "git_account_password") {
+                    this.cloneInfo.password = e.target.text;
+                }
             },
 
             // 开始搜索Github

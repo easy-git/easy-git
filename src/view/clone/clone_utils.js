@@ -132,7 +132,7 @@ async function getOAuthUserAllGitRepos(webview, platform="all") {
 
     let ge = new Gitee();
     let giteeRepos = await ge.getUserRepos();
-    console.error("giteeRepos result ->", platform, giteeRepos);
+    // console.error("giteeRepos result ->", platform, giteeRepos);
 
     // 先返回gitee
     if (platform == "all" || platform == 'gitee') {

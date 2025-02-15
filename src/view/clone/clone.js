@@ -8,9 +8,14 @@ const {hxShowMessageBox} = require('../../common/utils.js');
 
 function openCloneView(context, isSwitchSearchGithub=false) {
     try{
-        // openFormDialog();
-        cloneMainForVue();
-        // openWebDialog('', isSwitchSearchGithub);
+        cloneMainForVue(isSwitchSearchGithub);
+        return
+    }catch(e){
+        console.error(e)
+    };
+
+    try{
+        openWebDialog('', isSwitchSearchGithub);
     }catch(e){
         console.error(e)
     };
