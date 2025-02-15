@@ -14,9 +14,15 @@ const {
     gitClone,
     updateHBuilderXConfig,
     importProjectToExplorer } = require('../../common/utils.js');
-const { axiosGet } = require('../../common/axios.js');
+
 const { Gitee, Github, openOAuthBox } = require('../../common/oauth.js');
 const { getSyncIcon } = require('../static/icon.js');
+
+const {
+    openGithubSearch,
+    getDefaultClonePath,
+    getOAuthUserAllGitRepos
+} = require("./clone_utils.js");
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'static', 'vue.min.js');
 const bootstrapCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'bootstrap.min.css');
@@ -25,33 +31,11 @@ const customCssFile = path.join(path.resolve(__dirname, '..'), 'static', 'custom
 const osName = os.platform();
 const SyncIcon = getSyncIcon('#d4d4d4');
 
-const appDataDir = hx.env.appData;
-
 // Git仓库地址，用于数据填充
 var GitRepoUrl = '';
 
 // 克隆目录
 var ProjectWizard = '';
-
-/**
- * @description 设置初始克隆目录
- */
-function getProjectWizard() {
-    try{
-        let config = hx.workspace.getConfiguration();
-        let LastCloneDir = config.get('EasyGit.LastCloneDir');
-        if (LastCloneDir && LastCloneDir != '') {
-            return LastCloneDir;
-        };
-        if (osName == 'darwin') {
-            return path.join(process.env.HOME, 'Documents')
-        } else {
-            return path.join("C:", process.env.HOMEPATH, 'Documents')
-        };
-    }catch(e){
-        return '';
-    };
-};
 
 
 /**
@@ -72,142 +56,6 @@ async function checkSSH(webviewDialog, webview) {
         webviewDialog.displayError(emsg);
     };
     return publicKey;
-};
-
-/**
- * @description 搜索Github
- * @param {Object} word 搜索关键字
- * @param {Object} webviewDialog
- * @param {Object} webview
- */
-async function openGithubSearch(word, webviewDialog, webview) {
-    let data = {"ssh":[],"https":[]};
-
-    if (word.length < 2) {return};
-    webviewDialog.displayError('');
-
-    hx.window.setStatusBarMessage(`easy-git: 正在github搜索 ${word} ...., 这取决于您的网络状况`, 500000, 'info');
-
-    let url = `https://api.github.com/search/repositories?q=${word}`
-    let headers = {"Accept": "application/vnd.github.v3+json"};
-    let SearchResult = await axiosGet(url, headers).catch(error=> {
-        return 'fail';
-    });
-    hx.window.clearStatusBarMessage();
-
-    if (SearchResult == 'fail') {
-        webviewDialog.displayError("Github搜索失败，请检查网络。")
-        return data;
-    } else {
-        let { items } = SearchResult;
-        if ( items.length == 0) {
-            webviewDialog.displayError("Github搜索，没有搜索到结果。")
-            return data;
-        } else {
-            hx.window.setStatusBarMessage(`easy-git: github搜索 ${word} 成功。`, 500000, 'success');
-        }
-        data.ssh = items.map( x => x["ssh_url"]);
-        data.https = items.map( x => x["clone_url"]);
-        webview.postMessage({command: 'githubSearchResult',data: data});
-        return data;
-    };
-};
-
-/**
- * @description 保存github缓存数据到本地
- * @param {Object} Data - Github仓库URL列表
- */
-function saveGithupReposCacheData(data) {
-    try{
-        let {ssh, https} = data;
-        if (ssh.length) {
-            let cacheFile = path.join(GithubReposCacheDir, '.cache_github_repos');
-            fs.writeFile(cacheFile, JSON.stringify(data), function (err) {
-               if (err) throw err;
-            });
-        };
-    }catch(e){
-        console.log(e)
-    };
-};
-
-/**
- * @description github缓存数据
- */
-class GithubCache {
-    constructor() {
-        this.cacheFile = path.join(appDataDir, 'easy-git', 'oauth', '.cache_github_repos');
-    };
-
-    async save(data) {
-        try{
-            let {ssh, https} = data;
-            if (ssh.length) {
-                fs.writeFile(this.cacheFile, JSON.stringify(data), function (err) {
-                   if (err) throw err;
-                });
-            };
-        }catch(e){};
-    };
-
-    async read() {
-        try{
-            let fileRawContent = fs.readFileSync(this.cacheFile, 'utf-8');
-            let fileLastContent = JSON.parse(fileRawContent);
-            let check = fileLastContent instanceof Object;
-            if (!check) {return false;};
-            let {ssh, https} = fileLastContent;
-            if (ssh.length && https.length) {
-                return fileLastContent;
-            };
-        }catch(e){
-            return false;
-        };
-    };
-}
-
-/**
- * @description 获取用户仓库列表
- */
-async function getUserAllGitRepos(webview) {
-    let allRepos = {"ssh":[],"https":[]};
-
-    let ghCache = new GithubCache();
-    try{
-        // 读取本地的Github缓存数据
-        let ghCacheData = await ghCache.read()
-        allRepos.ssh = [ ...allRepos["ssh"], ...ghCacheData["ssh"] ];
-        allRepos.https = [ ...allRepos["https"], ...ghCacheData["https"] ];
-    }catch(e){};
-
-    let ge = new Gitee();
-    let giteeRepos = await ge.getUserRepos();
-
-    // 先返回gitee
-    if (giteeRepos != 'fail-authorize') {
-        let {ssh, https} = giteeRepos;
-        allRepos.ssh = [ ...allRepos["ssh"], ...ssh ];
-        allRepos.https = [ ...allRepos["https"], ...https ];
-        webview.postMessage({command: 'authResult',data: true});
-        webview.postMessage({command: 'repos',data: allRepos});
-    };
-
-    let gtb = new Github();
-    let githubRepos = await gtb.getUserRepos();
-
-    if (githubRepos == 'fail-authorize') {
-        return;
-    };
-    if (githubRepos != 'fail-authorize') {
-        ghCache.save(githubRepos);
-
-        allRepos.ssh = [ ...allRepos["ssh"], ...githubRepos["ssh"] ];
-        allRepos.https = [ ...allRepos["https"], ...githubRepos["https"] ];
-    };
-    if (allRepos) {
-        webview.postMessage({command: 'authResult',data: true});
-        webview.postMessage({command: 'repos',data: allRepos});
-    };
 };
 
 /**
@@ -298,7 +146,7 @@ async function clone(webviewDialog, webview, info) {
 function showClone(clone_url="", isSwitchSearchGithub=false) {
 
     // 获取克隆目录
-    ProjectWizard = getProjectWizard();
+    ProjectWizard = getDefaultClonePath();
     isSwitchSearchGithub = typeof isSwitchSearchGithub == 'boolean' ? isSwitchSearchGithub : false;
     let hxData = { 'ProjectWizard': ProjectWizard, "isSwitchSearchGithub": isSwitchSearchGithub};
 
@@ -342,7 +190,7 @@ function showClone(clone_url="", isSwitchSearchGithub=false) {
                 openOAuthBox();
                 break;
             case 'MyGitRepos':
-                getUserAllGitRepos(webview);
+                getOAuthUserAllGitRepos(webview);
                 break;
             case 'checkSSH':
                 checkSSH(webviewDialog, webview);

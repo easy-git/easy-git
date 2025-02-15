@@ -51,13 +51,15 @@
                 @textChanged="el_set"
                 placeholderText="输入Git存储库URL （以git@或http开头）">
             </q-input> -->
-            <q-combox :items='cacheRepoList'
+            <q-combox
+                :items='cacheRepoList'
                 :currentIndex='cacheRepoIndex'
                 :currentText='cacheRepoName'
                 :stretch-factor='1'
                 accessibleName="git_repo_combox"
                 placeholderText="输入Git存储库URL （以git@或http开头）"
-                @currentTextChanged="el_set"></q-combox>
+                @currentTextChanged="el_set"
+                style="font-size: 12px;"></q-combox>
             <q-view horizontal-size-policy="ShrinkFlag"></q-view>
         </q-view>
 
@@ -125,8 +127,9 @@
     const {
         openGithubSearch,
         getDefaultClonePath,
-        openOAuthBox
-    } = require('./utils.js');
+        openOAuthBox,
+        getOAuthUserAllGitRepos
+    } = require('../clone_utils.js');
 
     export default {
         data() {
@@ -141,7 +144,7 @@
                     username: "",
                     password: ""
                 },
-                cacheRepoList: ["https://www.badu.com"],
+                cacheRepoList: [],
                 cacheRepoIndex: -1,
                 cacheRepoName: "",
                 cloneInfo: {
@@ -155,9 +158,22 @@
 
         created() {
             this.cloneInfo.local_destination_path = getDefaultClonePath();
+            this.getOAuthCacheRepoList();
         },
 
         methods: {
+            async getOAuthCacheRepoList() {
+                let giteeResult = await getOAuthUserAllGitRepos(undefined, 'gitee');
+                // console.error("[getOAuthCacheRepoList] ...... ", giteeResult);
+                this.cacheRepoList = giteeResult['https'];
+                await this.updateUi();
+
+                let githubResult = await getOAuthUserAllGitRepos(undefined, 'github');
+                // console.error("[githubResult] ...... ", githubResult);
+                this.cacheRepoList = [...this.cacheRepoList, ...githubResult['https']];
+                await this.updateUi();
+            },
+
             async setAction(e) {
                 let v = e.target['data-value'];
                 this.action = v;
@@ -229,7 +245,7 @@
 
             // github、gitee授权
             async goAuthorize() {
-                // openOAuthBox();
+                openOAuthBox();
             },
 
             // 打开链接
@@ -248,7 +264,7 @@
 
     #scrollView {
         width: 100%;
-        justify-content: start;
+        /* justify-content: start; */
     }
 
     #labelView {
@@ -261,7 +277,7 @@
         height: 30px;
         border-bottom: 1px solid #d6d6d6;
         outline: none;
-        color: #000;
+        /* color: #000; */
         font-size: 12px;
         margin-right: 10px;
     }

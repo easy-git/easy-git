@@ -27,7 +27,7 @@ async function cloneMainForVue() {
 
     let form = await hx.window.showFormDialog({
         title: "Git Clone - 克隆仓库",
-        submitButtonText: "提交(&S)",
+        submitButtonText: "开始克隆(&S)",
         cancelButtonText: "取消(&C)",
         footer: "<a href=\"https://easy-git.github.io/connecting/\">相关文档</a>",
         width: 800,
