@@ -196,11 +196,9 @@ async function gitRepositoryCreate(FromData={}) {
         };
     });
 
-    let promi = webviewDialog.show();
-    promi.then(function (data) {});
-
     let giteeOAuthInfoForHtml = JSON.stringify(giteeOAuthInfo);
     let githubOAuthInfoForHtml = JSON.stringify(githubOAuthInfo);
+
     webview.html = `<!DOCTYPE html>
     <html lang="en">
         <head>
@@ -484,6 +482,9 @@ async function gitRepositoryCreate(FromData={}) {
             </script>
         </body>
     </html>`
+
+    let promi = webviewDialog.show();
+    promi.then(function (data) {});
 };
 
 module.exports = {
