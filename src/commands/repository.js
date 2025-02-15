@@ -171,30 +171,6 @@ async function gitRepositoryCreate(FromData={}) {
     let api = new Api(webviewDialog);
 
     const webview = webviewDialog.webView;
-    webview.onDidReceiveMessage((msg) => {
-        let type = msg.type;
-        let { data } = msg;
-        switch (type) {
-            case 'closed':
-                if (watcher) {
-                    watcher.close();
-                };
-                webviewDialog.close();
-                break;
-            case 'create':
-                api.CreateRepo(data);
-                break;
-            case 'authorize':
-                let {host} = data;
-                api.goAuthorize(host);
-                break;
-            case 'refreshAuthorizeStatus':
-                api.refreshAuthorizeStatus();
-                break;
-            default:
-                break;
-        };
-    });
 
     let giteeOAuthInfoForHtml = JSON.stringify(giteeOAuthInfo);
     let githubOAuthInfoForHtml = JSON.stringify(githubOAuthInfo);
@@ -482,6 +458,32 @@ async function gitRepositoryCreate(FromData={}) {
             </script>
         </body>
     </html>`
+
+
+    webview.onDidReceiveMessage((msg) => {
+        let type = msg.type;
+        let { data } = msg;
+        switch (type) {
+            case 'closed':
+                if (watcher) {
+                    watcher.close();
+                };
+                webviewDialog.close();
+                break;
+            case 'create':
+                api.CreateRepo(data);
+                break;
+            case 'authorize':
+                let {host} = data;
+                api.goAuthorize(host);
+                break;
+            case 'refreshAuthorizeStatus':
+                api.refreshAuthorizeStatus();
+                break;
+            default:
+                break;
+        };
+    });
 
     let promi = webviewDialog.show();
     promi.then(function (data) {});
