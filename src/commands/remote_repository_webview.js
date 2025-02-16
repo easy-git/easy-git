@@ -3,12 +3,8 @@ const fs = require('fs');
 const hx = require('hbuilderx');
 const chokidar = require('chokidar');
 
-const { goSetEncoding } = require('./base.js');
-const { gitSetForWebDialog } = require('./repository_init.js');
-
-const { axiosPost, axiosGet } = require('../common/axios.js');
 const { Gitee, Github, gitRepoCreate } = require('../common/oauth.js');
-const { gitRaw, createOutputChannel, gitAddRemoteOrigin } = require('../common/utils.js');
+const { createOutputChannel, gitAddRemoteOrigin } = require('../common/utils.js');
 const count = require('../common/count.js');
 
 const vueFile = path.join(path.resolve(__dirname, '..'), 'view', 'static', 'vue.min.js');
