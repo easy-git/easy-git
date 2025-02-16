@@ -12,7 +12,7 @@ const quickOpen = require('./quick_open.js');
 const sshKeygen = require('./ssh_keygen.js');
 const { goStash, goStashPop, goStashClear, goStashShow } = require('./stash.js');
 
-const { gitRepositoryCreate } = require('./repository.js');
+const { gitRepositoryCreate } = require('./remote_repository_webview.js');
 const gitRemoteRepositoryCreate = require('./remote_repository_vue.js');
 const { gitInitProject, gitInitAfterSetting } = require('./repository_init.js');
 
