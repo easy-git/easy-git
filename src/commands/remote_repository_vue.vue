@@ -63,14 +63,24 @@
             </q-input>
         </q-view>
 
-        <!-- <q-view layout='hbox' style="margin-top: 5px;">
+        <q-view layout='hbox' style="margin-top: 5px;">
             <q-label text="克隆操作" id="labelView"></q-label>
             <q-checkbox id="elCheckBox" text="远程仓库创建后，是否克隆到本地。勾选后，会打开克隆视图。"
                 accessibleName="action_clone"
                 @clicked="el_set"
                 :checked='isClone' />
             <q-view horizontal-size-policy="Expanding"></q-view>
-        </q-view> -->
+        </q-view>
+        <q-view layout='hbox' style="margin-top: 5px;" v-if="isClone">
+            <q-label text="" id="labelView"></q-label>
+            <q-radio-group layout="hbox" layout-spacing='5'>
+                <q-radio id="elRadio" text=" 使用HTTPS/HTTP克隆&nbsp;&nbsp;"
+                    :checked="clone_protocol == 'http'" @clicked="el_set_clone_protocol" data-value="http" />
+                <q-radio id="elRadio" text=" 使用SSH克隆"
+                    :checked="clone_protocol == 'ssh'" @clicked="el_set_clone_protocol" data-value="ssh" />
+            </q-radio-group>
+            <q-view horizontal-size-policy="Expanding"></q-view>
+        </q-view>
 
         <!-- vertical-size-policy 垂直填充 -->
         <q-view vertical-size-policy="Expanding"></q-view>
@@ -93,6 +103,7 @@
                 repos_name: "",
                 isPrivate: true,
                 isClone: false,
+                clone_protocol: 'http',
                 giteeOAuthInfo: {},
                 githubOAuthInfo: {},
                 // oauth_info: {
@@ -130,8 +141,11 @@
             },
 
             async el_set_host(e) {
-                let v = e.target['data-value'];
-                this.host = v;
+                this.host = e.target['data-value'];
+                await this.updateUi();
+            },
+            async el_set_clone_protocol(e) {
+                this.clone_protocol = e.target['data-value'];
                 await this.updateUi();
             },
 

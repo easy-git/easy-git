@@ -570,7 +570,7 @@
                 },
                 {
                     "command": "EasyGit.clone",
-                    "title": "Git克隆",
+                    "title": "Git clone",
                     "when": "explorerResourceCount == 0"
                 },
                 {

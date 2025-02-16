@@ -59,11 +59,15 @@ function validate(formData, that) {
 };
 
 
-async function cloneMainForVue(isSwitchSearchGithub=false) {
+async function cloneMainForVue(cloneParams={}, isSwitchSearchGithub=false) {
     hx.vue.defineComponent('UITest', path.join(path.dirname(__filename), "./vue/static.vue"));
 
     // 设置默认Git克隆目录
     cfg_git_clone_wizard_path = getDefaultClonePath();
+
+    if (JSON.stringify(cloneParams) != '{}') {
+        cfg_git_clone_data = cloneParams;
+    };
     // console.error("--->", cfg_git_clone_data);
 
     let form = await hx.window.showFormDialog({
@@ -129,7 +133,7 @@ async function clone(info) {
 
     // 操作: 用户名和密码
     if (repo.startsWith('http://') || repo.startsWith('https://')) {
-        if ( username.trim().length != 0 && password.trim().length != 0 ) {
+        if (username && username.trim().length != 0 && password && password.trim().length != 0 ) {
             cloneData.isAuth = true;
             cloneData.username = username;
             cloneData.password = password;
