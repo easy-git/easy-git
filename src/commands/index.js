@@ -13,6 +13,7 @@ const sshKeygen = require('./ssh_keygen.js');
 const { goStash, goStashPop, goStashClear, goStashShow } = require('./stash.js');
 
 const { gitRepositoryCreate } = require('./repository.js');
+const gitRemoteRepositoryCreate = require('./remote_repository_vue.js');
 const { gitInitProject, gitInitAfterSetting } = require('./repository_init.js');
 
 const { gitAddFile, goCleanFile, goCommit } = require('./file.js');
@@ -40,7 +41,7 @@ let lastProjectInfo = {};
  */
 async function action(param, action_name) {
     let easyGitInner, projectName, projectPath, selectedFile, isFromGitView;
-    
+
     if (param != null) {
         try{
             easyGitInner = param.easyGitInner;
@@ -389,7 +390,11 @@ async function independentFunction(action_name, param) {
             quickOpen(param);
             break;
         case 'CreateRemoteRepository':
-            gitRepositoryCreate(param);
+            try {
+                gitRemoteRepositoryCreate();
+            } catch (error) {
+                gitRepositoryCreate(param);
+            };
             break;
         case 'sshKeygen':
             let ssh = new sshKeygen()
