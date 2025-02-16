@@ -543,6 +543,16 @@
                     "group": "tab"
                 },
                 {
+                    "command": "EasyGit.searchGithubToClone",
+                    "title": "Github - 搜索仓库并克隆",
+                    "group": "tab"
+                },
+                {
+                    "command": "EasyGit.CreateRemoteRepository",
+                    "title": "Github/Gitee - 创建远程仓库",
+                    "group": "tab"
+                },
+                {
                     "group": "tab"
                 }
             ],
