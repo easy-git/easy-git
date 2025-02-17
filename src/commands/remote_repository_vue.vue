@@ -203,6 +203,14 @@
         image: url(:/hxui/resource/rdbt-checked.png);
     }
 
+    #elCheckBox::indicator::unchecked {
+    	image: url(:/hxui/resource/chbx.png);
+    }
+
+    #elCheckBox::indicator::checked {
+        image: url(:/hxui/resource/chbx-checked.png);
+    }
+
     #elInput {
         border: none;
         height: 30px;
