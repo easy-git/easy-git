@@ -92,14 +92,14 @@
             <q-button id="elStandButton" text="浏览..." @clicked='select_local_path()'></q-button>
         </q-view>
         <q-view layout='hbox' style="margin-top: 6px;">
-            <q-view layout="vbox" layout-spacing="0">
+            <q-view layout="vbox" layout-spacing="10">
                 <q-view layout="hbox">
-                    <q-label id="Tips" text="1. 基于 SSH 协议的 Git clone，需要先配置好账户/仓库的SSH公钥"></q-label>
+                    <q-label id="Tips" text="1. 基于 SSH 协议的 Git clone，需要先配置好账户/仓库的SSH公钥。"></q-label>
                     <q-button id="TipsBtn" text="一键生成配置SSH KEY" @clicked="set_ssh_key"></q-button>
                     <q-view horizontal-size-policy='Expanding'></q-view>
                 </q-view>
                 <q-view layout='hbox'>
-                    <q-label id="Tips" text="2. 如果使用HTTP/HTTPS协议, Git Clone 可能需要账号密码, 如本地已缓存Git凭据, 则不需要填写. "></q-label>
+                    <q-label id="Tips" text="2. 如果使用HTTP/HTTPS协议, Git Clone 可能需要账号密码, 如本地已缓存Git凭据, 则不需要填写。"></q-label>
                     <q-button id="TipsBtn" text="详情" @clicked="open_url('https://easy-git.github.io/auth/http')"></q-button>
                     <q-view horizontal-size-policy='Expanding'></q-view>
                 </q-view>
@@ -328,7 +328,7 @@
         font-size: 12px;
         color: #58ba72;
         text-decoration: underline;
-        margin-top: -3px;
+        /* margin-top: -3px; */
     }
 
     QComboBox {
