@@ -180,6 +180,7 @@
     * {
         background: transparent;
         padding: 0;
+        border: none;
     }
 
     #scrollView {
