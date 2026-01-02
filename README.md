@@ -3,7 +3,6 @@
 
 - `作者利用业余时间开发，维护, 下载请给个好评或收藏`
 - `有问题给5星后留言可得到及时的解答`
-- `插件交流群 QQ: 623513298` [点击加入](https://qm.qq.com/cgi-bin/qm/qr?k=QRbb77rmIhpsh8OthaftVWfYZQdBr_Ir&jump_from=webapi)
 
 easy-git, 是基于HBuilderX API开发的可视化图形Git插件，界面参考vscode源代码管理器。
 
@@ -55,12 +54,6 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 ```
 
 2022-11-27, 发布1.9.0版本。此版本已去除所有数据统计。
-
-## 赞助
-
-如果您觉得easy-git帮到了您，请小小的打个赏赞助一下，让我们全力以赴，做更好的工具！
-
-![](https://easy-git.github.io/static/pay.png)
 
 ## easy-git历史版本
 
