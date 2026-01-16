@@ -20,7 +20,9 @@ Windows需要电脑本机安装`git-bash`。[git-bash下载地址](https://git-s
 
 > easy-git文档是采用的Github pages，某些地区可能无法访问，如果无法访问，修改dns试试。
 
-[easy-git文档地址](https://easy-git.github.io/)
+Github Pages部署文档访问地址：[https://easy-git.github.io](https://easy-git.github.io]
+
+vercel部署文档访问地址：[https://easy-git.vercel.app/](https://easy-git.vercel.app/)
 
 
 ## 插件预览
